@@ -1,4 +1,4 @@
-# Quantexa Goal Planner - Backend
+# Backend
 
 ## Setup
 
