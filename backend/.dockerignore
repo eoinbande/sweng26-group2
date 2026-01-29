@@ -5,7 +5,7 @@ __pycache__/
 *.so
 .Python
 
-# Virtual Environment
+# Virtual environment (not needed in Docker)
 venv/
 env/
 ENV/
@@ -13,6 +13,10 @@ ENV/
 # Environment variables
 .env
 .env.local
+
+# Git
+.git
+.gitignore
 
 # IDE
 .vscode/
@@ -32,5 +36,11 @@ htmlcov/
 # Logs
 *.log
 
-# Docker volumes
-data/
+# Documentation
+README.md
+DOCKER_COMMANDS.md
+
+# Docker files themselves
+Dockerfile
+docker-compose.yml
+.dockerignore
