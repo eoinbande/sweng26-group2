@@ -2,6 +2,8 @@
 
 .auth-container {
     min-height: 100vh;
+    max-width: 480px;
+    margin: 0 auto;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -14,12 +16,12 @@
 /* large decorative blob in bckground */
 .auth-blob {
     position: absolute;
-    width: 500px;
-    height: 500px;
+    width: 380px;
+    height: 380px;
     background: linear-gradient(135deg, #F5D89F 0%, #FFB92E 100%);
     border-radius: 45% 55% 60% 40% / 55% 45% 55% 45%;
-    top: -100px;
-    left: -100px;
+    top: -120px;
+    left: -80px;
     z-index: 0;
     animation: blobFloat 20s ease-in-out infinite;
 }
@@ -210,10 +212,10 @@
     }
 
     .auth-blob {
-        width: 400px;
-        height: 400px;
-        top: -80px;
-        left: -80px;
+        width: 350px;
+        height: 350px;
+        top: -100px;
+        left: -70px;
     }
 
     .form-group input {
