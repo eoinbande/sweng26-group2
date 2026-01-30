@@ -1,21 +1,15 @@
-import os
-from dotenv import load_dotenv
-from supabase import create_client
+#import os
+from .database import supabase
+from .config import settings
+#from supabase import create_client
 
-#load env 
-load_dotenv()
 
-#from env get credentials
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_KEY = os.getenv("SUPABASE_KEY")
-TEST_USER_ID = os.getenv("TEST_USER_ID")
 
-supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 ######CHECK IF CONNECTION WITH SUPABASE IS ON############
 
-# Try fetching goals
-response = supabase.table("goals").select("*").eq("user_id", TEST_USER_ID).execute()
+# Try fetching goals 
+response = supabase.table("goals").select("*").eq("user_id", settings.TEST_USER_ID).execute()
 
 # Print the full response to confirm connection
 print("Full response object:", response)
@@ -24,18 +18,6 @@ print("Full response object:", response)
 print("Goals data:", response.data)
 
 
-# # Insert a test goal to confirm writing works
-# insert_response = supabase.table("goals").insert({
-#     "user_id": TEST_USER_ID,
-#     "title": "Test Goal",
-#     "description": "This confirms the connection is working"
-# }).execute()
-
-# print("Inserted goal:", insert_response.data)
-
-# # Fetch again to see the new goal
-# goals_after_insert = supabase.table("goals").select("*").eq("user_id", TEST_USER_ID).execute()
-# print("Goals after insert:", goals_after_insert.data)
 
 
 
