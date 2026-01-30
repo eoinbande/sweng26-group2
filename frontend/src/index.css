@@ -1,0 +1,133 @@
+:root {
+  /* Colors */
+  --bg-color: #F8F8F4;
+  --card-bg: #FFFFFF;
+
+  /* Updated User Palette */
+  --primary: #FFB92E;
+  /* Golden Yellow */
+  --text-main: #1C1C1E;
+  --text-secondary: #6B6B70;
+
+  --accent-green: #69995D;
+  --accent-blue: #BFD1E5;
+  --accent-red-soft: #DD645F;
+  --accent-pink: #FFC5C4;
+
+  /* Fonts */
+  --font-serif: 'Lora', serif;
+  --font-sans: 'Inter', sans-serif;
+
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 20px;
+  /* Reduced slightly to help fit screen */
+  --space-xl: 32px;
+
+  /* Radius */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-pill: 9999px;
+
+  /* Shadows - Increased intensity */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 8px 20px rgba(0, 0, 0, 0.15);
+  --shadow-float: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.4;
+  height: 100vh;
+  overflow: hidden;
+  /* Try to contain everything */
+}
+
+#root {
+  height: 100%;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+/* Utilities */
+.container {
+  max-width: 480px;
+  margin: 0 auto;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-md);
+  padding-bottom: 80px;
+  /* Nav spacing */
+  background-color: var(--bg-color);
+  position: relative;
+  overflow-y: auto;
+  /* Allow Scroll if needed, but aim for fit */
+}
+
+/* Hide scrollbar for clean look */
+.container::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.card {
+  background: var(--card-bg);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  box-shadow: var(--shadow-md);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.interactive:hover {
+  cursor: pointer;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+button {
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+button:active {
+  transform: scale(0.95);
+}
