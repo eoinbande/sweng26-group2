@@ -1,24 +1,10 @@
-#import os
-from .database import supabase
-from .config import settings
-#from supabase import create_client
+from app.database import supabase
+from app.config import settings
 
 
 
 
 ######CHECK IF CONNECTION WITH SUPABASE IS ON############
-
-# Try fetching goals 
-response = supabase.table("goals").select("*").eq("user_id", settings.TEST_USER_ID).execute()
-
-# Print the full response to confirm connection
-print("Full response object:", response)
-
-# Print the data (may be empty)
-print("Goals data:", response.data)
-
-
-
 
 
 #we are required to do 2 main things: Store and Retrieve Data (WE ALSO NEED TO HANDLE DUPLICATION!)
@@ -93,40 +79,26 @@ def get_tasks(goal_id):
     return supabase.table("tasks").select("*").eq("goal_id", goal_id).execute().data
 
 
-# ===================== TEST BLOCK =====================
-# Run only when this file is executed directly
+# ================== TEST BLOCK ==================
+
 if __name__ == "__main__":
-    print("\n---- STARTING DATABASE FUNCTION TEST ----")
+    print("\n---- DATABASE FUNCTION TEST ----")
 
-    TEST_USER_ID_2 = "06d69836-1260-4226-aa9c-4b0b360f0da1"  # replace with real Auth user ID
+    TEST_USER_ID = settings.TEST_USER_ID
 
-    # 1️⃣ Create test user profile
-    print("\nCreating test user profile...")
-    user_result = create_user(TEST_USER_ID_2, "Test User 2", "test2@test.com")
-    print("User result:", user_result)
+    user_result = create_user(TEST_USER_ID, "Test User", "test@test.com")
+    print("User:", user_result)
 
-    # 2️⃣ Create a goal
-    print("\nCreating test goal...")
-    goal_result = create_goal(TEST_USER_ID_2, "Learn FastAPI", "Build backend API", "2026-02-20")
-    print("Goal result:", goal_result)
+    goal_result = create_goal(TEST_USER_ID, "Learn FastAPI", "Build backend", "2026-02-20")
+    print("Goal:", goal_result)
 
-    # Get goal_id safely
     goal_id = goal_result.data[0]["id"] if hasattr(goal_result, "data") else goal_result["id"]
 
-    # 3️⃣ Create a task
-    print("\nCreating test task...")
     task_result = create_task(goal_id, "Create endpoints", "2026-02-10")
-    print("Task result:", task_result)
+    print("Task:", task_result)
 
-    # 4️⃣ Fetch goals
-    print("\nFetching all goals for user...")
-    goals = get_all_goals(TEST_USER_ID_2)
-    print(goals)
-
-    # 5️⃣ Fetch tasks
-    print("\nFetching all tasks for goal...")
-    tasks = get_tasks(goal_id)
-    print(tasks)
+    print("Goals:", get_all_goals(TEST_USER_ID))
+    print("Tasks:", get_tasks(goal_id))
 
     print("\n---- TEST COMPLETE ----")
 
