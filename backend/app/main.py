@@ -3,6 +3,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
 from app.database import supabase
 
+# Import the routers
+from app.routers.goal_Endpoint import goal_router
+from app.routers.task_Endpoint import task_router
+
 app = FastAPI(
     title="Procrastination Solver API",
     description="AI-powered goal planning and task management",
@@ -22,6 +26,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Include routers
+app.include_router(goal_router, prefix="/api", tags=["Goals"])
+app.include_router(task_router, prefix="/api", tags=["Tasks"])
 
 @app.get("/")
 async def root():
