@@ -4,8 +4,8 @@ from app.config import settings
 from app.database import supabase
 
 # Import the routers
-from app.routers.goal_Endpoint import goal_router
-from app.routers.task_Endpoint import task_router
+from app.routers.goals import goal_router
+from app.routers.tasks import task_router
 
 app = FastAPI(
     title="Procrastination Solver API",
