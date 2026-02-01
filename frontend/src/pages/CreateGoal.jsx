@@ -141,7 +141,9 @@ function CreateGoal() {
                     backgroundColor: 'var(--card-bg)',
                     borderRadius: 'var(--radius-pill)',
                     padding: '12px 20px',
+                    boxShadow: 'var(--shadow-md)',
                     transition: 'box-shadow 0.2s',
+                    minWidth: 0,
                 }}>
                     <input
                         type="text"
@@ -158,6 +160,7 @@ function CreateGoal() {
                         }}
                         style={{
                             flex: 1,
+                            minWidth: 0,
                             border: 'none',
                             outline: 'none',
                             fontFamily: 'var(--font-sans)',
@@ -226,9 +229,10 @@ function CreateGoal() {
                     gap: 'var(--space-md)',
                     backgroundColor: 'var(--card-bg)',
                     borderRadius: 'var(--radius-pill)',
-                    padding: 'var(--space-md) var(--space-lg)',
+                    padding: '12px 20px',
                     boxShadow: 'var(--shadow-md)',
                     transition: 'box-shadow 0.2s',
+                    minWidth: 0,
                 }}>
                     <input
                         type="text"
@@ -251,6 +255,7 @@ function CreateGoal() {
                         }}
                         style={{
                             flex: 1,
+                            minWidth: 0,
                             border: 'none',
                             outline: 'none',
                             fontFamily: 'var(--font-sans)',
