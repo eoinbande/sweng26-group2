@@ -17,7 +17,8 @@ const CreateGoalCard = () => {
             marginBottom: 'var(--space-md)', /* Reduced margin */
             boxShadow: 'var(--shadow-md)',
             border: 'none',
-            cursor: 'pointer'
+            cursor: 'pointer',
+            borderRadius: 'var(--radius-xl)',
         }}>
             <div>
                 <h3 style={{ fontSize: '18px', marginBottom: 'var(--space-xs)' }}>
