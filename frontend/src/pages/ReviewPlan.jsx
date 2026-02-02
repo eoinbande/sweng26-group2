@@ -38,8 +38,7 @@ function ReviewPlan() {
                 position: 'relative',
                 zIndex: 1,
                 flexShrink: 0,
-                height: isExpanded ? '75vh' : 'auto',
-                maxHeight: isExpanded ? '75vh' : '280px',
+                height: isExpanded ? '75vh' : '280px',
                 transition: 'all 0.6s ease-out',
                 display: 'flex',
                 flexDirection: 'column',
@@ -78,38 +77,74 @@ function ReviewPlan() {
                     How you feel<br />about these?
                 </h1>
 
-                {/* task cards container - scrollable, fades in with expansion */}
+                {/* task cards container wrapper with fade effects */}
                 <div style={{
                     flex: 1,
-                    overflowY: 'auto',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 'var(--space-md)',
-                    paddingRight: 'var(--space-sm)',
+                    minHeight: 0,
+                    position: 'relative',
                     opacity: isExpanded ? 1 : 0,
                     transition: 'opacity 0.4s ease-out 0.2s',
                 }}>
-                    {/* Placeholder TaskCards - replace with actual data later */}
-                    <TaskCard
-                        title="Learn the keyboard layout"
-                        dueDate="Tomorrow"
-                        onEdit={() => console.log("Edit clicked")}
-                    />
-                    <TaskCard
-                        title="Learn the keyboard layout"
-                        dueDate="3 days left"
-                        onEdit={() => console.log("Edit clicked")}
-                    />
-                    <TaskCard
-                        title="Learn the keyboard layout"
-                        dueDate="5 days left"
-                        onEdit={() => console.log("Edit clicked")}
-                    />
-                    <TaskCard
-                        title="Learn the keyboard layout"
-                        dueDate="5 days left"
-                        onEdit={() => console.log("Edit clicked")}
-                    />
+                    {/* scrollable task cards */}
+                    <div style={{
+                        height: '100%',
+                        overflowY: 'auto',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 'var(--space-md)',
+                        paddingRight: 'var(--space-sm)',
+                    }}>
+                        {/* placeholder taskcards - replace with actual data later */}
+                        <TaskCard
+                            title="Learn the keyboard layout"
+                            dueDate="Tomorrow"
+                            onEdit={() => console.log("Edit clicked")}
+                        />
+                        <TaskCard
+                            title="Learn the keyboard layout"
+                            dueDate="3 days left"
+                            onEdit={() => console.log("Edit clicked")}
+                        />
+                        <TaskCard
+                            title="Learn the keyboard layout"
+                            dueDate="5 days left"
+                            onEdit={() => console.log("Edit clicked")}
+                        />
+                        <TaskCard
+                            title="Learn the keyboard layout"
+                            dueDate="5 days left"
+                            onEdit={() => console.log("Edit clicked")}
+                        />
+                        <TaskCard
+                            title="Learn the keyboard layout"
+                            dueDate="5 days left"
+                            onEdit={() => console.log("Edit clicked")}
+                        />
+                    </div>
+
+                    {/* top fade overlay */}
+                    <div style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        height: '30px',
+                        background: 'linear-gradient(to bottom, var(--accent-blue) 0%, transparent 100%)',
+                        pointerEvents: 'none',
+                        zIndex: 10,
+                    }} />
+
+                    {/* bottom fade overlay */}
+                    <div style={{
+                        position: 'absolute',
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        height: '30px',
+                        background: 'linear-gradient(to top, var(--accent-blue) 0%, transparent 100%)',
+                        pointerEvents: 'none',
+                        zIndex: 10,
+                    }} />
                 </div>
 
                 {/* accept/discard - fades in with expansion */}
