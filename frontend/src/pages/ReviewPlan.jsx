@@ -1,11 +1,20 @@
-import React, { useState } from 'react';
-import { ArrowRight, Bot } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
 import { TaskCard } from '../components/TaskCard';
 import '../index.css';
 
 function ReviewPlan() {
+    const navigate = useNavigate();
+    const [isExpanded, setIsExpanded] = useState(false);
+
+    // Trigger expansion animation on mount
+    useEffect(() => {
+        const timer = setTimeout(() => setIsExpanded(true), 50);
+        return () => clearTimeout(timer);
+    }, []);
+
     return (
         <div style={{
             height: '100vh',
@@ -14,24 +23,177 @@ function ReviewPlan() {
             maxWidth: '480px',
             margin: '0 auto',
             overflow: 'hidden',
+            backgroundColor: 'var(--bg-color)',
         }}>
-            <main style={{
-                flex: 1,
+            {/* Blue Section - Expanded */}
+            <div style={{
                 backgroundColor: 'var(--accent-blue)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
                 padding: 'var(--space-lg)',
-                paddingBottom: '100px',
+                paddingTop: 'var(--space-xl)',
+                paddingBottom: 'var(--space-xl)',
+                borderRadius: '0 0 var(--radius-xxl) var(--radius-xxl)',
+                boxShadow: 'var(--shadow-float)',
+                overflow: 'hidden',
+                position: 'relative',
+                zIndex: 1,
+                flex: isExpanded ? '1' : '0',
+                minHeight: isExpanded ? '70vh' : 'auto',
+                transition: 'all 0.5s ease-out',
+                display: 'flex',
+                flexDirection: 'column',
             }}>
-                <div style={{ width: '100%' }}>
+                {/* Back button */}
+                <button
+                    onClick={() => navigate('/create-goal')}
+                    style={{
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        padding: 'var(--space-sm)',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        marginBottom: 'var(--space-md)',
+                        transition: 'transform 0.2s',
+                        alignSelf: 'flex-start',
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+                    onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1.0)'}
+                >
+                    <ArrowLeft size={32} color="var(--text-main)" strokeWidth={2.5} />
+                </button>
+
+                {/* Title */}
+                <h1 style={{
+                    fontFamily: 'var(--font-serif)',
+                    fontSize: '36px',
+                    fontWeight: '600',
+                    lineHeight: '1.2',
+                    marginBottom: 'var(--space-lg)',
+                    color: 'var(--text-main)',
+                    textAlign: 'center',
+                }}>
+                    How you feel<br />about these?
+                </h1>
+
+                {/* Task Cards Container - Scrollable */}
+                <div style={{
+                    flex: 1,
+                    overflowY: 'auto',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 'var(--space-md)',
+                    paddingRight: 'var(--space-sm)',
+                }}>
+                    {/* Placeholder TaskCards - replace with actual data later */}
                     <TaskCard
                         title="Learn the keyboard layout"
                         dueDate="Tomorrow"
                         onEdit={() => console.log("Edit clicked")}
                     />
+                    <TaskCard
+                        title="Learn the keyboard layout"
+                        dueDate="3 days left"
+                        onEdit={() => console.log("Edit clicked")}
+                    />
+                    <TaskCard
+                        title="Learn the keyboard layout"
+                        dueDate="5 days left"
+                        onEdit={() => console.log("Edit clicked")}
+                    />
+                    <TaskCard
+                        title="Learn the keyboard layout"
+                        dueDate="5 days left"
+                        onEdit={() => console.log("Edit clicked")}
+                    />
                 </div>
-            </main>
+
+                {/* Accept / Discard Buttons */}
+                <div style={{
+                    display: 'flex',
+                    gap: 'var(--space-md)',
+                    justifyContent: 'center',
+                    marginTop: 'var(--space-lg)',
+                }}>
+                    <button style={{
+                        backgroundColor: 'var(--card-bg)',
+                        color: 'var(--text-main)',
+                        border: 'none',
+                        borderRadius: 'var(--radius-pill)',
+                        padding: '12px 32px',
+                        fontFamily: 'var(--font-sans)',
+                        fontSize: '16px',
+                        fontWeight: '500',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s',
+                    }}>
+                        Accept
+                    </button>
+                    <button style={{
+                        backgroundColor: 'var(--accent-red-soft)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: 'var(--radius-pill)',
+                        padding: '12px 32px',
+                        fontFamily: 'var(--font-sans)',
+                        fontSize: '16px',
+                        fontWeight: '500',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s',
+                    }}>
+                        Discard
+                    </button>
+                </div>
+            </div>
+
+            {/* Bottom Section - Feedback Input */}
+            <div style={{
+                padding: 'var(--space-lg)',
+                paddingBottom: '100px',
+                backgroundColor: 'var(--bg-color)',
+            }}>
+                {/* Feedback input */}
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 'var(--space-md)',
+                    backgroundColor: 'var(--card-bg)',
+                    borderRadius: 'var(--radius-pill)',
+                    padding: '12px 20px',
+                    boxShadow: 'var(--shadow-md)',
+                }}>
+                    <input
+                        type="text"
+                        placeholder="Feedback to AI..."
+                        style={{
+                            flex: 1,
+                            border: 'none',
+                            outline: 'none',
+                            fontFamily: 'var(--font-sans)',
+                            fontSize: '16px',
+                            backgroundColor: 'transparent',
+                            color: 'var(--text-main)',
+                        }}
+                    />
+                    <button
+                        style={{
+                            backgroundColor: 'transparent',
+                            border: 'none',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            padding: 'var(--space-xs)',
+                            transition: 'transform 0.2s',
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.15)'}
+                        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1.0)'}
+                    >
+                        <ArrowRight size={24} color="var(--text-main)" />
+                    </button>
+                </div>
+            </div>
+
             <BottomNav />
         </div>
     );
