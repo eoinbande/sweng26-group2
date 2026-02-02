@@ -79,7 +79,12 @@ function CreateGoal() {
                     flexWrap: 'wrap',
                     marginBottom: 'var(--space-lg)',
                 }}>
-                    <button style={{
+                    <button
+                    onClick={() => {
+                        console.log('AI suggestion clicked: Create a new bank account.');
+                        navigate('/review-plan');
+                    }}
+                    style={{
                         backgroundColor: 'rgba(139, 157, 175, 0.5)',
                         color: 'white',
                         border: 'none',
@@ -105,7 +110,12 @@ function CreateGoal() {
                     >
                         Create a new bank account.
                     </button>
-                    <button style={{
+                    <button
+                    onClick={() => {
+                        console.log('AI suggestion clicked: Help me get an A in Probability I.');
+                        navigate('/review-plan');
+                    }}
+                    style={{
                         backgroundColor: 'rgba(139, 157, 175, 0.5)',
                         color: 'white',
                         border: 'none',
@@ -141,7 +151,9 @@ function CreateGoal() {
                     backgroundColor: 'var(--card-bg)',
                     borderRadius: 'var(--radius-pill)',
                     padding: '12px 20px',
+                    boxShadow: 'var(--shadow-md)',
                     transition: 'box-shadow 0.2s',
+                    minWidth: 0,
                 }}>
                     <input
                         type="text"
@@ -154,10 +166,12 @@ function CreateGoal() {
                                 // Example: sendMessageToBackend(message);
                                 console.log('Message submitted:', message);
                                 setMessage(''); // Clear input after submission
+                                navigate('/review-plan');
                             }
                         }}
                         style={{
                             flex: 1,
+                            minWidth: 0,
                             border: 'none',
                             outline: 'none',
                             fontFamily: 'var(--font-sans)',
@@ -171,6 +185,7 @@ function CreateGoal() {
                             // TODO: Backend Integration - Handle voice input
                             // Example: startVoiceRecording();
                             console.log('Microphone button clicked');
+                            navigate('/review-plan');
                         }}
                         style={{
                             backgroundColor: 'var(--text-main)',
@@ -226,9 +241,10 @@ function CreateGoal() {
                     gap: 'var(--space-md)',
                     backgroundColor: 'var(--card-bg)',
                     borderRadius: 'var(--radius-pill)',
-                    padding: 'var(--space-md) var(--space-lg)',
+                    padding: '12px 20px',
                     boxShadow: 'var(--shadow-md)',
                     transition: 'box-shadow 0.2s',
+                    minWidth: 0,
                 }}>
                     <input
                         type="text"
@@ -241,6 +257,7 @@ function CreateGoal() {
                                 // Example: createGoalManually(manualGoal);
                                 console.log('Manual goal submitted:', manualGoal);
                                 setManualGoal(''); // Clear input after submission
+                                navigate('/review-plan');
                             }
                         }}
                         onFocus={(e) => {
@@ -251,6 +268,7 @@ function CreateGoal() {
                         }}
                         style={{
                             flex: 1,
+                            minWidth: 0,
                             border: 'none',
                             outline: 'none',
                             fontFamily: 'var(--font-sans)',
@@ -265,6 +283,7 @@ function CreateGoal() {
                             // Example: createGoalManually(manualGoal);
                             console.log('Manual goal submitted via button:', manualGoal);
                             setManualGoal(''); // Clear input after submission
+                            navigate('/review-plan');
                         }}
                         style={{
                             backgroundColor: 'transparent',
