@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Mic, ArrowRight } from 'lucide-react';
+import { ArrowLeft, Mic } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
+import { InputBar } from '../components/InputBar';
 import '../index.css';
 
 function CreateGoal() {
@@ -144,68 +145,18 @@ function CreateGoal() {
                 </div>
 
                 {/* ai input */}
-                <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 'var(--space-md)',
-                    backgroundColor: 'var(--card-bg)',
-                    borderRadius: 'var(--radius-pill)',
-                    padding: '12px 20px',
-                    boxShadow: 'var(--shadow-md)',
-                    transition: 'box-shadow 0.2s',
-                    minWidth: 0,
-                }}>
-                    <input
-                        type="text"
-                        placeholder="Message"
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                                // TODO: Backend Integration - Handle message submission
-                                // Example: sendMessageToBackend(message);
-                                console.log('Message submitted:', message);
-                                setMessage(''); // Clear input after submission
-                                navigate('/review-plan');
-                            }
-                        }}
-                        style={{
-                            flex: 1,
-                            minWidth: 0,
-                            border: 'none',
-                            outline: 'none',
-                            fontFamily: 'var(--font-sans)',
-                            fontSize: '16px',
-                            backgroundColor: 'transparent',
-                            color: 'var(--text-main)',
-                        }}
-                    />
-                    <button
-                        onClick={() => {
-                            // TODO: Backend Integration - Handle voice input
-                            // Example: startVoiceRecording();
-                            console.log('Microphone button clicked');
-                            navigate('/review-plan');
-                        }}
-                        style={{
-                            backgroundColor: 'var(--text-main)',
-                            border: 'none',
-                            borderRadius: '50%',
-                            width: '40px',
-                            height: '40px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            cursor: 'pointer',
-                            flexShrink: 0,
-                            transition: 'transform 0.2s',
-                        }}
-                        onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
-                        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1.0)'}
-                    >
-                        <Mic size={20} color="white" />
-                    </button>
-                </div>
+                <InputBar
+                    placeholder="Message"
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    onSubmit={() => {
+                        console.log('Message submitted:', message);
+                        setMessage('');
+                        navigate('/review-plan');
+                    }}
+                    icon={<Mic size={20} color="white" />}
+                    buttonStyle="dark"
+                />
             </div>
 
             {/* Beige Section - Bottom */}
@@ -235,72 +186,17 @@ function CreateGoal() {
                 </div>
 
                 {/* manual input */}
-                <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 'var(--space-md)',
-                    backgroundColor: 'var(--card-bg)',
-                    borderRadius: 'var(--radius-pill)',
-                    padding: '12px 20px',
-                    boxShadow: 'var(--shadow-md)',
-                    transition: 'box-shadow 0.2s',
-                    minWidth: 0,
-                }}>
-                    <input
-                        type="text"
-                        placeholder="Manually create your goal..."
-                        value={manualGoal}
-                        onChange={(e) => setManualGoal(e.target.value)}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                                // TODO: Backend Integration - Handle manual goal creation
-                                // Example: createGoalManually(manualGoal);
-                                console.log('Manual goal submitted:', manualGoal);
-                                setManualGoal(''); // Clear input after submission
-                                navigate('/review-plan');
-                            }
-                        }}
-                        onFocus={(e) => {
-                            e.currentTarget.parentElement.style.boxShadow = 'var(--shadow-lg)';
-                        }}
-                        onBlur={(e) => {
-                            e.currentTarget.parentElement.style.boxShadow = 'var(--shadow-md)';
-                        }}
-                        style={{
-                            flex: 1,
-                            minWidth: 0,
-                            border: 'none',
-                            outline: 'none',
-                            fontFamily: 'var(--font-sans)',
-                            fontSize: '16px',
-                            backgroundColor: 'transparent',
-                            color: 'var(--text-main)',
-                        }}
-                    />
-                    <button
-                        onClick={() => {
-                            // TODO: Backend Integration - Handle manual goal submission
-                            // Example: createGoalManually(manualGoal);
-                            console.log('Manual goal submitted via button:', manualGoal);
-                            setManualGoal(''); // Clear input after submission
-                            navigate('/review-plan');
-                        }}
-                        style={{
-                            backgroundColor: 'transparent',
-                            border: 'none',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            padding: 'var(--space-xs)',
-                            transition: 'transform 0.2s',
-                        }}
-                        onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.15)'}
-                        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1.0)'}
-                    >
-                        <ArrowRight size={24} color="var(--text-main)" />
-                    </button>
-                </div>
+                <InputBar
+                    placeholder="Manually create your goal..."
+                    value={manualGoal}
+                    onChange={(e) => setManualGoal(e.target.value)}
+                    onSubmit={() => {
+                        console.log('Manual goal submitted:', manualGoal);
+                        setManualGoal('');
+                        navigate('/review-plan');
+                    }}
+                    showFocusShadow
+                />
             </div>
 
             <BottomNav />

@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
 import { TaskCard } from '../components/TaskCard';
+import { InputBar } from '../components/InputBar';
 import '../index.css';
 
 function ReviewPlan() {
     const navigate = useNavigate();
     const [isExpanded, setIsExpanded] = useState(false);
 
-    // Trigger expansion animation on mount
+    // trigger expansion animation after delay to show transition from creategoal size
     useEffect(() => {
-        const timer = setTimeout(() => setIsExpanded(true), 50);
+        const timer = setTimeout(() => setIsExpanded(true), 400);
         return () => clearTimeout(timer);
     }, []);
 
@@ -25,7 +26,7 @@ function ReviewPlan() {
             overflow: 'hidden',
             backgroundColor: 'var(--bg-color)',
         }}>
-            {/* Blue Section - Expanded */}
+            {/* blue section - starts at creategoal size, then expands */}
             <div style={{
                 backgroundColor: 'var(--accent-blue)',
                 padding: 'var(--space-lg)',
@@ -36,9 +37,10 @@ function ReviewPlan() {
                 overflow: 'hidden',
                 position: 'relative',
                 zIndex: 1,
-                flex: isExpanded ? '1' : '0',
-                minHeight: isExpanded ? '70vh' : 'auto',
-                transition: 'all 0.5s ease-out',
+                flexShrink: 0,
+                height: isExpanded ? '75vh' : 'auto',
+                maxHeight: isExpanded ? '75vh' : '280px',
+                transition: 'all 0.6s ease-out',
                 display: 'flex',
                 flexDirection: 'column',
             }}>
@@ -76,7 +78,7 @@ function ReviewPlan() {
                     How you feel<br />about these?
                 </h1>
 
-                {/* Task Cards Container - Scrollable */}
+                {/* task cards container - scrollable, fades in with expansion */}
                 <div style={{
                     flex: 1,
                     overflowY: 'auto',
@@ -84,6 +86,8 @@ function ReviewPlan() {
                     flexDirection: 'column',
                     gap: 'var(--space-md)',
                     paddingRight: 'var(--space-sm)',
+                    opacity: isExpanded ? 1 : 0,
+                    transition: 'opacity 0.4s ease-out 0.2s',
                 }}>
                     {/* Placeholder TaskCards - replace with actual data later */}
                     <TaskCard
@@ -108,12 +112,14 @@ function ReviewPlan() {
                     />
                 </div>
 
-                {/* Accept / Discard Buttons */}
+                {/* accept/discard - fades in with expansion */}
                 <div style={{
                     display: 'flex',
                     gap: 'var(--space-md)',
                     justifyContent: 'center',
                     marginTop: 'var(--space-lg)',
+                    opacity: isExpanded ? 1 : 0,
+                    transition: 'opacity 0.4s ease-out 0.3s',
                 }}>
                     <button style={{
                         backgroundColor: 'var(--card-bg)',
@@ -146,52 +152,16 @@ function ReviewPlan() {
                 </div>
             </div>
 
-            {/* Bottom Section - Feedback Input */}
+            {/* bottom section - feedback input */}
             <div style={{
                 padding: 'var(--space-lg)',
                 paddingBottom: '100px',
                 backgroundColor: 'var(--bg-color)',
             }}>
-                {/* Feedback input */}
-                <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 'var(--space-md)',
-                    backgroundColor: 'var(--card-bg)',
-                    borderRadius: 'var(--radius-pill)',
-                    padding: '12px 20px',
-                    boxShadow: 'var(--shadow-md)',
-                }}>
-                    <input
-                        type="text"
-                        placeholder="Feedback to AI..."
-                        style={{
-                            flex: 1,
-                            border: 'none',
-                            outline: 'none',
-                            fontFamily: 'var(--font-sans)',
-                            fontSize: '16px',
-                            backgroundColor: 'transparent',
-                            color: 'var(--text-main)',
-                        }}
-                    />
-                    <button
-                        style={{
-                            backgroundColor: 'transparent',
-                            border: 'none',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            padding: 'var(--space-xs)',
-                            transition: 'transform 0.2s',
-                        }}
-                        onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.15)'}
-                        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1.0)'}
-                    >
-                        <ArrowRight size={24} color="var(--text-main)" />
-                    </button>
-                </div>
+                <InputBar
+                    placeholder="Feedback to AI..."
+                    onSubmit={(value) => console.log('Feedback submitted:', value)}
+                />
             </div>
 
             <BottomNav />
