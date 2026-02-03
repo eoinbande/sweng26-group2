@@ -52,7 +52,26 @@ const Loading = ({ onLoadingComplete }) => {
                 {phrase}
             </p>
 
+            {/* animations */}
+            <style>{`
+                @keyframes spin {
+                    0% {
+                        transform: rotate(0deg);
+                    }
+                    100% {
+                        transform: rotate(360deg);
+                    }
+                }
 
+                @keyframes fadeInOut {
+                    0%, 100% {
+                        opacity: 0.5;
+                    }
+                    50% {
+                        opacity: 1;
+                    }
+                }
+            `}</style>
         </div>
     );
 };
