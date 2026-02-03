@@ -84,15 +84,21 @@ function ReviewPlan() {
                     position: 'relative',
                     opacity: isExpanded ? 1 : 0,
                     transition: 'opacity 0.4s ease-out 0.2s',
+                    overflow: 'visible',
                 }}>
                     {/* scrollable task cards */}
                     <div style={{
                         height: '100%',
                         overflowY: 'auto',
+                        overflowX: 'hidden',
                         display: 'flex',
                         flexDirection: 'column',
+                        alignItems: 'center',
                         gap: 'var(--space-md)',
-                        paddingRight: 'var(--space-sm)',
+                        paddingLeft: '40px',
+                        paddingRight: 'var(--space-md)',
+                        width: '100%',
+                        boxSizing: 'border-box',
                     }}>
                         {/* placeholder taskcards - replace with actual data later */}
                         {[
@@ -108,12 +114,17 @@ function ReviewPlan() {
                                     opacity: isExpanded ? 1 : 0,
                                     transform: isExpanded ? 'translateY(0)' : 'translateY(20px)',
                                     transition: `all 0.5s ease-out ${0.3 + index * 0.1}s`,
+                                    width: '100%',
+                                    maxWidth: '400px',
                                 }}
                             >
                                 <TaskCard
                                     title={task.title}
                                     dueDate={task.dueDate}
+                                    variant="review"
                                     onEdit={() => console.log("Edit clicked")}
+                                    onConfirm={() => console.log("Confirmed:", task.title)}
+                                    onDeny={() => console.log("Denied:", task.title)}
                                 />
                             </div>
                         ))}
