@@ -1,48 +1,37 @@
-
 stages:
   - lint
   - test
   - build
 
-# Use Python image for backend jobs
-image: python:3.11-slim
-
-# Cache pip packages for faster builds
-cache:
-  paths:
-    - backend/.cache/pip
-
-# Define what happens before each job
-before_script:
-  - cd backend
-  - pip install --cache-dir=.cache/pip -r requirements.txt
-
-# Stage 1: Lint - Check code quality
+# Lint stage
 lint:
   stage: lint
+  image: python:3.11-slim
   script:
+    - cd backend
     - pip install flake8
+    - pip install -r requirements.txt
     - flake8 app/ --max-line-length=120 --exclude=__pycache__
-  allow_failure: true  # Don't fail pipeline if linting fails (warnings only)
+  allow_failure: true
 
-# Stage 2: Test - Run tests (placeholder for now)
+# Test stage
 test:
   stage: test
+  image: python:3.11-slim
   script:
-    - echo "Tests will go here"
-    - echo "For now, just checking imports work"
-    - python -c "from app.main import app; print('✅ App imports successfully')"
-  
-# Stage 3: Build - Verify Docker image builds
+    - cd backend
+    - pip install -r requirements.txt
+    - python -c "from app.main import app; print('Backend imports successfully')"
+
+# Build stage
 build:
   stage: build
   image: docker:latest
   services:
-    - docker:dind  # Docker-in-Docker
+    - docker:dind
   script:
     - cd backend
     - docker build -t backend:$CI_COMMIT_SHORT_SHA .
-    - echo "✅ Docker build successful"
   only:
     - main
     - merge_requests
