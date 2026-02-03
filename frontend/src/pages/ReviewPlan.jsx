@@ -65,7 +65,8 @@ function ReviewPlan() {
                 </button>
 
                 {/* Title */}
-                <h1 style={{
+                <div className="auth-header">
+                    <h1 style={{
                     fontFamily: 'var(--font-serif)',
                     fontSize: '36px',
                     fontWeight: '600',
@@ -74,8 +75,10 @@ function ReviewPlan() {
                     color: 'var(--text-main)',
                     textAlign: 'center',
                 }}>
-                    How you feel<br />about these?
+                    How do you feel<br />about these?
                 </h1>
+                </div>
+                
 
                 {/* task cards container wrapper with fade effects */}
                 <div style={{
