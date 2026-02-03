@@ -28,7 +28,7 @@ function ReviewPlan() {
         }}>
             {/* blue section - starts at creategoal size, then expands */}
             <div style={{
-                backgroundColor: 'var(--accent-blue)',
+                background: 'linear-gradient(135deg, #BFD1E5 0%, #9BB5D0 100%)',
                 padding: 'var(--space-lg)',
                 paddingTop: 'var(--space-xl)',
                 paddingBottom: 'var(--space-xl)',
@@ -38,7 +38,7 @@ function ReviewPlan() {
                 position: 'relative',
                 zIndex: 1,
                 flexShrink: 0,
-                height: isExpanded ? '75vh' : '280px',
+                height: isExpanded ? '75vh' : '55vh', //placeholder
                 transition: 'all 0.6s ease-out',
                 display: 'flex',
                 flexDirection: 'column',
@@ -196,7 +196,10 @@ function ReviewPlan() {
                 <InputBar
                     placeholder="Feedback to AI..."
                     onSubmit={(value) => console.log('Feedback submitted:', value)}
+                    variant="auth"
+                    borderRadius="var(--radius-xl)"
                 />
+                
             </div>
 
             <BottomNav />

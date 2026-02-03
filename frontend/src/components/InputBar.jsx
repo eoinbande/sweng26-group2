@@ -9,7 +9,12 @@ export function InputBar({
     icon = <ArrowRight size={24} color="var(--text-main)" />,
     buttonStyle = "transparent",
     showFocusShadow = false,
+    variant = "default", // "default" or "auth"
+    padding = null, // custom padding override
+    borderRadius = null, // custom border radius override
 }) {
+    const isAuthVariant = variant === "auth";
+
     const handleKeyDown = (e) => {
         if (e.key === 'Enter' && onSubmit) {
             onSubmit(value);
@@ -23,14 +28,32 @@ export function InputBar({
     };
 
     const handleFocus = (e) => {
-        if (showFocusShadow) {
+        if (isAuthVariant) {
+            e.currentTarget.parentElement.style.boxShadow = '0 4px 12px rgba(255, 185, 46, 0.2), 0 0 0 3px rgba(255, 185, 46, 0.1)';
+            e.currentTarget.parentElement.style.transform = 'translateY(-2px)';
+        } else if (showFocusShadow) {
             e.currentTarget.parentElement.style.boxShadow = 'var(--shadow-lg)';
         }
     };
 
     const handleBlur = (e) => {
-        if (showFocusShadow) {
+        if (isAuthVariant) {
+            e.currentTarget.parentElement.style.boxShadow = 'var(--shadow-sm)';
+            e.currentTarget.parentElement.style.transform = 'translateY(0)';
+        } else if (showFocusShadow) {
             e.currentTarget.parentElement.style.boxShadow = 'var(--shadow-md)';
+        }
+    };
+
+    const handleMouseEnter = (e) => {
+        if (isAuthVariant) {
+            e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+        }
+    };
+
+    const handleMouseLeave = (e) => {
+        if (isAuthVariant) {
+            e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
         }
     };
 
@@ -49,9 +72,9 @@ export function InputBar({
             return {
                 ...baseStyles,
                 backgroundColor: 'var(--text-main)',
-                borderRadius: '50%',
-                width: '40px',
-                height: '40px',
+                borderRadius: 'var(--radius-md)',
+                width: '36px',
+                height: '36px',
             };
         }
 
@@ -63,17 +86,21 @@ export function InputBar({
     };
 
     return (
-        <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 'var(--space-md)',
-            backgroundColor: 'var(--card-bg)',
-            borderRadius: 'var(--radius-pill)',
-            padding: '12px 20px',
-            boxShadow: 'var(--shadow-md)',
-            transition: 'box-shadow 0.2s',
-            minWidth: 0,
-        }}>
+        <div
+            style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--space-md)',
+                backgroundColor: 'var(--card-bg)',
+                borderRadius: borderRadius || (isAuthVariant ? 'var(--radius-md)' : 'var(--radius-pill)'),
+                padding: padding || (isAuthVariant ? '16px 20px' : '12px 20px'),
+                boxShadow: isAuthVariant ? 'var(--shadow-sm)' : 'var(--shadow-md)',
+                transition: 'all 0.3s ease',
+                minWidth: 0,
+            }}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+        >
             <input
                 type="text"
                 placeholder={placeholder}
