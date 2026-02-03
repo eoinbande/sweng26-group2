@@ -28,7 +28,7 @@ function ReviewPlan() {
         }}>
             {/* blue section - starts at creategoal size, then expands */}
             <div style={{
-                background: 'linear-gradient(135deg, #BFD1E5 0%, #9BB5D0 100%)',
+                background: 'var(--accent-blue)',
                 padding: 'var(--space-lg)',
                 paddingTop: 'var(--space-xl)',
                 paddingBottom: 'var(--space-xl)',
