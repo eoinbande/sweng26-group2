@@ -95,31 +95,28 @@ function ReviewPlan() {
                         paddingRight: 'var(--space-sm)',
                     }}>
                         {/* placeholder taskcards - replace with actual data later */}
-                        <TaskCard
-                            title="Learn the keyboard layout"
-                            dueDate="Tomorrow"
-                            onEdit={() => console.log("Edit clicked")}
-                        />
-                        <TaskCard
-                            title="Learn the keyboard layout"
-                            dueDate="3 days left"
-                            onEdit={() => console.log("Edit clicked")}
-                        />
-                        <TaskCard
-                            title="Learn the keyboard layout"
-                            dueDate="5 days left"
-                            onEdit={() => console.log("Edit clicked")}
-                        />
-                        <TaskCard
-                            title="Learn the keyboard layout"
-                            dueDate="5 days left"
-                            onEdit={() => console.log("Edit clicked")}
-                        />
-                        <TaskCard
-                            title="Learn the keyboard layout"
-                            dueDate="5 days left"
-                            onEdit={() => console.log("Edit clicked")}
-                        />
+                        {[
+                            { title: "Learn the keyboard layout", dueDate: "Tomorrow" },
+                            { title: "Learn the keyboard layout", dueDate: "3 days left" },
+                            { title: "Learn the keyboard layout", dueDate: "5 days left" },
+                            { title: "Learn the keyboard layout", dueDate: "5 days left" },
+                            { title: "Learn the keyboard layout", dueDate: "5 days left" },
+                        ].map((task, index) => (
+                            <div
+                                key={index}
+                                style={{
+                                    opacity: isExpanded ? 1 : 0,
+                                    transform: isExpanded ? 'translateY(0)' : 'translateY(20px)',
+                                    transition: `all 0.5s ease-out ${0.3 + index * 0.1}s`,
+                                }}
+                            >
+                                <TaskCard
+                                    title={task.title}
+                                    dueDate={task.dueDate}
+                                    onEdit={() => console.log("Edit clicked")}
+                                />
+                            </div>
+                        ))}
                     </div>
 
                     {/* top fade overlay */}
@@ -156,32 +153,54 @@ function ReviewPlan() {
                     opacity: isExpanded ? 1 : 0,
                     transition: 'opacity 0.4s ease-out 0.3s',
                 }}>
-                    <button style={{
-                        backgroundColor: 'var(--card-bg)',
-                        color: 'var(--text-main)',
-                        border: 'none',
-                        borderRadius: 'var(--radius-pill)',
-                        padding: '12px 32px',
-                        fontFamily: 'var(--font-sans)',
-                        fontSize: '16px',
-                        fontWeight: '500',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s',
-                    }}>
+                    <button
+                        style={{
+                            backgroundColor: 'var(--card-bg)',
+                            color: 'var(--text-main)',
+                            border: 'none',
+                            borderRadius: 'var(--radius-pill)',
+                            padding: '12px 32px',
+                            fontFamily: 'var(--font-sans)',
+                            fontSize: '16px',
+                            fontWeight: '500',
+                            cursor: 'pointer',
+                            transition: 'all 0.3s ease',
+                            boxShadow: 'var(--shadow-sm)',
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = 'translateY(-3px)';
+                            e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = 'translateY(0)';
+                            e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+                        }}
+                    >
                         Accept
                     </button>
-                    <button style={{
-                        backgroundColor: 'var(--accent-red-soft)',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: 'var(--radius-pill)',
-                        padding: '12px 32px',
-                        fontFamily: 'var(--font-sans)',
-                        fontSize: '16px',
-                        fontWeight: '500',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s',
-                    }}>
+                    <button
+                        style={{
+                            backgroundColor: 'var(--accent-red-soft)',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: 'var(--radius-pill)',
+                            padding: '12px 32px',
+                            fontFamily: 'var(--font-sans)',
+                            fontSize: '16px',
+                            fontWeight: '500',
+                            cursor: 'pointer',
+                            transition: 'all 0.3s ease',
+                            boxShadow: 'var(--shadow-sm)',
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = 'translateY(-3px)';
+                            e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = 'translateY(0)';
+                            e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+                        }}
+                    >
                         Discard
                     </button>
                 </div>
