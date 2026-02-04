@@ -66,6 +66,22 @@ def create_task(goal_id, description, due_date=None):
         "due_date": due_date
     }).execute() #we insert a task to that goal
 
+def create_ai_task(goal_id, description, due_date=None, ai_generated = True):
+
+    exist_task = supabase.table("tasks").select("*").eq("goal_id", goal_id).eq("description", description).eq("ai generated", ai_generated).execute().data
+    
+    #if the task already exist, do not allow duplicates
+    if exist_task:
+        print("Task with this description already exists for this goal.")
+        return exist_task[0]
+    
+    return supabase.table("ai tasks").insert({
+        "goal_id": goal_id,
+        "description": description,
+        "due_date": due_date,
+        "ai generated": ai_generated
+    })
+
 
 ##################    GET DATA        ####################33333
 
@@ -78,7 +94,8 @@ def get_all_goals(user_id):
 def get_tasks(goal_id):
     return supabase.table("tasks").select("*").eq("goal_id", goal_id).execute().data
 
-
+def get_ai_tasks(goal_id):
+    return supabase.table("tasks").select("*").eq("goal_id", goal_id).eq("ai generated", ai_generated).execute().data
 # ================== TEST BLOCK ==================
 
 if __name__ == "__main__":
