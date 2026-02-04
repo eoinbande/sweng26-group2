@@ -1,11 +1,11 @@
-# .gitlab-ci.yml - STARTER VERSION
-
 stages:
   - test
 
 test:
   stage: test
   image: python:3.11
+  tags:
+    - docker  # ← This will use runner #153 (SCSS Docker Runner)
   before_script:
     - pip install --upgrade pip
     - pip install -r requirements.txt
