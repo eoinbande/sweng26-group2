@@ -1,37 +1,16 @@
+# .gitlab-ci.yml - STARTER VERSION
+
 stages:
-  - lint
   - test
-  - build
 
-# Lint stage
-lint:
-  stage: lint
-  image: python:3.11-slim
-  script:
-    - cd backend
-    - pip install flake8
-    - pip install -r requirements.txt
-    - flake8 app/ --max-line-length=120 --exclude=__pycache__
-  allow_failure: true
-
-# Test stage
 test:
   stage: test
-  image: python:3.11-slim
-  script:
-    - cd backend
+  image: python:3.11
+  before_script:
+    - pip install --upgrade pip
     - pip install -r requirements.txt
-    - python -c "from app.main import app; print('Backend imports successfully')"
-
-# Build stage
-build:
-  stage: build
-  image: docker:latest
-  services:
-    - docker:dind
   script:
-    - cd backend
-    - docker build -t backend:$CI_COMMIT_SHORT_SHA .
+    - pytest tests/ -v
   only:
-    - main
+    - branches
     - merge_requests
