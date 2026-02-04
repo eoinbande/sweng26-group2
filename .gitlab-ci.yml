@@ -5,12 +5,12 @@ test:
   stage: test
   image: python:3.11
   tags:
-    - docker  # ← This will use runner #153 (SCSS Docker Runner)
+    - docker
   before_script:
     - pip install --upgrade pip
-    - pip install -r requirements.txt
+    - pip install -r backend/requirements.txt  
   script:
-    - pytest tests/ -v
+    - pytest backend/tests/ -v  
   only:
     - branches
     - merge_requests
