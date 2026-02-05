@@ -233,4 +233,86 @@ class GoalData(BaseModel):
     model_config = ConfigDict(extra="allow")
 
 
+     # -------------------------------------------------------------------------
+    # Helper Methods
+    # -------------------------------------------------------------------------
+
+    def get_node_by_id(self, task_id: str) -> Optional[TaskNode]:
+        """Find a node by its ID."""
+        for node in self.nodes:
+            if node.id == task_id:
+                return node
+        return None
+    
+    def get_children(self, task_id: str) -> list[TaskNode]:
+        """Get all direct children of a task (via subtask edges)."""
+        child_ids = [
+            edge.tail for edge in self.edges 
+            if edge.head == task_id and edge.edge_type == EdgeType.SUBTASK
+        ]
+        return [node for node in self.nodes if node.id in child_ids]
+    
+    def get_next_tasks(self, task_id: str) -> list[TaskNode]:
+        """Get tasks that come after this one (via ordering edges or untyped edges)."""
+        next_ids = [
+            edge.tail for edge in self.edges 
+            if edge.head == task_id and edge.edge_type in [EdgeType.ORDERING, None]
+        ]
+        return [node for node in self.nodes if node.id in next_ids]
+    
+    def get_available_tasks(self) -> list[TaskNode]:
+        """
+        Get tasks that are available to work on now.
+        
+        A task is available if:
+        - All its dependencies (DEPENDENCY edges) are completed
+        - All its ordering predecessors (ORDERING edges or untyped edges) are completed
+        - It's not already completed
+        
+        For GENERAL goals, multiple tasks can be available simultaneously.
+        """
+        blocked_tasks = set()
+        
+        for edge in self.edges:
+            # For ordering, dependency, or untyped edges, check if predecessor is done
+            # Treat None (untyped) as ordering edge for backwards compatibility
+            if edge.edge_type in [EdgeType.ORDERING, EdgeType.DEPENDENCY, None]:
+                head_node = self.get_node_by_id(edge.head)
+                if head_node and head_node.status != TaskStatus.COMPLETED:
+                    blocked_tasks.add(edge.tail)
+        
+        return [
+            node for node in self.nodes
+            if node.id not in blocked_tasks 
+            and node.status != TaskStatus.COMPLETED
+            and node.node_type == NodeType.TASK  # Don't return LIST nodes as workable
+        ]
+    
+    def validate_graph(self) -> list[str]:
+        """
+        Validate the graph structure. Returns list of warnings/errors.
+        Useful for testing and debugging.
+        """
+        issues = []
+        node_ids = {node.id for node in self.nodes}
+        
+        # Check for duplicate node IDs
+        if len(node_ids) != len(self.nodes):
+            issues.append("Duplicate node IDs found")
+        
+        # Check edges reference valid nodes
+        for edge in self.edges:
+            if edge.head not in node_ids:
+                issues.append(f"Edge references non-existent head: {edge.head}")
+            if edge.tail not in node_ids:
+                issues.append(f"Edge references non-existent tail: {edge.tail}")
+        
+        # Check for self-loops
+        for edge in self.edges:
+            if edge.head == edge.tail:
+                issues.append(f"Self-loop detected: {edge.head}")
+        
+        return issues
+
+
 
