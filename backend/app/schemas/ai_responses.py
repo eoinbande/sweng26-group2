@@ -173,6 +173,64 @@ class Edge(BaseModel):
         return v.strip()
     
 
-    
+# =============================================================================
+# GOAL SCHEMA (Container for nodes and edges)
+# =============================================================================
+
+class GoalData(BaseModel):
+    """
+    The complete goal structure stored as JSON in the database.
+        
+    This entire object is stored in the `goal_data` JSONB column.
+    Kept flexible - only goal_id, user_id, title, nodes are truly required.
+    """
+
+    # Required fields
+    goal_id: str = Field(
+        default_factory=lambda: str(uuid.uuid4()),
+        description="Unique identifier for the goal"
+    )
+    user_id: str = Field(
+        ...,
+        description="ID of the user who owns this goal"
+    )
+    title: str = Field(
+        ...,
+        description="The user's original goal input"
+    )
+    nodes: list[TaskNode] = Field(
+        default_factory=list,
+        description="List of all task nodes in the goal"
+    )
+    edges: list[Edge] = Field(
+        default_factory=list,
+        description="List of edges defining task relationships"
+    )
+
+    # Optional 
+    goal_type: Optional[GoalType] = Field(
+        default=None,
+        description="Type of goal: SPECIFIC, GENERAL, or HABIT"
+    )
+    created_at: Optional[datetime] = Field(
+        default_factory=datetime.utcnow
+    )
+    updated_at: Optional[datetime] = Field(
+        default_factory=datetime.utcnow
+    )
+
+    # HABIT-specific fields (all optional)
+    iteration: Optional[int] = None
+    streak: Optional[int] = None
+    previous_iteration_id: Optional[str] = None
+
+    # FLEXIBLE: Allow any additional fields
+    extra: Optional[dict[str, Any]] = Field(
+        default=None,
+        description="Flexible field for any additional data"
+    )
+
+    model_config = ConfigDict(extra="allow")
+
 
 
