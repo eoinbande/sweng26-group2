@@ -98,6 +98,60 @@ function LoadingOverlay({ onComplete }) {
                 >
                     <ArrowLeft size={32} color="var(--text-main)" strokeWidth={2.5} />
                 </button>
+
+                {/* title - same position as ReviewPlan, fades in when shrinking */}
+                <h1 style={{
+                    fontFamily: 'var(--font-serif)',
+                    fontSize: '36px',
+                    fontWeight: '600',
+                    lineHeight: '1.2',
+                    marginBottom: 'var(--space-lg)',
+                    color: 'var(--text-main)',
+                    textAlign: 'center',
+                    opacity: isShrinking ? 1 : 0,
+                    transition: 'opacity 0.4s ease-out 0.3s',
+                }}>
+                    How do you feel<br />about these?
+                </h1>
+
+                {/* centered loading content - fixed to center of viewport */}
+                <div style={{
+                    position: 'fixed',
+                    top: '50%',
+                    left: '50%',
+                    transform: isTextVisible && !isShrinking
+                        ? 'translate(-50%, -50%)'
+                        : 'translate(-50%, calc(-50% + 10px))',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    opacity: isTextVisible && !isShrinking ? 1 : 0,
+                    transition: 'all 0.5s ease-out',
+                    zIndex: 201,
+                }}>
+                    {/* spinning circle */}
+                    <div style={{
+                        width: '50px',
+                        height: '50px',
+                        border: '3px solid rgba(28, 28, 30, 0.15)',
+                        borderTop: '3px solid var(--text-main)',
+                        borderRadius: '50%',
+                        animation: 'spin 1s linear infinite',
+                        marginBottom: 'var(--space-lg)',
+                    }} />
+
+                    {/* cycling phrase */}
+                    <p style={{
+                        fontFamily: 'var(--font-serif)',
+                        fontSize: '24px',
+                        fontWeight: '500',
+                        color: 'var(--text-main)',
+                        textAlign: 'center',
+                        animation: 'pulseText 1.5s ease-in-out infinite',
+                    }}>
+                        {phrases[currentPhraseIndex]}
+                    </p>
+                </div>
             </div>
         </>
     );
