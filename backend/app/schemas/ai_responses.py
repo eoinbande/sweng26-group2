@@ -129,4 +129,50 @@ class TaskNode(BaseModel):
         return v.strip()
     
 
+# =============================================================================
+# EDGE SCHEMA (Relationships between tasks)
+# =============================================================================
+
+class Edge(BaseModel):
+    """
+    Represents a directed relationship between two task nodes.
     
+    Edge direction: head -> tail (head comes before/contains tail)
+    
+    Includes explicit edge_type:
+    - ordering: "Do this, then that"
+    - subtask: Parent-child relationship
+    - dependency: Hard requirement
+    
+    Example:
+        {"head": "task_1", "tail": "task_2", "edge_type": "ordering"}
+    """
+    head: str = Field(
+        ...,
+        description="Source task ID"
+    )
+    tail: str = Field(
+        ...,
+        description="Target task ID"
+    )
+
+    # Optional: allows explicit typing but doesn't require it
+    # Sample mocks don't use edge_type, so we keep it optional for compatibility
+    edge_type: Optional[EdgeType] = Field(
+        default=None,
+        description="Type of relationship: ordering, subtask, or dependency. Optional for flexibility."
+    )
+
+    model_config = ConfigDict(extra="allow")
+
+    @field_validator('head', 'tail')
+    @classmethod
+    def validate_edge_ids(cls, v: str) -> str:
+        if not v or len(v.strip()) == 0:
+            raise ValueError("Edge task IDs cannot be empty")
+        return v.strip()
+    
+
+    
+
+
