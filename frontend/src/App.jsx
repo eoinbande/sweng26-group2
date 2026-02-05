@@ -1,13 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import CreateGoal from './pages/CreateGoal';
 import ReviewPlan from './pages/ReviewPlan';
 import Login from './pages/Login';
 import SignUp from './pages/SignUp';
+import Loading from './components/Loading';
 import './index.css';
 
 function App() {
+  const [isLoading, setIsLoading] = useState(true);
+
   return (
     <Router>
       <Routes>
