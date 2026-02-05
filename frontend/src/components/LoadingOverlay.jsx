@@ -18,7 +18,9 @@ function LoadingOverlay({ onComplete }) {
         "Crafting your plan..."
     ];
 
-    const [currentPhraseIndex, setCurrentPhraseIndex] = useState(0);
+    const [currentPhraseIndex, setCurrentPhraseIndex] = useState(() =>
+        Math.floor(Math.random() * phrases.length)
+    );
     const [isTextVisible, setIsTextVisible] = useState(false);
     const [isShrinking, setIsShrinking] = useState(false);
     const [isPhraseVisible, setIsPhraseVisible] = useState(true);
