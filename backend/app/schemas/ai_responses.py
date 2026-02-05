@@ -313,6 +313,56 @@ class GoalData(BaseModel):
                 issues.append(f"Self-loop detected: {edge.head}")
         
         return issues
+    
+
+# =============================================================================
+# AI RESPONSE SCHEMAS
+# =============================================================================
+
+class AIGeneratePlanResponse(BaseModel):
+    """
+    Schema for AI response when generating a new plan from a goal.
+    
+    Kept minimal - AI just needs to return the graph structure.
+    """
+    goal_type: GoalType = Field(
+        ...,
+        description="AI-determined goal type"
+    )
+    nodes: list[TaskNode] = Field(
+        ...,
+        description="Generated task nodes",
+        min_length=1
+    )
+    edges: list[Edge] = Field(
+        default_factory=list,
+        description="Edges defining task relationships"
+    )
+
+    model_config = ConfigDict(extra="allow")
+
+class AIExpandTaskResponse(BaseModel):
+    """
+    Schema for AI response when user clicks "I'm stuck" on a task.
+    """
+    original_task_id: str
+    new_nodes: list[TaskNode] = Field(..., min_length=1)
+    new_edges: list[Edge]
+    edges_to_remove: list[Edge] = Field(default_factory=list)
+
+    model_config = ConfigDict(extra="allow")
+
+class AIAdaptTaskResponse(BaseModel):
+    """
+    Schema for adapting a task (especially for HABIT goals).
+    """
+    original_task_id: str
+    adaptations: list[TaskNode] = Field(..., min_length=1)
+    new_edges: list[Edge]
+    edges_to_remove: list[Edge] = Field(default_factory=list)
+
+    model_config = ConfigDict(extra="allow")
+
 
 
 
