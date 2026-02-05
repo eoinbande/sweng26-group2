@@ -174,7 +174,7 @@ function ReviewPlan() {
                 }}>
                     <button
                         style={{
-                            backgroundColor: 'var(--card-bg)',
+                            backgroundColor: 'var(--primary)',
                             color: 'var(--text-main)',
                             border: 'none',
                             borderRadius: 'var(--radius-pill)',
