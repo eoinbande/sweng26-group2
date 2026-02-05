@@ -12,21 +12,16 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
 
   return (
-    <>
-      {isLoading ? (
-        <Loading onLoadingComplete={() => setIsLoading(false)} />
-      ) : (
-        <Router>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/create-goal" element={<CreateGoal />} />
-            <Route path="/review-plan" element={<ReviewPlan />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<SignUp />} />
-          </Routes>
-        </Router>
-      )}
-    </>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/create-goal" element={<CreateGoal />} />
+        <Route path="/review-plan" element={<ReviewPlan />} />
+        <Route path="/create-goal" element={<CreateGoal />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<SignUp />} />
+      </Routes>
+    </Router>
   );
 }
 
