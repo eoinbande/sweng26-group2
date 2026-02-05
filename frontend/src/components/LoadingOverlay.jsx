@@ -9,6 +9,7 @@ function LoadingOverlay({ onComplete }) {
 
     const phrases = [
         "Quantexing...",
+        "Did you know? Procrastination is just your brain's way of saying 'I need a break!'",
         "Breaking down your goal...",
         "Creating actionable steps...",
         "Organizing your journey...",
@@ -18,6 +19,7 @@ function LoadingOverlay({ onComplete }) {
     const [currentPhraseIndex, setCurrentPhraseIndex] = useState(0);
     const [isTextVisible, setIsTextVisible] = useState(false);
     const [isShrinking, setIsShrinking] = useState(false);
+    const [isPhraseVisible, setIsPhraseVisible] = useState(true);
 
     useEffect(() => {
         // fade in text after initial mount
@@ -25,25 +27,31 @@ function LoadingOverlay({ onComplete }) {
             setIsTextVisible(true);
         }, 100);
 
-        // cycle through phrases
+        // cycle through phrases with fade transition
         const cycleInterval = setInterval(() => {
-            setCurrentPhraseIndex((prev) => (prev + 1) % phrases.length);
-        }, 1500);
+            // fade out
+            setIsPhraseVisible(false);
+            // change phrase after fade out, then fade in
+            setTimeout(() => {
+                setCurrentPhraseIndex((prev) => (prev + 1) % phrases.length);
+                setIsPhraseVisible(true);
+            }, 400);
+        }, 2500);
 
         // start shrinking animation after showing phrases
         const shrinkTimer = setTimeout(() => {
             setIsTextVisible(false);
-        }, 3500);
+        }, 5000);
 
         // begin card shrink
         const transitionTimer = setTimeout(() => {
             setIsShrinking(true);
-        }, 4000);
+        }, 5500);
 
         // notify parent that loading is complete
         const completeTimer = setTimeout(() => {
             onComplete?.();
-        }, 5500);
+        }, 7000);
 
         return () => {
             clearTimeout(fadeInTimer);
@@ -132,7 +140,8 @@ function LoadingOverlay({ onComplete }) {
                         fontWeight: '500',
                         color: 'var(--text-main)',
                         textAlign: 'center',
-                        animation: 'pulseText 1.5s ease-in-out infinite',
+                        opacity: isPhraseVisible ? 1 : 0,
+                        transition: 'opacity 0.4s ease-in-out',
                     }}>
                         {phrases[currentPhraseIndex]}
                     </p>
