@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { hourglass } from 'ldrs'
+import 'ldrs/react/Hourglass.css'
 import '../index.css';
 
 // loading overlay component for transitioning between pages
@@ -22,6 +24,9 @@ function LoadingOverlay({ onComplete }) {
     const [isPhraseVisible, setIsPhraseVisible] = useState(true);
 
     useEffect(() => {
+        // register hourglass spinner
+        hourglass.register();
+
         // fade in text after initial mount
         const fadeInTimer = setTimeout(() => {
             setIsTextVisible(true);
@@ -61,6 +66,7 @@ function LoadingOverlay({ onComplete }) {
             clearTimeout(completeTimer);
         };
     }, [phrases.length, onComplete]);
+    
 
     return (
         <>
@@ -84,7 +90,6 @@ function LoadingOverlay({ onComplete }) {
                 transition: 'all 1.2s cubic-bezier(0.25, 0.1, 0.25, 1)',
                 display: 'flex',
                 flexDirection: 'column',
-                boxSizing: 'border-box',
             }}>
                 {/* back button - goes back to create goal */}
                 <button
@@ -97,7 +102,7 @@ function LoadingOverlay({ onComplete }) {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        marginBottom: 'var(--space-md)',
+                        marginBottom: 'var(--space-lg)',
                         transition: 'transform 0.2s',
                         alignSelf: 'flex-start',
                     }}
@@ -107,33 +112,48 @@ function LoadingOverlay({ onComplete }) {
                     <ArrowLeft size={32} color="var(--text-main)" strokeWidth={2.5} />
                 </button>
 
-                {/* centered loading content */}
+                {/* spinner - fixed at center of viewport */}
                 <div style={{
                     position: 'fixed',
-                    top: '50%',
+                    top: '45%',
                     left: '50%',
-                    transform: isTextVisible && !isShrinking
-                        ? 'translate(-50%, -50%)'
-                        : 'translate(-50%, calc(-50% + 10px))',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
+                    transform: 'translate(-50%, -50%)',
                     opacity: isTextVisible && !isShrinking ? 1 : 0,
-                    transition: 'all 0.5s ease-out',
+                    transition: 'opacity 0.5s ease-out',
                     zIndex: 201,
                 }}>
-                    {/* spinning circle */}
-                    <div style={{
+                
+                <l-hourglass
+                    size="90"
+                    bg-opacity="0.3"
+                    speed="1.75" 
+                    color="black" 
+                ></l-hourglass>
+
+
+
+                {/* <div style={{
                         width: '50px',
                         height: '50px',
                         border: '3px solid rgba(28, 28, 30, 0.15)',
                         borderTop: '3px solid var(--text-main)',
                         borderRadius: '50%',
                         animation: 'spin 1s linear infinite',
-                        marginBottom: 'var(--space-lg)',
-                    }} />
+                    }} /> */}
+                </div>
 
-                    {/* cycling phrase */}
+                {/* cycling phrase - positioned below spinner, expands downward */}
+                <div style={{
+                    position: 'fixed',
+                    top: 'calc(50% + 50px)',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    width: '80%',
+                    maxWidth: '400px',
+                    opacity: isTextVisible && !isShrinking ? 1 : 0,
+                    transition: 'opacity 0.5s ease-out',
+                    zIndex: 201,
+                }}>
                     <p style={{
                         fontFamily: 'var(--font-serif)',
                         fontSize: '24px',
@@ -142,6 +162,7 @@ function LoadingOverlay({ onComplete }) {
                         textAlign: 'center',
                         opacity: isPhraseVisible ? 1 : 0,
                         transition: 'opacity 0.4s ease-in-out',
+                        margin: 0,
                     }}>
                         {phrases[currentPhraseIndex]}
                     </p>

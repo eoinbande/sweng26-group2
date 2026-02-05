@@ -70,7 +70,6 @@ function CreateGoal() {
                         alignItems: 'center',
                         justifyContent: 'center',
                         marginBottom: 'var(--space-lg)',
-                        transition: 'transform 0.2s',
                         opacity: 1,
                     }}
                     onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
