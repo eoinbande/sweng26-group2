@@ -99,7 +99,7 @@ function LoadingOverlay({ onComplete }) {
                     <ArrowLeft size={32} color="var(--text-main)" strokeWidth={2.5} />
                 </button>
 
-                {/* title - same position as ReviewPlan, fades in when shrinking */}
+                {/* title*/}
                 <h1 style={{
                     fontFamily: 'var(--font-serif)',
                     fontSize: '36px',
@@ -114,7 +114,7 @@ function LoadingOverlay({ onComplete }) {
                     How do you feel<br />about these?
                 </h1>
 
-                {/* centered loading content - fixed to center of viewport */}
+                {/* centered loading content */}
                 <div style={{
                     position: 'fixed',
                     top: '50%',
@@ -153,6 +153,18 @@ function LoadingOverlay({ onComplete }) {
                     </p>
                 </div>
             </div>
+
+            {/* inline styles for keyframe animations */}
+            <style>{`
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+                @keyframes pulseText {
+                    0%, 100% { opacity: 0.7; }
+                    50% { opacity: 1; }
+                }
+            `}</style>
         </>
     );
 }
