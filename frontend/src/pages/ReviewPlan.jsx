@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
@@ -9,12 +9,38 @@ import '../index.css';
 function ReviewPlan() {
     const navigate = useNavigate();
     const [isExpanded, setIsExpanded] = useState(false);
+    const [showTopFade, setShowTopFade] = useState(false);
+    const [showBottomFade, setShowBottomFade] = useState(true);
+    const scrollContainerRef = useRef(null);
 
     // trigger expansion animation after delay to show transition from creategoal size
     useEffect(() => {
         const timer = setTimeout(() => setIsExpanded(true), 400);
         return () => clearTimeout(timer);
     }, []);
+
+    // handle scroll to update fade visibility
+    const handleScroll = () => {
+        const container = scrollContainerRef.current;
+        if (!container) return;
+
+        const { scrollTop, scrollHeight, clientHeight } = container;
+        const isAtTop = scrollTop <= 5;
+        const isAtBottom = scrollTop + clientHeight >= scrollHeight - 5;
+
+        setShowTopFade(!isAtTop);
+        setShowBottomFade(!isAtBottom);
+    };
+
+    // check initial scroll state after expansion
+    useEffect(() => {
+        if (isExpanded) {
+            const timer = setTimeout(() => {
+                handleScroll();
+            }, 100);
+            return () => clearTimeout(timer);
+        }
+    }, [isExpanded]);
 
     return (
         <div style={{
@@ -90,7 +116,10 @@ function ReviewPlan() {
                     overflow: 'visible',
                 }}>
                     {/* scrollable task cards */}
-                    <div style={{
+                    <div 
+                        ref={scrollContainerRef}
+                        onScroll={handleScroll}
+                        style={{
                         height: '100%',
                         overflowY: 'auto',
                         overflowX: 'hidden',
@@ -133,7 +162,7 @@ function ReviewPlan() {
                         ))}
                     </div>
 
-                    {/* top fade overlay */}
+                    {/* top fade overlay - only show when scrolled down */}
                     <div style={{
                         position: 'absolute',
                         top: 0,
@@ -143,9 +172,11 @@ function ReviewPlan() {
                         background: 'linear-gradient(to bottom, var(--accent-blue) 0%, transparent 100%)',
                         pointerEvents: 'none',
                         zIndex: 10,
+                        opacity: showTopFade ? 1 : 0,
+                        transition: 'opacity 0.2s ease',
                     }} />
 
-                    {/* bottom fade overlay */}
+                    {/* bottom fade overlay - only show when more content below */}
                     <div style={{
                         position: 'absolute',
                         bottom: 0,
@@ -155,6 +186,8 @@ function ReviewPlan() {
                         background: 'linear-gradient(to top, var(--accent-blue) 0%, transparent 100%)',
                         pointerEvents: 'none',
                         zIndex: 10,
+                        opacity: showBottomFade ? 1 : 0,
+                        transition: 'opacity 0.2s ease',
                     }} />
                 </div>
 
