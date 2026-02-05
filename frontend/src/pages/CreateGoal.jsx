@@ -26,7 +26,7 @@ function CreateGoal() {
 
         // step 3: navigate after expansion completes
         setTimeout(() => {
-            navigate('/response-loading', { state: { goal: goalText } });
+            navigate('/review-plan', { state: { goal: goalText, showLoading: true } });
         }, 1800);
     };
 
@@ -41,7 +41,7 @@ function CreateGoal() {
             position: 'relative',
             backgroundColor: 'var(--bg-color)',
         }}>
-            {/* blue section - 66% of screen, expands to full */}
+            {/* blue section */}
             <div style={{
                 background: 'var(--accent-blue)',
                 padding: 'var(--space-lg)',
@@ -208,7 +208,7 @@ function CreateGoal() {
                 </div>
             </div>
 
-            {/* bottom section - positioned below blue card (34% of screen) */}
+            {/* bottom section */}
             <div style={{
                 position: 'absolute',
                 top: '66vh',
@@ -219,7 +219,7 @@ function CreateGoal() {
                 flexDirection: 'column',
                 backgroundColor: 'var(--bg-color)',
             }}>
-                {/* 'or' divider - centered in the space between card and input */}
+                {/* 'or' divider*/}
                 <div style={{
                     flex: 1,
                     display: 'flex',
@@ -236,7 +236,7 @@ function CreateGoal() {
                     </p>
                 </div>
 
-                {/* manual input - fixed above bottom nav */}
+                {/* manual input*/}
                 <div style={{
                     padding: '0 var(--space-lg)',
                     paddingBottom: '150px',
@@ -257,7 +257,7 @@ function CreateGoal() {
                 </div>
             </div>
 
-            {/* bottom nav - stays visible until covered */}
+            {/* bottom nav*/}
             <BottomNav />
         </div>
     );

@@ -99,21 +99,6 @@ function LoadingOverlay({ onComplete }) {
                     <ArrowLeft size={32} color="var(--text-main)" strokeWidth={2.5} />
                 </button>
 
-                {/* title*/}
-                <h1 style={{
-                    fontFamily: 'var(--font-serif)',
-                    fontSize: '36px',
-                    fontWeight: '600',
-                    lineHeight: '1.2',
-                    marginBottom: 'var(--space-lg)',
-                    color: 'var(--text-main)',
-                    textAlign: 'center',
-                    opacity: isShrinking ? 1 : 0,
-                    transition: 'opacity 0.4s ease-out 0.3s',
-                }}>
-                    How do you feel<br />about these?
-                </h1>
-
                 {/* centered loading content */}
                 <div style={{
                     position: 'fixed',
