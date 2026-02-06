@@ -14,6 +14,11 @@ def expand_task(request: ExpandTaskRequest):
     template = mock_feedback_templates.get(request.task_id)
 
 
+    #exception in case if there is no expansion available(ONLY USE IN MOCKED, AI will do this!)
+    if not template:
+        raise HTTPException(status_code = 404, detail = "No mocked expansion available")
+
+    #we return the new graph after the update!
     return AIExpandTaskResponse(
         original_task_id=request.task_id,
         new_nodes=template["new_nodes"],
