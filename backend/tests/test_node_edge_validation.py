@@ -79,4 +79,87 @@ class TestEdge:
         with pytest.raises(ValueError):
             Edge(head="   ", tail="task_2")
 
+
+# =============================================================================
+# GoalData Graph Validation Tests
+# =============================================================================
+
+class TestGoalDataValidation:
+    """Tests for GoalData.validate_graph() method."""
+
+    def test_valid_graph(self):
+        """Should return no issues for valid graph."""
+        goal = GoalData(
+            user_id="user_123",
+            title="Test goal",
+            nodes=[
+                TaskNode(id="task_1", task="First task"),
+                TaskNode(id="task_2", task="Second task"),
+            ],
+            edges=[
+                Edge(head="task_1", tail="task_2")
+            ]
+        )
+        issues = goal.validate_graph()
+        assert issues == []
+
+    def test_duplicate_node_ids(self):
+        """Should detect duplicate node IDs."""
+        goal = GoalData(
+            user_id="user_123",
+            title="Test goal",
+            nodes=[
+                TaskNode(id="task_1", task="First task"),
+                TaskNode(id="task_1", task="Duplicate ID"),
+            ],
+            edges=[]
+        )
+        issues = goal.validate_graph()
+        assert "Duplicate node IDs found" in issues
+
+    def test_edge_references_nonexistent_head(self):
+        """Should detect edge referencing non-existent head node."""
+        goal = GoalData(
+            user_id="user_123",
+            title="Test goal",
+            nodes=[
+                TaskNode(id="task_1", task="First task"),
+            ],
+            edges=[
+                Edge(head="task_999", tail="task_1")
+            ]
+        )
+        issues = goal.validate_graph()
+        assert any("non-existent head" in issue for issue in issues)
+
+    def test_edge_references_nonexistent_tail(self):
+        """Should detect edge referencing non-existent tail node."""
+        goal = GoalData(
+            user_id="user_123",
+            title="Test goal",
+            nodes=[
+                TaskNode(id="task_1", task="First task"),
+            ],
+            edges=[
+                Edge(head="task_1", tail="task_999")
+            ]
+        )
+        issues = goal.validate_graph()
+        assert any("non-existent tail" in issue for issue in issues)
+
+    def test_self_loop_detected(self):
+        """Should detect self-loop (edge pointing to itself)."""
+        goal = GoalData(
+            user_id="user_123",
+            title="Test goal",
+            nodes=[
+                TaskNode(id="task_1", task="First task"),
+            ],
+            edges=[
+                Edge(head="task_1", tail="task_1")
+            ]
+        )
+        issues = goal.validate_graph()
+        assert any("Self-loop" in issue for issue in issues)
+
     
