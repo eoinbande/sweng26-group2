@@ -43,6 +43,21 @@ mock_feedback_templates = {
             Edge(head="task_29", tail="task_23")  #reconnect
         ]
     },
+
+    #following example: GENERAL (Branching) Wedding Planning (USER CAN DO TASKS IN PARALLEL)
+    "task_11": {  # "Book venue" task
+        "new_nodes": [
+            TaskNode(id="task_15", task="Google venues within 20 miles"),
+            TaskNode(id="task_16", task="Filter venues by max capacity"),
+            TaskNode(id="task_17", task="Email top 3 venues for quotes")
+        ],
+        "edges_to_remove": [],  # no edges to remove, just adding subtasks
+        "new_edges": [
+            Edge(head="task_11", tail="task_15"),
+            Edge(head="task_11", tail="task_16"),
+            Edge(head="task_11", tail="task_17")
+        ]
+    },
 }
 
 
