@@ -94,3 +94,31 @@ class TestAIExpandTaskResponse:
                 new_nodes=[],
                 new_edges=[]
             )
+
+
+# =============================================================================
+# AIAdaptTaskResponse Tests
+# =============================================================================
+
+class TestAIAdaptTaskResponse:
+    """Tests for AIAdaptTaskResponse schema (HABIT adaptation)."""
+
+    def test_valid_response(self):
+        """Should accept valid adapt task response."""
+        response = AIAdaptTaskResponse(
+            original_task_id="task_22",
+            adaptations=[TaskNode(id="task_28", task="Do 10 mins instead", is_adaptation=True)],
+            new_edges=[Edge(head="task_22", tail="task_28")],
+            edges_to_remove=[]
+        )
+        assert response.original_task_id == "task_22"
+        assert response.adaptations[0].is_adaptation == True
+
+    def test_empty_adaptations_rejected(self):
+        """Should reject response with empty adaptations."""
+        with pytest.raises(ValueError):
+            AIAdaptTaskResponse(
+                original_task_id="task_22",
+                adaptations=[],
+                new_edges=[]
+            )
