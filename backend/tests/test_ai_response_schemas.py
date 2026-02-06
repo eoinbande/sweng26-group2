@@ -52,3 +52,45 @@ class TestAIGeneratePlanResponse:
                 edges=[]
             )
             assert response.goal_type == goal_type
+
+
+# =============================================================================
+# AIExpandTaskResponse Tests
+# =============================================================================
+
+class TestAIExpandTaskResponse:
+    """Tests for AIExpandTaskResponse schema (I'm stuck flow)."""
+
+    def test_valid_response(self):
+        """Should accept valid expand task response."""
+        response = AIExpandTaskResponse(
+            original_task_id="task_3",
+            new_nodes=[TaskNode(id="task_6", task="Subtask")],
+            new_edges=[Edge(head="task_3", tail="task_6")],
+            edges_to_remove=[]
+        )
+        assert response.original_task_id == "task_3"
+        assert len(response.new_nodes) == 1
+
+    def test_response_with_edges_to_remove(self):
+        """Should accept response with edges to remove."""
+        response = AIExpandTaskResponse(
+            original_task_id="task_3",
+            new_nodes=[TaskNode(id="task_6", task="Subtask")],
+            new_edges=[
+                Edge(head="task_3", tail="task_6"),
+                Edge(head="task_6", tail="task_4")  # reconnect to original next task
+            ],
+            edges_to_remove=[Edge(head="task_3", tail="task_4")]
+        )
+        assert len(response.edges_to_remove) == 1
+        assert len(response.new_edges) == 2
+
+    def test_empty_new_nodes_rejected(self):
+        """Should reject response with empty new_nodes."""
+        with pytest.raises(ValueError):
+            AIExpandTaskResponse(
+                original_task_id="task_3",
+                new_nodes=[],
+                new_edges=[]
+            )
