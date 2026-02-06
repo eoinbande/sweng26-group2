@@ -45,3 +45,38 @@ class TestTaskNode:
         assert node.id == "task_1"
 
     
+# =============================================================================
+# Edge Validation Tests
+# =============================================================================
+
+class TestEdge:
+    """Tests for Edge validation."""
+
+    def test_valid_edge(self):
+        """Should accept valid edge."""
+        edge = Edge(head="task_1", tail="task_2")
+        assert edge.head == "task_1"
+        assert edge.tail == "task_2"
+        assert edge.edge_type is None
+
+    def test_edge_with_type(self):
+        """Should accept edge with explicit type."""
+        edge = Edge(head="task_1", tail="task_2", edge_type=EdgeType.ORDERING)
+        assert edge.edge_type == EdgeType.ORDERING
+
+    def test_empty_head_rejected(self):
+        """Should reject empty head ID."""
+        with pytest.raises(ValueError):
+            Edge(head="", tail="task_2")
+
+    def test_empty_tail_rejected(self):
+        """Should reject empty tail ID."""
+        with pytest.raises(ValueError):
+            Edge(head="task_1", tail="")
+
+    def test_whitespace_head_rejected(self):
+        """Should reject whitespace-only head ID."""
+        with pytest.raises(ValueError):
+            Edge(head="   ", tail="task_2")
+
+    
