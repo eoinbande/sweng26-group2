@@ -58,8 +58,27 @@ mock_feedback_templates = {
             Edge(head="task_11", tail="task_17")
         ]
     },
+
+    #following example: LINEAR cooking recipe
+     "task_31": {  # "Bake the cake" task
+        "new_nodes": [
+            TaskNode(id="task_32", task="Preheat oven to 180°C"),
+            TaskNode(id="task_33", task="Grease the baking pan"),
+            TaskNode(id="task_34", task="Pour batter into pan")
+        ],
+        "edges_to_remove": [
+            Edge(head="task_31", tail="task_35")  # original next step
+        ],
+        "new_edges": [
+            Edge(head="task_31", tail="task_32"),
+            Edge(head="task_32", tail="task_33"),
+            Edge(head="task_33", tail="task_34"),
+            Edge(head="task_34", tail="task_35")
+        ]
+    }
 }
 
+#TOTAL OF 4 EXAMPLES FOR MOCKED AI RESPONSES (FEEDBACK)
 
 
 
