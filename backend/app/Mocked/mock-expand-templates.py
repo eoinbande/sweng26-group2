@@ -8,15 +8,15 @@ wants to break down a specific task """
 
 #we want to do to the following modification: "new_nodes", "remove_edges", "new_edges"
 
-#following example: goal: Find puncture in tube
+#following example: goal: fix Bike (linear)
 mock_feedback_templates = {
-    "task_3": {
+    "task_3": { #Find puncture in tube
         "new_nodes": [ #create new nodes
             TaskNode(id = "task_6", task = "Inflate tube sligtly to hear air leak"),
             TaskNode(id = "task_7", task = "Submerge tube in water to see bubbles"),
             TaskNode(id = "task_8", task = "Mark the hole with chalk")
         ],
-        "edged_to_remove": [ #remove edges
+        "edges_to_remove": [ #remove edges
             Edge(head = "task_3", tail = "task_4")
         ],
         "new_edges": [ #create new edges that connect the new nodes
@@ -25,8 +25,26 @@ mock_feedback_templates = {
             Edge(head="task_7", tail ="task_8"), #task7 -> task8
             Edge(head="task_8", tail ="task_4") #task8 -> task4
         ]
-    }
+    },
+
+
+    #following example: Habit goal - Morning Exercise(Cyclical)
+    "task_22": {  # "20-min workout" task
+        "new_nodes": [
+            TaskNode(id="task_28", task="Do just 10 minutes instead", is_adaptation=True),
+            TaskNode(id="task_29", task="Focus on stretching if too tired for cardio", is_adaptation=True)
+        ],
+        "edges_to_remove": [
+            Edge(head="task_22", tail="task_23")  #remove edge to take a break 
+        ],
+        "new_edges": [
+            Edge(head="task_22", tail="task_28"),
+            Edge(head="task_28", tail="task_29"),
+            Edge(head="task_29", tail="task_23")  #reconnect
+        ]
+    },
 }
 
 
-#following example
+
+
