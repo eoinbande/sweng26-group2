@@ -11,15 +11,15 @@ wants to break down a specific task """
 #following example: goal: Find puncture in tube
 mock_feedback_templates = {
     "task_3": {
-        "new_nodes": [
+        "new_nodes": [ #create new nodes
             TaskNode(id = "task_6", task = "Inflate tube sligtly to hear air leak"),
             TaskNode(id = "task_7", task = "Submerge tube in water to see bubbles"),
             TaskNode(id = "task_8", task = "Mark the hole with chalk")
         ],
-        "edged_to_remove": [
+        "edged_to_remove": [ #remove edges
             Edge(head = "task_3", tail = "task_4")
         ],
-        "new_edges": [
+        "new_edges": [ #create new edges that connect the new nodes
             Edge(head="task_3", tail = "task_6"), #task3 -> task6
             Edge(head="task_6", tail ="task_7"), #task6 -> task7
             Edge(head="task_7", tail ="task_8"), #task7 -> task8
