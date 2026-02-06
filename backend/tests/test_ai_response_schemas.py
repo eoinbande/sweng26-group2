@@ -1,5 +1,5 @@
 import pytest
-from app.mock_expand_templates import mock_feedback_templates
+from app.Mocked.mock_expand_templates import mock_feedback_templates
 from app.schemas.ai_responses import (
     TaskNode, Edge, GoalType, EdgeType,
     AIGeneratePlanResponse, AIExpandTaskResponse, AIAdaptTaskResponse
