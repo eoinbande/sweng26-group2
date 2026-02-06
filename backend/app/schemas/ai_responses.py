@@ -88,6 +88,10 @@ class TaskNode(BaseModel):
         default=None,
         description="Estimated time to complete in minutes"
     )
+    due_date: Optional[str] = Field(
+        default=None,
+        description="Deadline for the task"
+    )
 
     # Timestamps - all optional for flexibility
     created_at: Optional[datetime] = None
