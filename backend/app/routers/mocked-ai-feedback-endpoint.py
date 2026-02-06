@@ -18,11 +18,14 @@ def expand_task(request: ExpandTaskRequest):
     if not template:
         raise HTTPException(status_code = 404, detail = "No mocked expansion available")
 
-    #we return the new graph after the update!
+    #we return the new graph after the update! (does not update the DB)
     return AIExpandTaskResponse(
         original_task_id=request.task_id,
         new_nodes=template["new_nodes"],
         new_edges=template["new_edges"],
         edges_to_remove=template["edges_to_remove"]
     )
+
+#returns JSON with the updated Graph edges and nodes
+    
 
