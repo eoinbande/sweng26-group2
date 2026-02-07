@@ -14,6 +14,9 @@ def reroute_goal(request: RerouteRequest):
 
     template = mock_feedback_templates(request.task_id)
 
+    #if there is no template available, raise exception
+    if not template:
+        raise HTTPException(status_code = 404, detail = "No reroute available")
 
      #first, load current graph of tasks
     goal_graph = get_goal_graph(request.goal_id)
