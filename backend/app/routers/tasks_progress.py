@@ -13,6 +13,9 @@ def modify_task_status(request: UpdateTaskStatusRequest):
         status = request.status
     )
 
+    #if task is not found, send an 404 exception!
+    if not result.data:
+        raise HTTPException(status_code = 404, detail= "Task not found")
 
     return {
         "message": "Task status updated successfully!",
