@@ -12,7 +12,7 @@ reroute_router = APIRouter()
 @reroute_router.post("/feedback/reroute")
 def reroute_goal(request: RerouteRequest):
 
-    template = mock_feedback_templates(request.task_id)
+    template = mock_feedback_templates.get(request.task_id)
 
     #if there is no template available, raise exception
     if not template:
@@ -22,7 +22,7 @@ def reroute_goal(request: RerouteRequest):
     goal_graph = get_goal_graph(request.goal_id)
 
     #Second, apply the changes(later by AI)
-    goal_graph["nodes"].extend(template["new_nodes"])
+    goal_graph["nodes"].extend(template["new_nodes"]) #THIS LOGIC MAY FAIL(jsut for testing!)
 
     #Third, Remove edges
     goal_graph["edges"] = [
