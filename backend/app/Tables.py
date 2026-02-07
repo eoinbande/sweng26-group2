@@ -68,7 +68,7 @@ def create_task(goal_id, description, due_date=None):
 
 def create_ai_task(goal_id, description, due_date=None, ai_generated = True):
 
-    exist_task = supabase.table("tasks").select("*").eq("goal_id", goal_id).eq("description", description).eq("ai generated", ai_generated).execute().data
+    exist_task = supabase.table("tasks").select("*").eq("goal_id", goal_id).eq("description", description).eq("ai_generated", ai_generated).execute().data
     
     # if the task already exist and is ai generated will not allow it to be generated again.
     # might need to prompt to endit the already existing one when the modify task endpoint gets made

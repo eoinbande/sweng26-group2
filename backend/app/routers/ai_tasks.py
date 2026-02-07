@@ -6,7 +6,7 @@ ai_task_router = APIRouter()
 
 class RequestAiTasks(BaseModel):
     goal_id: str
-    title: str
+    #title: str
     description: str
     due_date: str | None = None
     ai_generated: bool = True  # Default to True for AI tasks
@@ -15,7 +15,7 @@ class RequestAiTasks(BaseModel):
 def generate_ai_task(task: RequestAiTasks):
     result = create_ai_task(
         goal_id=task.goal_id,
-        title=task.title,
+        #title=task.title,
         description=task.description,
         due_date=task.due_date,
         ai_generated=task.ai_generated 
