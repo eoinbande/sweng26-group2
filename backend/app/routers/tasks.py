@@ -21,7 +21,7 @@ class RequestTasks(BaseModel):
 def write_task(task: RequestTasks):
     result = create_task(
         goal_id = task.goal_id,
-       # title = goal.title,
+        # title = goal.title,
         description = task.description,
         due_date = task.due_date
     )
