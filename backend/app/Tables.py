@@ -112,6 +112,11 @@ def update_task_status(task_id: str, status: str):
         {"status": status}
     ).eq("id", task_id).execute() #this function will modify the status of an arbitrary task
 
+#Store the UPDATED graph to the DB(blob of JSON in goals)
+def update_goal_graph(goal_id: str, updated_graph: dict):
+    return supabase.table("goals").update({"goal_data": updated_graph}).eq("id", goal_id).execute()
+
+
 ##################    GET DATA        ####################33333
 
 
