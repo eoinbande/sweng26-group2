@@ -75,3 +75,29 @@ def get_goals(user_id: str):
         return {"goals": [], "message": "No goals assocciated with the user"}
     return {"goals": all_goals}
 
+# NEW endpoint to get goal details with full graph structure
+@goal_router.get("/goal-details/{goal_id}")
+def get_goal_details(goal_id: str):
+    """Get full goal data including nodes and edges (goal_data JSON)"""
+    from app.database import supabase
+    
+    result = supabase.table("goals").select("*").eq("id", goal_id).execute()
+    
+    if not result.data:
+        return {"error": "Goal not found"}
+    
+    goal = result.data[0]
+    
+    # Check if goal has goal_data field
+    if "goal_data" in goal and goal["goal_data"]:
+        return {
+            "goal": goal,
+            "has_ai_plan": True,
+            "goal_data": goal["goal_data"]
+        }
+    else:
+        return {
+            "goal": goal,
+            "has_ai_plan": False,
+            "message": "This goal doesn't have an AI-generated plan"
+        }
