@@ -89,6 +89,12 @@ def create_task(goal_id, description, due_date=None):
     }).execute() #we insert a task to that goal
 
 
+#Update the status column in the tasks table
+def update_task_status(task_id: str, status: str):
+    return supabase.table("tasks").update(
+        {"status": status}
+    ).eq("id", task_id).execute() #this function will modify the status of an arbitrary task
+
 ##################    GET DATA        ####################33333
 
 
