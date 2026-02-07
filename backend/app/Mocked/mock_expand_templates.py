@@ -1,4 +1,4 @@
-from app.schemas.ai_models import TaskNode, Edge
+from app.schemas.ai_responses import TaskNode, Edge
 
 """ GOAL OF THIS .py FILE: there will be MOCK templates
 which will show the feedback given by AI when a User 
