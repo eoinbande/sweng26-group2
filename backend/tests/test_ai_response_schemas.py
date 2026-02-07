@@ -1,4 +1,5 @@
 import pytest
+from app.Mocked.mock_expand_templates import mock_feedback_templates
 from app.schemas.ai_responses import (
     TaskNode, Edge, GoalType, EdgeType,
     AIGeneratePlanResponse, AIExpandTaskResponse, AIAdaptTaskResponse
@@ -122,3 +123,55 @@ class TestAIAdaptTaskResponse:
                 adaptations=[],
                 new_edges=[]
             )
+
+
+
+
+class TestMockFeedbackTemplates:
+    """Tests that mock feedback templates conform to schema."""
+
+    def test_all_templates_valid(self):
+        """All mock feedback templates should match AIExpandTaskResponse schema."""
+        
+        # Loop through each template (task_3, task_22, task_11, task_31)
+        for task_id, template in mock_feedback_templates.items():
+            
+            # Try to create an AIExpandTaskResponse from the template
+            # If the template has wrong field names or invalid data, this will fail
+            response = AIExpandTaskResponse(
+                original_task_id=task_id,
+                new_nodes=template["new_nodes"],
+                new_edges=template["new_edges"],
+                edges_to_remove=template["edges_to_remove"]
+            )
+            
+            # Check that at least one new node exists (required by schema)
+            assert len(response.new_nodes) >= 1
+            
+'''
+class TestMockResponseTemplates:
+    """Tests that mock AI response templates conform to schema."""
+
+    def test_all_templates_valid(self):
+        """
+        Validates that all mock response templates conform to AIGeneratePlanResponse schema.
+        
+        This test catches:
+        - Invalid goal_type values
+        - Invalid TaskNode data (e.g., empty id)
+        - Invalid Edge data (e.g., empty head/tail)
+        - Empty nodes list (schema requires at least 1)
+        """
+        for goal_title, template in mock_response_templates.items():
+            response = AIGeneratePlanResponse(
+                # Tests that goal_type is valid (SPECIFIC, GENERAL, or HABIT)
+                goal_type=template["goal_type"],
+                
+                # Tests that nodes list contains valid TaskNode objects
+                nodes=template["nodes"],
+                
+                # Tests that edges list contains valid Edge objects
+                edges=template["edges"]
+            )
+            assert len(response.nodes) >= 1
+'''
