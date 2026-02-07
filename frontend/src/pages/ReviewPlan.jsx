@@ -1,0 +1,276 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import BottomNav from '../components/BottomNav';
+import { TaskCard } from '../components/TaskCard';
+import { InputBar } from '../components/InputBar';
+import '../index.css';
+
+function ReviewPlan() {
+    const navigate = useNavigate();
+    const [isExpanded, setIsExpanded] = useState(false);
+    const [showTopFade, setShowTopFade] = useState(false);
+    const [showBottomFade, setShowBottomFade] = useState(true);
+    const scrollContainerRef = useRef(null);
+
+    // trigger expansion animation after delay to show transition from creategoal size
+    useEffect(() => {
+        const timer = setTimeout(() => setIsExpanded(true), 400);
+        return () => clearTimeout(timer);
+    }, []);
+
+    // handle scroll to update fade visibility
+    const handleScroll = () => {
+        const container = scrollContainerRef.current;
+        if (!container) return;
+
+        const { scrollTop, scrollHeight, clientHeight } = container;
+        const isAtTop = scrollTop <= 5;
+        const isAtBottom = scrollTop + clientHeight >= scrollHeight - 5;
+
+        setShowTopFade(!isAtTop);
+        setShowBottomFade(!isAtBottom);
+    };
+
+    // check initial scroll state after expansion
+    useEffect(() => {
+        if (isExpanded) {
+            const timer = setTimeout(() => {
+                handleScroll();
+            }, 100);
+            return () => clearTimeout(timer);
+        }
+    }, [isExpanded]);
+
+    return (
+        <div style={{
+            height: '100vh',
+            display: 'flex',
+            flexDirection: 'column',
+            maxWidth: '480px',
+            margin: '0 auto',
+            overflow: 'hidden',
+            backgroundColor: 'var(--bg-color)',
+        }}>
+            {/* blue section - starts at creategoal size, then expands */}
+            <div style={{
+                background: 'var(--accent-blue)',
+                padding: 'var(--space-lg)',
+                paddingTop: 'var(--space-xl)',
+                paddingBottom: 'var(--space-xl)',
+                borderRadius: '0 0 var(--radius-xxl) var(--radius-xxl)',
+                boxShadow: 'var(--shadow-float)',
+                overflow: 'hidden',
+                position: 'relative',
+                zIndex: 1,
+                flexShrink: 0,
+                height: isExpanded ? '75vh' : '55vh', //placeholder
+                transition: 'all 0.6s ease-out',
+                display: 'flex',
+                flexDirection: 'column',
+            }}>
+                {/* Back button */}
+                <button
+                    onClick={() => navigate('/create-goal')}
+                    style={{
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        padding: 'var(--space-sm)',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        marginBottom: 'var(--space-md)',
+                        transition: 'transform 0.2s',
+                        alignSelf: 'flex-start',
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+                    onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1.0)'}
+                >
+                    <ArrowLeft size={32} color="var(--text-main)" strokeWidth={2.5} />
+                </button>
+
+                {/* Title */}
+                <div className="auth-header">
+                    <h1 style={{
+                    fontFamily: 'var(--font-serif)',
+                    fontSize: '36px',
+                    fontWeight: '600',
+                    lineHeight: '1.2',
+                    marginBottom: 'var(--space-lg)',
+                    color: 'var(--text-main)',
+                    textAlign: 'center',
+                }}>
+                    How do you feel<br />about these?
+                </h1>
+                </div>
+                
+
+                {/* task cards container wrapper with fade effects */}
+                <div style={{
+                    flex: 1,
+                    minHeight: 0,
+                    position: 'relative',
+                    opacity: isExpanded ? 1 : 0,
+                    transition: 'opacity 0.4s ease-out 0.2s',
+                    overflow: 'visible',
+                }}>
+                    {/* scrollable task cards */}
+                    <div 
+                        ref={scrollContainerRef}
+                        onScroll={handleScroll}
+                        style={{
+                        height: '100%',
+                        overflowY: 'auto',
+                        overflowX: 'hidden',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: 'var(--space-md)',
+                        paddingLeft: '40px',
+                        paddingRight: 'var(--space-md)',
+                        width: '100%',
+                        boxSizing: 'border-box',
+                    }}>
+                        {/* placeholder taskcards - replace with actual data later */}
+                        {[
+                            { title: "Learn the keyboard layout", dueDate: "Tomorrow" },
+                            { title: "Learn the keyboard layout", dueDate: "3 days left" },
+                            { title: "Learn the keyboard layout", dueDate: "5 days left" },
+                            { title: "Learn the keyboard layout", dueDate: "5 days left" },
+                            { title: "Learn the keyboard layout", dueDate: "5 days left" },
+                        ].map((task, index) => (
+                            <div
+                                key={index}
+                                style={{
+                                    opacity: isExpanded ? 1 : 0,
+                                    transform: isExpanded ? 'translateY(0)' : 'translateY(20px)',
+                                    transition: `all 0.5s ease-out ${0.3 + index * 0.1}s`,
+                                    width: '100%',
+                                    maxWidth: '400px',
+                                }}
+                            >
+                                <TaskCard
+                                    title={task.title}
+                                    dueDate={task.dueDate}
+                                    variant="review"
+                                    onEdit={() => console.log("Edit clicked")}
+                                    onConfirm={() => console.log("Confirmed:", task.title)}
+                                    onDeny={() => console.log("Denied:", task.title)}
+                                />
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* top fade overlay - only show when scrolled down */}
+                    <div style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        height: '30px',
+                        background: 'linear-gradient(to bottom, var(--accent-blue) 0%, transparent 100%)',
+                        pointerEvents: 'none',
+                        zIndex: 10,
+                        opacity: showTopFade ? 1 : 0,
+                        transition: 'opacity 0.2s ease',
+                    }} />
+
+                    {/* bottom fade overlay - only show when more content below */}
+                    <div style={{
+                        position: 'absolute',
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        height: '30px',
+                        background: 'linear-gradient(to top, var(--accent-blue) 0%, transparent 100%)',
+                        pointerEvents: 'none',
+                        zIndex: 10,
+                        opacity: showBottomFade ? 1 : 0,
+                        transition: 'opacity 0.2s ease',
+                    }} />
+                </div>
+
+                {/* accept/discard - fades in with expansion */}
+                <div style={{
+                    display: 'flex',
+                    gap: 'var(--space-md)',
+                    justifyContent: 'center',
+                    marginTop: 'var(--space-lg)',
+                    opacity: isExpanded ? 1 : 0,
+                    transition: 'opacity 0.4s ease-out 0.3s',
+                }}>
+                    <button
+                        style={{
+                            backgroundColor: 'var(--card-bg)',
+                            color: 'var(--text-main)',
+                            border: 'none',
+                            borderRadius: 'var(--radius-pill)',
+                            padding: '12px 32px',
+                            fontFamily: 'var(--font-sans)',
+                            fontSize: '16px',
+                            fontWeight: '500',
+                            cursor: 'pointer',
+                            transition: 'all 0.3s ease',
+                            boxShadow: 'var(--shadow-sm)',
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = 'translateY(-3px)';
+                            e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = 'translateY(0)';
+                            e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+                        }}
+                    >
+                        Accept
+                    </button>
+                    <button
+                        style={{
+                            backgroundColor: 'var(--accent-red-soft)',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: 'var(--radius-pill)',
+                            padding: '12px 32px',
+                            fontFamily: 'var(--font-sans)',
+                            fontSize: '16px',
+                            fontWeight: '500',
+                            cursor: 'pointer',
+                            transition: 'all 0.3s ease',
+                            boxShadow: 'var(--shadow-sm)',
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = 'translateY(-3px)';
+                            e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = 'translateY(0)';
+                            e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+                        }}
+                    >
+                        Discard
+                    </button>
+                </div>
+            </div>
+
+            {/* bottom section - feedback input */}
+            <div style={{
+                padding: 'var(--space-lg)',
+                paddingBottom: '100px',
+                backgroundColor: 'var(--bg-color)',
+            }}>
+                <InputBar
+                    placeholder="Feedback to AI..."
+                    onSubmit={(value) => console.log('Feedback submitted:', value)}
+                    variant="auth"
+                    borderRadius="var(--radius-xl)"
+                />
+                
+            </div>
+
+            <BottomNav />
+        </div>
+    );
+}
+
+export default ReviewPlan;

@@ -1,0 +1,17 @@
+stages:
+  - test
+
+# Run backend tests
+test:
+  stage: test
+  image: python:3.11
+  tags:
+    - docker
+  before_script:
+    - pip install --upgrade pip
+    - pip install -r backend/requirements.txt
+  script:
+    - pytest backend/tests/ -v
+  only:
+    - branches
+    - merge_requests
