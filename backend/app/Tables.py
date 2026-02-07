@@ -126,6 +126,13 @@ def get_tasks(goal_id):
 #get ai generated tasks for a goal 
 def get_ai_tasks(goal_id):
     return supabase.table("tasks").select("*").eq("goal_id", goal_id).eq("ai_generated", True).execute().data
+
+#Fetch the goal's stored graph(nodes + edges) data from the database
+def get_goal_graph(goal_id: str):
+    result = supabase.tablr("goals").select("goal_data").eq("id", goal_id).single().execute()
+
+    return result.data["goal_data"]
+
 # ================== TEST BLOCK ==================
 
 if __name__ == "__main__":
