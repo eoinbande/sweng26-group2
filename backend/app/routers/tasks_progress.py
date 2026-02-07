@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from app.schemas.task_status import UpdateTaskStatusRequest
 from ..Tables import update_task_status
 
-task_progress_router = APIRouter()
+task_progress_router = APIRouter() #main router for task progression
 
 #this function will EDIT the current status of the task
 #(will sent an http request from frontEnd)
@@ -18,6 +18,6 @@ def modify_task_status(request: UpdateTaskStatusRequest):
         raise HTTPException(status_code = 404, detail= "Task not found")
 
     return {
-        "message": "Task status updated successfully!",
+        "message": "Task status updated successfully!", #we return to the user that the task status has updated
         "task": result.data
     }

@@ -88,7 +88,7 @@ def create_task(goal_id, description, due_date=None):
         "due_date": due_date
     }).execute() #we insert a task to that goal
 
-
+ 
 #Update the status column in the tasks table(modify DB)
 def update_task_status(task_id: str, status: str):
     return supabase.table("tasks").update(
