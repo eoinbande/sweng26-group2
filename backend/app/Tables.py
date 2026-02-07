@@ -70,17 +70,18 @@ def create_ai_task(goal_id, description, due_date=None, ai_generated = True):
 
     exist_task = supabase.table("tasks").select("*").eq("goal_id", goal_id).eq("description", description).eq("ai generated", ai_generated).execute().data
     
-    #if the task already exist, do not allow duplicates
+    # if the task already exist and is ai generated will not allow it to be generated again.
+    # might need to prompt to endit the already existing one when the modify task endpoint gets made
     if exist_task:
-        print("Task with this description already exists for this goal.")
+        print("AI task with this description already exists for this goal.")
         return exist_task[0]
     
-    return supabase.table("ai tasks").insert({
+    return supabase.table("tasks").insert({
         "goal_id": goal_id,
         "description": description,
         "due_date": due_date,
-        "ai generated": ai_generated
-    })
+        "ai_generated": ai_generated
+    }).execute()
 
 
 ##################    GET DATA        ####################33333
@@ -94,8 +95,9 @@ def get_all_goals(user_id):
 def get_tasks(goal_id):
     return supabase.table("tasks").select("*").eq("goal_id", goal_id).execute().data
 
+#get ai generated tasks for a goal 
 def get_ai_tasks(goal_id):
-    return supabase.table("tasks").select("*").eq("goal_id", goal_id).eq("ai generated", ai_generated).execute().data
+    return supabase.table("tasks").select("*").eq("goal_id", goal_id).eq("ai_generated", True).execute().data
 # ================== TEST BLOCK ==================
 
 if __name__ == "__main__":
