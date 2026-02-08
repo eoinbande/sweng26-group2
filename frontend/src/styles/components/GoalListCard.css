@@ -1,0 +1,128 @@
+/* GoalListCard Component Styles */
+
+.goal-list-card {
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    display: flex;
+    align-items: stretch;
+    padding-right: 30px; /* space for date tab */
+}
+
+.goal-list-card:hover {
+    transform: translateY(-3px);
+}
+
+.goal-list-card:focus {
+    outline: none;
+}
+
+/* Card Inner Container – takes up most of the width */
+.goal-card-inner {
+    flex: 1;
+    border-radius: 28px;
+    border-top-right-radius: 0px;
+    overflow: hidden;
+    min-width: 0;
+}
+
+/* Card Header */
+.goal-card-header {
+    padding: 20px 24px;
+}
+
+.goal-card-title {
+    font-family: var(--font-serif);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0;
+    line-height: 1.3;
+}
+
+/* Card Body */
+.goal-card-body {
+    padding: 16px 24px 22px;
+}
+
+.goal-card-description {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0 0 16px 0;
+}
+
+/* ---- Progress-bar base styles ---- */
+.goal-list-card .progress-wrap {
+    width: 100%;
+}
+
+.goal-list-card .progress-track {
+    position: relative;
+    width: 100%;
+    height: 8px;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 99px;
+    overflow: hidden;
+}
+
+.goal-list-card .progress-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.3s ease;
+}
+
+/* date Tab – vertical strip on the right side of the card  */
+.goal-date-tab {
+
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 30px;
+    height: 80px; /* Fixed height for bookmark appearance */
+    background-color: #E8505B;
+    border-radius: 0 14px 14px 0px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    writing-mode: vertical-rl;
+    z-index: 2;
+    box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.goal-date-text {
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: 700;
+    color: white;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+/* Responsive adjustments */
+@media (max-width: 380px) {
+    .goal-list-card {
+        padding-right: 26px;
+    }
+    .goal-card-title {
+        font-size: 18px;
+    }
+
+    .goal-card-description {
+        font-size: 13px;
+    }
+
+    .goal-card-header {
+        padding: 16px 18px;
+    }
+
+    .goal-card-body {
+        padding: 14px 18px 18px;
+    }
+
+    .goal-date-tab {
+        width: 26px;
+        height: 70px;
+    }
+}
