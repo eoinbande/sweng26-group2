@@ -88,6 +88,8 @@ def create_task(goal_id, description, due_date=None):
         "due_date": due_date
     }).execute() #we insert a task to that goal
 
+ 
+
 def create_ai_task(goal_id, description, due_date=None, ai_generated = True):
 
     exist_task = supabase.table("tasks").select("*").eq("goal_id", goal_id).eq("description", description).eq("ai_generated", ai_generated).execute().data
@@ -106,7 +108,7 @@ def create_ai_task(goal_id, description, due_date=None, ai_generated = True):
     }).execute()
 
 
-#Update the status column in the tasks table
+#Update the status column in the tasks table(modify DB)
 def update_task_status(task_id: str, status: str):
     return supabase.table("tasks").update(
         {"status": status}
