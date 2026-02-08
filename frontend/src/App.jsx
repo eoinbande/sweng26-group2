@@ -7,6 +7,7 @@ import ReviewPlan from './pages/ReviewPlan';
 import Login from './pages/Login';
 import SignUp from './pages/SignUp';
 import Loading from './components/Loading';
+import ComponentTest from './pages/ComponentTest';
 import './index.css';
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
         <Route path="/create-goal" element={<CreateGoal />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
+        <Route path="/test" element={<ComponentTest />} /> //temporary route for testing new components
       </Routes>
     </Router>
   );
