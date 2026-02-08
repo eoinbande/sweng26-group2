@@ -7,6 +7,8 @@ from app.database import supabase
 from app.routers.goals import goal_router
 from app.routers.tasks import task_router
 from app.routers.auth import account_router
+from app.routers.feedback import feedback_router
+from app.routers.task_progress import task_progress_router
 from app.routers.ai_tasks import ai_task_router
 from app.routers.feedback import feedback_router
 
@@ -36,7 +38,7 @@ app.include_router(task_router, prefix="/api", tags=["Tasks"])
 app.include_router(account_router, prefix="/api", tags=["Profiles"])
 app.include_router(ai_task_router, prefix="/api", tags=["AI Tasks"])
 app.include_router(feedback_router, prefix="/api", tags=["AI Feedback"])
-
+app.include_router(task_progress_router, prefix="/api", tags=["task progression"])
 
 @app.get("/")
 async def root():
