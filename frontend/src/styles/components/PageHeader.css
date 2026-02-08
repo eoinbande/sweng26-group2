@@ -1,0 +1,38 @@
+/* PageHeader Component Styles */
+
+.page-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: var(--space-lg);
+    padding-top: var(--space-lg);
+    position: relative;
+    margin-left: -16px; /* Pull to edge of container */
+}
+
+.page-header-accent {
+    width: 28px;
+    height: 56px;
+    border-radius: 0 56px 56px 0; /* Half circle on right side */
+    flex-shrink: 0;
+}
+
+.page-header-title {
+    font-family: var(--font-serif);
+    font-size: 36px;
+    font-weight: 600;
+    color: var(--text-main);
+    margin: 0;
+    margin-left: var(--space-md);
+}
+
+/* Responsive adjustments */
+@media (max-width: 380px) {
+    .page-header-title {
+        font-size: 30px;
+    }
+    
+    .page-header-accent {
+        width: 24px;
+        height: 48px;
+    }
+}
