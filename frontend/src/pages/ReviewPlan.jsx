@@ -1,46 +1,26 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowLeft } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
 import { TaskCard } from '../components/TaskCard';
 import { InputBar } from '../components/InputBar';
+import LoadingOverlay from '../components/LoadingOverlay';
 import '../index.css';
 
 function ReviewPlan() {
     const navigate = useNavigate();
-    const [isExpanded, setIsExpanded] = useState(false);
-    const [showTopFade, setShowTopFade] = useState(false);
-    const [showBottomFade, setShowBottomFade] = useState(true);
-    const scrollContainerRef = useRef(null);
+    const location = useLocation();
+    const [contentVisible, setContentVisible] = useState(false);
+    const [showLoading, setShowLoading] = useState(location.state?.showLoading || false);
 
-    // trigger expansion animation after delay to show transition from creategoal size
+    // fade in content after mount (or after loading overlay completes)
     useEffect(() => {
-        const timer = setTimeout(() => setIsExpanded(true), 400);
+        // if loading overlay is showing, wait for it to complete before fading in content
+        if (showLoading) return;
+
+        const timer = setTimeout(() => setContentVisible(true), 100);
         return () => clearTimeout(timer);
-    }, []);
-
-    // handle scroll to update fade visibility
-    const handleScroll = () => {
-        const container = scrollContainerRef.current;
-        if (!container) return;
-
-        const { scrollTop, scrollHeight, clientHeight } = container;
-        const isAtTop = scrollTop <= 5;
-        const isAtBottom = scrollTop + clientHeight >= scrollHeight - 5;
-
-        setShowTopFade(!isAtTop);
-        setShowBottomFade(!isAtBottom);
-    };
-
-    // check initial scroll state after expansion
-    useEffect(() => {
-        if (isExpanded) {
-            const timer = setTimeout(() => {
-                handleScroll();
-            }, 100);
-            return () => clearTimeout(timer);
-        }
-    }, [isExpanded]);
+    }, [showLoading]);
 
     return (
         <div style={{
@@ -52,20 +32,19 @@ function ReviewPlan() {
             overflow: 'hidden',
             backgroundColor: 'var(--bg-color)',
         }}>
-            {/* blue section - starts at creategoal size, then expands */}
+            {/* blue section - starts at final size (seamless from LoadingOverlay) */}
             <div style={{
                 background: 'var(--accent-blue)',
                 padding: 'var(--space-lg)',
                 paddingTop: 'var(--space-xl)',
                 paddingBottom: 'var(--space-xl)',
                 borderRadius: '0 0 var(--radius-xxl) var(--radius-xxl)',
-                boxShadow: 'var(--shadow-float)',
+                boxShadow: showLoading ? 'none' : 'var(--shadow-float)',
                 overflow: 'hidden',
                 position: 'relative',
                 zIndex: 1,
                 flexShrink: 0,
-                height: isExpanded ? '75vh' : '55vh', //placeholder
-                transition: 'all 0.6s ease-out',
+                height: '75vh',
                 display: 'flex',
                 flexDirection: 'column',
             }}>
@@ -90,9 +69,8 @@ function ReviewPlan() {
                     <ArrowLeft size={32} color="var(--text-main)" strokeWidth={2.5} />
                 </button>
 
-                {/* Title */}
-                <div className="auth-header">
-                    <h1 style={{
+                {/* title - fades in after loading overlay completes */}
+                <h1 style={{
                     fontFamily: 'var(--font-serif)',
                     fontSize: '36px',
                     fontWeight: '600',
@@ -100,10 +78,11 @@ function ReviewPlan() {
                     marginBottom: 'var(--space-lg)',
                     color: 'var(--text-main)',
                     textAlign: 'center',
+                    opacity: contentVisible ? 1 : 0,
+                    transition: 'opacity 0.4s ease-out',
                 }}>
                     How do you feel<br />about these?
                 </h1>
-                </div>
                 
 
                 {/* task cards container wrapper with fade effects */}
@@ -111,15 +90,12 @@ function ReviewPlan() {
                     flex: 1,
                     minHeight: 0,
                     position: 'relative',
-                    opacity: isExpanded ? 1 : 0,
+                    opacity: contentVisible ? 1 : 0,
                     transition: 'opacity 0.4s ease-out 0.2s',
                     overflow: 'visible',
                 }}>
                     {/* scrollable task cards */}
-                    <div 
-                        ref={scrollContainerRef}
-                        onScroll={handleScroll}
-                        style={{
+                    <div style={{
                         height: '100%',
                         overflowY: 'auto',
                         overflowX: 'hidden',
@@ -143,8 +119,8 @@ function ReviewPlan() {
                             <div
                                 key={index}
                                 style={{
-                                    opacity: isExpanded ? 1 : 0,
-                                    transform: isExpanded ? 'translateY(0)' : 'translateY(20px)',
+                                    opacity: contentVisible ? 1 : 0,
+                                    transform: contentVisible ? 'translateY(0)' : 'translateY(20px)',
                                     transition: `all 0.5s ease-out ${0.3 + index * 0.1}s`,
                                     width: '100%',
                                     maxWidth: '400px',
@@ -162,7 +138,7 @@ function ReviewPlan() {
                         ))}
                     </div>
 
-                    {/* top fade overlay - only show when scrolled down */}
+                    {/* top fade overlay */}
                     <div style={{
                         position: 'absolute',
                         top: 0,
@@ -172,11 +148,9 @@ function ReviewPlan() {
                         background: 'linear-gradient(to bottom, var(--accent-blue) 0%, transparent 100%)',
                         pointerEvents: 'none',
                         zIndex: 10,
-                        opacity: showTopFade ? 1 : 0,
-                        transition: 'opacity 0.2s ease',
                     }} />
 
-                    {/* bottom fade overlay - only show when more content below */}
+                    {/* bottom fade overlay */}
                     <div style={{
                         position: 'absolute',
                         bottom: 0,
@@ -186,23 +160,21 @@ function ReviewPlan() {
                         background: 'linear-gradient(to top, var(--accent-blue) 0%, transparent 100%)',
                         pointerEvents: 'none',
                         zIndex: 10,
-                        opacity: showBottomFade ? 1 : 0,
-                        transition: 'opacity 0.2s ease',
                     }} />
                 </div>
 
-                {/* accept/discard - fades in with expansion */}
+                {/* accept/discard - fades in with content */}
                 <div style={{
                     display: 'flex',
                     gap: 'var(--space-md)',
                     justifyContent: 'center',
                     marginTop: 'var(--space-lg)',
-                    opacity: isExpanded ? 1 : 0,
+                    opacity: contentVisible ? 1 : 0,
                     transition: 'opacity 0.4s ease-out 0.3s',
                 }}>
                     <button
                         style={{
-                            backgroundColor: 'var(--card-bg)',
+                            backgroundColor: 'var(--primary)',
                             color: 'var(--text-main)',
                             border: 'none',
                             borderRadius: 'var(--radius-pill)',
@@ -269,6 +241,11 @@ function ReviewPlan() {
             </div>
 
             <BottomNav />
+
+            {/* loading overlay - shown when navigating from CreateGoal */}
+            {showLoading && (
+                <LoadingOverlay onComplete={() => setShowLoading(false)} />
+            )}
         </div>
     );
 }
