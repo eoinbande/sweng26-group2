@@ -6,10 +6,10 @@ import '../index.css';
 function ComponentTest() {
 
     return (
-        <div style={{ padding: 'var(--space-lg)' }}>
+        <div className="container" style={{ position: 'relative', backgroundColor: 'var(--bg-color)', padding: 0 }}>
             <h2>Component Test Page</h2>
-            <FeedbackPopUp variant="roadblock" onClose={() => { }} onSubmit={(feedback) => console.log('Roadblock Feedback:', feedback)} />
-            <FeedbackPopUp variant="change" onClose={() => { }} onSubmit={(feedback) => console.log('Change Feedback:', feedback)} />
+            <FeedbackPopUp variant="help" onClose={() => { }} onSubmit={(feedback) => console.log('Help Feedback:', feedback)} />
+            <FeedbackPopUp variant="reroute" onClose={() => { }} onSubmit={(feedback) => console.log('Reroute Feedback:', feedback)} />
         </div>
     )
 }
