@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
+import Goals from './pages/Goals';
 import CreateGoal from './pages/CreateGoal';
 import ReviewPlan from './pages/ReviewPlan';
 import Login from './pages/Login';
@@ -15,6 +16,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/goals" element={<Goals />} />
         <Route path="/create-goal" element={<CreateGoal />} />
         <Route path="/review-plan" element={<ReviewPlan />} />
         <Route path="/create-goal" element={<CreateGoal />} />
