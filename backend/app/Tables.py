@@ -114,6 +114,11 @@ def update_task_status(task_id: str, status: str):
         {"status": status}
     ).eq("id", task_id).execute() #this function will modify the status of an arbitrary task
 
+#Store the UPDATED graph to the DB(blob of JSON in goals)
+def update_goal_graph(goal_id: str, updated_graph: dict):
+    return supabase.table("goals").update({"goal_data": updated_graph}).eq("id", goal_id).execute()
+
+
 ##################    GET DATA        ####################33333
 
 
@@ -128,6 +133,13 @@ def get_tasks(goal_id):
 #get ai generated tasks for a goal 
 def get_ai_tasks(goal_id):
     return supabase.table("tasks").select("*").eq("goal_id", goal_id).eq("ai_generated", True).execute().data
+
+#Fetch the goal's stored graph(nodes + edges) data from the database
+def get_goal_graph(goal_id: str):
+    result = supabase.tablr("goals").select("goal_data").eq("id", goal_id).single().execute()
+
+    return result.data["goal_data"]
+
 # ================== TEST BLOCK ==================
 
 if __name__ == "__main__":
