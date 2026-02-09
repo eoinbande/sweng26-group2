@@ -30,7 +30,7 @@ mock_initial_goal_responses = {
     # Example 2: HABIT Goal (Cyclical) - Morning Exercise
     "morning_exercise_routine": {
         "goal_type": "HABIT",
-        "title": "morning exercise routine",
+        "title": "Morning exercise routine",
         "description": "Build a consistent daily morning workout habit with warm-up, exercise, and cool-down.",
         "nodes": [
             TaskNode(id="task_20", task="Wake up and drink water", est_time=2),
@@ -48,7 +48,7 @@ mock_initial_goal_responses = {
     # Example 3: GENERAL Goal (Branching) - Wedding Planning
     "plan_my_sisters_wedding": {
         "goal_type": "GENERAL",
-        "title": "plan my sister's wedding",
+        "title": "Plan my sister's wedding",
         "description": "Coordinate all the key aspects of wedding planning, from budget to venue to guest list.",
         "nodes": [
             TaskNode(id="task_10", task="Set overall budget", est_time=60),
@@ -68,7 +68,7 @@ mock_initial_goal_responses = {
     # Example 4: SPECIFIC Goal (Linear) - Cooking Recipe
     "bake_chocolate_cake": {
         "goal_type": "SPECIFIC",
-        "title": "bake a chocolate cake",
+        "title": "Bake a chocolate cake",
         "description": "Follow a simple recipe to bake a delicious homemade chocolate cake from scratch.",
         "nodes": [
             TaskNode(id="task_30", task="Mix dry ingredients", est_time=5),
@@ -84,7 +84,7 @@ mock_initial_goal_responses = {
     # Additional example: Study for exam (LINEAR)
     "study_for_biology_exam": {
         "goal_type": "SPECIFIC",
-        "title": "study for biology exam",
+        "title": "Study for biology exam",
         "description": "A structured study plan covering notes review, textbook reading, practice problems, and a mock test.",
         "nodes": [
             TaskNode(id="task_40", task="Review lecture notes from past 4 weeks", est_time=120),
@@ -104,7 +104,7 @@ mock_initial_goal_responses = {
     # Additional example: Home organization project (BRANCHING)
     "organize_home_office": {
         "goal_type": "GENERAL",
-        "title": "organize home office",
+        "title": "Organize home office",
         "description": "Declutter, reorganize, and deep clean your home office for a more productive workspace.",
         "nodes": [
             TaskNode(id="task_50", task="Declutter desk surface", est_time=30),
