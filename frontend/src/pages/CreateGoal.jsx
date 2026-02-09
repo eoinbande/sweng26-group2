@@ -3,6 +3,7 @@ import { ArrowLeft, Mic } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
 import { InputBar } from '../components/InputBar';
+import { supabase } from '../supabase_client';
 import '../index.css';
 
 function CreateGoal() {
@@ -12,8 +13,8 @@ function CreateGoal() {
     const [isFading, setIsFading] = useState(false);
     const [isExpanding, setIsExpanding] = useState(false);
 
-    // handle goal submission - triggers transition to loading
-    const handleGoalSubmit = (goalText) => {
+    // handle goal submission - calls backend then transitions to review
+    const handleGoalSubmit = async (goalText) => {
         console.log('Goal submitted:', goalText);
 
         // step 1: fade out the text inside the blue card
@@ -24,10 +25,56 @@ function CreateGoal() {
             setIsExpanding(true);
         }, 400);
 
-        // step 3: navigate after expansion completes
-        setTimeout(() => {
-            navigate('/review-plan', { state: { goal: goalText, showLoading: true } });
-        }, 1800);
+        // get the logged-in user
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+            alert('You must be logged in to create a goal.');
+            navigate('/login');
+            return;
+        }
+
+        // call backend to create goal + get AI plan
+        try {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/goals`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    user_id: user.id,
+                    title: goalText,
+                    description: goalText,
+                    generate_plan: true
+                })
+            });
+
+            const data = await res.json();
+            console.log('Backend response:', data);
+
+            if (!res.ok) {
+                console.error('Goal creation error:', data);
+                alert('Failed to create goal. Check console.');
+                return;
+            }
+
+            // step 3: navigate after expansion completes
+            setTimeout(() => {
+                if (data.ai_generated) {
+                    // AI plan was generated → go to review
+                    navigate('/review-plan', {
+                        state: {
+                            goal: goalText,
+                            showLoading: true,
+                            goalResponse: data
+                        }
+                    });
+                } else {
+                    // No AI match → goal saved but no plan to review
+                    navigate('/goals');
+                }
+            }, 1400);
+        } catch (err) {
+            console.error('Network error creating goal:', err);
+            alert('Network error. Is the backend running?');
+        }
     };
 
     return (

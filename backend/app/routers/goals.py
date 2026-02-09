@@ -54,7 +54,8 @@ def write_goal(goal: RequestGoals):
             result = create_goal_with_data( 
                 user_id=goal.user_id,
                 title=goal.title,
-                goal_data=goal_data
+                goal_data=goal_data,
+                description=ai_plan.get("description", goal.description)
             )
             
             return {
