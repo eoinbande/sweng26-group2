@@ -28,15 +28,6 @@ def write_goal(goal: RequestGoals):
     
     If generate_plan=True, AI will create a task breakdown.
     If generate_plan=False, creates a simple goal without tasks.
-    
-    Request:
-    {
-        "user_id": "user_123",
-        "title": "fix my bike tire",
-        "description": "Need to fix flat tire",
-        "due_date": "2026-02-15",
-        "generate_plan": true
-    }
     """
 
     # If user wants AI-generated plan
@@ -45,14 +36,14 @@ def write_goal(goal: RequestGoals):
         ai_plan = get_initial_goal_breakdown(goal.title)
         
         if ai_plan:
-            # Create goal_data structure
+            #  **Convert Pydantic models to dictionaries for JSON storage
             goal_data = {
                 "user_id": goal.user_id,
                 "title": goal.title,
                 "description": goal.description,
                 "goal_type": ai_plan["goal_type"],
-                "nodes": ai_plan["nodes"],
-                "edges": ai_plan["edges"]
+                "nodes": [node.model_dump() for node in ai_plan["nodes"]],  
+                "edges": [edge.model_dump() for edge in ai_plan["edges"]]   
             }
             
             # Add due_date if provided
@@ -71,8 +62,7 @@ def write_goal(goal: RequestGoals):
                 "goal": result.data,
                 "ai_generated": True,
                 "goal_type": ai_plan["goal_type"],
-                "task_count": len(ai_plan["nodes"]),
-                "goal data": goal_data
+                "task_count": len(ai_plan["nodes"])
             }
     
     # Fallback: Original manual goal creation
@@ -83,7 +73,6 @@ def write_goal(goal: RequestGoals):
         due_date=goal.due_date
     )
     return {"message": "Goal successfully created", "goal": result.data}
-
 
 #USE GET HTTP REQUEST TO GET DATA FROM SUPABASE
 @goal_router.get("/goals/{user_id}") #FETCH by user_id!
