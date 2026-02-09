@@ -13,6 +13,30 @@ function ReviewPlan() {
     const [contentVisible, setContentVisible] = useState(false);
     const [showLoading, setShowLoading] = useState(location.state?.showLoading || false);
 
+    // Extract tasks from the backend response passed via navigation state
+    const goalResponse = location.state?.goalResponse;
+    const goalTitle = location.state?.goal || 'Your Goal';
+
+    // Parse tasks from the goal_data in the response
+    const tasks = React.useMemo(() => {
+        if (!goalResponse) return [];
+
+        // The goal data is in goalResponse.goal[0].goal_data (from Supabase insert response)
+        const goalData = goalResponse.goal?.[0]?.goal_data
+            ?? goalResponse.goal?.goal_data
+            ?? goalResponse.goal_data;
+
+        if (goalData?.nodes) {
+            return goalData.nodes.map(node => ({
+                id: node.id,
+                title: node.task,
+                dueDate: node.est_time ? `~${node.est_time} min` : '',
+            }));
+        }
+
+        return [];
+    }, [goalResponse]);
+
     // fade in content after mount (or after loading overlay completes)
     useEffect(() => {
         // if loading overlay is showing, wait for it to complete before fading in content
@@ -108,14 +132,8 @@ function ReviewPlan() {
                         width: '100%',
                         boxSizing: 'border-box',
                     }}>
-                        {/* placeholder taskcards - replace with actual data later */}
-                        {[
-                            { title: "Learn the keyboard layout", dueDate: "Tomorrow" },
-                            { title: "Learn the keyboard layout", dueDate: "3 days left" },
-                            { title: "Learn the keyboard layout", dueDate: "5 days left" },
-                            { title: "Learn the keyboard layout", dueDate: "5 days left" },
-                            { title: "Learn the keyboard layout", dueDate: "5 days left" },
-                        ].map((task, index) => (
+                        {/* task cards - populated from backend response */}
+                        {tasks.map((task, index) => (
                             <div
                                 key={index}
                                 style={{
