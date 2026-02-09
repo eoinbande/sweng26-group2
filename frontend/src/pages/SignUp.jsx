@@ -52,12 +52,16 @@ function SignUp() {
             if (!res.ok) {
                 const errData = await res.json();
                 console.error('Profile creation error:', errData);
+                alert('User created but profile failed. Check console.');
+                return;
             }
         } catch (err) {
             console.error('Failed to create profile:', err);
+                alert('Network error creating profile');
+                return;   
         }
 
-        alert('Account created! Check your email to confirm.');
+        alert('Account created successfully!');
         navigate('/login');
     };
 
