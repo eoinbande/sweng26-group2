@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '../styles/Auth.css';
+import { supabase } from '../supabase_client';
 
 function SignUp() {
     const navigate = useNavigate();
@@ -17,12 +18,27 @@ function SignUp() {
         });
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        // Add your authentication logic here
-        console.log('Sign up:', formData);
-        // For now, redirect to home
-        navigate('/');
+    const handleSubmit = async (e) => { //added async here but not sure if its correct!
+    e.preventDefault();
+    //added AUTHENTICATION Code!!!!!!!
+    const { error } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+            data: {
+                username: formData.username
+            }
+        }
+    });
+
+    if (error) {
+        alert(error.message);
+        return;
+    }
+
+    alert("Account created! Check your email.");
+    navigate('/login');
+};
     };
 
     return (

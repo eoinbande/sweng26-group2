@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '../styles/Auth.css';
+import { supabase } from '../supabase_client';
 
 function Login() {
     const navigate = useNavigate();
@@ -16,9 +17,18 @@ function Login() {
         });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => { //added "assync" here but not sure if that is correct
         e.preventDefault();
-        // add authentication logic later
+        //Authentication Code !!!
+        const { error } = await supabase.auth.signInWithPassword({
+            email: formData.username, //I guess that username is Email?
+            password: formData.password
+        });
+
+        if (error) {
+            alert(error.message);
+            return;
+        }
         console.log('Login:', formData);
         // for now just redirect to homepage
         navigate('/');
