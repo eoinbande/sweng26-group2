@@ -8,7 +8,7 @@ from app.routers.goals import goal_router
 from app.routers.tasks import task_router
 from app.routers.auth import account_router
 from app.routers.feedback import feedback_router
-from app.routers.task_progress import task_progress_router
+from app.routers.tasks_progress import task_progress_router
 from app.routers.ai_tasks import ai_task_router
 from app.routers.feedback import feedback_router
 from app.routers.reroute import reroute_router

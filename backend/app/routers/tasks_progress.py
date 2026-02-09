@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from app.schemas.task_status import UpdateTaskStatusRequest
+from app.schemas.tasks_status import UpdateTaskStatusRequest
 from ..Tables import update_task_status
 
 task_progress_router = APIRouter() #main router for task progression
