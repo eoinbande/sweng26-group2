@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 
 from app.schemas.feedback_request import ExpandTaskRequest
-from app.schemas.ai_models import AIExpandTaskResponse
+from app.schemas.ai_responses import AIExpandTaskResponse
 from app.Mocked.mock_expand_templates import mock_feedback_templates
 
 #GOAL OF ENDPOINT: POST subtasks (if user wants feedback, post the new subtasks and 
