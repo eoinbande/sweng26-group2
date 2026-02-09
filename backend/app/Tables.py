@@ -49,7 +49,7 @@ def create_goal(user_id, title, description, due_date=None):
     }).execute() #we insert a new goal to that user 
 
 #insert a new goal with goal_data JSON
-def create_goal_with_data(user_id: str, title: str, goal_data: dict):
+def create_goal_with_data(user_id: str, title: str, goal_data: dict, description: str = None):
     """
     Create a goal with the full goal_data JSON structure.
     
@@ -67,6 +67,7 @@ def create_goal_with_data(user_id: str, title: str, goal_data: dict):
     return supabase.table("goals").insert({
         "user_id": user_id,
         "title": title,
+        "description": description,
         "goal_data": goal_data
     }).execute()
 

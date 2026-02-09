@@ -10,7 +10,8 @@ mock_initial_goal_responses = {
     # Example 1: SPECIFIC Goal (Linear) - Fix Bike Tire
     "fix_my_bike_tire": {
         "goal_type": "SPECIFIC",
-        "title": "fix my bike tire",
+        "title": "Fix my bike tire",
+        "description": "Step-by-step guide to repair a flat or damaged bike tire, from removing the wheel to reinflating.",
         "nodes": [
             TaskNode(id="task_1", task="Remove wheel from bike", est_time=10),
             TaskNode(id="task_2", task="Take tire off rim", est_time=15),
@@ -30,6 +31,7 @@ mock_initial_goal_responses = {
     "morning_exercise_routine": {
         "goal_type": "HABIT",
         "title": "morning exercise routine",
+        "description": "Build a consistent daily morning workout habit with warm-up, exercise, and cool-down.",
         "nodes": [
             TaskNode(id="task_20", task="Wake up and drink water", est_time=2),
             TaskNode(id="task_21", task="5-min warm-up stretches", est_time=5),
@@ -47,6 +49,7 @@ mock_initial_goal_responses = {
     "plan_my_sisters_wedding": {
         "goal_type": "GENERAL",
         "title": "plan my sister's wedding",
+        "description": "Coordinate all the key aspects of wedding planning, from budget to venue to guest list.",
         "nodes": [
             TaskNode(id="task_10", task="Set overall budget", est_time=60),
             TaskNode(id="task_11", task="Book venue", est_time=120),
@@ -66,6 +69,7 @@ mock_initial_goal_responses = {
     "bake_chocolate_cake": {
         "goal_type": "SPECIFIC",
         "title": "bake a chocolate cake",
+        "description": "Follow a simple recipe to bake a delicious homemade chocolate cake from scratch.",
         "nodes": [
             TaskNode(id="task_30", task="Mix dry ingredients", est_time=5),
             TaskNode(id="task_31", task="Bake the cake", est_time=45),
@@ -81,6 +85,7 @@ mock_initial_goal_responses = {
     "study_for_biology_exam": {
         "goal_type": "SPECIFIC",
         "title": "study for biology exam",
+        "description": "A structured study plan covering notes review, textbook reading, practice problems, and a mock test.",
         "nodes": [
             TaskNode(id="task_40", task="Review lecture notes from past 4 weeks", est_time=120),
             TaskNode(id="task_41", task="Read textbook chapters 5-8", est_time=180),
@@ -100,6 +105,7 @@ mock_initial_goal_responses = {
     "organize_home_office": {
         "goal_type": "GENERAL",
         "title": "organize home office",
+        "description": "Declutter, reorganize, and deep clean your home office for a more productive workspace.",
         "nodes": [
             TaskNode(id="task_50", task="Declutter desk surface", est_time=30),
             TaskNode(id="task_51", task="Sort through papers and files", est_time=60),
@@ -120,6 +126,7 @@ mock_initial_goal_responses = {
     "daily_meditation": {
         "goal_type": "HABIT",
         "title": "daily meditation practice",
+        "description": "Establish a calming daily meditation routine with breathing exercises and journaling.",
         "nodes": [
             TaskNode(id="task_60", task="Find quiet space", est_time=2),
             TaskNode(id="task_61", task="Set timer for 10 minutes", est_time=1),
