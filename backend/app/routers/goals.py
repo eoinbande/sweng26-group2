@@ -1,7 +1,9 @@
-from fastapi import APIRouter
-from ..Tables import create_goal, create_goal_with_data, get_all_goals #we import the functions related to goals
-from ..Mocked.mock_response_templates import get_initial_goal_breakdown  
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
+from ..Tables import create_goal, create_goal_with_data, get_all_goals #we import the functions related to goals
+from ..database import supabase
+from ..Mocked.mock_response_templates import get_initial_goal_breakdown  
+
 
 
 #CREATION of GOAL(when you create an arbitrary goal) endpoint
@@ -20,8 +22,23 @@ class RequestGoals(BaseModel):
 
 #USE POST HTTP REQUEST TO STORE DATA IN SUPABASE
 @goal_router.post("/goals")
-@goal_router.post("/goals")
 def write_goal(goal: RequestGoals):
+    """
+    Create a goal with optional AI-generated task breakdown.
+    
+    If generate_plan=True, AI will create a task breakdown.
+    If generate_plan=False, creates a simple goal without tasks.
+    
+    Request:
+    {
+        "user_id": "user_123",
+        "title": "fix my bike tire",
+        "description": "Need to fix flat tire",
+        "due_date": "2026-02-15",
+        "generate_plan": true
+    }
+    """
+
     # If user wants AI-generated plan
     if goal.generate_plan:
         # Get AI-generated plan from mock templates
@@ -54,7 +71,8 @@ def write_goal(goal: RequestGoals):
                 "goal": result.data,
                 "ai_generated": True,
                 "goal_type": ai_plan["goal_type"],
-                "task_count": len(ai_plan["nodes"])
+                "task_count": len(ai_plan["nodes"]),
+                "goal data": goal_data
             }
     
     # Fallback: Original manual goal creation
@@ -101,3 +119,40 @@ def get_goal_details(goal_id: str):
             "has_ai_plan": False,
             "message": "This goal doesn't have an AI-generated plan"
         }
+    
+@goal_router.delete("/goals/{user_id}/{goal_id}")
+def delete_goal(user_id: str, goal_id: str):
+    """
+    Delete a goal by its goal_id.
+    """
+    try:
+        # Find the goal
+        all_goals = get_all_goals(user_id)
+        db_id = None
+        
+        for goal_record in all_goals:
+            if goal_record.get("goal_data", {}).get("goal_id") == goal_id:
+                db_id = goal_record.get("id")
+                break
+        
+        if not db_id:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Goal {goal_id} not found for user {user_id}"
+            )
+        
+        # Delete from database
+        supabase.table("goals").delete().eq("id", db_id).execute()
+        
+        return {
+            "status": "success",
+            "message": f"Goal {goal_id} deleted successfully"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error deleting goal: {str(e)}"
+        )
