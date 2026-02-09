@@ -1,0 +1,311 @@
+/* src/styles/GoalDetail.css */
+
+/* Page wrapper — same width as other pages */
+.goal-detail-page {
+    position: relative;
+    max-width: 480px;
+    margin: 0 auto;
+    height: 100%;
+    background-color: var(--bg-color);
+    min-height: 100vh;
+}
+
+.goal-detail-container {
+    padding: 0 var(--space-md);
+    padding-bottom: 180px; /* Extra space for FABs and BottomNav */
+    overflow-y: auto;
+    height: 100%;
+    scrollbar-width: none; /* Firefox */
+}
+
+.goal-detail-container::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+}
+
+/* Back Button */
+.goal-detail-back {
+    padding-top: 20px;
+    margin-bottom: 12px;
+}
+
+.back-button {
+    background: none;
+    border: none;
+    padding: 0;
+    display: flex;
+    align-items: center;
+}
+
+/* Header Section */
+.goal-title {
+    font-size: 30px;
+    font-family: var(--font-serif);
+    margin: 0 0 var(--space-sm) 0;
+    color: var(--text-main);
+    line-height: 1.2;
+}
+
+/* Progress Bar */
+.detail-progress-track {
+    width: 100%;
+    height: 8px;
+    background-color: #E5E5EA;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: var(--space-sm);
+}
+
+.detail-progress-fill {
+    height: 100%;
+    background-color: #FF3B30;
+    border-radius: 4px;
+}
+
+/* Meta Row (percentage + tag) */
+.goal-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-md);
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.tag-creative {
+    background-color: #F0F0EC;
+    color: #1a1a1a;
+    padding: 4px 14px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid #D6D6D0;
+}
+
+/* Date Section */
+.goal-end-date {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-serif);
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: var(--space-lg);
+    color: var(--text-main);
+}
+
+/* ===== Timeline Layout — Staggered ===== */
+.timeline-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding-bottom: var(--space-md);
+}
+
+/* Task Item */
+.task-item {
+    display: flex;
+    align-items: flex-start;
+    position: relative;
+    z-index: 1;
+    padding-left: 0;
+    margin-bottom: -4px; /* overlap slightly for visual tightness */
+}
+
+/* Odd tasks shift right for zigzag effect */
+.task-item--offset {
+    padding-left: 40px;
+}
+
+/* Connector lines between tasks */
+.timeline-connector {
+    position: absolute;
+    width: 2px;
+    background-color: #E5E5EA;
+    z-index: 0;
+}
+
+.connector-right {
+    left: 23px;
+    top: 48px;
+    height: calc(100% - 10px);
+}
+
+.connector-left {
+    left: 63px; /* shifted for offset items */
+    top: 48px;
+    height: calc(100% - 10px);
+}
+
+/* Status Icons (Circles on the left) */
+.status-icon-wrapper {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: -8px;
+    z-index: 2;
+    border: 3px solid var(--bg-color);
+}
+
+.status-yellow {
+    background-color: #FFCC00;
+    color: white;
+    box-shadow: 0 3px 8px rgba(255, 204, 0, 0.35);
+}
+
+.status-grey {
+    background-color: #F5F5F3;
+    border: 2px solid #E5E5EA;
+    color: #C7C7CC;
+}
+
+.status-red {
+    background-color: #FF5A5F;
+    color: white;
+    box-shadow: 0 3px 8px rgba(255, 90, 95, 0.35);
+}
+
+/* The Task Card */
+.task-card {
+    flex: 1;
+    background-color: white;
+    border-radius: 20px;
+    padding: 14px 16px;
+    padding-right: 48px; /* room for flag */
+    box-shadow: var(--shadow-sm);
+    min-height: 72px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.task-card--locked {
+    background-color: #FFF0F0;
+}
+
+.task-card h4 {
+    font-family: var(--font-sans);
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: 2px;
+    color: var(--text-main);
+}
+
+.meta-text {
+    font-size: 12px;
+    color: #8E8E93;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin: 0;
+}
+
+.task-card p {
+    font-size: 12px;
+    color: #8E8E93;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.strikethrough-text {
+    text-decoration: line-through;
+    color: #C7C7CC !important;
+}
+
+.error-text {
+    color: #FF5A5F;
+    font-size: 11px !important;
+    margin-top: 2px;
+    line-height: 1.2;
+}
+
+/* The Flag (Right side tab) */
+.task-flag {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 36px;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 13px;
+    gap: 4px;
+}
+
+.flag-green { background-color: #7AD37F; }
+.flag-blue { background-color: #AECBFA; }
+.flag-grey { background-color: #D1D1D6; }
+
+/* Bookmark flag (ribbon) for first task */
+.task-bookmark {
+    position: absolute;
+    right: 8px;
+    top: -4px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    z-index: 3;
+}
+
+.task-bookmark svg {
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.12));
+}
+
+.bookmark-text {
+    position: absolute;
+    top: 8px;
+    color: white;
+    font-weight: 700;
+    font-size: 13px;
+}
+
+/* Floating Action Buttons Area */
+.fab-container {
+    position: fixed;
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 480px;
+    padding: 0 var(--space-md);
+    display: flex;
+    gap: var(--space-md);
+    z-index: 90;
+}
+
+.btn-primary-yellow {
+    flex: 1;
+    background-color: #FFD465;
+    color: #1A1A1A;
+    font-weight: 600;
+    border: none;
+    border-radius: 24px;
+    padding: 14px;
+    font-size: 15px;
+    box-shadow: 0 4px 12px rgba(255, 212, 101, 0.4);
+}
+
+.btn-secondary-pink {
+    flex: 1;
+    background-color: #FFC5C4;
+    color: #1A1A1A;
+    font-weight: 600;
+    border: none;
+    border-radius: 24px;
+    padding: 14px;
+    font-size: 15px;
+    box-shadow: 0 4px 12px rgba(255, 197, 196, 0.4);
+}
