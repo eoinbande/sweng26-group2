@@ -12,6 +12,7 @@
 
 .goal-detail-container {
     padding: 0 var(--space-md);
+    padding-top: 24px;
     padding-bottom: 180px; /* Extra space for FABs and BottomNav */
     overflow-y: auto;
     height: 100%;
@@ -22,27 +23,23 @@
     display: none; /* Chrome/Safari */
 }
 
-/* Back Button */
-.goal-detail-back {
-    padding-top: 20px;
-    margin-bottom: 12px;
-}
-
-.back-button {
-    background: none;
-    border: none;
-    padding: 0;
+/* Header Row with Flag Icon + Title */
+.goal-header-row {
     display: flex;
     align-items: center;
+    gap: 8px;
+    margin-bottom: var(--space-sm);
+    padding-top: 16px;
 }
 
 /* Header Section */
 .goal-title {
-    font-size: 30px;
+    font-size: 28px;
     font-family: var(--font-serif);
-    margin: 0 0 var(--space-sm) 0;
+    margin: 0;
     color: var(--text-main);
     line-height: 1.2;
+    font-weight: 700;
 }
 
 /* Progress Bar */
@@ -57,8 +54,8 @@
 
 .detail-progress-fill {
     height: 100%;
-    background-color: #FF3B30;
     border-radius: 4px;
+    transition: width 0.4s ease, background-color 0.4s ease;
 }
 
 /* Meta Row (percentage + tag) */
@@ -109,7 +106,7 @@
     position: relative;
     z-index: 1;
     padding-left: 0;
-    margin-bottom: -4px; /* overlap slightly for visual tightness */
+    margin-bottom: 16px; /* visible gap between cards */
 }
 
 /* Odd tasks shift right for zigzag effect */
@@ -128,13 +125,13 @@
 .connector-right {
     left: 23px;
     top: 48px;
-    height: calc(100% - 10px);
+    height: calc(100% + 6px);
 }
 
 .connector-left {
     left: 63px; /* shifted for offset items */
     top: 48px;
-    height: calc(100% - 10px);
+    height: calc(100% + 6px);
 }
 
 /* Status Icons (Circles on the left) */
@@ -169,6 +166,23 @@
     box-shadow: 0 3px 8px rgba(255, 90, 95, 0.35);
 }
 
+/* Empty circle for un-completed active tasks */
+.status-empty {
+    background-color: #FFFFFF;
+    border: 3px solid #E5E5EA;
+}
+
+/* Make active / completed icons clickable */
+.status-icon--clickable {
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.status-icon--clickable:hover {
+    transform: scale(1.12);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
 /* The Task Card */
 .task-card {
     flex: 1;
@@ -187,6 +201,11 @@
 
 .task-card--locked {
     background-color: #FFF0F0;
+}
+
+/* Subtask cards are slightly narrower than parent tasks */
+.task-card--subtask {
+    max-width: 85%;
 }
 
 .task-card h4 {
@@ -286,7 +305,7 @@
     z-index: 90;
 }
 
-.btn-primary-yellow {
+.btn-add-task {
     flex: 1;
     background-color: #FFD465;
     color: #1A1A1A;
@@ -295,10 +314,16 @@
     border-radius: 24px;
     padding: 14px;
     font-size: 15px;
+    cursor: pointer;
     box-shadow: 0 4px 12px rgba(255, 212, 101, 0.4);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-.btn-secondary-pink {
+.btn-add-task:active {
+    transform: scale(0.97);
+}
+
+.btn-reroute {
     flex: 1;
     background-color: #FFC5C4;
     color: #1A1A1A;
@@ -307,5 +332,11 @@
     border-radius: 24px;
     padding: 14px;
     font-size: 15px;
+    cursor: pointer;
     box-shadow: 0 4px 12px rgba(255, 197, 196, 0.4);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-reroute:active {
+    transform: scale(0.97);
 }
