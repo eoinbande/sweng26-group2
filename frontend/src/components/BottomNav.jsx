@@ -1,10 +1,20 @@
 import React from 'react';
-import { Target, Calendar, Home, BarChart2, User } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Target, Calendar, BarChart2, User } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import '../index.css';
+
+/* Custom filled house icon with fully rounded corners */
+const HomeIcon = ({ size = 26 }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="#1A1A1A" xmlns="http://www.w3.org/2000/svg">
+        <path d="M10.8 2.8a1.8 1.8 0 0 1 2.4 0l7 6.5A2.5 2.5 0 0 1 21 11.5V19a3 3 0 0 1-3 3h-2.5a2 2 0 0 1-2-2v-3.5a1.5 1.5 0 0 0-1.5-1.5h-1a1.5 1.5 0 0 0-1.5 1.5V20a2 2 0 0 1-2 2H5a3 3 0 0 1-3-3v-7.5a2.5 2.5 0 0 1 .8-2.2l7-6.5Z"
+              strokeLinejoin="round" />
+    </svg>
+);
 
 const BottomNav = () => {
     const navigate = useNavigate();
+    const location = useLocation();
+    const currentPath = location.pathname;
 
     return (
         <div style={{
@@ -14,51 +24,65 @@ const BottomNav = () => {
             transform: 'translateX(-50%)',
             width: '100%',
             maxWidth: '480px',
-            backgroundColor: 'rgba(248, 248, 244, 0.95)', // Semi-transparent matching bg
-            backdropFilter: 'blur(10px)',
-            padding: 'var(--space-md) var(--space-lg)',
+            backgroundColor: 'rgba(248, 248, 244, 0.97)',
+            backdropFilter: 'blur(12px)',
+            padding: '10px var(--space-lg) 14px',
             display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            borderTop: '1px solid rgba(0,0,0,0.05)',
-            zIndex: 100
+            alignItems: 'flex-end',
+            justifyContent: 'space-around',
+            borderTop: '1px solid rgba(0,0,0,0.06)',
+            zIndex: 100,
         }}>
-            <NavIcon icon={<Target size={24} />} label="Goals" onClick={() => navigate('/goals')} />
-            <NavIcon icon={<Calendar size={24} />} label="Schedule" onClick={() => navigate('/schedule')} />
+            <NavIcon icon={<Target size={24} />} label="Goals" active={currentPath === '/goals'} onClick={() => navigate('/goals')} />
+            <NavIcon icon={<Calendar size={24} />} label="Schedule" active={currentPath === '/schedule'} onClick={() => navigate('/schedule')} />
 
             {/* Floating Home Button */}
-            <div onClick={() => navigate('/')} style={{
-                marginTop: '-30px', // Pull up
-                backgroundColor: 'var(--primary)',
-                width: '60px',
-                height: '60px',
-                borderRadius: '50%',
+            <div style={{
                 display: 'flex',
+                flexDirection: 'column',
                 alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: '0 4px 12px rgba(255, 184, 76, 0.4)',
-                cursor: 'pointer'
-            }}>
-                <Home size={28} color="#1A1A1A" fill="#1A1A1A" />
+                gap: '3px',
+                cursor: 'pointer',
+                marginBottom: '0px',
+            }} onClick={() => navigate('/')}>
+                <div style={{
+                    backgroundColor: 'var(--primary)',
+                    width: '56px',
+                    height: '56px',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 4px 14px rgba(255, 185, 46, 0.4)',
+                    marginTop: '-28px',
+                }}>
+                    <HomeIcon size={26} />
+                </div>
             </div>
 
-            <NavIcon icon={<BarChart2 size={24} />} label="Progress" onClick={() => navigate('/progress')} />
-            <NavIcon icon={<User size={24} />} label="Profile" onClick={() => navigate('/profile')} />
+            <NavIcon icon={<BarChart2 size={24} />} label="Progress" active={currentPath === '/progress'} onClick={() => navigate('/progress')} />
+            <NavIcon icon={<User size={24} />} label="Profile" active={currentPath === '/profile'} onClick={() => navigate('/profile')} />
         </div>
     );
 };
 
-const NavIcon = ({ icon, label, onClick }) => (
+const NavIcon = ({ icon, label, onClick, active }) => (
     <div onClick={onClick} style={{
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         gap: '4px',
         cursor: 'pointer',
-        color: '#8E8E93'
+        color: active ? 'var(--text-main)' : '#8E8E93',
+        transition: 'color 0.2s ease',
+        minWidth: '48px',
     }}>
         {icon}
-        <span style={{ fontSize: '10px', fontWeight: '500' }}>{label}</span>
+        <span style={{
+            fontSize: '10px',
+            fontWeight: active ? '600' : '500',
+            fontFamily: 'var(--font-sans)',
+        }}>{label}</span>
     </div>
 );
 
