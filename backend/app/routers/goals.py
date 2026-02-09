@@ -109,11 +109,11 @@ def get_goal_details(goal_id: str):
             "message": "This goal doesn't have an AI-generated plan"
         }
     
-@goal_router.delete("/goals/{user_id}/{goal_id}")
+"""@goal_router.delete("/goals/{user_id}/{goal_id}")
 def delete_goal(user_id: str, goal_id: str):
-    """
+    
     Delete a goal by its goal_id.
-    """
+    
     try:
         # Find the goal
         all_goals = get_all_goals(user_id)
@@ -145,3 +145,4 @@ def delete_goal(user_id: str, goal_id: str):
             status_code=500,
             detail=f"Error deleting goal: {str(e)}"
         )
+        """ 
