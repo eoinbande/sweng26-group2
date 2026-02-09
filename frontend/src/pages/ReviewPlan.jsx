@@ -12,30 +12,61 @@ function ReviewPlan() {
     const location = useLocation();
     const [contentVisible, setContentVisible] = useState(false);
     const [showLoading, setShowLoading] = useState(location.state?.showLoading || false);
+    const [saving, setSaving] = useState(false);
 
-    // Extract tasks from the backend response passed via navigation state
-    const goalResponse = location.state?.goalResponse;
-    const goalTitle = location.state?.goal || 'Your Goal';
+    // Data from CreateGoal (preview only, not saved yet)
+    const previewData = location.state?.previewData;
+    const userId = location.state?.userId;
+    const goalTitle = location.state?.goal || '';
+    const originalPrompt = location.state?.originalPrompt || goalTitle;
 
-    // Parse tasks from the goal_data in the response
+    // Parse tasks from the preview response
     const tasks = React.useMemo(() => {
-        if (!goalResponse) return [];
+        if (!previewData?.goal_data?.nodes) return [];
+        return previewData.goal_data.nodes.map(node => ({
+            id: node.id,
+            title: node.task,
+            dueDate: node.est_time ? `~${node.est_time} min` : '',
+        }));
+    }, [previewData]);
 
-        // The goal data is in goalResponse.goal[0].goal_data (from Supabase insert response)
-        const goalData = goalResponse.goal?.[0]?.goal_data
-            ?? goalResponse.goal?.goal_data
-            ?? goalResponse.goal_data;
+    // Accept: save the goal to Supabase via POST /goals
+    const handleAccept = async () => {
+        setSaving(true);
+        try {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/goals`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    user_id: userId,
+                    title: goalTitle,
+                    description: previewData?.goal_data?.description || goalTitle,
+                    generate_plan: true
+                })
+            });
 
-        if (goalData?.nodes) {
-            return goalData.nodes.map(node => ({
-                id: node.id,
-                title: node.task,
-                dueDate: node.est_time ? `~${node.est_time} min` : '',
-            }));
+            const data = await res.json();
+            console.log('Goal saved:', data);
+
+            if (!res.ok) {
+                console.error('Save error:', data);
+                alert('Failed to save goal.');
+                setSaving(false);
+                return;
+            }
+
+            navigate('/goals');
+        } catch (err) {
+            console.error('Network error saving goal:', err);
+            alert('Network error. Is the backend running?');
+            setSaving(false);
         }
+    };
 
-        return [];
-    }, [goalResponse]);
+    // Discard: go back to CreateGoal with the original prompt restored
+    const handleDiscard = () => {
+        navigate('/create-goal', { state: { originalPrompt } });
+    };
 
     // fade in content after mount (or after loading overlay completes)
     useEffect(() => {
@@ -74,7 +105,7 @@ function ReviewPlan() {
             }}>
                 {/* Back button */}
                 <button
-                    onClick={() => navigate('/create-goal')}
+                    onClick={handleDiscard}
                     style={{
                         backgroundColor: 'transparent',
                         border: 'none',
@@ -191,6 +222,8 @@ function ReviewPlan() {
                     transition: 'opacity 0.4s ease-out 0.3s',
                 }}>
                     <button
+                        onClick={handleAccept}
+                        disabled={saving}
                         style={{
                             backgroundColor: 'var(--primary)',
                             color: 'var(--text-main)',
@@ -200,9 +233,10 @@ function ReviewPlan() {
                             fontFamily: 'var(--font-sans)',
                             fontSize: '16px',
                             fontWeight: '500',
-                            cursor: 'pointer',
+                            cursor: saving ? 'wait' : 'pointer',
                             transition: 'all 0.3s ease',
                             boxShadow: 'var(--shadow-sm)',
+                            opacity: saving ? 0.7 : 1,
                         }}
                         onMouseEnter={(e) => {
                             e.currentTarget.style.transform = 'translateY(-3px)';
@@ -213,9 +247,10 @@ function ReviewPlan() {
                             e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
                         }}
                     >
-                        Accept
+                        {saving ? 'Saving...' : 'Accept'}
                     </button>
                     <button
+                        onClick={handleDiscard}
                         style={{
                             backgroundColor: 'var(--accent-red-soft)',
                             color: 'white',
