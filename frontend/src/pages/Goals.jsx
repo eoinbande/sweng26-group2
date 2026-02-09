@@ -1,11 +1,16 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import PageHeader from '../components/PageHeader';
 import GoalListCard from '../components/GoalListCard';
 import BottomNav from '../components/BottomNav';
+import { supabase } from '../supabase_client';
 import '../styles/Goals.css';
+
+const COLOR_SCHEMES_LIST = ['blue', 'yellow', 'orange', 'pink'];
 
 const Goals = () => {
     const [showBottomFade, setShowBottomFade] = useState(true);
+    const [goals, setGoals] = useState([]);
+    const [loading, setLoading] = useState(true);
     const scrollRef = useRef(null);
 
     const handleScroll = useCallback(() => {
@@ -14,73 +19,41 @@ const Goals = () => {
         const isAtBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 10;
         setShowBottomFade(!isAtBottom);
     }, []);
-    // Mock data for goals - matching the design
-    const goals = [
-        {
-            id: 1,
-            title: 'Master the piano',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-            date: '27 Jan',
-            progress: 25,
-            colorScheme: 'blue'
-        },
-        {
-            id: 2,
-            title: 'Create a bank account',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.',
-            date: '1 May',
-            progress: 75,
-            colorScheme: 'yellow'
-        },
-        {
-            id: 3,
-            title: 'Computer Networks revision',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-            date: '27 Jan',
-            progress: 30,
-            colorScheme: 'orange'
-        },
-        {
-            id: 4,
-            title: 'Create a bank account',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.',
-            date: '1 May',
-            progress: 10,
-            colorScheme: 'pink'
-        },
-        {
-            id: 5,
-            title: 'Read 12 books this year',
-            description: 'Track reading progress across fiction and non-fiction books throughout the year.',
-            date: '31 Dec',
-            progress: 50,
-            colorScheme: 'blue'
-        },
-        {
-            id: 6,
-            title: 'Learn to cook Italian',
-            description: 'Master at least 10 traditional Italian recipes from scratch.',
-            date: '15 Mar',
-            progress: 60,
-            colorScheme: 'yellow'
-        },
-        {
-            id: 7,
-            title: 'Marathon training',
-            description: 'Follow a structured training plan to complete a full marathon by autumn.',
-            date: '20 Oct',
-            progress: 15,
-            colorScheme: 'orange'
-        },
-        {
-            id: 8,
-            title: 'Save for summer trip',
-            description: 'Set aside money each month to fund a two-week summer holiday.',
-            date: '1 Jun',
-            progress: 100,
-            colorScheme: 'pink'
-        }
-    ];
+
+    // Fetch goals from backend on mount
+    useEffect(() => {
+        const fetchGoals = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) {
+                setLoading(false);
+                return;
+            }
+
+            try {
+                const res = await fetch(`${import.meta.env.VITE_API_URL}/goals/${user.id}`);
+                const data = await res.json();
+
+                const mapped = (data.goals || []).map((goal, index) => ({
+                    id: goal.id,
+                    title: goal.title,
+                    description: goal.description || '',
+                    date: goal.due_date
+                        ? new Date(goal.due_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
+                        : '',
+                    progress: 0, // TODO: calculate from task completion
+                    colorScheme: COLOR_SCHEMES_LIST[index % COLOR_SCHEMES_LIST.length],
+                }));
+
+                setGoals(mapped);
+            } catch (err) {
+                console.error('Failed to fetch goals:', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchGoals();
+    }, []);
 
     return (
         <div className="goals-page">
@@ -89,9 +62,15 @@ const Goals = () => {
 
             {/* Goals List */}
             <div className="goals-list">
-                {goals.map((goal) => (
-                    <GoalListCard key={goal.id} goal={goal} />
-                ))}
+                {loading ? (
+                    <p style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>Loading goals...</p>
+                ) : goals.length === 0 ? (
+                    <p style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>No goals yet. Create one!</p>
+                ) : (
+                    goals.map((goal) => (
+                        <GoalListCard key={goal.id} goal={goal} />
+                    ))
+                )}
             </div>
         </div>
 
