@@ -75,6 +75,42 @@ def write_goal(goal: RequestGoals):
     )
     return {"message": "Goal successfully created", "goal": result.data}
 
+# PREVIEW endpoint - returns AI plan WITHOUT saving to DB
+@goal_router.post("/goals/preview")
+def preview_goal(goal: RequestGoals):
+    """
+    Get an AI-generated task breakdown without saving anything.
+    The goal is only saved when the user clicks Accept on the review page.
+    """
+    if goal.generate_plan:
+        ai_plan = get_initial_goal_breakdown(goal.title)
+
+        if ai_plan:
+            goal_data = {
+                "user_id": goal.user_id,
+                "title": goal.title,
+                "description": ai_plan.get("description", goal.description),
+                "goal_type": ai_plan["goal_type"],
+                "nodes": [node.model_dump() for node in ai_plan["nodes"]],
+                "edges": [edge.model_dump() for edge in ai_plan["edges"]]
+            }
+
+            if goal.due_date:
+                goal_data["due_date"] = goal.due_date
+
+            return {
+                "message": "AI plan generated (not saved yet)",
+                "goal_data": goal_data,
+                "ai_generated": True,
+                "goal_type": ai_plan["goal_type"],
+                "task_count": len(ai_plan["nodes"])
+            }
+
+    return {
+        "message": "No AI plan available for this goal",
+        "ai_generated": False
+    }
+
 #USE GET HTTP REQUEST TO GET DATA FROM SUPABASE
 @goal_router.get("/goals/{user_id}") #FETCH by user_id!
 def get_goals(user_id: str):
