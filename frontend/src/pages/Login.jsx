@@ -6,7 +6,7 @@ import { supabase } from '../supabase_client';
 function Login() {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
-        username: '',
+        email: '',
         password: ''
     });
 
@@ -17,11 +17,11 @@ function Login() {
         });
     };
 
-    const handleSubmit = async (e) => { //added "assync" here but not sure if that is correct
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        //Authentication Code !!!
+
         const { error } = await supabase.auth.signInWithPassword({
-            email: formData.username, //I guess that username is Email?
+            email: formData.email,
             password: formData.password
         });
 
@@ -29,8 +29,7 @@ function Login() {
             alert(error.message);
             return;
         }
-        console.log('Login:', formData);
-        // for now just redirect to homepage
+
         navigate('/');
     };
 
@@ -46,12 +45,12 @@ function Login() {
 
                 <form className="auth-form" onSubmit={handleSubmit}>
                     <div className="form-group">
-                        <label htmlFor="username">Username</label>
+                        <label htmlFor="email">Email</label>
                         <input
-                            type="text"
-                            id="username"
-                            name="username"
-                            value={formData.username}
+                            type="email"
+                            id="email"
+                            name="email"
+                            value={formData.email}
                             onChange={handleChange}
                             required
                         />

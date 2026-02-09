@@ -18,27 +18,47 @@ function SignUp() {
         });
     };
 
-    const handleSubmit = async (e) => { //added async here but not sure if its correct!
-    e.preventDefault();
-    //added AUTHENTICATION Code!!!!!!!
-    const { error } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-        options: {
-            data: {
-                username: formData.username
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        // 1. Create the user in Supabase Auth
+        const { data, error } = await supabase.auth.signUp({
+            email: formData.email,
+            password: formData.password,
+            options: {
+                data: {
+                    username: formData.username
+                }
             }
+        });
+
+        if (error) {
+            alert(error.message);
+            return;
         }
-    });
 
-    if (error) {
-        alert(error.message);
-        return;
-    }
+        // 2. Create the profile row in the backend
+        try {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/profiles`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    user_id: data.user.id,
+                    name: formData.username,
+                    email: formData.email
+                })
+            });
 
-    alert("Account created! Check your email.");
-    navigate('/login');
-};
+            if (!res.ok) {
+                const errData = await res.json();
+                console.error('Profile creation error:', errData);
+            }
+        } catch (err) {
+            console.error('Failed to create profile:', err);
+        }
+
+        alert('Account created! Check your email to confirm.');
+        navigate('/login');
     };
 
     return (
