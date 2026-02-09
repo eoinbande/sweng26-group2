@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
@@ -13,6 +13,19 @@ function ReviewPlan() {
     const [contentVisible, setContentVisible] = useState(false);
     const [showLoading, setShowLoading] = useState(location.state?.showLoading || false);
     const [saving, setSaving] = useState(false);
+
+    // Scroll-based fade visibility
+    const scrollRef = useRef(null);
+    const [showTopFade, setShowTopFade] = useState(false);
+    const [showBottomFade, setShowBottomFade] = useState(false);
+
+    const updateFades = useCallback(() => {
+        const el = scrollRef.current;
+        if (!el) return;
+        const threshold = 5; // px tolerance
+        setShowTopFade(el.scrollTop > threshold);
+        setShowBottomFade(el.scrollTop + el.clientHeight < el.scrollHeight - threshold);
+    }, []);
 
     // Data from CreateGoal (preview only, not saved yet)
     const previewData = location.state?.previewData;
@@ -29,6 +42,15 @@ function ReviewPlan() {
             dueDate: node.est_time ? `~${node.est_time} min` : '',
         }));
     }, [previewData]);
+
+    // Re-check fades when content becomes visible or tasks change
+    useEffect(() => {
+        if (contentVisible) {
+            // Small delay so cards have rendered
+            const t = setTimeout(updateFades, 600);
+            return () => clearTimeout(t);
+        }
+    }, [contentVisible, tasks, updateFades]);
 
     // Accept: save the goal to Supabase via POST /goals
     const handleAccept = async () => {
@@ -150,19 +172,23 @@ function ReviewPlan() {
                     overflow: 'visible',
                 }}>
                     {/* scrollable task cards */}
-                    <div style={{
-                        height: '100%',
-                        overflowY: 'auto',
-                        overflowX: 'hidden',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        gap: 'var(--space-md)',
-                        paddingLeft: '40px',
-                        paddingRight: 'var(--space-md)',
-                        width: '100%',
-                        boxSizing: 'border-box',
-                    }}>
+                    <div
+                        ref={scrollRef}
+                        onScroll={updateFades}
+                        style={{
+                            height: '100%',
+                            overflowY: 'auto',
+                            overflowX: 'hidden',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            gap: 'var(--space-md)',
+                            paddingLeft: '40px',
+                            paddingRight: 'var(--space-md)',
+                            width: '100%',
+                            boxSizing: 'border-box',
+                        }}
+                    >
                         {/* task cards - populated from backend response */}
                         {tasks.map((task, index) => (
                             <div
@@ -187,7 +213,7 @@ function ReviewPlan() {
                         ))}
                     </div>
 
-                    {/* top fade overlay */}
+                    {/* top fade overlay - hidden when scrolled to top */}
                     <div style={{
                         position: 'absolute',
                         top: 0,
@@ -197,9 +223,11 @@ function ReviewPlan() {
                         background: 'linear-gradient(to bottom, var(--accent-blue) 0%, transparent 100%)',
                         pointerEvents: 'none',
                         zIndex: 10,
+                        opacity: showTopFade ? 1 : 0,
+                        transition: 'opacity 0.25s ease',
                     }} />
 
-                    {/* bottom fade overlay */}
+                    {/* bottom fade overlay - hidden when scrolled to bottom */}
                     <div style={{
                         position: 'absolute',
                         bottom: 0,
@@ -209,6 +237,8 @@ function ReviewPlan() {
                         background: 'linear-gradient(to top, var(--accent-blue) 0%, transparent 100%)',
                         pointerEvents: 'none',
                         zIndex: 10,
+                        opacity: showBottomFade ? 1 : 0,
+                        transition: 'opacity 0.25s ease',
                     }} />
                 </div>
 
