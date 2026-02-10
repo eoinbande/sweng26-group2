@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '../styles/Auth.css';
-import { supabase } from '../supabase_client';
+import { supabase, isDemoMode } from '../supabase_client';
 
 function SignUp() {
     const navigate = useNavigate();
@@ -20,6 +20,12 @@ function SignUp() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (isDemoMode) {
+            alert('Account created successfully! (Demo mode)');
+            navigate('/login');
+            return;
+        }
 
         // 1. Create the user in Supabase Auth
         const { data, error } = await supabase.auth.signUp({

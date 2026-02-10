@@ -3,8 +3,21 @@ import { ArrowLeft, Mic } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
 import { InputBar } from '../components/InputBar';
-import { supabase } from '../supabase_client';
+import { supabase, isDemoMode } from '../supabase_client';
 import '../index.css';
+
+const MOCK_PREVIEW = {
+    ai_generated: true,
+    goal_data: {
+        description: 'Demo goal plan',
+        nodes: [
+            { id: 1, task: 'Research the topic thoroughly', est_time: 30 },
+            { id: 2, task: 'Create an action plan', est_time: 20 },
+            { id: 3, task: 'Start working on first milestone', est_time: 45 },
+            { id: 4, task: 'Review and adjust progress', est_time: 15 },
+        ],
+    },
+};
 
 function CreateGoal() {
     const navigate = useNavigate();
@@ -30,8 +43,30 @@ function CreateGoal() {
             setIsExpanding(true);
         }, 400);
 
+        // In demo mode, skip backend and navigate with mock data
+        if (isDemoMode) {
+            setTimeout(() => {
+                navigate('/review-plan', {
+                    state: {
+                        goal: goalText,
+                        showLoading: true,
+                        previewData: MOCK_PREVIEW,
+                        userId: 'demo-user-001',
+                        originalPrompt: goalText,
+                    },
+                });
+            }, 1400);
+            return;
+        }
+
         // get the logged-in user
-        const { data: { user } } = await supabase.auth.getUser();
+        let user;
+        try {
+            const { data } = await supabase.auth.getUser();
+            user = data?.user;
+        } catch (err) {
+            console.error('Supabase auth error:', err);
+        }
         if (!user) {
             alert('You must be logged in to create a goal.');
             navigate('/login');
