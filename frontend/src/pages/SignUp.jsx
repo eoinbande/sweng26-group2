@@ -18,27 +18,26 @@ function SignUp() {
         });
     };
 
-    const handleSubmit = async (e) => { //added async here but not sure if its correct!
-    e.preventDefault();
-    //added AUTHENTICATION Code!!!!!!!
-    const { error } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-        options: {
-            data: {
-                username: formData.username
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        const { error } = await supabase.auth.signUp({
+            email: formData.email,
+            password: formData.password,
+            options: {
+                data: {
+                    username: formData.username
+                }
             }
+        });
+
+        if (error) {
+            alert(error.message);
+            return;
         }
-    });
 
-    if (error) {
-        alert(error.message);
-        return;
-    }
-
-    alert("Account created! Check your email.");
-    navigate('/login');
-};
+        alert('Account created! Check your email.');
+        navigate('/login');
     };
 
     return (
