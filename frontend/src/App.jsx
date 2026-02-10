@@ -7,6 +7,7 @@ import ReviewPlan from './pages/ReviewPlan';
 import Login from './pages/Login';
 import SignUp from './pages/SignUp';
 import GoalDetail from './pages/GoalDetail';
+import Feedback from './pages/Feedback';
 import Loading from './components/Loading';
 import './index.css';
 
@@ -23,6 +24,7 @@ function App() {
         <Route path="/review-plan" element={<ReviewPlan />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
+        <Route path="/feedback" element={<Feedback />} />
       </Routes>
     </Router>
   );

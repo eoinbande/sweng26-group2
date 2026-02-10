@@ -5,31 +5,48 @@
     position: relative;
     max-width: 480px;
     margin: 0 auto;
-    height: 100%;
     background-color: var(--bg-color);
-    min-height: 100vh;
+    height: 100vh;
+    overflow-y: auto;
+    scrollbar-width: none; /* Firefox */
+}
+
+.goal-detail-page::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
 }
 
 .goal-detail-container {
     padding: 0 var(--space-md);
     padding-top: 24px;
     padding-bottom: 180px; /* Extra space for FABs and BottomNav */
-    overflow-y: auto;
-    height: 100%;
-    scrollbar-width: none; /* Firefox */
 }
 
-.goal-detail-container::-webkit-scrollbar {
-    display: none; /* Chrome/Safari */
-}
-
-/* Header Row with Flag Icon + Title */
+/* Header Row with Back Arrow + Title */
 .goal-header-row {
     display: flex;
     align-items: center;
     gap: 8px;
     margin-bottom: var(--space-sm);
     padding-top: 16px;
+}
+
+.back-arrow-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-main);
+    border-radius: 50%;
+    transition: background-color 0.15s ease, transform 0.15s ease;
+    flex-shrink: 0;
+}
+
+.back-arrow-btn:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    transform: scale(1.1);
 }
 
 /* Header Section */
@@ -69,13 +86,13 @@
 }
 
 .tag-creative {
-    background-color: #F0F0EC;
-    color: #1a1a1a;
+    background-color: #69995D;
+    color: white;
     padding: 4px 14px;
     border-radius: 12px;
     font-size: 12px;
     font-weight: 600;
-    border: 1px solid #D6D6D0;
+    border: none;
 }
 
 /* Date Section */
@@ -109,11 +126,6 @@
     margin-bottom: 16px; /* visible gap between cards */
 }
 
-/* Odd tasks shift right for zigzag effect */
-.task-item--offset {
-    padding-left: 40px;
-}
-
 /* Connector lines between tasks */
 .timeline-connector {
     position: absolute;
@@ -122,14 +134,8 @@
     z-index: 0;
 }
 
-.connector-right {
+.connector-straight {
     left: 23px;
-    top: 48px;
-    height: calc(100% + 6px);
-}
-
-.connector-left {
-    left: 63px; /* shifted for offset items */
     top: 48px;
     height: calc(100% + 6px);
 }
@@ -203,10 +209,7 @@
     background-color: #FFF0F0;
 }
 
-/* Subtask cards are slightly narrower than parent tasks */
-.task-card--subtask {
-    max-width: 85%;
-}
+/* Removed: subtask cards are now the same width as parent tasks */
 
 .task-card h4 {
     font-family: var(--font-sans);
@@ -291,7 +294,7 @@
     font-size: 13px;
 }
 
-/* Floating Action Buttons Area */
+/* Floating Action Button Area */
 .fab-container {
     position: fixed;
     bottom: 90px;
@@ -299,32 +302,14 @@
     transform: translateX(-50%);
     width: 100%;
     max-width: 480px;
-    padding: 0 var(--space-md);
+    padding: 0 var(--space-lg);
     display: flex;
-    gap: var(--space-md);
+    justify-content: center;
     z-index: 90;
 }
 
-.btn-add-task {
-    flex: 1;
-    background-color: #FFD465;
-    color: #1A1A1A;
-    font-weight: 600;
-    border: none;
-    border-radius: 24px;
-    padding: 14px;
-    font-size: 15px;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(255, 212, 101, 0.4);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.btn-add-task:active {
-    transform: scale(0.97);
-}
-
-.btn-reroute {
-    flex: 1;
+.btn-update-plan {
+    width: 220px;
     background-color: #FFC5C4;
     color: #1A1A1A;
     font-weight: 600;
@@ -337,6 +322,112 @@
     transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-.btn-reroute:active {
+.btn-update-plan:active {
     transform: scale(0.97);
+}
+
+/* ===== Subtask List inside active task cards ===== */
+.subtask-list {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    border-top: 1px solid #F0F0EC;
+    padding-top: 8px;
+}
+
+.subtask-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    background-color: #F9F9F7;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+    min-height: 36px;
+}
+
+.subtask-row:hover {
+    background-color: #F0F0EC;
+}
+
+.subtask-row--done {
+    background-color: #F0FAF0;
+}
+
+.subtask-row--done:hover {
+    background-color: #E0F5E0;
+}
+
+.subtask-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.subtask-row span {
+    font-size: 13px;
+    color: var(--text-main);
+    font-weight: 400;
+}
+
+.subtask-date {
+    font-size: 11px !important;
+    color: #8E8E93 !important;
+    display: flex;
+    align-items: center;
+}
+
+.subtask-help-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: none;
+    background-color: transparent;
+    color: #8E8E93;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.15s ease;
+}
+
+.subtask-help-btn:hover {
+    background-color: #E8E8E5;
+    color: #5681b3;
+}
+
+.subtask-check {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid #D1D1D6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.15s ease;
+}
+
+.subtask-check--done {
+    background-color: #7AD37F;
+    border-color: #7AD37F;
+    color: white;
+}
+
+/* Status icon for active task with all subtasks done */
+.status-ready {
+    background-color: #7AD37F;
+    color: white;
+    box-shadow: 0 3px 8px rgba(122, 211, 127, 0.4);
+    animation: pulse-ready 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-ready {
+    0%, 100% { box-shadow: 0 3px 8px rgba(122, 211, 127, 0.4); }
+    50% { box-shadow: 0 3px 16px rgba(122, 211, 127, 0.7); }
 }
