@@ -30,40 +30,18 @@ def create_user(user_id, name, email):
 
 #insert a new goal
 def create_goal(user_id, title, description, due_date=None):
-
-    exist_goal = supabase.table("goals").select("*").eq("user_id", user_id).eq("title", title).execute().data
-
-
-    #if goal already exist, do not allow duplication
-    if exist_goal:
-        print("Goal already exist!")
-        return exist_goal[0]
-
-
-    #if goal do no exist, create new goal 
     return supabase.table("goals").insert({
         "user_id": user_id,
         "title": title,
         "description": description,
         "due_date": due_date
-    }).execute() #we insert a new goal to that user 
+    }).execute() 
 
 #insert a new goal with goal_data JSON
 def create_goal_with_data(user_id: str, title: str, goal_data: dict, description: str = None):
     """
     Create a goal with the full goal_data JSON structure.
-    
-    Args:
-        user_id: The user's ID
-        title: Goal title (stored separately for easy querying)
-        goal_data: The full goal structure (nodes, edges, goal_type, etc.)
     """
-    exist_goal = supabase.table("goals").select("*").eq("user_id", user_id).eq("title", title).execute().data
-
-    if exist_goal:
-        print("Goal already exists!")
-        return exist_goal[0]
-
     return supabase.table("goals").insert({
         "user_id": user_id,
         "title": title,

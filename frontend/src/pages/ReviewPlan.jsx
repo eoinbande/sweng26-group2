@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
@@ -12,30 +12,83 @@ function ReviewPlan() {
     const location = useLocation();
     const [contentVisible, setContentVisible] = useState(false);
     const [showLoading, setShowLoading] = useState(location.state?.showLoading || false);
+    const [saving, setSaving] = useState(false);
 
-    // Extract tasks from the backend response passed via navigation state
-    const goalResponse = location.state?.goalResponse;
-    const goalTitle = location.state?.goal || 'Your Goal';
+    // Scroll-based fade visibility
+    const scrollRef = useRef(null);
+    const [showTopFade, setShowTopFade] = useState(false);
+    const [showBottomFade, setShowBottomFade] = useState(false);
 
-    // Parse tasks from the goal_data in the response
+    const updateFades = useCallback(() => {
+        const el = scrollRef.current;
+        if (!el) return;
+        const threshold = 5; // px tolerance
+        setShowTopFade(el.scrollTop > threshold);
+        setShowBottomFade(el.scrollTop + el.clientHeight < el.scrollHeight - threshold);
+    }, []);
+
+    // Data from CreateGoal (preview only, not saved yet)
+    const previewData = location.state?.previewData;
+    const userId = location.state?.userId;
+    const goalTitle = location.state?.goal || '';
+    const originalPrompt = location.state?.originalPrompt || goalTitle;
+
+    // Parse tasks from the preview response
     const tasks = React.useMemo(() => {
-        if (!goalResponse) return [];
+        if (!previewData?.goal_data?.nodes) return [];
+        return previewData.goal_data.nodes.map(node => ({
+            id: node.id,
+            title: node.task,
+            dueDate: node.est_time ? `~${node.est_time} min` : '',
+        }));
+    }, [previewData]);
 
-        // The goal data is in goalResponse.goal[0].goal_data (from Supabase insert response)
-        const goalData = goalResponse.goal?.[0]?.goal_data
-            ?? goalResponse.goal?.goal_data
-            ?? goalResponse.goal_data;
-
-        if (goalData?.nodes) {
-            return goalData.nodes.map(node => ({
-                id: node.id,
-                title: node.task,
-                dueDate: node.est_time ? `~${node.est_time} min` : '',
-            }));
+    // Re-check fades when content becomes visible or tasks change
+    useEffect(() => {
+        if (contentVisible) {
+            // Small delay so cards have rendered
+            const t = setTimeout(updateFades, 600);
+            return () => clearTimeout(t);
         }
+    }, [contentVisible, tasks, updateFades]);
 
-        return [];
-    }, [goalResponse]);
+    // Accept: save the goal to Supabase via POST /goals
+    const handleAccept = async () => {
+        setSaving(true);
+        try {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/goals`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    user_id: userId,
+                    title: goalTitle,
+                    description: previewData?.goal_data?.description || goalTitle,
+                    generate_plan: true
+                })
+            });
+
+            const data = await res.json();
+            console.log('Goal saved:', data);
+
+            if (!res.ok) {
+                console.error('Save error:', data);
+                alert('Failed to save goal.');
+                setSaving(false);
+                return;
+            }
+
+            navigate('/goals');
+        } catch (err) {
+            console.error('Network error saving goal:', err);
+            alert('Network error. Is the backend running?');
+            setSaving(false);
+        }
+    };
+
+    // Discard: go back to CreateGoal with the original prompt restored
+    const handleDiscard = () => {
+        navigate('/create-goal', { state: { originalPrompt } });
+    };
 
     // fade in content after mount (or after loading overlay completes)
     useEffect(() => {
@@ -74,7 +127,7 @@ function ReviewPlan() {
             }}>
                 {/* Back button */}
                 <button
-                    onClick={() => navigate('/create-goal')}
+                    onClick={handleDiscard}
                     style={{
                         backgroundColor: 'transparent',
                         border: 'none',
@@ -119,19 +172,23 @@ function ReviewPlan() {
                     overflow: 'visible',
                 }}>
                     {/* scrollable task cards */}
-                    <div style={{
-                        height: '100%',
-                        overflowY: 'auto',
-                        overflowX: 'hidden',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        gap: 'var(--space-md)',
-                        paddingLeft: '40px',
-                        paddingRight: 'var(--space-md)',
-                        width: '100%',
-                        boxSizing: 'border-box',
-                    }}>
+                    <div
+                        ref={scrollRef}
+                        onScroll={updateFades}
+                        style={{
+                            height: '100%',
+                            overflowY: 'auto',
+                            overflowX: 'hidden',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            gap: 'var(--space-md)',
+                            paddingLeft: '40px',
+                            paddingRight: 'var(--space-md)',
+                            width: '100%',
+                            boxSizing: 'border-box',
+                        }}
+                    >
                         {/* task cards - populated from backend response */}
                         {tasks.map((task, index) => (
                             <div
@@ -156,7 +213,7 @@ function ReviewPlan() {
                         ))}
                     </div>
 
-                    {/* top fade overlay */}
+                    {/* top fade overlay - hidden when scrolled to top */}
                     <div style={{
                         position: 'absolute',
                         top: 0,
@@ -166,9 +223,11 @@ function ReviewPlan() {
                         background: 'linear-gradient(to bottom, var(--accent-blue) 0%, transparent 100%)',
                         pointerEvents: 'none',
                         zIndex: 10,
+                        opacity: showTopFade ? 1 : 0,
+                        transition: 'opacity 0.25s ease',
                     }} />
 
-                    {/* bottom fade overlay */}
+                    {/* bottom fade overlay - hidden when scrolled to bottom */}
                     <div style={{
                         position: 'absolute',
                         bottom: 0,
@@ -178,6 +237,8 @@ function ReviewPlan() {
                         background: 'linear-gradient(to top, var(--accent-blue) 0%, transparent 100%)',
                         pointerEvents: 'none',
                         zIndex: 10,
+                        opacity: showBottomFade ? 1 : 0,
+                        transition: 'opacity 0.25s ease',
                     }} />
                 </div>
 
@@ -191,6 +252,8 @@ function ReviewPlan() {
                     transition: 'opacity 0.4s ease-out 0.3s',
                 }}>
                     <button
+                        onClick={handleAccept}
+                        disabled={saving}
                         style={{
                             backgroundColor: 'var(--primary)',
                             color: 'var(--text-main)',
@@ -200,9 +263,10 @@ function ReviewPlan() {
                             fontFamily: 'var(--font-sans)',
                             fontSize: '16px',
                             fontWeight: '500',
-                            cursor: 'pointer',
+                            cursor: saving ? 'wait' : 'pointer',
                             transition: 'all 0.3s ease',
                             boxShadow: 'var(--shadow-sm)',
+                            opacity: saving ? 0.7 : 1,
                         }}
                         onMouseEnter={(e) => {
                             e.currentTarget.style.transform = 'translateY(-3px)';
@@ -213,9 +277,10 @@ function ReviewPlan() {
                             e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
                         }}
                     >
-                        Accept
+                        {saving ? 'Saving...' : 'Accept'}
                     </button>
                     <button
+                        onClick={handleDiscard}
                         style={{
                             backgroundColor: 'var(--accent-red-soft)',
                             color: 'white',
