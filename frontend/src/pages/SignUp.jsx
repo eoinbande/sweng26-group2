@@ -57,8 +57,8 @@ function SignUp() {
             }
         } catch (err) {
             console.error('Failed to create profile:', err);
-                alert('Network error creating profile');
-                return;   
+            alert('Network error creating profile');
+            return;
         }
 
         alert('Account created successfully!');
