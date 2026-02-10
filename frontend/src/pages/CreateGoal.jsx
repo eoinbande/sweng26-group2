@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Mic } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
 import { InputBar } from '../components/InputBar';
 import { supabase } from '../supabase_client';
@@ -8,12 +8,17 @@ import '../index.css';
 
 function CreateGoal() {
     const navigate = useNavigate();
-    const [message, setMessage] = useState('');
+    const location = useLocation();
+
+    // Restore the prompt if coming back from ReviewPlan via Discard
+    const restoredPrompt = location.state?.originalPrompt || '';
+
+    const [message, setMessage] = useState(restoredPrompt);
     const [manualGoal, setManualGoal] = useState('');
     const [isFading, setIsFading] = useState(false);
     const [isExpanding, setIsExpanding] = useState(false);
 
-    // handle goal submission - calls backend then transitions to review
+    // handle goal submission - calls preview endpoint (does NOT save)
     const handleGoalSubmit = async (goalText) => {
         console.log('Goal submitted:', goalText);
 
@@ -33,9 +38,9 @@ function CreateGoal() {
             return;
         }
 
-        // call backend to create goal + get AI plan
+        // call preview endpoint (does NOT save to DB)
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/goals`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/goals/preview`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -47,32 +52,33 @@ function CreateGoal() {
             });
 
             const data = await res.json();
-            console.log('Backend response:', data);
+            console.log('Preview response:', data);
 
             if (!res.ok) {
-                console.error('Goal creation error:', data);
-                alert('Failed to create goal. Check console.');
+                console.error('Preview error:', data);
+                alert('Failed to get AI plan. Check console.');
                 return;
             }
 
             // step 3: navigate after expansion completes
             setTimeout(() => {
                 if (data.ai_generated) {
-                    // AI plan was generated → go to review
                     navigate('/review-plan', {
                         state: {
                             goal: goalText,
                             showLoading: true,
-                            goalResponse: data
+                            previewData: data,
+                            userId: user.id,
+                            originalPrompt: goalText
                         }
                     });
                 } else {
-                    // No AI match → goal saved but no plan to review
+                    // No AI match — go to goals page
                     navigate('/goals');
                 }
             }, 1400);
         } catch (err) {
-            console.error('Network error creating goal:', err);
+            console.error('Network error:', err);
             alert('Network error. Is the backend running?');
         }
     };
