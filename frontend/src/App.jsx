@@ -6,6 +6,7 @@ import CreateGoal from './pages/CreateGoal';
 import ReviewPlan from './pages/ReviewPlan';
 import Login from './pages/Login';
 import SignUp from './pages/SignUp';
+import GoalDetail from './pages/GoalDetail';
 import Loading from './components/Loading';
 import './index.css';
 
@@ -17,9 +18,9 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/goals" element={<Goals />} />
+        <Route path="/goal/:id" element={<GoalDetail />} /> {/* Add dynamic route */}
         <Route path="/create-goal" element={<CreateGoal />} />
         <Route path="/review-plan" element={<ReviewPlan />} />
-        <Route path="/create-goal" element={<CreateGoal />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
       </Routes>
