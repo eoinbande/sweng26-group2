@@ -418,75 +418,9 @@ def add_subtasks_to_task(goal_id: str, parent_task_id: str, subtasks: list[dict]
     return subtasks
 
 
-#insert a new task
-def create_task(goal_id, description, due_date=None):
-
-   
-    exist_task = supabase.table("tasks").select("*").eq("goal_id", goal_id).eq("description", description).execute().data
-    
-    #if the task already exist, do not allow duplicates
-    if exist_task:
-        print("Task with this description already exists for this goal.")
-        return exist_task[0]
-
-    #else add task
-    return supabase.table("tasks").insert({
-        "goal_id": goal_id,
-        "description": description,
-        "due_date": due_date
-    }).execute() #we insert a task to that goal
-
- 
-
-def create_ai_task(goal_id, description, due_date=None, ai_generated = True):
-
-    exist_task = supabase.table("tasks").select("*").eq("goal_id", goal_id).eq("description", description).eq("ai_generated", ai_generated).execute().data
-    
-    # if the task already exist and is ai generated will not allow it to be generated again.
-    # might need to prompt to endit the already existing one when the modify task endpoint gets made
-    if exist_task:
-        print("AI task with this description already exists for this goal.")
-        return exist_task[0]
-    
-    return supabase.table("tasks").insert({
-        "goal_id": goal_id,
-        "description": description,
-        "due_date": due_date,
-        "ai_generated": ai_generated
-    }).execute()
 
 
-#Update the status column in the tasks table(modify DB)
-def update_task_status(task_id: str, status: str):
-    return supabase.table("tasks").update(
-        {"status": status}
-    ).eq("id", task_id).execute() #this function will modify the status of an arbitrary task
 
-#Store the UPDATED graph to the DB(blob of JSON in goals)
-def update_goal_graph(goal_id: str, updated_graph: dict):
-    return supabase.table("goals").update({"goal_data": updated_graph}).eq("id", goal_id).execute()
-
-
-##################    GET DATA        ####################33333
-
-
-#Get all goals for a user
-def get_all_goals(user_id):
-    return supabase.table("goals").select("*").eq("user_id", user_id).execute().data
-
-#Get all tasks for a specific goal
-def get_tasks(goal_id):
-    return supabase.table("tasks").select("*").eq("goal_id", goal_id).execute().data
-
-#get ai generated tasks for a goal 
-def get_ai_tasks(goal_id):
-    return supabase.table("tasks").select("*").eq("goal_id", goal_id).eq("ai_generated", True).execute().data
-
-#Fetch the goal's stored graph(nodes + edges) data from the database
-def get_goal_graph(goal_id: str):
-    result = supabase.tablr("goals").select("goal_data").eq("id", goal_id).single().execute()
-
-    return result.data["goal_data"]
 
 # ================== TEST BLOCK ==================
 
