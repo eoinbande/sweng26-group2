@@ -13,25 +13,26 @@ const CreateGoalCard = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: 'var(--space-lg)',
-            marginBottom: 'var(--space-md)', /* Reduced margin */
+            padding: '36px',
+            maxWidth: '480px',
+            margin: 'var(--space-md)',
             boxShadow: 'var(--shadow-md)',
             border: 'none',
             cursor: 'pointer',
             borderRadius: 'var(--radius-xl)',
         }}>
             <div>
-                <h3 style={{ fontSize: '18px', marginBottom: 'var(--space-xs)' }}>
+                <h3 style={{ fontSize: '18px', marginBottom: '12px' }}>
                     Create a new Goal
                 </h3>
-                <p style={{ fontSize: '14px', opacity: 0.9 }}>
+                <p style={{ fontSize: '14px', }}>
                     Break it down, step <br /> by step.
                 </p>
             </div>
 
             <button style={{
-                width: '64px',
-                height: '64px',
+                width: '70px',
+                height: '70px',
                 borderRadius: '50%',
                 backgroundColor: 'var(--accent-blue)', // Updated to use variable
                 border: 'none',
@@ -46,7 +47,7 @@ const CreateGoalCard = () => {
                 onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
                 onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1.0)'}
             >
-                <Plus size={32} color="#1A1A1A" />
+                <Plus size={36} color="#1A1A1A" />
             </button>
         </div>
     );
