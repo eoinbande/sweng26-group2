@@ -15,16 +15,15 @@ const GoalsGrid = () => {
     ];
 
     return (
-        <div style={{ marginBottom: '0px', overflow: 'hidden' }}>
+        <div style={{ marginBottom: '0px' }}>
             <h4 style={{ fontSize: '20px', marginBottom: 'var(--space-sm)' }}>January's goals</h4>
 
             <div style={{
                 display: 'flex',
                 gap: 'var(--space-md)',
                 overflowX: 'auto',
-                padding: 'var(--space-md)', // Added full padding to allow hover growth
-                margin: '-16px', // Negative margin to compensate layout
-                marginBottom: '0px'
+                padding: 'var(--space-md) 24px',
+                margin: '0 -24px',
             }}>
                 {goals.map((goal, index) => (
                     <div key={index} className="interactive" onClick={() => navigate('/goal-detail')} style={{
