@@ -350,6 +350,74 @@ def get_total_task_count(goal_id: str) -> int:
     ).execute()
     return result.count or 0
 
+
+# =============================================================================
+# EXPAND TASK (breaking a task into subtasks)
+# =============================================================================
+#
+# When a user finds a task too hard or gets stuck, they can "expand" it.
+# This calls AI (or mock) to generate subtasks, then we save them.
+#
+# =============================================================================
+
+def add_subtasks_to_task(goal_id: str, parent_task_id: str, subtasks: list[dict]):
+    """
+    Add subtasks to an existing task that currently has none.
+    
+    Used when user clicks "expand" or "I'm stuck" on a task.
+    The AI generates subtasks, and this function saves them to both
+    the tasks table and the goal_data JSONB.
+    
+    Args:
+        goal_id: The goal's UUID
+        parent_task_id: UUID of the task being expanded
+        subtasks: List of subtask dicts from AI/mock. Each has ai_id
+                  but no UUID yet.
+                  
+                  Example:
+                  [
+                      {"ai_id": "task_5a", "description": "Put tube back in tyre", "order": 1, ...},
+                      {"ai_id": "task_5b", "description": "Fit tyre onto rim", "order": 2, ...}
+                  ]
+    
+    Returns: The subtasks list with UUIDs assigned.
+    """
+    # Step 1: Assign UUIDs to each new subtask
+    for sub in subtasks:
+        if not sub.get("id"):
+            sub["id"] = str(uuid.uuid4())
+
+    # Step 2: Insert subtask rows into the tasks table
+    # Each subtask's parent_id points to the parent task's UUID
+    for sub in subtasks:
+        supabase.table("tasks").upsert({
+            "id": sub["id"],
+            "ai_id": sub["ai_id"],
+            "goal_id": goal_id,
+            "description": sub["description"],
+            "order": sub["order"],
+            "status": "not_started",
+            "requires_input": False,
+            "parent_id": parent_task_id  # Links subtask to its parent
+        }).execute()
+
+    # Step 3: Update the goal_data JSONB to include these subtasks
+    # Find the parent task in the JSON and add the subtasks array
+    goal = get_goal(goal_id)
+    goal_data = goal.get("goal_data", {})
+    if isinstance(goal_data, str):
+        goal_data = json.loads(goal_data)
+
+    for task in goal_data.get("tasks", []):
+        if task.get("id") == parent_task_id:
+            task["subtasks"] = subtasks
+            break
+
+    update_goal_data(goal_id, goal_data)
+
+    return subtasks
+
+
 #insert a new task
 def create_task(goal_id, description, due_date=None):
 
