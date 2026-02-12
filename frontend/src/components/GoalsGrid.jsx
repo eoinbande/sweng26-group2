@@ -26,7 +26,7 @@ const GoalsGrid = () => {
                 margin: '0 -24px',
             }}>
                 {goals.map((goal, index) => (
-                    <div key={index} className="interactive" onClick={() => navigate('/goal-detail')} style={{
+                    <div key={index} className="goal-grid-card" onClick={() => navigate('/goal-detail')} style={{
                         backgroundColor: goal.color,
                         borderRadius: '36px',
                         minWidth: '160px',

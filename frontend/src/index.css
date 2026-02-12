@@ -138,6 +138,16 @@ h6 {
     justify-content: space-between;
 }
 
+.goal-grid-card {
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.goal-grid-card:hover {
+    transform: scale(1.05) rotate(-2deg);
+    box-shadow: var(--shadow-lg);
+}
+
 button {
     font-family: var(--font-sans);
     cursor: pointer;
