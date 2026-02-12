@@ -429,19 +429,30 @@ if __name__ == "__main__":
 
     TEST_USER_ID = settings.TEST_USER_ID
 
+    # Test 1: Create a user
     user_result = create_user(TEST_USER_ID, "Test User", "test@test.com")
     print("User:", user_result)
 
-    goal_result = create_goal(TEST_USER_ID, "Learn FastAPI", "Build backend", "2026-02-20")
+    # Test 2: Create a goal (starts with empty task list)
+    goal_result = create_goal(TEST_USER_ID, "Fix my bike tyre")
     print("Goal:", goal_result)
 
-    goal_id = goal_result.data[0]["id"] if hasattr(goal_result, "data") else goal_result["id"]
+    # Extract the goal ID from the response
+    if hasattr(goal_result, "data") and goal_result.data:
+        goal_id = goal_result.data[0]["id"]
+    else:
+        goal_id = goal_result["id"]
 
-    task_result = create_task(goal_id, "Create endpoints", "2026-02-10")
-    print("Task:", task_result)
+    # Test 3: Load mock tasks and save them (simulates "Accept" flow)
+    # mock_response_templates.py lives in app/Mocked/
+    from app.Mocked.mock_response_templates import get_mock_plan
+    mock_plan = get_mock_plan("Fix my bike tyre")
+    saved_tasks = save_tasks_to_db(goal_id, mock_plan["tasks"])
+    print(f"Saved {len(saved_tasks)} tasks")
 
+    # Test 4: Verify data is in both places
     print("Goals:", get_all_goals(TEST_USER_ID))
-    print("Tasks:", get_tasks(goal_id))
+    print("Task rows:", get_tasks_for_goal(goal_id))
+    print(f"Progress: {get_completed_task_count(goal_id)}/{get_total_task_count(goal_id)}")
 
     print("\n---- TEST COMPLETE ----")
-
