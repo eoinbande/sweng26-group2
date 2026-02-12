@@ -5,9 +5,8 @@ import '../index.css';
 
 /* Custom filled house icon with fully rounded corners */
 const HomeIcon = ({ size = 26 }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="#1A1A1A" xmlns="http://www.w3.org/2000/svg">
-        <path d="M10.8 2.8a1.8 1.8 0 0 1 2.4 0l7 6.5A2.5 2.5 0 0 1 21 11.5V19a3 3 0 0 1-3 3h-2.5a2 2 0 0 1-2-2v-3.5a1.5 1.5 0 0 0-1.5-1.5h-1a1.5 1.5 0 0 0-1.5 1.5V20a2 2 0 0 1-2 2H5a3 3 0 0 1-3-3v-7.5a2.5 2.5 0 0 1 .8-2.2l7-6.5Z"
-              strokeLinejoin="round" />
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="#1A1A1A" xmlns="http://www.w3.org/2000/svg" style={{ display: 'flex' }}>
+        <path d="M12 3Q13.5 3 15.75 5L20.5 9Q21.5 10 21.5 11.5V18Q21.5 22 17.75 22H15.25Q13.75 22 13.75 20V18Q13.75 15 12 15Q10.25 15 10.25 18V20Q10.25 22 8.75 22H6.25Q2.5 22 2.5 18V11.5Q2.5 10 3.5 9L8.25 5Q10.5 3 12 3Z" />
     </svg>
 );
 
@@ -56,7 +55,7 @@ const BottomNav = () => {
                     boxShadow: '0 4px 14px rgba(255, 185, 46, 0.4)',
                     marginTop: '-28px',
                 }}>
-                    <HomeIcon size={26} />
+                    <HomeIcon  />
                 </div>
             </div>
 
