@@ -73,18 +73,16 @@ function CreateGoal() {
             return;
         }
 
-        // call preview endpoint (does NOT save to DB)
+        // call preview endpoint (actually creates goal + gets plan)
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/goals/preview`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    user_id: user.id,
-                    title: goalText,
-                    description: goalText,
-                    generate_plan: true
-                })
-            });
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/goals`, {
+                 method: 'POST',
+                 headers: { 'Content-Type': 'application/json' },
+                 body: JSON.stringify({
+                     user_id: user.id,
+                     title: goalText
+                 })
+             });
 
             const data = await res.json();
             console.log('Preview response:', data);
@@ -97,21 +95,16 @@ function CreateGoal() {
 
             // step 3: navigate after expansion completes
             setTimeout(() => {
-                if (data.ai_generated) {
-                    navigate('/review-plan', {
-                        state: {
-                            goal: goalText,
-                            showLoading: true,
-                            previewData: data,
-                            userId: user.id,
-                            originalPrompt: goalText
-                        }
-                    });
-                } else {
-                    // No AI match — go to goals page
-                    navigate('/goals');
-                }
-            }, 1400);
+                navigate('/review-plan', {
+                    state: {
+                        goal: goalText,
+                        previewData: data, // pass the full response (has tasks & goal_id)
+                        userId: user.id,
+                        originalPrompt: goalText,
+                    },
+                });
+            }, 1000);
+
         } catch (err) {
             console.error('Network error:', err);
             alert('Network error. Is the backend running?');
