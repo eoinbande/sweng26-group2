@@ -56,7 +56,19 @@ const Goals = () => {
                     date: goal.due_date
                         ? new Date(goal.due_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
                         : '',
-                    progress: 0,
+                    progress: (() => {
+                        let tasks = [];
+                        try {
+                            const gd = typeof goal.goal_data === 'string' 
+                                ? JSON.parse(goal.goal_data) 
+                                : goal.goal_data;
+                            tasks = gd?.tasks || [];
+                        } catch (e) { tasks = []; }
+                        
+                        if (tasks.length === 0) return 0;
+                        const completed = tasks.filter(t => t.status === 'completed').length;
+                        return Math.round((completed / tasks.length) * 100);
+                    })(),
                     colorScheme: COLOR_SCHEMES_LIST[index % COLOR_SCHEMES_LIST.length],
                 }));
 
