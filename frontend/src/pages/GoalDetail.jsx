@@ -3,9 +3,9 @@ import {
     Calendar, 
     Check, 
     CheckCheck, 
-    Lock, 
     Clock, 
-    HelpCircle,
+    X,
+    Mic,
     ArrowUpLeft 
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -40,6 +40,7 @@ const GoalDetail = () => {
     const location = useLocation();
 
     const goalTitle = location.state?.goal?.title || "Master the piano";
+    const goalId = location.state?.goal?.id || null;
 
     /* Default task data — used on first visit */
     const defaultTasks = [
@@ -95,6 +96,10 @@ const GoalDetail = () => {
 
     /* Restore tasks from location.state if returning from feedback page, otherwise use defaults */
     const [tasks, setTasks] = useState(location.state?.tasks || defaultTasks);
+
+    /* ---- Change-of-plans modal state ---- */
+    const [showReroute, setShowReroute] = useState(false);
+    const [rerouteText, setRerouteText] = useState('');
 
     /* ---- Derived: is each task complete? (all subtasks done) ---- */
     const isTaskComplete = (task) =>
@@ -169,7 +174,12 @@ const GoalDetail = () => {
                 <div className="goal-header-row">
                     <button
                         className="back-arrow-btn"
-                        onClick={() => navigate('/goals')}
+                        onClick={() => navigate('/goals', {
+                            state: {
+                                updatedGoalId: goalId,
+                                updatedProgress: progress,
+                            }
+                        })}
                         aria-label="Back to goals"
                     >
                         <ArrowUpLeft size={28} strokeWidth={2.5} />
@@ -270,25 +280,6 @@ const GoalDetail = () => {
                                                             {getDaysLeftText(sub.dueDate)}
                                                         </span>
                                                     </div>
-                                                    <button
-                                                        className="subtask-help-btn"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            navigate('/feedback', {
-                                                                state: {
-                                                                    subtask: sub,
-                                                                    taskTitle: task.title,
-                                                                    // Pass current state so we can restore it on return
-                                                                    returnTo: location.pathname,
-                                                                    tasks: tasks,
-                                                                    goal: { title: goalTitle },
-                                                                }
-                                                            });
-                                                        }}
-                                                        aria-label="Get help with this subtask"
-                                                    >
-                                                        <HelpCircle size={18} />
-                                                    </button>
                                                 </div>
                                             ))}
                                         </div>
@@ -313,8 +304,48 @@ const GoalDetail = () => {
 
             {/* Floating Action Button */}
             <div className="fab-container">
-                <button className="btn-update-plan">Update Plan</button>
+                <button className="btn-update-plan" onClick={() => setShowReroute(true)}>Update Plan</button>
             </div>
+
+            {/* Change of Plans Modal */}
+            {showReroute && (
+                <div className="reroute-overlay" onClick={() => setShowReroute(false)}>
+                    <div className="reroute-sheet" onClick={(e) => e.stopPropagation()}>
+                        <button
+                            className="reroute-close-btn"
+                            onClick={() => setShowReroute(false)}
+                            aria-label="Close"
+                        >
+                            <X size={24} strokeWidth={2.5} />
+                        </button>
+
+                        <h2 className="reroute-title">Change of plans?</h2>
+                        <p className="reroute-subtitle">
+                            Tell us what's shifted, we'll help<br/>you reroute.
+                        </p>
+
+                        <div className="reroute-input-row">
+                            <input
+                                className="reroute-input"
+                                type="text"
+                                placeholder="Feedback to AI..."
+                                value={rerouteText}
+                                onChange={(e) => setRerouteText(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' && rerouteText.trim()) {
+                                        // TODO: handle reroute submission
+                                        setShowReroute(false);
+                                        setRerouteText('');
+                                    }
+                                }}
+                            />
+                            <button className="reroute-mic-btn" aria-label="Voice input">
+                                <Mic size={20} />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <BottomNav />
         </div>
@@ -326,7 +357,22 @@ const StatusIcon = ({ status, allSubsDone, onClick }) => {
     if (status === 'locked') {
         return (
             <div className="status-icon-wrapper status-red">
-                <Lock size={18} fill="white" strokeWidth={2.5} />
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    {/* Shackle */}
+                    <path
+                        d="M7 10V7a5 5 0 0 1 10 0v3"
+                        stroke="white"
+                        strokeWidth="2.2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        fill="none"
+                    />
+                    {/* Lock body */}
+                    <rect x="5" y="10" width="14" height="11" rx="2.5" fill="white" />
+                    {/* Keyhole */}
+                    <circle cx="12" cy="15" r="1.8" fill="#FF5A5F" />
+                    <rect x="11.2" y="15.5" width="1.6" height="3" rx="0.8" fill="#FF5A5F" />
+                </svg>
             </div>
         );
     }

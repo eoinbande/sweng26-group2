@@ -1,4 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import PageHeader from '../components/PageHeader';
 import GoalListCard from '../components/GoalListCard';
 import BottomNav from '../components/BottomNav';
@@ -15,6 +16,7 @@ const MOCK_GOALS = [
 ];
 
 const Goals = () => {
+    const location = useLocation();
     const [showBottomFade, setShowBottomFade] = useState(true);
     const [goals, setGoals] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -69,6 +71,17 @@ const Goals = () => {
 
         fetchGoals();
     }, []);
+
+    /* ---- Update progress when returning from GoalDetail ---- */
+    useEffect(() => {
+        const updatedId = location.state?.updatedGoalId;
+        const updatedProgress = location.state?.updatedProgress;
+        if (updatedId != null && updatedProgress != null) {
+            setGoals(prev => prev.map(g =>
+                g.id === updatedId ? { ...g, progress: updatedProgress } : g
+            ));
+        }
+    }, [location.state]);
 
     return (
         <div className="goals-page">
