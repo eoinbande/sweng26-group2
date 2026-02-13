@@ -13,7 +13,7 @@ const CalendarStrip = () => {
     ];
 
     return (
-        <div style={{ marginBottom: 'var(--space-lg)' }}>
+        <div style={{ marginBottom: 'var(--space-md)' }}>
             <div className="flex-between" style={{ padding: '0 var(--space-xs)' }}>
                 {days.map((item, index) => (
                     <div key={index} style={{
@@ -30,8 +30,8 @@ const CalendarStrip = () => {
                             {item.day}
                         </span>
                         <div style={{
-                            width: '50px',
-                            height: '50px',
+                            width: '40px',
+                            height: '40px',
                             borderRadius: '50%',
                             backgroundColor: item.active ? 'var(--primary)' : 'white',
                             display: 'flex',

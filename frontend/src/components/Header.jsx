@@ -4,7 +4,7 @@ import '../index.css';
 
 const Header = () => {
     return (
-        <header style={{ marginBottom: 'var(--space-lg)' }}>
+        <header style={{ marginBottom: 'var(--space-md)' }}>
             <div className="flex-between">
                 <div>
                     <h1 style={{

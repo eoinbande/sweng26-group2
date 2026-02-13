@@ -15,7 +15,7 @@ const CreateGoalCard = () => {
             justifyContent: 'space-between',
             padding: '38px 24px',
             maxWidth: '480px',
-            margin: 'var(--space-md)',
+            marginBottom: 'var(--space-md)',
             boxShadow: 'var(--shadow-md)',
             border: 'none',
             cursor: 'pointer',

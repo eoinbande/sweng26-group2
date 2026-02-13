@@ -15,8 +15,8 @@ const GoalsGrid = () => {
     ];
 
     return (
-        <div style={{ marginBottom: '0px' }}>
-            <h4 style={{ fontSize: '20px', marginBottom: 'var(--space-sm)' }}>January's goals</h4>
+        <div style={{ marginBottom: 'var(--space-md)' }}>
+            <h4 style={{ fontSize: '18px', marginBottom: 'var(--space-sm)' }}>January's goals</h4>
 
             <div style={{
                 display: 'flex',

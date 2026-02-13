@@ -59,7 +59,7 @@ const UpcomingTasks = () => {
                     borderRadius: 'var(--radius-lg)',
                     transform: 'rotate(-5deg)',
                     zIndex: 0,
-                    boxShadow: 'var(--shadow-md)',
+                    boxShadow: 'var(--shadow-sm)',
                 }}></div>
 
                 {/* blue front card */}
@@ -69,7 +69,7 @@ const UpcomingTasks = () => {
                     backgroundColor: 'var(--accent-blue)',
                     borderRadius: 'var(--radius-lg)',
                     padding: 'var(--space-sm)',
-                    boxShadow: 'var(--shadow-lg)',
+                    boxShadow: 'var(--shadow-md)',
                     flex: 1,
                     minHeight: 0,
                     display: 'flex',
