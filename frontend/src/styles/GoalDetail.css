@@ -1,6 +1,8 @@
-/* src/styles/GoalDetail.css */
+/* css for goaldetail.jsx: page-level layout + Reroute modal. */
+/* Header & Timeline styles have their own css in /styles/components */
 
-/* Page wrapper — same width as other pages */
+/* page wrapper */
+
 .goal-detail-page {
     position: relative;
     max-width: 480px;
@@ -8,293 +10,21 @@
     background-color: var(--bg-color);
     height: 100vh;
     overflow-y: auto;
-    scrollbar-width: none; /* Firefox */
+    scrollbar-width: none;
 }
 
 .goal-detail-page::-webkit-scrollbar {
-    display: none; /* Chrome/Safari */
+    display: none;
 }
 
 .goal-detail-container {
     padding: 0 var(--space-md);
-    padding-top: 24px;
-    padding-bottom: 180px; /* Extra space for FABs and BottomNav */
+    padding-top: 8px;
+    padding-bottom: 180px; /* room for FAB + BottomNav */
 }
 
-/* Header Row with Back Arrow + Title */
-.goal-header-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: var(--space-sm);
-    padding-top: 16px;
-}
+/* floating action button */
 
-.back-arrow-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-main);
-    border-radius: 50%;
-    transition: background-color 0.15s ease, transform 0.15s ease;
-    flex-shrink: 0;
-}
-
-.back-arrow-btn:hover {
-    background-color: rgba(0, 0, 0, 0.05);
-    transform: scale(1.1);
-}
-
-/* Header Section */
-.goal-title {
-    font-size: 28px;
-    font-family: var(--font-serif);
-    margin: 0;
-    color: var(--text-main);
-    line-height: 1.2;
-    font-weight: 700;
-}
-
-/* Progress Bar */
-.detail-progress-track {
-    width: 100%;
-    height: 8px;
-    background-color: #E5E5EA;
-    border-radius: 4px;
-    overflow: hidden;
-    margin-bottom: var(--space-sm);
-}
-
-.detail-progress-fill {
-    height: 100%;
-    border-radius: 4px;
-    transition: width 0.4s ease, background-color 0.4s ease;
-}
-
-/* Meta Row (percentage + tag) */
-.goal-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--space-md);
-    font-size: 14px;
-    color: var(--text-secondary);
-}
-
-.tag-creative {
-    background-color: #69995D;
-    color: white;
-    padding: 4px 14px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 600;
-    border: none;
-}
-
-/* Date Section */
-.goal-end-date {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-family: var(--font-serif);
-    font-size: 18px;
-    font-weight: 600;
-    margin-bottom: var(--space-lg);
-    color: var(--text-main);
-}
-
-/* ===== Timeline Layout — Staggered ===== */
-.timeline-wrapper {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-    padding-bottom: var(--space-md);
-}
-
-/* Task Item */
-.task-item {
-    display: flex;
-    align-items: flex-start;
-    position: relative;
-    z-index: 1;
-    padding-left: 0;
-    margin-bottom: 16px; /* visible gap between cards */
-}
-
-/* Connector lines between tasks */
-.timeline-connector {
-    position: absolute;
-    width: 2px;
-    background-color: #E5E5EA;
-    z-index: 0;
-}
-
-.connector-straight {
-    left: 23px;
-    top: 48px;
-    height: calc(100% + 6px);
-}
-
-/* Status Icons (Circles on the left) */
-.status-icon-wrapper {
-    width: 44px;
-    height: 44px;
-    flex-shrink: 0;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: -8px;
-    z-index: 2;
-    border: 3px solid var(--bg-color);
-}
-
-.status-yellow {
-    background-color: #FFCC00;
-    color: white;
-    box-shadow: 0 3px 8px rgba(255, 204, 0, 0.35);
-}
-
-.status-grey {
-    background-color: #F5F5F3;
-    border: 2px solid #E5E5EA;
-    color: #C7C7CC;
-}
-
-.status-red {
-    background-color: #FF5A5F;
-    color: white;
-    box-shadow: 0 3px 8px rgba(255, 90, 95, 0.35);
-}
-
-/* Empty circle for un-completed active tasks */
-.status-empty {
-    background-color: #FFFFFF;
-    border: 3px solid #E5E5EA;
-}
-
-/* Make active / completed icons clickable */
-.status-icon--clickable {
-    cursor: pointer;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.status-icon--clickable:hover {
-    transform: scale(1.12);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-/* The Task Card */
-.task-card {
-    flex: 1;
-    background-color: white;
-    border-radius: 20px;
-    padding: 14px 16px;
-    padding-right: 48px; /* room for flag */
-    box-shadow: var(--shadow-sm);
-    min-height: 72px;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    overflow: hidden;
-}
-
-.task-card--locked {
-    background-color: #FFF0F0;
-}
-
-/* Removed: subtask cards are now the same width as parent tasks */
-
-.task-card h4 {
-    font-family: var(--font-sans);
-    font-size: 15px;
-    font-weight: 500;
-    margin-bottom: 2px;
-    color: var(--text-main);
-}
-
-.meta-text {
-    font-size: 12px;
-    color: #8E8E93;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    margin: 0;
-}
-
-.task-card p {
-    font-size: 12px;
-    color: #8E8E93;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.strikethrough-text {
-    text-decoration: line-through;
-    color: #C7C7CC !important;
-}
-
-.error-text {
-    color: #FF5A5F;
-    font-size: 11px !important;
-    margin-top: 2px;
-    line-height: 1.2;
-}
-
-/* The Flag (Right side tab) */
-.task-flag {
-    position: absolute;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    width: 36px;
-    border-top-right-radius: 20px;
-    border-bottom-right-radius: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: 700;
-    font-size: 13px;
-    gap: 4px;
-}
-
-.flag-green { background-color: #7AD37F; }
-.flag-blue { background-color: #AECBFA; }
-.flag-grey { background-color: #D1D1D6; }
-
-/* Bookmark flag (ribbon) for first task */
-.task-bookmark {
-    position: absolute;
-    right: 8px;
-    top: -4px;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    z-index: 3;
-}
-
-.task-bookmark svg {
-    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.12));
-}
-
-.bookmark-text {
-    position: absolute;
-    top: 8px;
-    color: white;
-    font-weight: 700;
-    font-size: 13px;
-}
-
-/* Floating Action Button Area */
 .fab-container {
     position: fixed;
     bottom: 90px;
@@ -309,16 +39,16 @@
 }
 
 .btn-update-plan {
-    width: 220px;
-    background-color: #FFC5C4;
-    color: #1A1A1A;
+    width: 180px;
+    background-color: var(--yellow);
+    color: var(--text-main);
     font-weight: 600;
     border: none;
     border-radius: 24px;
     padding: 14px;
     font-size: 15px;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(255, 197, 196, 0.4);
+    box-shadow: 0 4px 12px rgba(255, 185, 46, 0.35);
     transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
@@ -326,113 +56,8 @@
     transform: scale(0.97);
 }
 
-/* ===== Subtask List inside active task cards ===== */
-.subtask-list {
-    margin-top: 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    border-top: 1px solid #F0F0EC;
-    padding-top: 8px;
-}
+/* change of plans (reroute) modal */
 
-.subtask-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 10px;
-    border-radius: 10px;
-    background-color: #F9F9F7;
-    cursor: pointer;
-    transition: background-color 0.15s ease;
-    min-height: 36px;
-}
-
-.subtask-row:hover {
-    background-color: #F0F0EC;
-}
-
-.subtask-row--done {
-    background-color: #F0FAF0;
-}
-
-.subtask-row--done:hover {
-    background-color: #E0F5E0;
-}
-
-.subtask-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    min-width: 0;
-}
-
-.subtask-row span {
-    font-size: 13px;
-    color: var(--text-main);
-    font-weight: 400;
-}
-
-.subtask-date {
-    font-size: 11px !important;
-    color: #8E8E93 !important;
-    display: flex;
-    align-items: center;
-}
-
-.subtask-help-btn {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    border: none;
-    background-color: transparent;
-    color: #8E8E93;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    flex-shrink: 0;
-    transition: all 0.15s ease;
-}
-
-.subtask-help-btn:hover {
-    background-color: #E8E8E5;
-    color: #5681b3;
-}
-
-.subtask-check {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    border: 2px solid #D1D1D6;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    transition: all 0.15s ease;
-}
-
-.subtask-check--done {
-    background-color: #7AD37F;
-    border-color: #7AD37F;
-    color: white;
-}
-
-/* Status icon for active task with all subtasks done */
-.status-ready {
-    background-color: #7AD37F;
-    color: white;
-    box-shadow: 0 3px 8px rgba(122, 211, 127, 0.4);
-    animation: pulse-ready 1.5s ease-in-out infinite;
-}
-
-@keyframes pulse-ready {
-    0%, 100% { box-shadow: 0 3px 8px rgba(122, 211, 127, 0.4); }
-    50% { box-shadow: 0 3px 16px rgba(122, 211, 127, 0.7); }
-}
-
-/* ===== Change of Plans (Reroute) Modal ===== */
 .reroute-overlay {
     position: fixed;
     inset: 0;
@@ -452,7 +77,7 @@
 .reroute-sheet {
     width: 88%;
     max-width: 420px;
-    background-color: #FFC5C4;
+    background-color: var(--pink);
     border-radius: 32px 32px 0 0;
     padding: 28px 28px 36px;
     position: relative;
