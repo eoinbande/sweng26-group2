@@ -7,7 +7,7 @@ from app.mock_ai_responses import (
     get_mock_plan, get_mock_feedback_response,
     BIKE_TYRE_INITIAL, BIKE_TYRE_AFTER_FEEDBACK,
     BIKE_TYRE_FEEDBACK_AFTER_PROGRESS, BIKE_EXPAND_TASK_5,
-    DRIVING_LICENCE_INITIAL, PASTA_INITIAL, DEFAULT_MOCK
+    WEDDING_INITIAL, PIANO_INITIAL, DEFAULT_MOCK
 )
 
 
@@ -176,18 +176,21 @@ class TestMockTemplates:
         assert task_1.status == TaskStatus.COMPLETED
         assert task_2.status == TaskStatus.COMPLETED
 
-    def test_driving_licence_valid(self):
-        """Driving licence plan should match AIGeneratePlanResponse schema."""
-        response = AIGeneratePlanResponse(**DRIVING_LICENCE_INITIAL)
-        assert len(response.tasks) == 6
-        # task_1 should require input
+    def test_wedding_valid(self):
+        """Wedding plan should match AIGeneratePlanResponse schema."""
+        response = AIGeneratePlanResponse(**WEDDING_INITIAL)
+        assert len(response.tasks) == 9
+        # task_1 should require input (info-gathering)
         task_1 = [t for t in response.tasks if t.ai_id == "task_1"][0]
         assert task_1.requires_input is True
 
-    def test_pasta_valid(self):
-        """Pasta plan should match AIGeneratePlanResponse schema."""
-        response = AIGeneratePlanResponse(**PASTA_INITIAL)
-        assert len(response.tasks) == 5
+    def test_piano_valid(self):
+        """Piano plan should match AIGeneratePlanResponse schema."""
+        response = AIGeneratePlanResponse(**PIANO_INITIAL)
+        assert len(response.tasks) == 6
+        # task_1 should require input (what instrument do you have?)
+        task_1 = [t for t in response.tasks if t.ai_id == "task_1"][0]
+        assert task_1.requires_input is True
 
     def test_expand_task_valid(self):
         """Expand task mock should match AIExpandTaskResponse schema."""
@@ -220,7 +223,7 @@ class TestMockTemplates:
         all_mocks = [
             BIKE_TYRE_INITIAL, BIKE_TYRE_AFTER_FEEDBACK,
             BIKE_TYRE_FEEDBACK_AFTER_PROGRESS,
-            DRIVING_LICENCE_INITIAL, PASTA_INITIAL, DEFAULT_MOCK
+            WEDDING_INITIAL, PIANO_INITIAL, DEFAULT_MOCK
         ]
         for mock in all_mocks:
             for task in mock["tasks"]:
@@ -234,7 +237,7 @@ class TestMockTemplates:
         """Every task and subtask should have an order field."""
         all_mocks = [
             BIKE_TYRE_INITIAL, BIKE_TYRE_AFTER_FEEDBACK,
-            DRIVING_LICENCE_INITIAL, PASTA_INITIAL
+            WEDDING_INITIAL, PIANO_INITIAL
         ]
         for mock in all_mocks:
             for task in mock["tasks"]:
