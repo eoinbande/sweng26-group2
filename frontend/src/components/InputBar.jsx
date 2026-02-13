@@ -12,6 +12,8 @@ export function InputBar({
     variant = "default", // "default" or "auth"
     padding = null, // custom padding override
     borderRadius = null, // custom border radius override
+    backgroundColor = null, // custom background color override
+    fontSize = null, // custom font size override
 }) {
     const isAuthVariant = variant === "auth";
 
@@ -91,7 +93,7 @@ export function InputBar({
                 display: 'flex',
                 alignItems: 'center',
                 gap: 'var(--space-md)',
-                backgroundColor: 'var(--card-bg)',
+                backgroundColor: backgroundColor || 'var(--card-bg)',
                 borderRadius: borderRadius || (isAuthVariant ? 'var(--radius-md)' : 'var(--radius-pill)'),
                 padding: padding || (isAuthVariant ? '16px 20px' : '12px 20px'),
                 boxShadow: isAuthVariant ? 'var(--shadow-sm)' : 'var(--shadow-md)',
@@ -115,7 +117,7 @@ export function InputBar({
                     border: 'none',
                     outline: 'none',
                     fontFamily: 'var(--font-sans)',
-                    fontSize: '16px',
+                    fontSize: fontSize || '16px',
                     backgroundColor: 'transparent',
                     color: 'var(--text-main)',
                 }}

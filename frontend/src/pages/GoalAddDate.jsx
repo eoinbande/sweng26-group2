@@ -9,6 +9,7 @@ function GoalAddDate() {
     const navigate = useNavigate();
     const location = useLocation();
     const [manualGoal, setManualGoal] = useState('');
+    const [dateValue, setDateValue] = useState('');
 
     // goal text passed from CreateGoal
     const goalText = location.state?.goalText || '';
@@ -71,9 +72,34 @@ function GoalAddDate() {
                     lineHeight: '1.2',
                     marginBottom: 'var(--space-md)',
                     color: 'var(--text-main)',
+                    textAlign: 'center',
+                    alignSelf: 'center',
                 }}>
                     When's your<br />deadline?
                 </h1>
+
+                {/* date input */}
+                <div style={{
+                    marginTop: 'var(--space-xl)',
+                    maxWidth: '90%',
+                    alignSelf: 'center',
+                }}>
+                    <InputBar
+                        placeholder="DD/MM/YYYY"
+                        value={dateValue}
+                        onChange={(e) => setDateValue(e.target.value)}
+                        onSubmit={() => {
+                            if (dateValue.trim()) {
+                                console.log('Date submitted:', dateValue);
+                            }
+                        }}
+                        variant="auth"
+                        borderRadius="var(--radius-xl)"
+                        backgroundColor="var(--blue-soft)"
+                        padding = "22px"
+                        fontSize="20px"
+                    />
+                </div>
 
             </div>
 
