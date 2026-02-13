@@ -145,6 +145,8 @@ function CreateGoal() {
                 height: isExpanding ? '100vh' : '66vh',
                 zIndex: 200,
                 transition: 'height 1.2s cubic-bezier(0.25, 0.1, 0.25, 1), border-radius 0.3s ease-out',
+                display: 'flex',
+                flexDirection: 'column',
             }}>
                 {/* back button - always visible */}
                 <button
@@ -157,6 +159,7 @@ function CreateGoal() {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
+                        alignSelf: 'flex-start',
                         marginBottom: 'var(--space-lg)',
                         opacity: 1,
                     }}
@@ -169,7 +172,7 @@ function CreateGoal() {
                 {/* title and subtitle - fades out first */}
                 <h1 style={{
                     fontFamily: 'var(--font-serif)',
-                    fontSize: '40px',
+                    fontSize: 'clamp(30px, 5vh, 40px)',
                     fontWeight: '600',
                     lineHeight: '1.2',
                     marginBottom: 'var(--space-md)',
@@ -182,7 +185,7 @@ function CreateGoal() {
                 </h1>
                 <p style={{
                     fontFamily: 'var(--font-sans)',
-                    fontSize: '16px',
+                    fontSize: 'clamp(14px, 2vh, 16px)',
                     color: 'var(--text-main)',
                     opacity: isFading ? 0 : 0.8,
                     marginBottom: 'var(--space-xl)',
@@ -197,7 +200,9 @@ function CreateGoal() {
                     display: 'flex',
                     gap: 'var(--space-md)',
                     flexWrap: 'wrap',
-                    marginBottom: 'var(--space-lg)',
+                    flex: 1,
+                    minHeight: 0,
+                    alignContent: 'flex-start',
                     opacity: isFading ? 0 : 1,
                     transform: isFading ? 'translateY(-20px)' : 'translateY(0)',
                     transition: 'all 0.4s ease-out 0.1s',
@@ -209,14 +214,13 @@ function CreateGoal() {
                             color: 'white',
                             border: 'none',
                             borderRadius: 'var(--radius-lg)',
-                            padding: '18px 24px',
+                            padding: 'clamp(12px, 2.2vh, 18px) 24px',
                             fontFamily: 'var(--font-sans)',
                             fontSize: '14px',
                             fontWeight: '500',
                             cursor: 'pointer',
                             transition: 'all 0.3s ease',
                             flex: '0 1 auto',
-                            minWidth: '140px',
                             textAlign: 'left',
                             boxShadow: '0 2px 8px rgba(107, 141, 176, 0.3)',
                         }}
@@ -240,14 +244,13 @@ function CreateGoal() {
                             color: 'white',
                             border: 'none',
                             borderRadius: 'var(--radius-lg)',
-                            padding: '18px 24px',
+                            padding: 'clamp(12px, 2.2vh, 18px) 24px',
                             fontFamily: 'var(--font-sans)',
                             fontSize: '14px',
                             fontWeight: '500',
                             cursor: 'pointer',
                             transition: 'all 0.3s ease',
                             flex: '0 1 auto',
-                            minWidth: '140px',
                             textAlign: 'left',
                             boxShadow: '0 2px 8px rgba(107, 141, 176, 0.3)',
                         }}
@@ -268,10 +271,9 @@ function CreateGoal() {
 
                 {/* ai input*/}
                 <div style={{
-                    position: 'absolute',
-                    bottom: '80px',
-                    left: 'var(--space-lg)',
-                    right: 'var(--space-lg)',
+                    flexShrink: 0,
+                    marginTop: 'auto',
+                    paddingBottom: 'var(--space-xl)',
                     opacity: isFading ? 0 : 1,
                     transform: isFading ? 'translateY(-20px)' : 'translateY(0)',
                     transition: 'all 0.4s ease-out 0.15s',
@@ -289,8 +291,8 @@ function CreateGoal() {
                         icon={<Mic size={18} color="white" />}
                         buttonStyle="dark"
                         variant="auth"
-                        padding="12px 14px"
-                        borderRadius="var(--radius-lg)"
+                        padding="18px 20px"
+                        borderRadius="var(--radius-xl)"
                     />
                 </div>
             </div>
@@ -339,6 +341,7 @@ function CreateGoal() {
                             }
                         }}
                         variant="auth"
+                        padding="18px 20px"
                         borderRadius="var(--radius-xl)"
                     />
                 </div>
