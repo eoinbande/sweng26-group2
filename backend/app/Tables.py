@@ -321,7 +321,7 @@ def update_task_status(task_id: str, status: str):
         # Save the updated JSON back to the goals table
         update_goal_data(goal_id, goal_data)
 
-        # ---- Parent auto-complete check (backlog item 6.3) ----
+        # ---- Parent auto-complete check ----
         # If this task is a subtask and we just completed it,
         # check if ALL sibling subtasks are now completed.
         # If so, auto-complete the parent task too.
