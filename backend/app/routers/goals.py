@@ -1,8 +1,13 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from ..Tables import create_goal, create_goal_with_data, get_all_goals #we import the functions related to goals
-from ..database import supabase
-from ..Mocked.mock_response_templates import get_initial_goal_breakdown  
+# Database functions (Tables.py)
+from ..Tables import (
+    create_goal, get_all_goals, get_goal, delete_goal,
+    update_goal_data, save_tasks_to_db, merge_and_save_tasks
+)
+
+# Mock AI responses (replace with real AI later)
+from ..mock_ai_responses import get_mock_plan, get_mock_feedback_response
 
 
 
@@ -13,12 +18,38 @@ from ..Mocked.mock_response_templates import get_initial_goal_breakdown
 
 goal_router = APIRouter()
 
-class RequestGoals(BaseModel):
+# =============================================================================
+# REQUEST MODELS
+# =============================================================================
+
+class CreateGoalRequest(BaseModel):
+    """
+    What frontend sends when user types a goal and hits submit.
+    
+    Example: {"user_id": "uuid-123", "title": "Fix my bike tyre"}
+    """
     user_id: str
     title: str
-    description: str
-    due_date: str | None = None #either a due_date OR NOT
-    generate_plan: bool = True  # NEW: Flag to generate AI plan
+
+
+class AcceptPlanRequest(BaseModel):
+    """
+    What frontend sends when user clicks "Accept" on the review screen.
+    Contains the task list (which may have been modified by feedback).
+    
+    Example: {"tasks": [{ai_id: "task_1", description: "...", ...}]}
+    """
+    tasks: list[dict]
+
+
+class FeedbackRequest(BaseModel):
+    """
+    What frontend sends when user gives feedback on a plan.
+    
+    Example: {"feedback": "I don't like task_3, use soapy water instead"}
+    """
+    feedback: str
+
 
 #USE POST HTTP REQUEST TO STORE DATA IN SUPABASE
 @goal_router.post("/goals")
