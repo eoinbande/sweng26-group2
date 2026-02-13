@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { DateScrollPicker } from 'react-date-wheel-picker';
 import BottomNav from '../components/BottomNav';
 import { InputBar } from '../components/InputBar';
 import '../index.css';
@@ -10,9 +11,31 @@ function GoalAddDate() {
     const location = useLocation();
     const [manualGoal, setManualGoal] = useState('');
     const [dateValue, setDateValue] = useState('');
+    const [showPicker, setShowPicker] = useState(false);
+    const pickerRef = useRef(null);
 
     // goal text passed from CreateGoal
     const goalText = location.state?.goalText || '';
+
+    // format date from picker as DD/MM/YYYY
+    const handleDateChange = (date) => {
+        const dd = String(date.getDate()).padStart(2, '0');
+        const mm = String(date.getMonth() + 1).padStart(2, '0');
+        const yyyy = date.getFullYear();
+        setDateValue(`${dd}/${mm}/${yyyy}`);
+    };
+
+    // close picker when clicking outside
+    useEffect(() => {
+        if (!showPicker) return;
+        const handleClickOutside = (e) => {
+            if (pickerRef.current && !pickerRef.current.contains(e.target)) {
+                setShowPicker(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [showPicker]);
 
     return (
         <div style={{
@@ -78,27 +101,71 @@ function GoalAddDate() {
                     When's your<br />deadline?
                 </h1>
 
-                {/* date input */}
-                <div style={{
-                    marginTop: 'var(--space-xl)',
-                    maxWidth: '90%',
-                    alignSelf: 'center',
-                }}>
-                    <InputBar
-                        placeholder="DD/MM/YYYY"
-                        value={dateValue}
-                        onChange={(e) => setDateValue(e.target.value)}
-                        onSubmit={() => {
-                            if (dateValue.trim()) {
-                                console.log('Date submitted:', dateValue);
-                            }
-                        }}
-                        variant="auth"
-                        borderRadius="var(--radius-xl)"
-                        backgroundColor="var(--blue-soft)"
-                        padding = "22px"
-                        fontSize="20px"
-                    />
+                {/* date input / picker morph container */}
+                <div
+                    ref={pickerRef}
+                    onClick={() => { if (!showPicker) setShowPicker(true); }}
+                    style={{
+                        marginTop: 'var(--space-xl)',
+                        maxWidth: showPicker ? '95%' : '90%',
+                        width: '100%',
+                        alignSelf: 'center',
+                        cursor: showPicker ? 'default' : 'pointer',
+                        backgroundColor: showPicker ? 'white' : 'var(--blue-soft)',
+                        borderRadius: 'var(--radius-xl)',
+                        padding: '0',
+                        boxShadow: showPicker ? 'var(--shadow-md)' : 'none',
+                        transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                        overflow: 'hidden',
+                    }}
+                >
+                    {/* collapsed: input bar label */}
+                    <div style={{
+                        maxHeight: showPicker ? '0px' : '80px',
+                        opacity: showPicker ? 0 : 1,
+                        overflow: 'hidden',
+                        transition: 'max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease',
+                    }}>
+                        <InputBar
+                            placeholder="DD/MM/YYYY"
+                            value={dateValue}
+                            onChange={() => {}}
+                            onSubmit={() => {}}
+                            variant="auth"
+                            borderRadius="var(--radius-xl)"
+                            backgroundColor="transparent"
+                            padding="22px"
+                            fontSize="20px"
+                            readOnly
+                        />
+                    </div>
+
+                    {/* expanded: date wheel picker */}
+                    <div className="date-picker-wrapper" style={{
+                        maxHeight: showPicker ? '200px' : '0px',
+                        opacity: showPicker ? 1 : 0,
+                        overflow: 'hidden',
+                        transition: 'max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease 0.1s',
+                        fontFamily: 'var(--font-sans)',
+                    }}>
+                        <DateScrollPicker
+                            onDateChange={handleDateChange}
+                            startYear={2025}
+                            defaultYear={new Date().getFullYear()}
+                            defaultMonth={new Date().getMonth()}
+                            defaultDay={new Date().getDate()}
+                            itemHeight={40}
+                            visibleRows={3}
+                            dateTimeFormatOptions={{ month: 'short' }}
+                            highlightOverlayStyle={{
+                                borderTop: '1px solid #ccc',
+                                borderBottom: '1px solid #ccc',
+                                background: 'transparent',
+                                borderRadius: 0,
+                                boxShadow: 'none',
+                            }}
+                        />
+                    </div>
                 </div>
 
                 {/* skip / let ai decide buttons */}

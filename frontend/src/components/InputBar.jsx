@@ -14,6 +14,7 @@ export function InputBar({
     borderRadius = null, // custom border radius override
     backgroundColor = null, // custom background color override
     fontSize = null, // custom font size override
+    readOnly = false, // make input read-only
 }) {
     const isAuthVariant = variant === "auth";
 
@@ -111,6 +112,7 @@ export function InputBar({
                 onKeyDown={handleKeyDown}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
+                readOnly={readOnly}
                 style={{
                     flex: 1,
                     minWidth: 0,
