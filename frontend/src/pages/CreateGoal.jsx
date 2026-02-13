@@ -3,21 +3,7 @@ import { ArrowLeft, Mic } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
 import { InputBar } from '../components/InputBar';
-import { supabase, isDemoMode } from '../supabase_client';
 import '../index.css';
-
-const MOCK_PREVIEW = {
-    ai_generated: true,
-    goal_data: {
-        description: 'Demo goal plan',
-        nodes: [
-            { id: 1, task: 'Research the topic thoroughly', est_time: 30 },
-            { id: 2, task: 'Create an action plan', est_time: 20 },
-            { id: 3, task: 'Start working on first milestone', est_time: 45 },
-            { id: 4, task: 'Review and adjust progress', est_time: 15 },
-        ],
-    },
-};
 
 function CreateGoal() {
     const navigate = useNavigate();
@@ -30,7 +16,6 @@ function CreateGoal() {
     const [manualGoal, setManualGoal] = useState('');
     const [isFading, setIsFading] = useState(false);
     const [contentVisible, setContentVisible] = useState(false);
-    // const [isExpanding, setIsExpanding] = useState(false);
 
     // fade in content on mount
     useEffect(() => {
@@ -55,76 +40,6 @@ function CreateGoal() {
             });
         }, 500);
     };
-
-    // // --- original backend submission (commented out for now) ---
-    // const handleGoalSubmitBackend = async (goalText) => {
-    //     setIsFading(true);
-    //     setTimeout(() => setIsExpanding(true), 400);
-    //
-    //     if (isDemoMode) {
-    //         setTimeout(() => {
-    //             navigate('/review-plan', {
-    //                 state: {
-    //                     goal: goalText,
-    //                     showLoading: true,
-    //                     previewData: MOCK_PREVIEW,
-    //                     userId: 'demo-user-001',
-    //                     originalPrompt: goalText,
-    //                 },
-    //             });
-    //         }, 1400);
-    //         return;
-    //     }
-    //
-    //     let user;
-    //     try {
-    //         const { data } = await supabase.auth.getUser();
-    //         user = data?.user;
-    //     } catch (err) {
-    //         console.error('Supabase auth error:', err);
-    //     }
-    //     if (!user) {
-    //         alert('You must be logged in to create a goal.');
-    //         navigate('/login');
-    //         return;
-    //     }
-    //
-    //     try {
-    //         const res = await fetch(`${import.meta.env.VITE_API_URL}/goals/preview`, {
-    //             method: 'POST',
-    //             headers: { 'Content-Type': 'application/json' },
-    //             body: JSON.stringify({
-    //                 user_id: user.id,
-    //                 title: goalText,
-    //                 description: goalText,
-    //                 generate_plan: true
-    //             })
-    //         });
-    //         const data = await res.json();
-    //         if (!res.ok) {
-    //             alert('Failed to get AI plan. Check console.');
-    //             return;
-    //         }
-    //         setTimeout(() => {
-    //             if (data.ai_generated) {
-    //                 navigate('/review-plan', {
-    //                     state: {
-    //                         goal: goalText,
-    //                         showLoading: true,
-    //                         previewData: data,
-    //                         userId: user.id,
-    //                         originalPrompt: goalText
-    //                     }
-    //                 });
-    //             } else {
-    //                 navigate('/goals');
-    //             }
-    //         }, 1400);
-    //     } catch (err) {
-    //         console.error('Network error:', err);
-    //         alert('Network error. Is the backend running?');
-    //     }
-    // };
 
     return (
         <div style={{
