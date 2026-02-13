@@ -13,7 +13,7 @@ const CreateGoalCard = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: '36px',
+            padding: '38px 24px',
             maxWidth: '480px',
             margin: 'var(--space-md)',
             boxShadow: 'var(--shadow-md)',
