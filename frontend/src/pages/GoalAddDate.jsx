@@ -13,7 +13,7 @@ function GoalAddDate() {
     const [dateValue, setDateValue] = useState('');
     const [showPicker, setShowPicker] = useState(false);
     const [contentVisible, setContentVisible] = useState(false);
-    // const [isFading, setIsFading] = useState(false);
+    const [isFadingOut, setIsFadingOut] = useState(false);
     // const [isExpanding, setIsExpanding] = useState(false);
     const pickerRef = useRef(null);
 
@@ -25,6 +25,16 @@ function GoalAddDate() {
         const timer = setTimeout(() => setContentVisible(true), 100);
         return () => clearTimeout(timer);
     }, []);
+
+    // fade out then navigate back
+    const handleBack = () => {
+        setIsFadingOut(true);
+        setTimeout(() => {
+            navigate('/create-goal', {
+                state: { originalPrompt: goalText },
+            });
+        }, 500);
+    };
 
     // format date from picker as MM/DD/YYYY
     const handleDateChange = (date) => {
@@ -103,9 +113,9 @@ function GoalAddDate() {
                 display: 'flex',
                 flexDirection: 'column',
             }}>
-                {/* back button */}
+                {/* back button - always visible */}
                 <button
-                    onClick={() => navigate('/create-goal')}
+                    onClick={handleBack}
                     style={{
                         backgroundColor: 'transparent',
                         border: 'none',
@@ -116,8 +126,7 @@ function GoalAddDate() {
                         justifyContent: 'center',
                         alignSelf: 'flex-start',
                         marginBottom: 'var(--space-lg)',
-                        opacity: contentVisible ? 1 : 0,
-                        transition: 'opacity 0.4s ease-out',
+                        opacity: 1,
                     }}
                     onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
                     onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1.0)'}
@@ -135,8 +144,8 @@ function GoalAddDate() {
                     color: 'var(--text-main)',
                     textAlign: 'center',
                     alignSelf: 'center',
-                    opacity: contentVisible ? 1 : 0,
-                    transform: contentVisible ? 'translateY(0)' : 'translateY(20px)',
+                    opacity: isFadingOut ? 0 : (contentVisible ? 1 : 0),
+                    transform: isFadingOut ? 'translateY(-20px)' : (contentVisible ? 'translateY(0)' : 'translateY(20px)'),
                     transition: 'all 0.4s ease-out 0.1s',
                 }}>
                     When's your<br />deadline?
@@ -148,8 +157,8 @@ function GoalAddDate() {
                     onClick={() => { if (!showPicker) setShowPicker(true); }}
                     style={{
                         marginTop: 'var(--space-xl)',
-                        opacity: contentVisible ? 1 : 0,
-                        transform: contentVisible ? 'translateY(0)' : 'translateY(20px)',
+                        opacity: isFadingOut ? 0 : (contentVisible ? 1 : 0),
+                        transform: isFadingOut ? 'translateY(-20px)' : (contentVisible ? 'translateY(0)' : 'translateY(20px)'),
                         transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.2s, background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), max-width 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
                         maxWidth: showPicker ? '95%' : '90%',
                         width: '100%',
@@ -219,8 +228,8 @@ function GoalAddDate() {
                     gap: '10px',
                     alignItems: 'center',
                     marginTop: 'var(--space-lg)',
-                    opacity: contentVisible ? 1 : 0,
-                    transform: contentVisible ? 'translateY(0)' : 'translateY(20px)',
+                    opacity: isFadingOut ? 0 : (contentVisible ? 1 : 0),
+                    transform: isFadingOut ? 'translateY(-20px)' : (contentVisible ? 'translateY(0)' : 'translateY(20px)'),
                     transition: 'all 0.4s ease-out 0.3s',
                 }}>
                     <button

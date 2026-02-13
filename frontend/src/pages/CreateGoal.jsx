@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Mic } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
@@ -29,7 +29,14 @@ function CreateGoal() {
     const [message, setMessage] = useState(restoredPrompt);
     const [manualGoal, setManualGoal] = useState('');
     const [isFading, setIsFading] = useState(false);
+    const [contentVisible, setContentVisible] = useState(false);
     // const [isExpanding, setIsExpanding] = useState(false);
+
+    // fade in content on mount
+    useEffect(() => {
+        const timer = setTimeout(() => setContentVisible(true), 100);
+        return () => clearTimeout(timer);
+    }, []);
 
     // handle goal submission - fades out content then navigates to date selection
     const handleGoalSubmit = (goalText) => {
@@ -177,9 +184,9 @@ function CreateGoal() {
                     lineHeight: '1.2',
                     marginBottom: 'var(--space-md)',
                     color: 'var(--text-main)',
-                    opacity: isFading ? 0 : 1,
-                    transform: isFading ? 'translateY(-20px)' : 'translateY(0)',
-                    transition: 'all 0.4s ease-out',
+                    opacity: isFading ? 0 : (contentVisible ? 1 : 0),
+                    transform: isFading ? 'translateY(-20px)' : (contentVisible ? 'translateY(0)' : 'translateY(20px)'),
+                    transition: 'all 0.4s ease-out 0.1s',
                 }}>
                     Let's build<br />your goal.
                 </h1>
@@ -187,10 +194,10 @@ function CreateGoal() {
                     fontFamily: 'var(--font-sans)',
                     fontSize: 'clamp(14px, 2vh, 16px)',
                     color: 'var(--text-main)',
-                    opacity: isFading ? 0 : 0.8,
+                    opacity: isFading ? 0 : (contentVisible ? 0.8 : 0),
                     marginBottom: 'var(--space-xl)',
-                    transform: isFading ? 'translateY(-20px)' : 'translateY(0)',
-                    transition: 'all 0.4s ease-out 0.05s',
+                    transform: isFading ? 'translateY(-20px)' : (contentVisible ? 'translateY(0)' : 'translateY(20px)'),
+                    transition: 'all 0.4s ease-out 0.15s',
                 }}>
                     Tell us where you want to go, we'll<br />show you how to get there
                 </p>
@@ -203,9 +210,9 @@ function CreateGoal() {
                     flex: 1,
                     minHeight: 0,
                     alignContent: 'flex-start',
-                    opacity: isFading ? 0 : 1,
-                    transform: isFading ? 'translateY(-20px)' : 'translateY(0)',
-                    transition: 'all 0.4s ease-out 0.1s',
+                    opacity: isFading ? 0 : (contentVisible ? 1 : 0),
+                    transform: isFading ? 'translateY(-20px)' : (contentVisible ? 'translateY(0)' : 'translateY(20px)'),
+                    transition: 'all 0.4s ease-out 0.2s',
                 }}>
                     <button
                         onClick={() => handleGoalSubmit('Create a new bank account.')}
@@ -274,9 +281,9 @@ function CreateGoal() {
                     flexShrink: 0,
                     marginTop: 'auto',
                     paddingBottom: 'var(--space-xl)',
-                    opacity: isFading ? 0 : 1,
-                    transform: isFading ? 'translateY(-20px)' : 'translateY(0)',
-                    transition: 'all 0.4s ease-out 0.15s',
+                    opacity: isFading ? 0 : (contentVisible ? 1 : 0),
+                    transform: isFading ? 'translateY(-20px)' : (contentVisible ? 'translateY(0)' : 'translateY(20px)'),
+                    transition: 'all 0.4s ease-out 0.25s',
                 }}>
                     <InputBar
                         placeholder="Message"
