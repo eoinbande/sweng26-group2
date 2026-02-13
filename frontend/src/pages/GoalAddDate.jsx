@@ -101,6 +101,70 @@ function GoalAddDate() {
                     />
                 </div>
 
+                {/* skip / let ai decide buttons */}
+                <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '10px',
+                    alignItems: 'center',
+                    marginTop: 'var(--space-lg)',
+                }}>
+                    <button
+                        onClick={() => console.log('Skip deadline')}
+                        style={{
+                            backgroundColor: 'var(--bg-color)',
+                            color: 'var(--text-main)',
+                            border: 'none',
+                            borderRadius: 'var(--radius-pill)',
+                            padding: '12px 32px',
+                            fontFamily: 'var(--font-sans)',
+                            fontSize: '16px',
+                            fontWeight: '500',
+                            cursor: 'pointer',
+                            transition: 'all 0.3s ease',
+                            boxShadow: 'var(--shadow-sm)',
+                            whiteSpace: 'nowrap',
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = 'translateY(-3px)';
+                            e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = 'translateY(0)';
+                            e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+                        }}
+                    >
+                        Skip deadline
+                    </button>
+                    <button
+                        onClick={() => console.log('Let AI decide')}
+                        style={{
+                            backgroundColor: 'var(--text-main)',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: 'var(--radius-pill)',
+                            padding: '12px 32px',
+                            fontFamily: 'var(--font-sans)',
+                            fontSize: '16px',
+                            fontWeight: '500',
+                            cursor: 'pointer',
+                            transition: 'all 0.3s ease',
+                            boxShadow: 'var(--shadow-sm)',
+                            whiteSpace: 'nowrap',
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = 'translateY(-3px)';
+                            e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = 'translateY(0)';
+                            e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+                        }}
+                    >
+                        Let AI decide
+                    </button>
+                </div>
+
             </div>
 
             {/* bottom section */}
