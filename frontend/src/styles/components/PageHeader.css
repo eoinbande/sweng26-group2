@@ -6,7 +6,7 @@
     margin-bottom: var(--space-lg);
     padding-top: var(--space-lg);
     position: relative;
-    margin-left: -16px; /* Pull to edge of container */
+    margin-left: calc(-1 * var(--space-lg)); /* pull to edge of container */
 }
 
 .page-header-accent {
