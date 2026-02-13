@@ -63,7 +63,17 @@ function GoalAddDate() {
                     <ArrowLeft size={32} color="var(--text-main)" strokeWidth={2.5} />
                 </button>
 
-                {/* page content will go here */}
+                {/* title */}
+                <h1 style={{
+                    fontFamily: 'var(--font-serif)',
+                    fontSize: 'clamp(30px, 5vh, 40px)',
+                    fontWeight: '600',
+                    lineHeight: '1.2',
+                    marginBottom: 'var(--space-md)',
+                    color: 'var(--text-main)',
+                }}>
+                    When's your<br />deadline?
+                </h1>
 
             </div>
 
