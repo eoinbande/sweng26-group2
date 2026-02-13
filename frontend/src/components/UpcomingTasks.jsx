@@ -102,7 +102,7 @@ const UpcomingTasks = () => {
                                             alignItems: 'center',
                                             justifyContent: 'space-between',
                                             marginBottom: '8px',
-                                            padding: '4px 0',
+                                            padding: '0.5px 0',
                                             borderRadius: '8px',
                                         }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
