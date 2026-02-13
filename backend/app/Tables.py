@@ -321,6 +321,34 @@ def update_task_status(task_id: str, status: str):
         # Save the updated JSON back to the goals table
         update_goal_data(goal_id, goal_data)
 
+        # ---- Parent auto-complete check (backlog item 6.3) ----
+        # If this task is a subtask and we just completed it,
+        # check if ALL sibling subtasks are now completed.
+        # If so, auto-complete the parent task too.
+        if status == "completed" and task.get("parent_id"):
+            parent_id = task["parent_id"]
+
+            # Get all subtasks that share the same parent
+            siblings = supabase.table("tasks").select("status").eq(
+                "parent_id", parent_id
+            ).execute().data
+
+            # Check if every sibling is completed
+            all_done = all(s["status"] == "completed" for s in siblings)
+
+            if all_done:
+                # Auto-complete the parent task in the tasks table
+                supabase.table("tasks").update(
+                    {"status": "completed"}
+                ).eq("id", parent_id).execute()
+
+                # Auto-complete the parent in the goal_data JSONB too
+                for t in goal_data.get("tasks", []):
+                    if t.get("id") == parent_id:
+                        t["status"] = "completed"
+                        break
+                update_goal_data(goal_id, goal_data)
+
     return task
 
 
