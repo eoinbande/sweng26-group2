@@ -9,15 +9,15 @@ const HomeIcon = ({ size = 26 }) => (
     </svg>
 );
 
-const Target = ({ size = 28 }) => (
+const Target = ({ size = 30 }) => (
     <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M11 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M12 7a5 5 0 1 0 5 5" fill="none" /><path d="M13 3.055a9 9 0 1 0 7.941 7.945" fill="none" /><path d="M15 6v3h3l3 -3h-3v-3l-3 3" /><path d="M15 9l-3 3" /></svg>
 )
 
-const Schedule = ({ size = 28 }) => (
+const Schedule = ({ size = 30 }) => (
     <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="currentColor" class="icon icon-tabler icons-tabler-filled icon-tabler-clipboard-text"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M17.997 4.17a3 3 0 0 1 2.003 2.83v12a3 3 0 0 1 -3 3h-10a3 3 0 0 1 -3 -3v-12a3 3 0 0 1 2.003 -2.83a4 4 0 0 0 3.997 3.83h4a4 4 0 0 0 3.98 -3.597zm-2.997 10.83h-6a1 1 0 0 0 0 2h6a1 1 0 0 0 0 -2m0 -4h-6a1 1 0 0 0 0 2h6a1 1 0 0 0 0 -2m-1 -9a2 2 0 1 1 0 4h-4a2 2 0 1 1 0 -4z" /></svg>
 )
 
-const BarChart = ({ size = 28 }) => (
+const BarChart = ({ size = 30 }) => (
     <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="currentColor" stroke="none">
         <rect x="2" y="13" width="6" height="8" rx="1.5" />
         <rect x="9" y="5" width="6" height="16" rx="1.5" />
@@ -25,7 +25,7 @@ const BarChart = ({ size = 28 }) => (
     </svg>
 )
 
-const User = ({ size = 28 }) => (
+const User = ({ size = 30 }) => (
 <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="currentColor" class="icon icon-tabler icons-tabler-filled icon-tabler-user"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 2a5 5 0 1 1 -5 5l.005 -.217a5 5 0 0 1 4.995 -4.783z" /><path d="M14 14a5 5 0 0 1 5 5v1a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-1a5 5 0 0 1 5 -5h4z" /></svg>
 )
 
@@ -98,8 +98,6 @@ const NavIcon = ({ icon, label, onClick, active }) => (
         minWidth: '48px',
     }}>
         <div style={{
-            width: '24px',
-            height: '24px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
