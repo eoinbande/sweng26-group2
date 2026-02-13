@@ -4,7 +4,22 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { DateScrollPicker } from 'react-date-wheel-picker';
 import BottomNav from '../components/BottomNav';
 import { InputBar } from '../components/InputBar';
+import { supabase, isDemoMode } from '../supabase_client';
 import '../index.css';
+
+// mocked ai response for demo
+const MOCK_PREVIEW = {
+    ai_generated: true,
+    goal_data: {
+        description: 'Demo goal plan',
+        nodes: [
+            { id: 1, task: 'Research the topic thoroughly', est_time: 30 },
+            { id: 2, task: 'Create an action plan', est_time: 20 },
+            { id: 3, task: 'Start working on first milestone', est_time: 45 },
+            { id: 4, task: 'Review and adjust progress', est_time: 15 },
+        ],
+    },
+};
 
 function GoalAddDate() {
     const navigate = useNavigate();
@@ -49,24 +64,90 @@ function GoalAddDate() {
         dateValueRef.current = formatted;
     };
 
-    // expanding blue card transition for navigating to loading/review
-    const handleDateSubmit = () => {
+    // goal submission - fade out, expand, then navigate to review
+    const handleGoalSubmit = async () => {
         if (navigatingRef.current) return;
         navigatingRef.current = true;
         // step 1: fade out content
         setIsFading(true);
         // step 2: expand blue card to fill screen
         setTimeout(() => setIsExpanding(true), 400);
-        // step 3: navigate to review/loading after expansion
-        setTimeout(() => {
-            navigate('/review-plan', {
-                state: {
-                    goalText,
-                    dueDate: dateValueRef.current,
-                    showLoading: true,
-                },
+
+        // in demo mode, use mocked data
+        if (isDemoMode) {
+            setTimeout(() => {
+                navigate('/review-plan', {
+                    state: {
+                        goal: goalText,
+                        showLoading: true,
+                        previewData: MOCK_PREVIEW,
+                        userId: 'demo-user-001',
+                        originalPrompt: goalText,
+                        dueDate: dateValueRef.current,
+                    },
+                });
+            }, 1400);
+            return;
+        }
+
+        // get authenticated user
+        let user;
+        try {
+            const { data } = await supabase.auth.getUser();
+            user = data?.user;
+        } catch (err) {
+            console.error('Supabase auth error:', err);
+        }
+        if (!user) {
+            alert('You must be logged in to create a goal.');
+            navigatingRef.current = false;
+            navigate('/login');
+            return;
+        }
+
+        // call backend for ai-generated plan
+        try {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/goals/preview`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    user_id: user.id,
+                    title: goalText,
+                    description: goalText,
+                    generate_plan: true,
+                }),
             });
-        }, 1400);
+            const data = await res.json();
+            if (!res.ok) {
+                alert('Failed to get AI plan. Check console.');
+                navigatingRef.current = false;
+                setIsFading(false);
+                setIsExpanding(false);
+                return;
+            }
+            setTimeout(() => {
+                if (data.ai_generated) {
+                    navigate('/review-plan', {
+                        state: {
+                            goal: goalText,
+                            showLoading: true,
+                            previewData: data,
+                            userId: user.id,
+                            originalPrompt: goalText,
+                            dueDate: dateValueRef.current,
+                        },
+                    });
+                } else {
+                    navigate('/goals');
+                }
+            }, 1400);
+        } catch (err) {
+            console.error('Network error:', err);
+            alert('Network error. Is the backend running?');
+            navigatingRef.current = false;
+            setIsFading(false);
+            setIsExpanding(false);
+        }
     };
 
     // close picker when clicking outside, trigger loading if date was picked
@@ -76,7 +157,7 @@ function GoalAddDate() {
             if (pickerRef.current && !pickerRef.current.contains(e.target)) {
                 setShowPicker(false);
                 if (dateValueRef.current && !navigatingRef.current) {
-                    handleDateSubmit();
+                    handleGoalSubmit();
                 }
             }
         };
@@ -234,7 +315,7 @@ function GoalAddDate() {
                     transition: 'all 0.4s ease-out 0.3s',
                 }}>
                     <button
-                        onClick={() => console.log('Skip deadline')}
+                        onClick={handleGoalSubmit}
                         style={{
                             backgroundColor: 'var(--bg-color)',
                             color: 'var(--text-main)',
@@ -261,7 +342,7 @@ function GoalAddDate() {
                         Skip deadline
                     </button>
                     <button
-                        onClick={() => console.log('Let AI decide')}
+                        onClick={handleGoalSubmit}
                         style={{
                             backgroundColor: 'var(--text-main)',
                             color: 'white',
