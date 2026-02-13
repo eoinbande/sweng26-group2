@@ -4,13 +4,14 @@ import '../index.css';
 
 const Header = () => {
     return (
-        <header style={{ marginBottom: 'var(--space-lg)' }}>
+        <header style={{ paddingTop: 'var(--space-lg)', paddingBottom: 'var(--space-sm)' }}>
             <div className="flex-between">
                 <div>
                     <h1 style={{
-                        fontSize: '32px',
-                        fontWeight: '700',
-                        marginBottom: 'var(--space-xs)'
+                        fontFamily: 'var(--font-serif)',
+                        fontSize: '40px',
+                        fontWeight: '600',
+                        marginBottom: '0'
                     }}>
                         Hi, Jaume L.
                     </h1>

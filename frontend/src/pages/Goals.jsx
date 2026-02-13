@@ -1,13 +1,22 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import PageHeader from '../components/PageHeader';
 import GoalListCard from '../components/GoalListCard';
 import BottomNav from '../components/BottomNav';
-import { supabase } from '../supabase_client';
+import { supabase, isDemoMode } from '../supabase_client';
 import '../styles/Goals.css';
 
 const COLOR_SCHEMES_LIST = ['blue', 'yellow', 'orange', 'pink'];
 
+const MOCK_GOALS = [
+    { id: 1, title: 'Learn Piano', description: 'Master basic chords and scales', date: '15 Mar', progress: 40, colorScheme: 'blue' },
+    { id: 2, title: 'Get fit for summer', description: 'Exercise 4x a week', date: '1 Jun', progress: 20, colorScheme: 'yellow' },
+    { id: 3, title: 'Ace Probability I', description: 'Study all chapters and past papers', date: '20 Apr', progress: 65, colorScheme: 'orange' },
+    { id: 4, title: 'Build portfolio site', description: 'Design and deploy personal website', date: '10 Mar', progress: 10, colorScheme: 'pink' },
+];
+
 const Goals = () => {
+    const location = useLocation();
     const [showBottomFade, setShowBottomFade] = useState(true);
     const [goals, setGoals] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -23,13 +32,20 @@ const Goals = () => {
     // Fetch goals from backend on mount
     useEffect(() => {
         const fetchGoals = async () => {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) {
+            // In demo mode, use mock data directly
+            if (isDemoMode) {
+                setGoals(MOCK_GOALS);
                 setLoading(false);
                 return;
             }
 
             try {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (!user) {
+                    setLoading(false);
+                    return;
+                }
+
                 const res = await fetch(`${import.meta.env.VITE_API_URL}/goals/${user.id}`);
                 const data = await res.json();
 
@@ -40,13 +56,14 @@ const Goals = () => {
                     date: goal.due_date
                         ? new Date(goal.due_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
                         : '',
-                    progress: 0, // TODO: calculate from task completion
+                    progress: 0,
                     colorScheme: COLOR_SCHEMES_LIST[index % COLOR_SCHEMES_LIST.length],
                 }));
 
                 setGoals(mapped);
             } catch (err) {
-                console.error('Failed to fetch goals:', err);
+                console.error('Failed to fetch goals, using mock data:', err);
+                setGoals(MOCK_GOALS);
             } finally {
                 setLoading(false);
             }
@@ -54,6 +71,17 @@ const Goals = () => {
 
         fetchGoals();
     }, []);
+
+    /* ---- Update progress when returning from GoalDetail ---- */
+    useEffect(() => {
+        const updatedId = location.state?.updatedGoalId;
+        const updatedProgress = location.state?.updatedProgress;
+        if (updatedId != null && updatedProgress != null) {
+            setGoals(prev => prev.map(g =>
+                g.id === updatedId ? { ...g, progress: updatedProgress } : g
+            ));
+        }
+    }, [location.state]);
 
     return (
         <div className="goals-page">

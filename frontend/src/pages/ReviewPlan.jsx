@@ -5,6 +5,7 @@ import BottomNav from '../components/BottomNav';
 import { TaskCard } from '../components/TaskCard';
 import { InputBar } from '../components/InputBar';
 import LoadingOverlay from '../components/LoadingOverlay';
+import { isDemoMode } from '../supabase_client';
 import '../index.css';
 
 function ReviewPlan() {
@@ -54,6 +55,12 @@ function ReviewPlan() {
 
     // Accept: save the goal to Supabase via POST /goals
     const handleAccept = async () => {
+        // In demo mode, just navigate to goals
+        if (isDemoMode) {
+            navigate('/goals');
+            return;
+        }
+
         setSaving(true);
         try {
             const res = await fetch(`${import.meta.env.VITE_API_URL}/goals`, {

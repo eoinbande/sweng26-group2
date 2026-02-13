@@ -1,0 +1,264 @@
+/* Wrapper */
+
+.tl-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding-bottom: var(--space-md);
+}
+
+/* task row */
+
+.tl-item {
+    display: flex;
+    align-items: flex-start;
+    position: relative;
+    z-index: 1;
+    margin-bottom: 16px;
+    gap: 12px; /* clear separation between icon and card */
+}
+
+/* vertical connector line */
+
+.tl-connector {
+    position: absolute;
+    width: 2px;
+    background-color: #E5E5EA;
+    z-index: 0;
+    left: 21px; /* center of 44px icon */
+    top: 48px;
+    height: calc(100% + 6px);
+}
+
+/* status icons */
+
+.tl-status-icon {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    flex-shrink: 0;
+}
+
+.tl-status-icon--active {
+    background-color: #FFFFFF;
+    border: 3px solid #E5E5EA;
+}
+
+.tl-status-icon--completed {
+    background-color: var(--green-soft);
+    color: white;
+    box-shadow: 0 3px 8px rgba(8, 107, 15, 0.35);
+}
+
+.tl-status-icon--locked {
+    background-color: var(--red);
+    color: white;
+    box-shadow: 0 3px 8px rgba(221, 100, 95, 0.35);
+}
+
+.tl-status-icon--ready {
+    background-color: var(--green-soft);
+    color: white;
+    box-shadow: 0 3px 8px rgba(167, 221, 153, 0.4);
+    animation: tl-pulse-ready 1.5s ease-in-out infinite;
+}
+
+@keyframes tl-pulse-ready {
+    0%, 100% { box-shadow: 0 3px 8px rgba(167, 221, 153, 0.4); }
+    50%      { box-shadow: 0 3px 16px rgba(167, 221, 153, 0.7); }
+}
+
+.tl-status-icon--clickable {
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.tl-status-icon--clickable:hover {
+    transform: scale(1.05);
+}
+
+/* Locked shake animation */
+.tl-status-icon--locked {
+    cursor: pointer;
+    transition: transform 0.15s ease;
+}
+
+.tl-status-icon--locked:active {
+    animation: tl-shake 0.4s ease;
+}
+
+.tl-status-icon--locked.tl-shake {
+    animation: tl-shake 0.4s ease;
+}
+
+@keyframes tl-shake {
+    0%, 100% { transform: translateX(0); }
+    15%      { transform: translateX(-1.5px) rotate(-1deg); }
+    30%      { transform: translateX(1.5px) rotate(1deg); }
+    45%      { transform: translateX(-1.5px) rotate(-1deg); }
+}
+
+/* task card */
+
+.tl-card {
+    flex: 1;
+    background-color: var(--card-bg);
+    border-radius: 20px;
+    padding: 14px 16px;
+    padding-right: 48px; /* room for bookmark */
+    box-shadow: var(--shadow-sm);
+    min-height: 72px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: visible; /* bookmark overflows the card */
+}
+
+.tl-card--locked {
+    background-color: #FFF5F3;
+}
+
+.tl-card--completed {
+    background-color: var(--green-soft);
+    background-color: #F0FAF0;
+}
+
+/* Locked items: vertically center the icon against the card */
+.tl-item--locked {
+    align-items: center;
+}
+
+.tl-card h4 {
+    font-family: var(--font-sans);
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: 2px;
+    color: var(--text-main);
+}
+
+.tl-meta {
+    font-size: 12px;
+    color: #8E8E93;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin: 0;
+}
+
+.tl-strikethrough {
+    text-decoration: line-through;
+    color: #C7C7CC !important;
+}
+
+.tl-lock-msg {
+    color: var(--red);
+    font-size: 11px;
+    margin-top: 2px;
+    line-height: 1.2;
+}
+
+/* bookmark ribbon */
+
+.tl-bookmark {
+    position: absolute;
+    right: 10px;
+    top: -6px; /* sits above the card edge */
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    z-index: 3;
+}
+
+.tl-bookmark svg {
+    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.12));
+}
+
+.tl-bookmark__text {
+    position: absolute;
+    top: 8px;
+    color: white;
+    font-weight: 700;
+    font-size: 13px;
+}
+
+/* subtask list */
+
+.tl-subtask-list {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    border-top: 1px solid #F0F0EC;
+    padding-top: 8px;
+}
+
+.tl-subtask {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    background-color: #F9F9F7;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+    min-height: 36px;
+}
+
+.tl-subtask:hover {
+    background-color: #F0F0EC;
+}
+
+.tl-subtask--done {
+    background-color: #F0FAF0;
+}
+
+.tl-subtask--done:hover {
+    background-color: #E0F5E0;
+}
+
+.tl-subtask__check {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid #D1D1D6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.15s ease;
+}
+
+.tl-subtask__check--done {
+    background-color: var(--green-soft);
+    border-color: var(--green-soft);
+    color: white;
+}
+
+.tl-subtask__content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.tl-subtask__content span {
+    font-size: 13px;
+    color: var(--text-main);
+    font-weight: 400;
+}
+
+.tl-subtask__date {
+    font-size: 11px !important;
+    color: #8E8E93 !important;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}

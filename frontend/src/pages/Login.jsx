@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '../styles/Auth.css';
-import { supabase } from '../supabase_client';
+import { supabase, isDemoMode } from '../supabase_client';
 
 function Login() {
     const navigate = useNavigate();
@@ -19,6 +19,11 @@ function Login() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (isDemoMode) {
+            navigate('/');
+            return;
+        }
 
         const { error } = await supabase.auth.signInWithPassword({
             email: formData.email,
