@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { X, Mic } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
 import GoalDetailHeader from '../components/GoalDetailHeader';
@@ -67,10 +66,6 @@ const GoalDetail = () => {
 
     /* rstore tasks from location.state if returning from feedback page */
     const [tasks, setTasks] = useState(location.state?.tasks || defaultTasks);
-
-    /* change-of-plans modal state */
-    const [showReroute, setShowReroute] = useState(false);
-    const [rerouteText, setRerouteText] = useState('');
 
     /* derived helpers */
     const isTaskComplete = (task) =>
@@ -157,49 +152,10 @@ const GoalDetail = () => {
 
             {/* Floating Action Button */}
             <div className="fab-container">
-                <button className="btn-update-plan" onClick={() => setShowReroute(true)}>
+                <button className="btn-update-plan">
                     Update Plan
                 </button>
             </div>
-
-            {/* change of plans modal */}
-            {showReroute && (
-                <div className="reroute-overlay" onClick={() => setShowReroute(false)}>
-                    <div className="reroute-sheet" onClick={(e) => e.stopPropagation()}>
-                        <button
-                            className="reroute-close-btn"
-                            onClick={() => setShowReroute(false)}
-                            aria-label="Close"
-                        >
-                            <X size={24} strokeWidth={2.5} />
-                        </button>
-
-                        <h2 className="reroute-title">Change of plans?</h2>
-                        <p className="reroute-subtitle">
-                            Tell us what's shifted, we'll help<br />you reroute.
-                        </p>
-
-                        <div className="reroute-input-row">
-                            <input
-                                className="reroute-input"
-                                type="text"
-                                placeholder="Feedback to AI..."
-                                value={rerouteText}
-                                onChange={(e) => setRerouteText(e.target.value)}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter' && rerouteText.trim()) {
-                                        setShowReroute(false);
-                                        setRerouteText('');
-                                    }
-                                }}
-                            />
-                            <button className="reroute-mic-btn" aria-label="Voice input">
-                                <Mic size={20} />
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
 
             <BottomNav />
         </div>
