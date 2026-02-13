@@ -32,13 +32,17 @@ const UpcomingTasks = () => {
 
     return (
         <div style={{
-            marginBottom: 'var(--space-md)',
-            flex: 1,
             display: 'flex',
             flexDirection: 'column',
-            minHeight: 0
+            maxHeight: '240px',
         }}>
-            <h4 style={{ fontSize: '18px', marginBottom: 'var(--space-sm)' }}>Upcoming Tasks</h4>
+            <h4 style={{
+                fontFamily: 'var(--font-serif)',
+                fontSize: '20px',
+                fontWeight: '600',
+                marginBottom: 'var(--space-md)',
+                flexShrink: 0,
+            }}>Upcoming Tasks</h4>
 
             <div style={{
                 position: 'relative',
@@ -70,8 +74,7 @@ const UpcomingTasks = () => {
                     borderRadius: 'var(--radius-lg)',
                     padding: 'var(--space-sm)',
                     boxShadow: 'var(--shadow-md)',
-                    flex: 1,
-                    minHeight: 0,
+                    height: '100%',
                     display: 'flex',
                     flexDirection: 'column',
                 }}>
@@ -79,8 +82,7 @@ const UpcomingTasks = () => {
                     <div style={{
                         backgroundColor: 'white',
                         borderRadius: 'var(--radius-md)',
-                        flex: 1,
-                        minHeight: 0,
+                        height: '100%',
                         position: 'relative',
                         overflow: 'hidden',
                     }}>
