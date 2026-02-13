@@ -150,15 +150,12 @@ function GoalAddDate() {
         }
     };
 
-    // close picker when clicking outside, trigger loading if date was picked
+    // close picker when clicking outside
     useEffect(() => {
         if (!showPicker) return;
         const handleClickOutside = (e) => {
             if (pickerRef.current && !pickerRef.current.contains(e.target)) {
                 setShowPicker(false);
-                if (dateValueRef.current && !navigatingRef.current) {
-                    handleGoalSubmit();
-                }
             }
         };
         document.addEventListener('mousedown', handleClickOutside);
@@ -265,7 +262,7 @@ function GoalAddDate() {
                             placeholder="MM/DD/YYYY"
                             value={dateValue}
                             onChange={() => {}}
-                            onSubmit={() => {}}
+                            onSubmit={() => { if (dateValueRef.current) handleGoalSubmit(); }}
                             variant="auth"
                             borderRadius="var(--radius-xl)"
                             backgroundColor="transparent"
