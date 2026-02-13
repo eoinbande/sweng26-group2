@@ -445,7 +445,7 @@ if __name__ == "__main__":
 
     # Test 3: Load mock tasks and save them (simulates "Accept" flow)
     # mock_response_templates.py lives in app/Mocked/
-    from app.Mocked.mock_response_templates import get_mock_plan
+    from app.mock_ai_responses import get_mock_plan
     mock_plan = get_mock_plan("Fix my bike tyre")
     saved_tasks = save_tasks_to_db(goal_id, mock_plan["tasks"])
     print(f"Saved {len(saved_tasks)} tasks")
