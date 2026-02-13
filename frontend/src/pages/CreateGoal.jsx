@@ -237,7 +237,8 @@ function CreateGoal() {
                 {/* ai input*/}
                 <div style={{
                     flexShrink: 0,
-                    marginTop: 'var(--space-lg)',
+                    marginTop: 'auto',
+                    paddingBottom: 'var(--space-xl)',
                     opacity: isFading ? 0 : 1,
                     transform: isFading ? 'translateY(-20px)' : 'translateY(0)',
                     transition: 'all 0.4s ease-out 0.15s',
@@ -255,8 +256,8 @@ function CreateGoal() {
                         icon={<Mic size={18} color="white" />}
                         buttonStyle="dark"
                         variant="auth"
-                        padding="12px 14px"
-                        borderRadius="var(--radius-lg)"
+                        padding="18px 20px"
+                        borderRadius="var(--radius-xl)"
                     />
                 </div>
             </div>
@@ -305,6 +306,7 @@ function CreateGoal() {
                             }
                         }}
                         variant="auth"
+                        padding="18px 20px"
                         borderRadius="var(--radius-xl)"
                     />
                 </div>
