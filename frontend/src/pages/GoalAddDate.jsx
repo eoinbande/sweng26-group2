@@ -14,8 +14,11 @@ function GoalAddDate() {
     const [showPicker, setShowPicker] = useState(false);
     const [contentVisible, setContentVisible] = useState(false);
     const [isFadingOut, setIsFadingOut] = useState(false);
-    // const [isExpanding, setIsExpanding] = useState(false);
+    const [isFading, setIsFading] = useState(false);
+    const [isExpanding, setIsExpanding] = useState(false);
     const pickerRef = useRef(null);
+    const dateValueRef = useRef('');
+    const navigatingRef = useRef(false);
 
     // goal text passed from CreateGoal
     const goalText = location.state?.goalText || '';
@@ -41,48 +44,45 @@ function GoalAddDate() {
         const dd = String(date.getDate()).padStart(2, '0');
         const mm = String(date.getMonth() + 1).padStart(2, '0');
         const yyyy = date.getFullYear();
-        setDateValue(`${mm}/${dd}/${yyyy}`);
+        const formatted = `${mm}/${dd}/${yyyy}`;
+        setDateValue(formatted);
+        dateValueRef.current = formatted;
     };
 
-    // close picker when clicking outside
+    // expanding blue card transition for navigating to loading/review
+    const handleDateSubmit = () => {
+        if (navigatingRef.current) return;
+        navigatingRef.current = true;
+        // step 1: fade out content
+        setIsFading(true);
+        // step 2: expand blue card to fill screen
+        setTimeout(() => setIsExpanding(true), 400);
+        // step 3: navigate to review/loading after expansion
+        setTimeout(() => {
+            navigate('/review-plan', {
+                state: {
+                    goalText,
+                    dueDate: dateValueRef.current,
+                    showLoading: true,
+                },
+            });
+        }, 1400);
+    };
+
+    // close picker when clicking outside, trigger loading if date was picked
     useEffect(() => {
         if (!showPicker) return;
         const handleClickOutside = (e) => {
             if (pickerRef.current && !pickerRef.current.contains(e.target)) {
                 setShowPicker(false);
+                if (dateValueRef.current && !navigatingRef.current) {
+                    handleDateSubmit();
+                }
             }
         };
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [showPicker]);
-
-    // // --- expanding blue card transition for navigating to loading/review ---
-    // // uncomment isFading and isExpanding state above to use
-    // const handleDateSubmit = () => {
-    //     // step 1: fade out content
-    //     setIsFading(true);
-    //     // step 2: expand blue card to fill screen
-    //     setTimeout(() => setIsExpanding(true), 400);
-    //     // step 3: navigate to review/loading after expansion
-    //     setTimeout(() => {
-    //         navigate('/review-plan', {
-    //             state: {
-    //                 goalText,
-    //                 dueDate: dateValue,
-    //                 showLoading: true,
-    //             },
-    //         });
-    //     }, 1400);
-    // };
-    //
-    // // blue section style additions for expansion:
-    // // borderRadius: isExpanding ? '0' : '0 0 var(--radius-xxl) var(--radius-xxl)',
-    // // height: isExpanding ? '100vh' : '66vh',
-    // // transition: 'height 1.2s cubic-bezier(0.25, 0.1, 0.25, 1), border-radius 0.3s ease-out',
-    //
-    // // content fade-out (add to each content element):
-    // // opacity: isFading ? 0 : (contentVisible ? 1 : 0),
-    // // transform: isFading ? 'translateY(-20px)' : (contentVisible ? 'translateY(0)' : 'translateY(20px)'),
 
     return (
         <div style={{
@@ -101,17 +101,18 @@ function GoalAddDate() {
                 padding: 'var(--space-lg)',
                 paddingTop: 'var(--space-xl)',
                 paddingBottom: 'var(--space-xl)',
-                borderRadius: '0 0 var(--radius-xxl) var(--radius-xxl)',
+                borderRadius: isExpanding ? '0' : '0 0 var(--radius-xxl) var(--radius-xxl)',
                 boxShadow: 'var(--shadow-float)',
                 overflow: 'hidden',
                 position: 'absolute',
                 top: 0,
                 left: 0,
                 right: 0,
-                height: '66vh',
+                height: isExpanding ? '100vh' : '66vh',
                 zIndex: 200,
                 display: 'flex',
                 flexDirection: 'column',
+                transition: 'height 1.2s cubic-bezier(0.25, 0.1, 0.25, 1), border-radius 0.3s ease-out',
             }}>
                 {/* back button - always visible */}
                 <button
@@ -144,8 +145,8 @@ function GoalAddDate() {
                     color: 'var(--text-main)',
                     textAlign: 'center',
                     alignSelf: 'center',
-                    opacity: isFadingOut ? 0 : (contentVisible ? 1 : 0),
-                    transform: isFadingOut ? 'translateY(-20px)' : (contentVisible ? 'translateY(0)' : 'translateY(20px)'),
+                    opacity: (isFadingOut || isFading) ? 0 : (contentVisible ? 1 : 0),
+                    transform: (isFadingOut || isFading) ? 'translateY(-20px)' : (contentVisible ? 'translateY(0)' : 'translateY(20px)'),
                     transition: 'all 0.4s ease-out 0.1s',
                 }}>
                     When's your<br />deadline?
@@ -157,8 +158,8 @@ function GoalAddDate() {
                     onClick={() => { if (!showPicker) setShowPicker(true); }}
                     style={{
                         marginTop: 'var(--space-xl)',
-                        opacity: isFadingOut ? 0 : (contentVisible ? 1 : 0),
-                        transform: isFadingOut ? 'translateY(-20px)' : (contentVisible ? 'translateY(0)' : 'translateY(20px)'),
+                        opacity: (isFadingOut || isFading) ? 0 : (contentVisible ? 1 : 0),
+                        transform: (isFadingOut || isFading) ? 'translateY(-20px)' : (contentVisible ? 'translateY(0)' : 'translateY(20px)'),
                         transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.2s, background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), max-width 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
                         maxWidth: showPicker ? '95%' : '90%',
                         width: '100%',
@@ -228,8 +229,8 @@ function GoalAddDate() {
                     gap: '10px',
                     alignItems: 'center',
                     marginTop: 'var(--space-lg)',
-                    opacity: isFadingOut ? 0 : (contentVisible ? 1 : 0),
-                    transform: isFadingOut ? 'translateY(-20px)' : (contentVisible ? 'translateY(0)' : 'translateY(20px)'),
+                    opacity: (isFadingOut || isFading) ? 0 : (contentVisible ? 1 : 0),
+                    transform: (isFadingOut || isFading) ? 'translateY(-20px)' : (contentVisible ? 'translateY(0)' : 'translateY(20px)'),
                     transition: 'all 0.4s ease-out 0.3s',
                 }}>
                     <button
