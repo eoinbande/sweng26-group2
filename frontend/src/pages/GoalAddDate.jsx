@@ -17,12 +17,12 @@ function GoalAddDate() {
     // goal text passed from CreateGoal
     const goalText = location.state?.goalText || '';
 
-    // format date from picker as DD/MM/YYYY
+    // format date from picker as MM/DD/YYYY
     const handleDateChange = (date) => {
         const dd = String(date.getDate()).padStart(2, '0');
         const mm = String(date.getMonth() + 1).padStart(2, '0');
         const yyyy = date.getFullYear();
-        setDateValue(`${dd}/${mm}/${yyyy}`);
+        setDateValue(`${mm}/${dd}/${yyyy}`);
     };
 
     // close picker when clicking outside
@@ -127,7 +127,7 @@ function GoalAddDate() {
                         transition: 'max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease',
                     }}>
                         <InputBar
-                            placeholder="DD/MM/YYYY"
+                            placeholder="MM/DD/YYYY"
                             value={dateValue}
                             onChange={() => {}}
                             onSubmit={() => {}}
