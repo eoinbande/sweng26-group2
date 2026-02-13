@@ -31,8 +31,8 @@ function CreateGoal() {
     const [isFading, setIsFading] = useState(false);
     const [isExpanding, setIsExpanding] = useState(false);
 
-    // handle goal submission - calls preview endpoint (does NOT save)
-    const handleGoalSubmit = async (goalText) => {
+    // handle goal submission - navigates to date selection page
+    const handleGoalSubmit = (goalText) => {
         console.log('Goal submitted:', goalText);
 
         // step 1: fade out the text inside the blue card
@@ -43,80 +43,86 @@ function CreateGoal() {
             setIsExpanding(true);
         }, 400);
 
-        // In demo mode, skip backend and navigate with mock data
-        if (isDemoMode) {
-            setTimeout(() => {
-                navigate('/review-plan', {
-                    state: {
-                        goal: goalText,
-                        showLoading: true,
-                        previewData: MOCK_PREVIEW,
-                        userId: 'demo-user-001',
-                        originalPrompt: goalText,
-                    },
-                });
-            }, 1400);
-            return;
-        }
-
-        // get the logged-in user
-        let user;
-        try {
-            const { data } = await supabase.auth.getUser();
-            user = data?.user;
-        } catch (err) {
-            console.error('Supabase auth error:', err);
-        }
-        if (!user) {
-            alert('You must be logged in to create a goal.');
-            navigate('/login');
-            return;
-        }
-
-        // call preview endpoint (does NOT save to DB)
-        try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/goals/preview`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    user_id: user.id,
-                    title: goalText,
-                    description: goalText,
-                    generate_plan: true
-                })
+        // step 3: navigate to date selection after expansion
+        setTimeout(() => {
+            navigate('/goal-add-date', {
+                state: {
+                    goalText,
+                    originalPrompt: goalText,
+                },
             });
-
-            const data = await res.json();
-            console.log('Preview response:', data);
-
-            if (!res.ok) {
-                console.error('Preview error:', data);
-                alert('Failed to get AI plan. Check console.');
-                return;
-            }
-
-            // step 3: navigate after expansion completes
-            setTimeout(() => {
-                if (data.ai_generated) {
-                    navigate('/review-plan', {
-                        state: {
-                            goal: goalText,
-                            showLoading: true,
-                            previewData: data,
-                            userId: user.id,
-                            originalPrompt: goalText
-                        }
-                    });
-                } else {
-                    // No AI match — go to goals page
-                    navigate('/goals');
-                }
-            }, 1400);
-        } catch (err) {
-            console.error('Network error:', err);
-            alert('Network error. Is the backend running?');
-        }
+        }, 1400);
     };
+
+    // // --- original backend submission (commented out for now) ---
+    // const handleGoalSubmitBackend = async (goalText) => {
+    //     setIsFading(true);
+    //     setTimeout(() => setIsExpanding(true), 400);
+    //
+    //     if (isDemoMode) {
+    //         setTimeout(() => {
+    //             navigate('/review-plan', {
+    //                 state: {
+    //                     goal: goalText,
+    //                     showLoading: true,
+    //                     previewData: MOCK_PREVIEW,
+    //                     userId: 'demo-user-001',
+    //                     originalPrompt: goalText,
+    //                 },
+    //             });
+    //         }, 1400);
+    //         return;
+    //     }
+    //
+    //     let user;
+    //     try {
+    //         const { data } = await supabase.auth.getUser();
+    //         user = data?.user;
+    //     } catch (err) {
+    //         console.error('Supabase auth error:', err);
+    //     }
+    //     if (!user) {
+    //         alert('You must be logged in to create a goal.');
+    //         navigate('/login');
+    //         return;
+    //     }
+    //
+    //     try {
+    //         const res = await fetch(`${import.meta.env.VITE_API_URL}/goals/preview`, {
+    //             method: 'POST',
+    //             headers: { 'Content-Type': 'application/json' },
+    //             body: JSON.stringify({
+    //                 user_id: user.id,
+    //                 title: goalText,
+    //                 description: goalText,
+    //                 generate_plan: true
+    //             })
+    //         });
+    //         const data = await res.json();
+    //         if (!res.ok) {
+    //             alert('Failed to get AI plan. Check console.');
+    //             return;
+    //         }
+    //         setTimeout(() => {
+    //             if (data.ai_generated) {
+    //                 navigate('/review-plan', {
+    //                     state: {
+    //                         goal: goalText,
+    //                         showLoading: true,
+    //                         previewData: data,
+    //                         userId: user.id,
+    //                         originalPrompt: goalText
+    //                     }
+    //                 });
+    //             } else {
+    //                 navigate('/goals');
+    //             }
+    //         }, 1400);
+    //     } catch (err) {
+    //         console.error('Network error:', err);
+    //         alert('Network error. Is the backend running?');
+    //     }
+    // };
 
     return (
         <div style={{
