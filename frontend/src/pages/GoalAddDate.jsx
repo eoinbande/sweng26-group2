@@ -325,6 +325,7 @@ function GoalAddDate() {
                             }
                         }}
                         variant="auth"
+                        padding="18px 20px"
                         borderRadius="var(--radius-xl)"
                     />
                 </div>
