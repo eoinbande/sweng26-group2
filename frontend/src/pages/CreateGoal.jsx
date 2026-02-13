@@ -29,21 +29,16 @@ function CreateGoal() {
     const [message, setMessage] = useState(restoredPrompt);
     const [manualGoal, setManualGoal] = useState('');
     const [isFading, setIsFading] = useState(false);
-    const [isExpanding, setIsExpanding] = useState(false);
+    // const [isExpanding, setIsExpanding] = useState(false);
 
-    // handle goal submission - navigates to date selection page
+    // handle goal submission - fades out content then navigates to date selection
     const handleGoalSubmit = (goalText) => {
         console.log('Goal submitted:', goalText);
 
-        // step 1: fade out the text inside the blue card
+        // fade out all content
         setIsFading(true);
 
-        // step 2: after text fades, start expanding the blue card
-        setTimeout(() => {
-            setIsExpanding(true);
-        }, 400);
-
-        // step 3: navigate to date selection after expansion
+        // navigate after fade completes
         setTimeout(() => {
             navigate('/goal-add-date', {
                 state: {
@@ -51,7 +46,7 @@ function CreateGoal() {
                     originalPrompt: goalText,
                 },
             });
-        }, 1400);
+        }, 500);
     };
 
     // // --- original backend submission (commented out for now) ---
@@ -141,16 +136,15 @@ function CreateGoal() {
                 padding: 'var(--space-lg)',
                 paddingTop: 'var(--space-xl)',
                 paddingBottom: 'var(--space-xl)',
-                borderRadius: isExpanding ? '0' : '0 0 var(--radius-xxl) var(--radius-xxl)',
+                borderRadius: '0 0 var(--radius-xxl) var(--radius-xxl)',
                 boxShadow: 'var(--shadow-float)',
                 overflow: 'hidden',
                 position: 'absolute',
                 top: 0,
                 left: 0,
                 right: 0,
-                height: isExpanding ? '100vh' : '66vh',
+                height: '66vh',
                 zIndex: 200,
-                transition: 'height 1.2s cubic-bezier(0.25, 0.1, 0.25, 1), border-radius 0.3s ease-out',
                 display: 'flex',
                 flexDirection: 'column',
             }}>

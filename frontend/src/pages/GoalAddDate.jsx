@@ -12,10 +12,19 @@ function GoalAddDate() {
     const [manualGoal, setManualGoal] = useState('');
     const [dateValue, setDateValue] = useState('');
     const [showPicker, setShowPicker] = useState(false);
+    const [contentVisible, setContentVisible] = useState(false);
+    // const [isFading, setIsFading] = useState(false);
+    // const [isExpanding, setIsExpanding] = useState(false);
     const pickerRef = useRef(null);
 
     // goal text passed from CreateGoal
     const goalText = location.state?.goalText || '';
+
+    // fade in content on mount
+    useEffect(() => {
+        const timer = setTimeout(() => setContentVisible(true), 100);
+        return () => clearTimeout(timer);
+    }, []);
 
     // format date from picker as MM/DD/YYYY
     const handleDateChange = (date) => {
@@ -36,6 +45,34 @@ function GoalAddDate() {
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [showPicker]);
+
+    // // --- expanding blue card transition for navigating to loading/review ---
+    // // uncomment isFading and isExpanding state above to use
+    // const handleDateSubmit = () => {
+    //     // step 1: fade out content
+    //     setIsFading(true);
+    //     // step 2: expand blue card to fill screen
+    //     setTimeout(() => setIsExpanding(true), 400);
+    //     // step 3: navigate to review/loading after expansion
+    //     setTimeout(() => {
+    //         navigate('/review-plan', {
+    //             state: {
+    //                 goalText,
+    //                 dueDate: dateValue,
+    //                 showLoading: true,
+    //             },
+    //         });
+    //     }, 1400);
+    // };
+    //
+    // // blue section style additions for expansion:
+    // // borderRadius: isExpanding ? '0' : '0 0 var(--radius-xxl) var(--radius-xxl)',
+    // // height: isExpanding ? '100vh' : '66vh',
+    // // transition: 'height 1.2s cubic-bezier(0.25, 0.1, 0.25, 1), border-radius 0.3s ease-out',
+    //
+    // // content fade-out (add to each content element):
+    // // opacity: isFading ? 0 : (contentVisible ? 1 : 0),
+    // // transform: isFading ? 'translateY(-20px)' : (contentVisible ? 'translateY(0)' : 'translateY(20px)'),
 
     return (
         <div style={{
@@ -79,7 +116,8 @@ function GoalAddDate() {
                         justifyContent: 'center',
                         alignSelf: 'flex-start',
                         marginBottom: 'var(--space-lg)',
-                        opacity: 1,
+                        opacity: contentVisible ? 1 : 0,
+                        transition: 'opacity 0.4s ease-out',
                     }}
                     onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
                     onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1.0)'}
@@ -97,6 +135,9 @@ function GoalAddDate() {
                     color: 'var(--text-main)',
                     textAlign: 'center',
                     alignSelf: 'center',
+                    opacity: contentVisible ? 1 : 0,
+                    transform: contentVisible ? 'translateY(0)' : 'translateY(20px)',
+                    transition: 'all 0.4s ease-out 0.1s',
                 }}>
                     When's your<br />deadline?
                 </h1>
@@ -107,6 +148,9 @@ function GoalAddDate() {
                     onClick={() => { if (!showPicker) setShowPicker(true); }}
                     style={{
                         marginTop: 'var(--space-xl)',
+                        opacity: contentVisible ? 1 : 0,
+                        transform: contentVisible ? 'translateY(0)' : 'translateY(20px)',
+                        transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.2s, background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), max-width 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
                         maxWidth: showPicker ? '95%' : '90%',
                         width: '100%',
                         alignSelf: 'center',
@@ -175,6 +219,9 @@ function GoalAddDate() {
                     gap: '10px',
                     alignItems: 'center',
                     marginTop: 'var(--space-lg)',
+                    opacity: contentVisible ? 1 : 0,
+                    transform: contentVisible ? 'translateY(0)' : 'translateY(20px)',
+                    transition: 'all 0.4s ease-out 0.3s',
                 }}>
                     <button
                         onClick={() => console.log('Skip deadline')}
