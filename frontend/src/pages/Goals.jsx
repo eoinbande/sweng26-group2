@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import PageHeader from '../components/PageHeader';
 import GoalListCard from '../components/GoalListCard';
 import BottomNav from '../components/BottomNav';
+import Loading from '../components/Loading';
 import { supabase, isDemoMode } from '../supabase_client';
 import '../styles/Goals.css';
 
@@ -98,24 +99,31 @@ const Goals = () => {
         }
     }, [location.state]);
 
+    if (loading) {
+        return (
+            <div className="goals-page">
+                <Loading />
+                <BottomNav />
+            </div>
+        );
+    }
+
     return (
         <div className="goals-page">
-        <div className="goals-container" ref={scrollRef} onScroll={handleScroll}>
-            <PageHeader title="Goals" />
+            <div className="goals-container" ref={scrollRef} onScroll={handleScroll}>
+                <PageHeader title="Goals" />
 
-            {/* Goals List */}
-            <div className="goals-list">
-                {loading ? (
-                    <p style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>Loading goals...</p>
-                ) : goals.length === 0 ? (
-                    <p style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>No goals yet. Create one!</p>
-                ) : (
-                    goals.map((goal) => (
-                        <GoalListCard key={goal.id} goal={goal} />
-                    ))
-                )}
+                {/* Goals List */}
+                <div className="goals-list">
+                    {goals.length === 0 ? (
+                        <p style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>No goals yet. Create one!</p>
+                    ) : (
+                        goals.map((goal) => (
+                            <GoalListCard key={goal.id} goal={goal} />
+                        ))
+                    )}
+                </div>
             </div>
-        </div>
 
             <div
                 className="goals-fade-overlay"

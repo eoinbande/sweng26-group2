@@ -3,47 +3,69 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
 import GoalDetailHeader from '../components/GoalDetailHeader';
 import TaskTimeline from '../components/TaskTimeline';
+import Loading from '../components/Loading'; // Import Loading component if it exists
 import '../styles/GoalDetail.css';
 
 const GoalDetail = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const goalTitle = location.state?.goal?.title || location.state?.goalTitle || "Master the piano";
+    // Safely access location state
+    // Use "Loading..." as default if we are loading, unless we want to show stale title?
+    // User requested "just put loading goals" instead of showing stale or mock data briefly.
+    const [goalTitle, setGoalTitle] = useState(location.state?.goal?.title || location.state?.goalTitle || "Loading...");
     const goalId = location.state?.goal?.id || location.state?.goalId || null;
 
-    /* mock data (fallback) */
-    const defaultTasks = [
-        {
-            id: 1,
-            title: "Set overall budget",
-            dueDate: "2026-03-09",
-            subtasks: [
-                { id: "1a", title: "Research costs",    dueDate: "2026-02-20", completed: true  },
-                { id: "1b", title: "Draft spreadsheet", dueDate: "2026-02-28", completed: false },
-                { id: "1c", title: "Get approval",      dueDate: "2026-03-05", completed: false }
-            ]
-        },
-        // ... (truncated, but we rely on fetching now)
-    ];
-
     /* rstore tasks from location.state if returning from feedback page */
-    const [tasks, setTasks] = useState(location.state?.tasks || defaultTasks);
-    const [endDate, setEndDate] = useState("27 Jan"); // Default / placeholder
+    const [tasks, setTasks] = useState(location.state?.tasks || []);
+    const [endDate, setEndDate] = useState("");
+    
+    // Add loading state
+    const [isLoading, setIsLoading] = useState(true);
 
     /* Fetch goal details from backend */
     useEffect(() => {
-        if (!goalId) return;
+        if (!goalId) {
+            console.error("No goal ID provided");
+            setIsLoading(false);
+            return;
+        }
 
         const fetchGoalDetails = async () => {
+            setIsLoading(true);
             try {
+                // Adjust URL if needed (some backends use /goals/:id/details)
+                // Assuming /goals/:id based on standard REST, but user code had /goal-details/:id
+                // Stick to user's route: /goal-details/:id
                 const response = await fetch(`${import.meta.env.VITE_API_URL}/goal-details/${goalId}`);
-                if (!response.ok) throw new Error('Failed to fetch details');
+                
+                if (!response.ok) {
+                    throw new Error('Failed to fetch details');
+                }
+                
                 const data = await response.json();
+                
+                // Debug log to check data structure
+                console.log("Goal details fetched:", data);
+
+                if (data.goal?.title) {
+                    setGoalTitle(data.goal.title);
+                }
                 
                 // Set End Date if available
                 if (data.goal && data.goal.goal_data && data.goal.goal_data.goal_due_date) {
-                    setEndDate(data.goal.goal_data.goal_due_date);
+                    const rawDate = data.goal.goal_data.goal_due_date;
+                    // Format date nicely (e.g. 14 Feb 2026)
+                    const dateObj = new Date(rawDate);
+                    if (!isNaN(dateObj)) {
+                        setEndDate(dateObj.toLocaleDateString('en-GB', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric'
+                        }));
+                    } else {
+                         setEndDate(rawDate);
+                    }
                 }
 
                 // Transform backend tasks to frontend format
@@ -65,11 +87,13 @@ const GoalDetail = () => {
                     }));
                 };
 
-                if (data.tasks && data.tasks.length > 0) {
+                if (data.tasks) {
                     setTasks(processTasks(data.tasks));
                 }
             } catch (err) {
                 console.error("Error loading goal details:", err);
+            } finally {
+                setIsLoading(false);
             }
         };
 
@@ -195,6 +219,18 @@ const GoalDetail = () => {
     const totalTasks = tasks.length;
     const completedTasks = tasks.filter(t => isTaskComplete(t)).length;
     const progress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+
+    if (isLoading) {
+        return (
+            <div className="goal-detail-page">
+                <div className="loading-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                     {/* Use Loading component if available, else text */}
+                     <Loading />
+                </div>
+                <BottomNav />
+            </div>
+        );
+    }
 
     return (
         <div className="goal-detail-page">
