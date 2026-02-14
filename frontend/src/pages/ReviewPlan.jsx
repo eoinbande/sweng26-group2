@@ -41,7 +41,7 @@ function ReviewPlan() {
         return previewData.tasks.map(t => ({
             id: t.ai_id,
             title: t.description,
-            dueDate: '', // Linear tasks don't have per-task time estimates in this schema yet
+            dueDate: t.due_date ? new Date(t.due_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : '',
         }));
     }, [previewData]);
 
