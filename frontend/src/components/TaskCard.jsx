@@ -115,6 +115,8 @@ export function TaskCard({
           gap: 'var(--space-xs)',
           fontSize: '12px',
           color: 'var(--text-secondary)',
+          whiteSpace: 'nowrap',
+          flexShrink: 0,
         }}>
           <Clock size={12} strokeWidth={2} />
           <span>{dueDate}</span>
