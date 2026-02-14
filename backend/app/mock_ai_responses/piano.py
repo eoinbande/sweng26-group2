@@ -17,6 +17,7 @@ PIANO_INITIAL = {
             "description": "Get access to a piano or keyboard",
             "order": 1,
             "status": "not_started",
+            "due_date": "2026-02-20",
             "requires_input": True,
             "guidance": "You need regular access to practice. Let us know what you have available so we can tailor the plan.",
             "subtasks": [
@@ -41,6 +42,7 @@ PIANO_INITIAL = {
             "description": "Learn the basics of piano layout and posture",
             "order": 2,
             "status": "not_started",
+            "due_date": "2026-03-01",
             "requires_input": False,
             "guidance": "Before playing any songs, you need to understand the instrument and how to sit at it properly to avoid bad habits.",
             "subtasks": [
@@ -72,6 +74,7 @@ PIANO_INITIAL = {
             "description": "Learn to read basic sheet music",
             "order": 3,
             "status": "not_started",
+            "due_date": "2026-03-10",
             "requires_input": False,
             "guidance": "Reading music opens up thousands of songs. Start with the treble clef (right hand) and add bass clef later.",
             "subtasks": [
@@ -102,6 +105,7 @@ PIANO_INITIAL = {
             "ai_id": "task_4",
             "description": "Practice basic scales and finger exercises",
             "order": 4,
+            "due_date": "2026-03-20",
             "status": "not_started",
             "requires_input": False,
             "guidance": "Scales build finger strength, independence, and familiarity with keys. Start slow and increase speed gradually.",
@@ -133,6 +137,7 @@ PIANO_INITIAL = {
             "ai_id": "task_5",
             "description": "Learn your first simple song",
             "order": 5,
+            "due_date": "2026-03-20",
             "status": "not_started",
             "requires_input": False,
             "guidance": "Nothing beats the motivation of playing a real song! Start with something simple that uses the notes and rhythms you've learned.",
@@ -171,6 +176,7 @@ PIANO_INITIAL = {
             "ai_id": "task_6",
             "description": "Establish a regular practice routine",
             "order": 6,
+            "due_date": "2026-03-20",
             "status": "not_started",
             "requires_input": False,
             "guidance": "Consistent short sessions beat occasional long ones. Even 15 minutes daily is better than 2 hours once a week.",
