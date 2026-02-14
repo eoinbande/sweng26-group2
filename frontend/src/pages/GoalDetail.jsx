@@ -50,11 +50,14 @@ const GoalDetail = () => {
                 const processTasks = (backendTasks) => {
                     return backendTasks.map(t => ({
                         ...t,
+                        // Map description to title (as backend uses description for task name)
+                        title: t.description || t.title, 
                         // Ensure dueDate is mapped (backend key is due_date usually)
                         dueDate: t.due_date || t.dueDate,
                         // Process subtasks: map status to completed boolean
                         subtasks: t.subtasks ? t.subtasks.map(s => ({
                            ...s,
+                           title: s.description || s.title,
                            dueDate: s.due_date || s.dueDate,
                            completed: s.status === 'completed'
                         })) : [],
@@ -87,8 +90,12 @@ const GoalDetail = () => {
     };
 
     /* derived helpers */
-    const isTaskComplete = (task) =>
-        task.subtasks.length > 0 && task.subtasks.every(s => s.completed);
+    const isTaskComplete = (task) => {
+        if (task.subtasks && task.subtasks.length > 0) {
+            return task.subtasks.every(s => s.completed);
+        }
+        return task.completed;
+    };
 
     const getTaskStatus = (taskIndex) => {
         const task = tasks[taskIndex];
@@ -147,18 +154,36 @@ const GoalDetail = () => {
                 }));
                 // Call API for the last subtask
                 updateTaskStatus(lastSubId, 'not_started');
+            } else {
+                 // No subtasks case: uncheck the task itself
+                 setTasks(prev => prev.map((t, i) => {
+                    if (i !== taskIndex) return t;
+                    return { ...t, completed: false, status: 'in_progress' };
+                 }));
+                 updateTaskStatus(task.id, 'not_started');
             }
         } else { // mark task as complete -> mark ALL subtasks as done
             setTasks(prev => prev.map((t, i) => {
                 if (i !== taskIndex) return t;
                 return {
                     ...t,
+                    completed: true,
+                    status: 'completed',
                     subtasks: t.subtasks.map(s => ({ ...s, completed: true }))
                 };
             }));
             
-            // Call API for ALL subtasks
-            task.subtasks.forEach(s => {
+            if (task.subtasks.length > 0) {
+                // Call API for ALL subtasks
+                task.subtasks.forEach(s => {
+                    if (!s.completed) {
+                        updateTaskStatus(s.id, 'completed');
+                    }
+                });
+            } else {
+                // Call API for task
+                 updateTaskStatus(task.id, 'completed');
+            }k.subtasks.forEach(s => {
                 if (!s.completed) {
                      updateTaskStatus(s.id, 'completed');
                 }

@@ -17,6 +17,11 @@ const getDaysLeftText = (dateStr) => {
 };
 
 const getBookmarkInfo = (task) => {
+    // If no subtasks, track the task itself (0/1 or 1/1)
+    if (!task.subtasks || task.subtasks.length === 0) {
+        const isDone = task.status === 'completed' || task.completed;
+        return { text: `${isDone ? 1 : 0}/1`, isComplete: isDone };
+    }
     const done  = task.subtasks.filter(s => s.completed).length;
     const total = task.subtasks.length;
     return { text: `${done}/${total}`, isComplete: done === total };
@@ -104,7 +109,9 @@ const TaskTimeline = ({ tasks, getTaskStatus, isTaskComplete, toggleTask, toggle
             {tasks.map((task, index) => {
                 const status    = getTaskStatus(index);
                 const bookmark  = getBookmarkInfo(task);
-                const allSubsDone = task.subtasks.every(s => s.completed);
+                const hasSubtasks = task.subtasks && task.subtasks.length > 0;
+                // Only show double-check if there ARE subtasks and they are ALL done
+                const allSubsDone = hasSubtasks && task.subtasks.every(s => s.completed);
                 const daysLeft  = getDaysLeftText(task.dueDate);
 
                 // message for locked tasks
