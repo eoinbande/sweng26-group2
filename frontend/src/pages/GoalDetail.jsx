@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
 import GoalDetailHeader from '../components/GoalDetailHeader';
 import TaskTimeline from '../components/TaskTimeline';
+import FeedbackPopUp from '../components/FeedbackPopUp';
 import '../styles/GoalDetail.css';
 
 const GoalDetail = () => {
@@ -66,6 +67,7 @@ const GoalDetail = () => {
 
     /* rstore tasks from location.state if returning from feedback page */
     const [tasks, setTasks] = useState(location.state?.tasks || defaultTasks);
+    const [showFeedback, setShowFeedback] = useState(false);
 
     /* derived helpers */
     const isTaskComplete = (task) =>
@@ -150,9 +152,24 @@ const GoalDetail = () => {
                 />
             </div>
 
-            {/* Floating Action Button */}
+            {/* feedback popup */}
+            {showFeedback && (
+                <div className="feedback-overlay" onClick={() => setShowFeedback(false)}>
+                    <div className="feedback-bottom-sheet" onClick={(e) => e.stopPropagation()}>
+                        <FeedbackPopUp
+                            variant="reroute"
+                            onClose={() => setShowFeedback(false)}
+                            onSubmit={(msg) => {
+                                setShowFeedback(false);
+                            }}
+                        />
+                    </div>
+                </div>
+            )}
+
+            {/* floating action button */}
             <div className="fab-container">
-                <button className="btn-update-plan">
+                <button className="btn-update-plan" onClick={() => setShowFeedback(true)}>
                     Update Plan
                 </button>
             </div>
