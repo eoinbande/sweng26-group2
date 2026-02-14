@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '../styles/Auth.css';
+import { supabase, isDemoMode } from '../supabase_client';
 
 function Login() {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
-        username: '',
+        email: '',
         password: ''
     });
 
@@ -16,11 +17,24 @@ function Login() {
         });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // add authentication logic later
-        console.log('Login:', formData);
-        // for now just redirect to homepage
+
+        if (isDemoMode) {
+            navigate('/');
+            return;
+        }
+
+        const { error } = await supabase.auth.signInWithPassword({
+            email: formData.email,
+            password: formData.password
+        });
+
+        if (error) {
+            alert(error.message);
+            return;
+        }
+
         navigate('/');
     };
 
@@ -36,12 +50,12 @@ function Login() {
 
                 <form className="auth-form" onSubmit={handleSubmit}>
                     <div className="form-group">
-                        <label htmlFor="username">Username</label>
+                        <label htmlFor="email">Email</label>
                         <input
-                            type="text"
-                            id="username"
-                            name="username"
-                            value={formData.username}
+                            type="email"
+                            id="email"
+                            name="email"
+                            value={formData.email}
                             onChange={handleChange}
                             required
                         />

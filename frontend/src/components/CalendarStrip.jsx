@@ -13,7 +13,7 @@ const CalendarStrip = () => {
     ];
 
     return (
-        <div style={{ marginBottom: 'var(--space-lg)' }}>
+        <div style={{ marginBottom: 'var(--space-mdlg)' }}>
             <div className="flex-between" style={{ padding: '0 var(--space-xs)' }}>
                 {days.map((item, index) => (
                     <div key={index} style={{

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '../styles/Auth.css';
+import { supabase, isDemoMode } from '../supabase_client';
 
 function SignUp() {
     const navigate = useNavigate();
@@ -17,12 +18,57 @@ function SignUp() {
         });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Add your authentication logic here
-        console.log('Sign up:', formData);
-        // For now, redirect to home
-        navigate('/');
+
+        if (isDemoMode) {
+            alert('Account created successfully! (Demo mode)');
+            navigate('/login');
+            return;
+        }
+
+        // 1. Create the user in Supabase Auth
+        const { data, error } = await supabase.auth.signUp({
+            email: formData.email,
+            password: formData.password,
+            options: {
+                data: {
+                    username: formData.username
+                }
+            }
+        });
+
+        if (error) {
+            alert(error.message);
+            return;
+        }
+
+        // 2. Create the profile row in the backend
+        try {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/profiles`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    user_id: data.user.id,
+                    name: formData.username,
+                    email: formData.email
+                })
+            });
+
+            if (!res.ok) {
+                const errData = await res.json();
+                console.error('Profile creation error:', errData);
+                alert('User created but profile failed. Check console.');
+                return;
+            }
+        } catch (err) {
+            console.error('Failed to create profile:', err);
+            alert('Network error creating profile');
+            return;
+        }
+
+        alert('Account created successfully!');
+        navigate('/login');
     };
 
     return (

@@ -1,0 +1,57 @@
+/* css for goaldetail.jsx: page-level layout + Reroute modal. */
+/* Header & Timeline styles have their own css in /styles/components */
+
+/* page wrapper */
+
+.goal-detail-page {
+    position: relative;
+    max-width: 480px;
+    margin: 0 auto;
+    background-color: var(--bg-color);
+    height: 100vh;
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+
+.goal-detail-page::-webkit-scrollbar {
+    display: none;
+}
+
+.goal-detail-container {
+    padding: 0 var(--space-md);
+    padding-top: 8px;
+    padding-bottom: 180px; /* room for FAB + BottomNav */
+}
+
+/* floating action button */
+
+.fab-container {
+    position: fixed;
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 480px;
+    padding: 0 var(--space-lg);
+    display: flex;
+    justify-content: center;
+    z-index: 90;
+}
+
+.btn-update-plan {
+    width: 180px;
+    background-color: var(--yellow);
+    color: var(--text-main);
+    font-weight: 600;
+    border: none;
+    border-radius: 24px;
+    padding: 14px;
+    font-size: 15px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(255, 185, 46, 0.35);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-update-plan:active {
+    transform: scale(0.97);
+}
