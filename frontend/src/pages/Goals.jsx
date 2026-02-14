@@ -6,7 +6,7 @@ import BottomNav from '../components/BottomNav';
 import { supabase, isDemoMode } from '../supabase_client';
 import '../styles/Goals.css';
 
-const COLOR_SCHEMES_LIST = ['blue', 'yellow', 'orange', 'pink'];
+const COLOR_SCHEMES_LIST = ['blue', 'yellow', 'green', 'pink'];
 
 const MOCK_GOALS = [
     { id: 1, title: 'Learn Piano', description: 'Master basic chords and scales', date: '15 Mar', progress: 40, colorScheme: 'blue' },
@@ -49,28 +49,31 @@ const Goals = () => {
                 const res = await fetch(`${import.meta.env.VITE_API_URL}/goals/${user.id}`);
                 const data = await res.json();
 
-                const mapped = (data.goals || []).map((goal, index) => ({
-                    id: goal.id,
-                    title: goal.title,
-                    description: goal.description || '',
-                    date: goal.due_date
-                        ? new Date(goal.due_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
-                        : '',
-                    progress: (() => {
-                        let tasks = [];
-                        try {
-                            const gd = typeof goal.goal_data === 'string' 
-                                ? JSON.parse(goal.goal_data) 
-                                : goal.goal_data;
-                            tasks = gd?.tasks || [];
-                        } catch (e) { tasks = []; }
-                        
-                        if (tasks.length === 0) return 0;
-                        const completed = tasks.filter(t => t.status === 'completed').length;
-                        return Math.round((completed / tasks.length) * 100);
-                    })(),
-                    colorScheme: COLOR_SCHEMES_LIST[index % COLOR_SCHEMES_LIST.length],
-                }));
+                const mapped = (data.goals || []).map((goal, index) => {
+                    let goalData = {};
+                    try {
+                        goalData = typeof goal.goal_data === 'string' 
+                            ? JSON.parse(goal.goal_data) 
+                            : goal.goal_data || {};
+                    } catch (e) { goalData = {}; }
+
+                    const tasks = goalData.tasks || [];
+
+                    return {
+                        id: goal.id,
+                        title: goal.title,
+                        description: goal.description || goalData.description || '',
+                        date: (goal.due_date || goalData.goal_due_date)
+                            ? new Date(goal.due_date || goalData.goal_due_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
+                            : '',
+                        progress: (() => {
+                            if (tasks.length === 0) return 0;
+                            const completed = tasks.filter(t => t.status === 'completed').length;
+                            return Math.round((completed / tasks.length) * 100);
+                        })(),
+                        colorScheme: COLOR_SCHEMES_LIST[index % COLOR_SCHEMES_LIST.length],
+                    };
+                });
 
                 setGoals(mapped);
             } catch (err) {
