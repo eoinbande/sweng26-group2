@@ -17,7 +17,7 @@ PIANO_INITIAL = {
             "description": "Get access to a piano or keyboard",
             "order": 1,
             "status": "not_started",
-            "due_date": "2026-02-20",
+            "due_date": "2026-02-22",
             "requires_input": True,
             "guidance": "You need regular access to practice. Let us know what you have available so we can tailor the plan.",
             "subtasks": [
@@ -26,7 +26,7 @@ PIANO_INITIAL = {
                     "description": "Choose the right instrument type",
                     "order": 1,
                     "status": "not_started",
-                    "due_date": "2026-02-18",
+                    "due_date": "2026-02-22",
                     "guidance": "For beginners, a 61+ key digital piano with weighted keys is the best balance of cost and feel. Full-size is 88 keys."
                 },
                 {
@@ -34,7 +34,7 @@ PIANO_INITIAL = {
                     "description": "Acquire the instrument",
                     "order": 2,
                     "status": "not_started",
-                    "due_date": "2026-02-20",
+                    "due_date": "2026-02-22",
                     "guidance": "Budget options: second-hand digital piano (€100-300), keyboard rental, or a local community centre with a piano room."
                 }
             ]

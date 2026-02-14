@@ -22,7 +22,7 @@ BIKE_TYRE_INITIAL = {
             "description": "Remove the wheel from the bike",
             "order": 1,
             "status": "not_started",
-            "due_date": "2026-02-20",
+            "due_date": "2026-02-22",
             "requires_input": False,
             "guidance": "Flip the bike upside down so it rests on the handlebars and seat. Release the brake if needed, then open the quick-release lever or loosen the axle nuts to remove the wheel.",
             "subtasks": []
@@ -32,7 +32,7 @@ BIKE_TYRE_INITIAL = {
             "description": "Take out the inner tube",
             "order": 2,
             "status": "not_started",
-            "due_date": "2026-02-20",
+            "due_date": "2026-02-22",
             "requires_input": False,
             "guidance": "Use tyre levers to pry one side of the tyre off the rim. Slide the lever around the rim to unseat the tyre, then pull the inner tube out carefully.",
             "subtasks": []

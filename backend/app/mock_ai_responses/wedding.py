@@ -26,7 +26,7 @@ WEDDING_INITIAL = {
                     "description": "Check availability of key guests",
                     "order": 1,
                     "status": "not_started",
-                    "due_date": "2026-02-20",
+                    "due_date": "2026-02-22",
                     "guidance": "Reach out early — December can clash with holiday plans."
                 },
                 {
