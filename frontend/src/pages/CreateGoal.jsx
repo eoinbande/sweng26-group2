@@ -98,6 +98,7 @@ function CreateGoal() {
                 navigate('/review-plan', {
                     state: {
                         goal: goalText,
+                        showLoading: true,
                         previewData: data, // pass the full response (has tasks & goal_id)
                         userId: user.id,
                         originalPrompt: goalText,
