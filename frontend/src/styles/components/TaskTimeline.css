@@ -53,13 +53,13 @@
 .tl-status-icon--completed {
     background-color: var(--green-soft);
     color: white;
-    box-shadow: 0 3px 8px rgba(8, 107, 15, 0.35);
+    /* box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35); */
 }
 
 .tl-status-icon--locked {
     background-color: var(--red);
     color: white;
-    box-shadow: 0 3px 8px rgba(221, 100, 95, 0.35);
+    /* box-shadow: 0 3px 8px rgba(221, 100, 95, 0.35); */
 }
 
 .tl-status-icon--ready {
@@ -122,7 +122,7 @@
 }
 
 .tl-card--locked {
-    background-color: #FFF5F3;
+    background-color: var(--pink-soft);
 }
 
 .tl-card--completed {

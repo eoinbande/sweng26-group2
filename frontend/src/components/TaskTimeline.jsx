@@ -139,7 +139,7 @@ const TaskTimeline = ({ tasks, getTaskStatus, isTaskComplete, toggleTask, toggle
                                 <svg width="36" height="44" viewBox="0 0 36 44" fill="none">
                                     <path
                                         d="M0 8C0 3.58 3.58 0 8 0H28C32.42 0 36 3.58 36 8V38L18 30L0 38V8Z"
-                                        fill={bookmark.isComplete ? '#A7DD99' : '#BFD1E5'}
+                                        fill={bookmark.isComplete ? 'var(--green-soft)' : 'var(--accent-blue)'}
                                     />
                                 </svg>
                                 <span className="tl-bookmark__text">{bookmark.text}</span>
