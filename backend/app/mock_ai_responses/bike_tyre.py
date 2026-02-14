@@ -14,12 +14,15 @@ Includes:
 # =============================================================================
 
 BIKE_TYRE_INITIAL = {
+    "description": "Step-by-step guide to fixing a flat bike tyre",
+    "goal_due_date": "2026-02-15",
     "tasks": [
         {
             "ai_id": "task_1",
             "description": "Remove the wheel from the bike",
             "order": 1,
             "status": "not_started",
+            "due_date": "2026-02-13",
             "requires_input": False,
             "guidance": "Flip the bike upside down so it rests on the handlebars and seat. Release the brake if needed, then open the quick-release lever or loosen the axle nuts to remove the wheel.",
             "subtasks": []
@@ -29,6 +32,7 @@ BIKE_TYRE_INITIAL = {
             "description": "Take out the inner tube",
             "order": 2,
             "status": "not_started",
+            "due_date": "2026-02-13",
             "requires_input": False,
             "guidance": "Use tyre levers to pry one side of the tyre off the rim. Slide the lever around the rim to unseat the tyre, then pull the inner tube out carefully.",
             "subtasks": []
@@ -38,6 +42,7 @@ BIKE_TYRE_INITIAL = {
             "description": "Find the puncture",
             "order": 3,
             "status": "not_started",
+            "due_date": "2026-02-14",
             "requires_input": False,
             "guidance": "Inflate the tube and listen or feel for escaping air. If you can't find it by feel, try one of the subtask methods below.",
             "subtasks": [
@@ -46,6 +51,7 @@ BIKE_TYRE_INITIAL = {
                     "description": "Inflate the tube slightly",
                     "order": 1,
                     "status": "not_started",
+                    "due_date": "2026-02-14",
                     "guidance": "Pump just enough air so the tube holds its shape — don't over-inflate."
                 },
                 {
@@ -53,6 +59,7 @@ BIKE_TYRE_INITIAL = {
                     "description": "Submerge in water to see bubbles",
                     "order": 2,
                     "status": "not_started",
+                    "due_date": "2026-02-14",
                     "guidance": "Hold the inflated tube underwater section by section. Bubbles will appear where the hole is. Mark the spot."
                 }
             ]
@@ -62,6 +69,7 @@ BIKE_TYRE_INITIAL = {
             "description": "Apply the puncture repair patch",
             "order": 4,
             "status": "not_started",
+            "due_date": "2026-02-14",
             "requires_input": False,
             "guidance": "Use a standard puncture repair kit. Make sure the area is clean and dry before applying.",
             "subtasks": [
@@ -70,6 +78,7 @@ BIKE_TYRE_INITIAL = {
                     "description": "Roughen the area around the puncture with sandpaper",
                     "order": 1,
                     "status": "not_started",
+                    "due_date": "2026-02-14",
                     "guidance": "This helps the glue bond to the rubber. Roughen an area slightly larger than the patch."
                 },
                 {
@@ -77,6 +86,7 @@ BIKE_TYRE_INITIAL = {
                     "description": "Apply rubber cement and wait 2 minutes",
                     "order": 2,
                     "status": "not_started",
+                    "due_date": "2026-02-14",
                     "guidance": "Spread a thin, even layer over the roughened area. Wait until it becomes tacky — don't rush this step."
                 },
                 {
@@ -84,6 +94,7 @@ BIKE_TYRE_INITIAL = {
                     "description": "Press the patch firmly over the puncture",
                     "order": 3,
                     "status": "not_started",
+                    "due_date": "2026-02-14",
                     "guidance": "Peel the backing off the patch, centre it over the hole, and press hard for 30 seconds. Roll a pen over it to ensure good contact."
                 }
             ]
@@ -93,6 +104,7 @@ BIKE_TYRE_INITIAL = {
             "description": "Reassemble the wheel and inflate the tyre",
             "order": 5,
             "status": "not_started",
+            "due_date": "2026-02-15",
             "requires_input": False,
             "guidance": "Put the tube back in, reseat the tyre on the rim, reattach the wheel, and inflate to the pressure shown on the tyre sidewall.",
             "subtasks": []
@@ -113,6 +125,7 @@ BIKE_TYRE_AFTER_FEEDBACK = {
             "description": "Remove the wheel from the bike",
             "order": 1,
             "status": "not_started",
+            "due_date": "2026-02-13",
             "requires_input": False,
             "guidance": "Flip the bike upside down so it rests on the handlebars and seat. Release the brake if needed, then open the quick-release lever or loosen the axle nuts to remove the wheel.",
             "subtasks": []
@@ -122,6 +135,7 @@ BIKE_TYRE_AFTER_FEEDBACK = {
             "description": "Take out the inner tube",
             "order": 2,
             "status": "not_started",
+            "due_date": "2026-02-13",
             "requires_input": False,
             "guidance": "Use tyre levers to pry one side of the tyre off the rim. Slide the lever around the rim to unseat the tyre, then pull the inner tube out carefully.",
             "subtasks": []
@@ -131,6 +145,7 @@ BIKE_TYRE_AFTER_FEEDBACK = {
             "description": "Find puncture with soapy water",
             "order": 3,
             "status": "not_started",
+            "due_date": "2026-02-14",
             "requires_input": False,
             "guidance": "The soapy water method is reliable and easy — bubbles form exactly where the air escapes.",
             "subtasks": [
@@ -139,6 +154,7 @@ BIKE_TYRE_AFTER_FEEDBACK = {
                     "description": "Mix soap with water in a bowl",
                     "order": 1,
                     "status": "not_started",
+                    "due_date": "2026-02-14",
                     "guidance": "A few drops of washing-up liquid in warm water works perfectly."
                 },
                 {
@@ -146,6 +162,7 @@ BIKE_TYRE_AFTER_FEEDBACK = {
                     "description": "Apply soapy water to the tube",
                     "order": 2,
                     "status": "not_started",
+                    "due_date": "2026-02-14",
                     "guidance": "Use a sponge or cloth to coat sections of the inflated tube with the soapy water."
                 },
                 {
@@ -153,6 +170,7 @@ BIKE_TYRE_AFTER_FEEDBACK = {
                     "description": "Look for bubbles forming",
                     "order": 3,
                     "status": "not_started",
+                    "due_date": "2026-02-14",
                     "guidance": "Watch closely — bubbles will appear at the puncture site. Mark it with a pen or chalk."
                 }
             ]
@@ -162,6 +180,7 @@ BIKE_TYRE_AFTER_FEEDBACK = {
             "description": "Apply the puncture repair patch",
             "order": 4,
             "status": "not_started",
+            "due_date": "2026-02-14",
             "requires_input": False,
             "guidance": "Use a standard puncture repair kit. Make sure the area is clean and dry before applying.",
             "subtasks": [
@@ -170,6 +189,7 @@ BIKE_TYRE_AFTER_FEEDBACK = {
                     "description": "Roughen the area around the puncture with sandpaper",
                     "order": 1,
                     "status": "not_started",
+                    "due_date": "2026-02-14",
                     "guidance": "This helps the glue bond to the rubber. Roughen an area slightly larger than the patch."
                 },
                 {
@@ -177,6 +197,7 @@ BIKE_TYRE_AFTER_FEEDBACK = {
                     "description": "Apply rubber cement and wait 2 minutes",
                     "order": 2,
                     "status": "not_started",
+                    "due_date": "2026-02-14",
                     "guidance": "Spread a thin, even layer over the roughened area. Wait until it becomes tacky."
                 },
                 {
@@ -184,6 +205,7 @@ BIKE_TYRE_AFTER_FEEDBACK = {
                     "description": "Press the patch firmly over the puncture",
                     "order": 3,
                     "status": "not_started",
+                    "due_date": "2026-02-14",
                     "guidance": "Peel the backing off the patch, centre it over the hole, and press hard for 30 seconds."
                 }
             ]
@@ -193,6 +215,7 @@ BIKE_TYRE_AFTER_FEEDBACK = {
             "description": "Reassemble the wheel and inflate the tyre",
             "order": 5,
             "status": "not_started",
+            "due_date": "2026-02-15",
             "requires_input": False,
             "guidance": "Put the tube back in, reseat the tyre on the rim, reattach the wheel, and inflate to the pressure shown on the tyre sidewall.",
             "subtasks": []
@@ -213,6 +236,7 @@ BIKE_TYRE_FEEDBACK_AFTER_PROGRESS = {
             "description": "Remove the wheel from the bike",
             "order": 1,
             "status": "completed",
+            "due_date": "2026-02-13",
             "requires_input": False,
             "subtasks": []
         },
@@ -221,6 +245,7 @@ BIKE_TYRE_FEEDBACK_AFTER_PROGRESS = {
             "description": "Take out the inner tube",
             "order": 2,
             "status": "completed",
+            "due_date": "2026-02-13",
             "requires_input": False,
             "subtasks": []
         },
@@ -229,6 +254,7 @@ BIKE_TYRE_FEEDBACK_AFTER_PROGRESS = {
             "description": "Find puncture — simplified method",
             "order": 3,
             "status": "not_started",
+            "due_date": "2026-02-14",
             "requires_input": False,
             "guidance": "Simplified approach — no water needed, just use your hands.",
             "subtasks": [
@@ -237,6 +263,7 @@ BIKE_TYRE_FEEDBACK_AFTER_PROGRESS = {
                     "description": "Just use your fingers to feel for escaping air",
                     "order": 1,
                     "status": "not_started",
+                    "due_date": "2026-02-14",
                     "guidance": "Inflate the tube well, then slowly move your hand around it. You'll feel a stream of air at the puncture."
                 }
             ]
@@ -246,25 +273,29 @@ BIKE_TYRE_FEEDBACK_AFTER_PROGRESS = {
             "description": "Apply the puncture repair patch",
             "order": 4,
             "status": "not_started",
+            "due_date": "2026-02-14",
             "requires_input": False,
             "subtasks": [
                 {
                     "ai_id": "task_4a",
                     "description": "Roughen the area around the puncture with sandpaper",
                     "order": 1,
-                    "status": "not_started"
+                    "status": "not_started",
+                    "due_date": "2026-02-14"
                 },
                 {
                     "ai_id": "task_4b",
                     "description": "Apply rubber cement and wait 2 minutes",
                     "order": 2,
-                    "status": "not_started"
+                    "status": "not_started",
+                    "due_date": "2026-02-14"
                 },
                 {
                     "ai_id": "task_4c",
                     "description": "Press the patch firmly over the puncture",
                     "order": 3,
-                    "status": "not_started"
+                    "status": "not_started",
+                    "due_date": "2026-02-14"
                 }
             ]
         },
@@ -273,6 +304,7 @@ BIKE_TYRE_FEEDBACK_AFTER_PROGRESS = {
             "description": "Reassemble the wheel and inflate the tyre",
             "order": 5,
             "status": "not_started",
+            "due_date": "2026-02-15",
             "requires_input": False,
             "subtasks": []
         }
