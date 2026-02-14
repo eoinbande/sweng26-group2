@@ -1,18 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import '../index.css';
 
 const Loading = ({ onLoadingComplete }) => {
-    const phrases = [
-        "Loading your goals...",
-        "Putting order to your ideas...",
-        "Seeing how far you've come...",
-        "Organizing your dreams...",
-        "Mapping your journey..."
-    ];
-
-    // pick a random phrase each time the component mounts
-    const [phrase] = useState(() => phrases[Math.floor(Math.random() * phrases.length)]);
-
     useEffect(() => {
         const timer = setTimeout(() => {
             onLoadingComplete && onLoadingComplete();
@@ -24,7 +13,7 @@ const Loading = ({ onLoadingComplete }) => {
     return (
         <div style={{
             height: '100vh',
-            width: '100vw',
+            width: '100%',
             backgroundColor: 'var(--bg-color)',
             display: 'flex',
             flexDirection: 'column',
@@ -41,16 +30,6 @@ const Loading = ({ onLoadingComplete }) => {
                 borderRadius: '50%',
                 animation: 'spin 1s linear infinite'
             }}></div>
-
-            {/*loading text*/}
-            <p style={{
-                fontFamily: 'var(--font-sans)',
-                fontSize: '16px',
-                color: 'var(--text-secondary)',
-                animation: 'fadeInOut 1.5s ease-in-out infinite'
-            }}>
-                {phrase}
-            </p>
 
             {/* animations */}
             <style>{`
