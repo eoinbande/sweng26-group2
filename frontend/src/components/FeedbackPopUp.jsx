@@ -24,7 +24,7 @@ export default function FeedbackPopUp({ variant = 'help', onClose, onSubmit }) {
         <div style={{
             background: config.background,
             padding: '12%',
-            borderRadius: '15%',
+            borderRadius: '15% 15% 0 0',
             position: 'relative',
             width: '100%',
             aspectRatio: '1 / 1',
