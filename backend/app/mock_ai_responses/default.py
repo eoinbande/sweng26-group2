@@ -9,11 +9,11 @@ Once real AI is integrated, this won't be needed anymore.
 
 DEFAULT_MOCK = {
     "description": "AI-generated plan to help you reach your goal",
-    "goal_due_date": "",
+    "goal_due_date": "2026-06-01",
     "tasks": [
         {
             "ai_id": "task_1",
-            "description": "Research what's involved in achieving this goal",
+            "description": "Research goal requirements",
             "order": 1,
             "status": "not_started",
             "due_date": "2026-03-01",
@@ -23,7 +23,7 @@ DEFAULT_MOCK = {
         },
         {
             "ai_id": "task_2",
-            "description": "Create a plan and gather any materials needed",
+            "description": "Create plan & gather materials",
             "order": 2,
             "status": "not_started",
             "due_date": "2026-03-05",
@@ -33,7 +33,7 @@ DEFAULT_MOCK = {
         },
         {
             "ai_id": "task_3",
-            "description": "Start working on the first actionable step",
+            "description": "Execute first step",
             "order": 3,
             "status": "not_started",
             "due_date": "2026-03-10",
@@ -43,7 +43,7 @@ DEFAULT_MOCK = {
         },
         {
             "ai_id": "task_4",
-            "description": "Review your progress and adjust if needed",
+            "description": "Review progress",
             "order": 4,
             "status": "not_started",
             "due_date": "2026-03-20",

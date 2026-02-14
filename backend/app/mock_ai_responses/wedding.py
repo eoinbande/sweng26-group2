@@ -14,7 +14,7 @@ WEDDING_INITIAL = {
     "tasks": [
         {
             "ai_id": "task_1",
-            "description": "Decide the wedding date or a general time frame",
+            "description": "Decide on the perfect wedding date",
             "order": 1,
             "status": "not_started",
             "due_date": "2026-03-01",
@@ -23,23 +23,25 @@ WEDDING_INITIAL = {
             "subtasks": [
                 {
                     "ai_id": "task_1a",
-                    "description": "Check availability of key family members and wedding party",
+                    "description": "Check availability of key guests",
                     "order": 1,
                     "status": "not_started",
+                    "due_date": "2026-02-20",
                     "guidance": "Reach out early — December can clash with holiday plans."
                 },
                 {
                     "ai_id": "task_1b",
-                    "description": "Confirm the final date or narrow it to 2-3 options",
+                    "description": "Confirm the final date choice",
                     "order": 2,
                     "status": "not_started",
+                    "due_date": "2026-03-01",
                     "guidance": "Having a few backup dates helps when negotiating with venues."
                 }
             ]
         },
         {
             "ai_id": "task_2",
-            "description": "Set the overall wedding budget",
+            "description": "Set a realistic wedding budget",
             "order": 2,
             "status": "not_started",
             "due_date": "2026-03-05",
@@ -48,30 +50,33 @@ WEDDING_INITIAL = {
             "subtasks": [
                 {
                     "ai_id": "task_2a",
-                    "description": "List all potential contributors and their amounts",
+                    "description": "List all financial contributors",
                     "order": 1,
                     "status": "not_started",
+                    "due_date": "2026-03-02",
                     "guidance": "Parents, the couple, and other family — get firm numbers, not vague promises."
                 },
                 {
                     "ai_id": "task_2b",
-                    "description": "Research average costs for weddings in the chosen location",
+                    "description": "Research local wedding costs",
                     "order": 2,
                     "status": "not_started",
+                    "due_date": "2026-03-03",
                     "guidance": "Look at real wedding cost breakdowns online for your area. This avoids sticker shock later."
                 },
                 {
                     "ai_id": "task_2c",
-                    "description": "Set a firm total budget and allocate to categories",
+                    "description": "Allocate budget to categories",
                     "order": 3,
                     "status": "not_started",
+                    "due_date": "2026-03-05",
                     "guidance": "Typical split: 40-50% venue/catering, 10% photography, 10% attire, 10% flowers/decor, rest divided among entertainment, transport, stationery, etc."
                 }
             ]
         },
         {
             "ai_id": "task_3",
-            "description": "Estimate the guest count",
+            "description": "Estimate the total guest count",
             "order": 3,
             "due_date": "2026-03-10",
             "status": "not_started",
@@ -80,16 +85,17 @@ WEDDING_INITIAL = {
             "subtasks": [
                 {
                     "ai_id": "task_3a",
-                    "description": "Draft an A-list (definite invites) and B-list (if space allows)",
+                    "description": "Draft A & B guest lists",
                     "order": 1,
                     "status": "not_started",
+                    "due_date": "2026-03-10",
                     "guidance": "The A-list should fit within your budget. The B-list fills spots from declined invitations."
                 }
             ]
         },
         {
             "ai_id": "task_4",
-            "description": "Choose a preferred location or style for the ceremony and reception",
+            "description": "Choose the location and style",
             "order": 4,
             "due_date": "2026-03-15",
             "status": "not_started",
@@ -99,7 +105,7 @@ WEDDING_INITIAL = {
         },
         {
             "ai_id": "task_5",
-            "description": "Research and book ceremony and reception venues",
+            "description": "Book the ceremony and reception venues",
             "order": 5,
             "due_date": "2026-03-25",
             "status": "not_started",
@@ -108,132 +114,99 @@ WEDDING_INITIAL = {
             "subtasks": [
                 {
                     "ai_id": "task_5a",
-                    "description": "Shortlist 5-8 venues that fit the budget, style, and guest count",
+                    "description": "Shortlist potential venues",
                     "order": 1,
                     "status": "not_started",
+                    "due_date": "2026-03-18",
                     "guidance": "Use wedding websites, Google reviews, and recommendations. Filter by capacity and price range."
                 },
                 {
                     "ai_id": "task_5b",
-                    "description": "Schedule tours and visit the top 3 venues",
+                    "description": "Tour the top 3 venues",
                     "order": 2,
                     "status": "not_started",
+                    "due_date": "2026-03-22",
                     "guidance": "Bring a checklist: ask about availability, what's included, corkage fees, minimum spend, wet-weather backup, parking."
                 },
                 {
                     "ai_id": "task_5c",
-                    "description": "Book the chosen venue and pay the deposit",
+                    "description": "Book the chosen venue",
                     "order": 3,
                     "status": "not_started",
+                    "due_date": "2026-03-25",
                     "guidance": "Read the contract carefully before signing. Check cancellation policy and payment schedule."
                 }
             ]
         },
         {
             "ai_id": "task_6",
-            "description": "Create a prioritised list of wedding vendors and start booking",
+            "description": "Book all necessary vendors",
             "order": 6,
-            "due_date": "2026-03-01",
+            "due_date": "2026-04-01",
             "status": "not_started",
             "requires_input": False,
             "guidance": "Make a list of must-have vendors and research local options. Get quotes and reviews, and prioritise bookings based on availability.",
             "subtasks": [
                 {
                     "ai_id": "task_6a",
-                    "description": "Book a photographer/videographer",
+                    "description": "Book the photographer",
                     "order": 1,
                     "status": "not_started",
+                    "due_date": "2026-03-28",
                     "guidance": "Good photographers book 12-18 months out. Look at full wedding galleries, not just highlight reels."
                 },
                 {
                     "ai_id": "task_6b",
-                    "description": "Book catering (if not included with venue)",
+                    "description": "Book the catering service",
                     "order": 2,
                     "status": "not_started",
+                    "due_date": "2026-03-30",
                     "guidance": "Request tastings. Consider dietary requirements of your guests."
                 },
                 {
                     "ai_id": "task_6c",
-                    "description": "Book entertainment (band, DJ, or both)",
+                    "description": "Book the entertainment",
                     "order": 3,
                     "status": "not_started",
+                    "due_date": "2026-03-31",
                     "guidance": "Ask to see them perform live or watch videos. Check if they need specific power or space requirements."
                 },
                 {
                     "ai_id": "task_6d",
-                    "description": "Book florist and decorator",
+                    "description": "Book the florist and decor",
                     "order": 4,
                     "status": "not_started",
+                    "due_date": "2026-04-01",
                     "guidance": "Bring photos of styles you like. Seasonal flowers are cheaper and look better."
                 }
             ]
         },
         {
             "ai_id": "task_7",
-            "description": "Develop a wedding day timeline and guest logistics plan",
+            "description": "Plan the timeline & logistics",
             "order": 7,
-            "due_date": "2026-03-01",
+            "due_date": "2026-04-15",
             "status": "not_started",
             "requires_input": False,
             "guidance": "Draft a schedule for the wedding day including ceremony times, reception, and key moments. Consider how guests will arrive, where they will stay, and transportation needs.",
             "subtasks": [
                 {
                     "ai_id": "task_7a",
-                    "description": "Draft the ceremony and reception timeline",
+                    "description": "Draft the event timeline",
                     "order": 1,
                     "status": "not_started",
+                    "due_date": "2026-04-10",
                     "guidance": "Work backwards from the ceremony time. Include getting ready, photos, ceremony, drinks reception, dinner, speeches, first dance, party."
                 },
                 {
                     "ai_id": "task_7b",
-                    "description": "Arrange accommodation options for travelling guests",
-                    "order": 2,
-                    "status": "not_started",
-                    "guidance": "Negotiate group rates at nearby hotels. Include info on the save-the-dates."
+                     "description": "Arrange transportation",
+                     "order": 2,
+                     "status": "not_started",
+                     "due_date": "2026-04-12",
+                     "guidance": "Book cars for the couple and shuttles for guests if venues are far apart."
                 }
             ]
-        },
-        {
-            "ai_id": "task_8",
-            "description": "Send save-the-dates and later formal invitations",
-            "order": 8,
-            "due_date": "2026-03-01",
-            "status": "not_started",
-            "requires_input": False,
-            "guidance": "Send save-the-dates 6-8 months out, formal invitations 6-8 weeks before. Request RSVPs with a firm deadline.",
-            "subtasks": [
-                {
-                    "ai_id": "task_8a",
-                    "description": "Gather accurate contact details for all guests",
-                    "order": 1,
-                    "status": "not_started",
-                    "guidance": "Spreadsheet time! Include names, addresses, email, dietary requirements, and plus-one status."
-                },
-                {
-                    "ai_id": "task_8b",
-                    "description": "Design and send save-the-dates",
-                    "order": 2,
-                    "status": "not_started",
-                    "guidance": "Can be physical cards or digital. Include date, location, and a wedding website link if you have one."
-                },
-                {
-                    "ai_id": "task_8c",
-                    "description": "Design and send formal invitations with RSVP deadline",
-                    "order": 3,
-                    "status": "not_started",
-                    "guidance": "Include ceremony and reception details, dress code, RSVP method, and dietary question."
-                }
-            ]
-        },
-        {
-            "ai_id": "task_9",
-            "description": "Set up a wedding planning tracker and budget spreadsheet",
-            "order": 9,
-            "due_date": "2026-03-01",
-            "status": "not_started",
-            "requires_input": False,
-            "guidance": "Use a spreadsheet or a digital planning tool to stay on top of tasks, payments, deposits, and deadlines. This will help manage the budget effectively.",
-            "subtasks": []
         }
     ]
 }

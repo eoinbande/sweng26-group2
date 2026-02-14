@@ -14,26 +14,26 @@ BIKE_EXPAND_TASK_5 = {
     "subtasks": [
         {
             "ai_id": "task_5a",
-            "description": "Put the inner tube back into the tyre",
+            "description": "Insert the inner tube into the tyre",
             "order": 1,
             "status": "not_started",
-            "due_date": "2026-02-15",
+            "due_date": "2026-02-28",
             "guidance": "Start by tucking the valve through the rim hole, then work the tube in evenly so it's not twisted or pinched."
         },
         {
             "ai_id": "task_5b",
-            "description": "Fit the tyre back onto the wheel rim",
+            "description": "Fit the tyre bead back onto the rim",
             "order": 2,
             "status": "not_started",
-            "due_date": "2026-02-15",
+            "due_date": "2026-02-28",
             "guidance": "Start opposite the valve and push the tyre bead over the rim with your hands. Avoid using levers if possible — they can pinch the tube."
         },
         {
             "ai_id": "task_5c",
-            "description": "Inflate to the recommended pressure (check tyre sidewall)",
+            "description": "Inflate the tyre to correct pressure",
             "order": 3,
             "status": "not_started",
-            "due_date": "2026-02-15",
+            "due_date": "2026-02-28",
             "guidance": "The recommended PSI range is printed on the tyre sidewall. Inflate to the middle of the range."
         },
         {
@@ -41,7 +41,7 @@ BIKE_EXPAND_TASK_5 = {
             "description": "Reattach the wheel to the bike frame",
             "order": 4,
             "status": "not_started",
-            "due_date": "2026-02-15",
+            "due_date": "2026-02-28",
             "guidance": "Slide the axle back into the dropouts, tighten the quick-release or nuts, and reconnect the brake if needed."
         }
     ]
