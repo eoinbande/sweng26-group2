@@ -144,7 +144,13 @@ def save_tasks_to_db(goal_id: str, tasks: list[dict]):
 
     # Step 2: Save the full nested JSON to goals.goal_data
     # This is what frontend will read — one query gets the whole task tree
-    update_goal_data(goal_id, {"tasks": tasks})
+    goal = get_goal(goal_id)
+    current_data = goal.get("goal_data", {})
+    if isinstance(current_data, str):
+        current_data = json.loads(current_data)
+
+    current_data["tasks"] = tasks
+    update_goal_data(goal_id, current_data)
 
     # Step 3: Insert individual rows into the tasks table
     # This lets backend do queries like "count completed" or "get by status"

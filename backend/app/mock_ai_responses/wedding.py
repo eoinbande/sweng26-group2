@@ -9,6 +9,8 @@ Includes:
 """
 
 WEDDING_INITIAL = {
+    "description": "Complete planning guide for organising a wedding",
+    "goal_due_date": "2026-06-15",
     "tasks": [
         {
             "ai_id": "task_1",

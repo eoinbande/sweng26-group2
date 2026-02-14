@@ -91,10 +91,19 @@ def create_goal_endpoint(goal: CreateGoalRequest):
     # TODO: Replace with real AI call when AI integration is ready
     ai_plan = get_mock_plan(goal.title)
 
+    # Save description and due date from AI plan to goal_data
+    update_goal_data(goal_id, {
+        "tasks": [],
+        "description": ai_plan.get("description", ""),
+        "goal_due_date": ai_plan.get("goal_due_date", "")
+    })
+
     return {
         "message": "Goal created — review your plan below",
         "goal_id": goal_id,
         "title": goal.title,
+        "description": ai_plan.get("description", ""),
+        "goal_due_date": ai_plan.get("goal_due_date", ""),
         "tasks": ai_plan["tasks"],   # Tasks for frontend to display on review screen
         "saved_to_db": False          # Frontend knows this isn't saved yet
     }

@@ -9,6 +9,8 @@ Includes:
 """
 
 PIANO_INITIAL = {
+    "description": "Beginner's roadmap to learning piano from scratch",
+    "goal_due_date": "2026-05-15",
     "tasks": [
         {
             "ai_id": "task_1",
