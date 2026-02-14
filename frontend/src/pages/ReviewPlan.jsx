@@ -91,8 +91,19 @@ function ReviewPlan() {
         }
     };
 
-    // Discard: go back to CreateGoal with the original prompt restored
-    const handleDiscard = () => {
+    // Discard: delete the temporary goal and go back to CreateGoal
+    const handleDiscard = async () => {
+        if (!isDemoMode && goalId) {
+            try {
+                // Delete the goal that was created for preview
+                await fetch(`${import.meta.env.VITE_API_URL}/goals/${goalId}`, {
+                    method: 'DELETE',
+                });
+                console.log('Discarded goal deleted:', goalId);
+            } catch (err) {
+                console.error('Error deleting discarded goal:', err);
+            }
+        }
         navigate('/create-goal', { state: { originalPrompt } });
     };
 
