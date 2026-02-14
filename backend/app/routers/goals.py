@@ -230,7 +230,13 @@ def get_goal_details(goal_id: str):
     import json
     goal_data = goal.get("goal_data", {})
     if isinstance(goal_data, str):
-        goal_data = json.loads(goal_data)
+        try:
+            goal_data = json.loads(goal_data)
+        except json.JSONDecodeError:
+            goal_data = {}
+            
+    # Ensure goal['goal_data'] is the parsed dict for the frontend
+    goal['goal_data'] = goal_data
 
     tasks = goal_data.get("tasks", [])
 

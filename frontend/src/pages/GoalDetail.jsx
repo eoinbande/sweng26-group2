@@ -19,6 +19,7 @@ const GoalDetail = () => {
     /* rstore tasks from location.state if returning from feedback page */
     const [tasks, setTasks] = useState(location.state?.tasks || []);
     const [endDate, setEndDate] = useState("");
+    const [progress, setProgress] = useState(0); 
     
     // Add loading state
     const [isLoading, setIsLoading] = useState(true);
@@ -34,9 +35,6 @@ const GoalDetail = () => {
         const fetchGoalDetails = async () => {
             setIsLoading(true);
             try {
-                // Adjust URL if needed (some backends use /goals/:id/details)
-                // Assuming /goals/:id based on standard REST, but user code had /goal-details/:id
-                // Stick to user's route: /goal-details/:id
                 const response = await fetch(`${import.meta.env.VITE_API_URL}/goal-details/${goalId}`);
                 
                 if (!response.ok) {
@@ -90,6 +88,11 @@ const GoalDetail = () => {
                 if (data.tasks) {
                     setTasks(processTasks(data.tasks));
                 }
+                
+                // Fetch progress from backend
+                const progRes = await fetch(`${import.meta.env.VITE_API_URL}/tasks/${goalId}/progress`);
+                const progData = await progRes.json();
+                if (progData) setProgress(progData.percentage);
             } catch (err) {
                 console.error("Error loading goal details:", err);
             } finally {
@@ -103,11 +106,26 @@ const GoalDetail = () => {
     /* API Helper to update status */
     const updateTaskStatus = async (taskId, newStatus) => {
         try {
-            await fetch(`${import.meta.env.VITE_API_URL}/tasks/${taskId}/status`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/tasks/${taskId}/status`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status: newStatus })
             });
+            
+            if (!res.ok) {
+                console.error("Failed to update task status:", res.status);
+                // Optionally revert local state here
+                return;
+            }
+
+            // Fetch progress after successful update
+            if (goalId) {
+                try {
+                    const progRes = await fetch(`${import.meta.env.VITE_API_URL}/tasks/${goalId}/progress`);
+                    const progData = await progRes.json();
+                    if (progData) setProgress(progData.percentage);
+                } catch (e) { console.error("Failed to fetch progress:", e); }
+            }
         } catch (e) {
             console.error("Failed to update task status:", e);
         }
@@ -215,10 +233,12 @@ const GoalDetail = () => {
         }
     };
 
-    /* progress */
-    const totalTasks = tasks.length;
-    const completedTasks = tasks.filter(t => isTaskComplete(t)).length;
-    const progress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+
+    /* progress - fetched from backend now */
+    // const totalTasks = tasks.length;
+    // const completedTasks = tasks.filter(t => isTaskComplete(t)).length;
+    // const progress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+
 
     if (isLoading) {
         return (

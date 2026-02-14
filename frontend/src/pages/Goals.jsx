@@ -50,7 +50,7 @@ const Goals = () => {
                 const res = await fetch(`${import.meta.env.VITE_API_URL}/goals/${user.id}`);
                 const data = await res.json();
 
-                const mapped = (data.goals || []).map((goal, index) => {
+                const mapped = await Promise.all((data.goals || []).map(async (goal, index) => {
                     let goalData = {};
                     try {
                         goalData = typeof goal.goal_data === 'string' 
@@ -58,7 +58,14 @@ const Goals = () => {
                             : goal.goal_data || {};
                     } catch (e) { goalData = {}; }
 
-                    const tasks = goalData.tasks || [];
+                    let progress = 0;
+                    try {
+                         const pRes = await fetch(`${import.meta.env.VITE_API_URL}/tasks/${goal.id}/progress`);
+                         const pData = await pRes.json();
+                         if (pData) progress = pData.percentage;
+                    } catch (e) {
+                        console.error("Failed to fetch progress for goal " + goal.id);
+                    }
 
                     return {
                         id: goal.id,
@@ -67,14 +74,10 @@ const Goals = () => {
                         date: (goal.due_date || goalData.goal_due_date)
                             ? new Date(goal.due_date || goalData.goal_due_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
                             : '',
-                        progress: (() => {
-                            if (tasks.length === 0) return 0;
-                            const completed = tasks.filter(t => t.status === 'completed').length;
-                            return Math.round((completed / tasks.length) * 100);
-                        })(),
+                        progress: progress,
                         colorScheme: COLOR_SCHEMES_LIST[index % COLOR_SCHEMES_LIST.length],
                     };
-                });
+                }));
 
                 setGoals(mapped);
             } catch (err) {
