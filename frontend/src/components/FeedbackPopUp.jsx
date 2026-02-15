@@ -39,8 +39,8 @@ export default function FeedbackPopUp({ variant = 'help', onClose, onSubmit }) {
                 onClick={onClose}
                 style={{
                     position: 'absolute',
-                    top: '6%',
-                    right: '6%',
+                    top: '8%',
+                    right: '8%',
                     backgroundColor: 'transparent',
                     border: 'none',
                     cursor: 'pointer',
@@ -53,7 +53,7 @@ export default function FeedbackPopUp({ variant = 'help', onClose, onSubmit }) {
                 onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
                 onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1.0)'}
             >
-                <X size={28} color="var(--text-main)" strokeWidth={2.5} />
+                <X size={24} color="var(--text-main)" strokeWidth={2.5} />
             </button>
 
             {/* title */}
@@ -91,8 +91,8 @@ export default function FeedbackPopUp({ variant = 'help', onClose, onSubmit }) {
                     onSubmit={onSubmit}
                     icon={<Mic size={18} color="white" />}
                     buttonStyle="dark"
-                    padding="12px 14px"
-                    borderRadius="var(--radius-lg)"
+                    padding="18px 20px"
+                    borderRadius="var(--radius-xl)"
                 />
             </div>
         </div>
