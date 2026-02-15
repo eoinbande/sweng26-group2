@@ -3,7 +3,8 @@ from pydantic import BaseModel
 # Database functions (Tables.py)
 from ..Tables import (
     create_goal, get_all_goals, get_goal, delete_goal,
-    update_goal_data, save_tasks_to_db, merge_and_save_tasks
+    update_goal_data, save_tasks_to_db, merge_and_save_tasks,
+    get_tasks_for_goal
 )
 
 # Mock AI responses (replace with real AI later)
@@ -217,10 +218,16 @@ def get_goal_details(goal_id: str):
     """
     Get full details of a single goal, including all tasks and subtasks.
     
-    The task data comes from the goal_data JSONB column —
-    one query gets everything frontend needs.
+    The task data comes from the goal_data JSONB column, BUT we patch
+    the status field from the 'tasks' table.
     
-    Called when: User taps on a goal to see its tasks.
+    Why?
+    The 'tasks' table is the Single Source of Truth for status and handles
+    concurrent updates (row-level locking) much better than the JSONB blob.
+    
+    The JSONB blob is liable to race conditions if the user clicks check/uncheck
+    rapidly. By reading status from the tasks table, we ensure the UI
+    always shows the correct state upon reload.
     """
     try:
         goal = get_goal(goal_id)
@@ -238,12 +245,36 @@ def get_goal_details(goal_id: str):
     # Ensure goal['goal_data'] is the parsed dict for the frontend
     goal['goal_data'] = goal_data
 
-    tasks = goal_data.get("tasks", [])
+    tasks_from_json = goal_data.get("tasks", [])
+
+    # fixed for frontend: Sync status from tasks table
+    try:
+        # Fetch current reliable states from DB
+        db_tasks = get_tasks_for_goal(goal_id)
+        if db_tasks is not None:
+            # Create map: task_id -> status
+            status_map = {t['id']: t['status'] for t in db_tasks}
+            
+            # Update the JSON structure with the reliable status
+            for task in tasks_from_json:
+                # Update parent
+                if task.get("id") in status_map:
+                    task["status"] = status_map[task["id"]]
+                
+                # Update subtasks
+                for sub in task.get("subtasks", []):
+                    if sub.get("id") in status_map:
+                        sub["status"] = status_map[sub["id"]]
+                    
+    except Exception as e:
+        print(f"Warning: Failed to sync tasks from DB: {e}")
+        # If DB sync fails, we just fall back to whatever is in the JSON
+        pass
 
     return {
         "goal": goal,
-        "tasks": tasks,
-        "has_tasks": len(tasks) > 0
+        "tasks": tasks_from_json,
+        "has_tasks": len(tasks_from_json) > 0
     }
 
 
