@@ -25,7 +25,6 @@ function App() {
         <Route path="/review-plan" element={<ReviewPlan />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
-        <Route path="/test" element={<ComponentTest />} /> 
         <Route path="/feedback" element={<Feedback />} />
       </Routes>
     </Router>
