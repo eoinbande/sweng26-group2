@@ -68,6 +68,15 @@ const GoalDetail = () => {
     /* rstore tasks from location.state if returning from feedback page */
     const [tasks, setTasks] = useState(location.state?.tasks || defaultTasks);
     const [showFeedback, setShowFeedback] = useState(false);
+    const [closingFeedback, setClosingFeedback] = useState(false);
+
+    const closeFeedback = () => {
+        setClosingFeedback(true);
+        setTimeout(() => {
+            setShowFeedback(false);
+            setClosingFeedback(false);
+        }, 150);
+    };
 
     /* derived helpers */
     const isTaskComplete = (task) =>
@@ -154,13 +163,19 @@ const GoalDetail = () => {
 
             {/* feedback popup */}
             {showFeedback && (
-                <div className="feedback-overlay" onClick={() => setShowFeedback(false)}>
-                    <div className="feedback-bottom-sheet" onClick={(e) => e.stopPropagation()}>
+                <div
+                    className={`feedback-overlay ${closingFeedback ? 'closing' : ''}`}
+                    onClick={closeFeedback}
+                >
+                    <div
+                        className={`feedback-bottom-sheet ${closingFeedback ? 'closing' : ''}`}
+                        onClick={(e) => e.stopPropagation()}
+                    >
                         <FeedbackPopUp
                             variant="reroute"
-                            onClose={() => setShowFeedback(false)}
+                            onClose={closeFeedback}
                             onSubmit={(msg) => {
-                                setShowFeedback(false);
+                                closeFeedback();
                             }}
                         />
                     </div>
