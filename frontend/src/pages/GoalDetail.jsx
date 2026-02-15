@@ -4,6 +4,7 @@ import BottomNav from '../components/BottomNav';
 import GoalDetailHeader from '../components/GoalDetailHeader';
 import TaskTimeline from '../components/TaskTimeline';
 import Loading from '../components/Loading'; // Import Loading component if it exists
+import FeedbackPopUp from '../components/FeedbackPopUp';
 import '../styles/GoalDetail.css';
 
 const GoalDetail = () => {
@@ -19,6 +20,18 @@ const GoalDetail = () => {
     const [tasks, setTasks] = useState(location.state?.tasks || []);
     const [endDate, setEndDate] = useState("");
     const [progress, setProgress] = useState(0);
+
+    // Feedback popup state
+    const [showFeedback, setShowFeedback] = useState(false);
+    const [closingFeedback, setClosingFeedback] = useState(false);
+
+    const closeFeedback = () => {
+        setClosingFeedback(true);
+        setTimeout(() => {
+            setShowFeedback(false);
+            setClosingFeedback(false);
+        }, 150);
+    };
 
     // Add loading state
     const [isLoading, setIsLoading] = useState(true);
@@ -269,9 +282,30 @@ const GoalDetail = () => {
                 />
             </div>
 
-            {/* Floating Action Button */}
+            {/* feedback popup */}
+            {showFeedback && (
+                <div
+                    className={`feedback-overlay ${closingFeedback ? 'closing' : ''}`}
+                    onClick={closeFeedback}
+                >
+                    <div
+                        className={`feedback-bottom-sheet ${closingFeedback ? 'closing' : ''}`}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <FeedbackPopUp
+                            variant="reroute"
+                            onClose={closeFeedback}
+                            onSubmit={(msg) => {
+                                closeFeedback();
+                            }}
+                        />
+                    </div>
+                </div>
+            )}
+
+            {/* floating action button */}
             <div className="fab-container">
-                <button className="btn-update-plan">
+                <button className="btn-update-plan" onClick={() => setShowFeedback(true)}>
                     Update Plan
                 </button>
             </div>

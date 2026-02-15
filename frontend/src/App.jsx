@@ -8,7 +8,6 @@ import Login from './pages/Login';
 import SignUp from './pages/SignUp';
 import GoalDetail from './pages/GoalDetail';
 import Feedback from './pages/Feedback';
-import Loading from './components/Loading';
 import './index.css';
 
 function App() {
