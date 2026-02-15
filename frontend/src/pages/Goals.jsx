@@ -47,22 +47,22 @@ const Goals = () => {
                     return;
                 }
 
-                const res = await fetch(`${import.meta.env.VITE_API_URL}/goals/${user.id}`);
+                const res = await fetch(`${import.meta.env.VITE_API_URL}/goals/${user.id}`, { cache: 'no-store' });
                 const data = await res.json();
 
                 const mapped = await Promise.all((data.goals || []).map(async (goal, index) => {
                     let goalData = {};
                     try {
-                        goalData = typeof goal.goal_data === 'string' 
-                            ? JSON.parse(goal.goal_data) 
+                        goalData = typeof goal.goal_data === 'string'
+                            ? JSON.parse(goal.goal_data)
                             : goal.goal_data || {};
                     } catch (e) { goalData = {}; }
 
                     let progress = 0;
                     try {
-                         const pRes = await fetch(`${import.meta.env.VITE_API_URL}/tasks/${goal.id}/progress`);
-                         const pData = await pRes.json();
-                         if (pData) progress = pData.percentage;
+                        const pRes = await fetch(`${import.meta.env.VITE_API_URL}/tasks/${goal.id}/progress`, { cache: 'no-store' });
+                        const pData = await pRes.json();
+                        if (pData) progress = pData.percentage;
                     } catch (e) {
                         console.error("Failed to fetch progress for goal " + goal.id);
                     }
