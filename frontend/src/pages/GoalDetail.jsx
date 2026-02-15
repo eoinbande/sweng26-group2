@@ -21,6 +21,18 @@ const GoalDetail = () => {
     const [endDate, setEndDate] = useState("");
     const [progress, setProgress] = useState(0);
 
+    // Feedback popup state
+    const [showFeedback, setShowFeedback] = useState(false);
+    const [closingFeedback, setClosingFeedback] = useState(false);
+
+    const closeFeedback = () => {
+        setClosingFeedback(true);
+        setTimeout(() => {
+            setShowFeedback(false);
+            setClosingFeedback(false);
+        }, 150);
+    };
+
     // Add loading state
     const [isLoading, setIsLoading] = useState(true);
 
