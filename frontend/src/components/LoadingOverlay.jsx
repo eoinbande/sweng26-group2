@@ -88,7 +88,7 @@ function LoadingOverlay({ onComplete }) {
                 borderRadius: isShrinking ? '0 0 var(--radius-xxl) var(--radius-xxl)' : '0',
                 boxShadow: isShrinking ? 'var(--shadow-float)' : 'none',
                 overflow: 'hidden',
-                zIndex: 200,
+                zIndex: 9999,
                 transition: 'all 1.2s cubic-bezier(0.25, 0.1, 0.25, 1)',
                 display: 'flex',
                 flexDirection: 'column',
