@@ -177,30 +177,26 @@ const GoalDetail = () => {
         const task = tasks[taskIndex];
         const isComplete = isTaskComplete(task); /* currently complete? */
 
-        if (isComplete) { // uncheck a completed task -> uncheck only the LAST subtask (go back one step)
-            // so we call API for only last subtask
+        if (isComplete) { // uncheck a completed task -> uncheck ALL subtasks
+            setTasks(prev => prev.map((t, i) => {
+                if (i !== taskIndex) return t;
+                return {
+                    ...t,
+                    completed: false,
+                    status: 'not_started',
+                    subtasks: t.subtasks.map(s => ({ ...s, completed: false, status: 'not_started' }))
+                };
+            }));
 
-            const lastSubIndex = task.subtasks.length - 1;
-            if (lastSubIndex >= 0) {
-                const lastSubId = task.subtasks[lastSubIndex].id;
-
-                setTasks(prev => prev.map((t, i) => {
-                    if (i !== taskIndex) return t;
-                    return {
-                        ...t,
-                        subtasks: t.subtasks.map((s, si) =>
-                            si === lastSubIndex ? { ...s, completed: false } : s
-                        )
-                    };
-                }));
-                // Call API for the last subtask
-                updateTaskStatus(lastSubId, 'not_started');
+            if (task.subtasks.length > 0) {
+                // Call API for ALL subtasks
+                task.subtasks.forEach(s => {
+                    updateTaskStatus(s.id, 'not_started');
+                });
+                // Also update parent task
+                updateTaskStatus(task.id, 'not_started');
             } else {
                 // No subtasks case: uncheck the task itself
-                setTasks(prev => prev.map((t, i) => {
-                    if (i !== taskIndex) return t;
-                    return { ...t, completed: false, status: 'in_progress' };
-                }));
                 updateTaskStatus(task.id, 'not_started');
             }
         } else { // mark task as complete -> mark ALL subtasks as done
