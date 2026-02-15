@@ -13,20 +13,20 @@ import '../styles/components/GoalListCard.css';
 
 const COLOR_SCHEMES = {
     blue: {
-        header: '#BFD1E5',
-        body: '#E8F0F8',
+        header: 'var(--blue)',
+        body: 'var(--blue-soft)',
     },
     yellow: {
-        header: '#F5D76E',
-        body: '#FBF0C4',
+        header: 'var(--yellow)',
+        body: 'var(--yellow-soft)',
     },
-    orange: {
-        header: '#F5B041',
-        body: '#FCE4B8',
+    green: {
+        header: 'var(--green)',
+        body: 'var(--green-soft)',
     },
     pink: {
-        header: '#F5B7B7',
-        body: '#FDEAEA',
+        header: 'var(--pink)',
+        body: 'var(--pink-soft)',
     }
 };
 

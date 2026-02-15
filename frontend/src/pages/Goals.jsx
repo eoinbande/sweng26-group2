@@ -3,10 +3,11 @@ import { useLocation } from 'react-router-dom';
 import PageHeader from '../components/PageHeader';
 import GoalListCard from '../components/GoalListCard';
 import BottomNav from '../components/BottomNav';
+import Loading from '../components/Loading';
 import { supabase, isDemoMode } from '../supabase_client';
 import '../styles/Goals.css';
 
-const COLOR_SCHEMES_LIST = ['blue', 'yellow', 'orange', 'pink'];
+const COLOR_SCHEMES_LIST = ['blue', 'yellow', 'green', 'pink'];
 
 const MOCK_GOALS = [
     { id: 1, title: 'Learn Piano', description: 'Master basic chords and scales', date: '15 Mar', progress: 40, colorScheme: 'blue' },
@@ -49,15 +50,33 @@ const Goals = () => {
                 const res = await fetch(`${import.meta.env.VITE_API_URL}/goals/${user.id}`);
                 const data = await res.json();
 
-                const mapped = (data.goals || []).map((goal, index) => ({
-                    id: goal.id,
-                    title: goal.title,
-                    description: goal.description || '',
-                    date: goal.due_date
-                        ? new Date(goal.due_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
-                        : '',
-                    progress: 0,
-                    colorScheme: COLOR_SCHEMES_LIST[index % COLOR_SCHEMES_LIST.length],
+                const mapped = await Promise.all((data.goals || []).map(async (goal, index) => {
+                    let goalData = {};
+                    try {
+                        goalData = typeof goal.goal_data === 'string' 
+                            ? JSON.parse(goal.goal_data) 
+                            : goal.goal_data || {};
+                    } catch (e) { goalData = {}; }
+
+                    let progress = 0;
+                    try {
+                         const pRes = await fetch(`${import.meta.env.VITE_API_URL}/tasks/${goal.id}/progress`);
+                         const pData = await pRes.json();
+                         if (pData) progress = pData.percentage;
+                    } catch (e) {
+                        console.error("Failed to fetch progress for goal " + goal.id);
+                    }
+
+                    return {
+                        id: goal.id,
+                        title: goal.title,
+                        description: goal.description || goalData.description || '',
+                        date: (goal.due_date || goalData.goal_due_date)
+                            ? new Date(goal.due_date || goalData.goal_due_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
+                            : '',
+                        progress: progress,
+                        colorScheme: COLOR_SCHEMES_LIST[index % COLOR_SCHEMES_LIST.length],
+                    };
                 }));
 
                 setGoals(mapped);
@@ -83,24 +102,31 @@ const Goals = () => {
         }
     }, [location.state]);
 
+    if (loading) {
+        return (
+            <div className="goals-page">
+                <Loading />
+                <BottomNav />
+            </div>
+        );
+    }
+
     return (
         <div className="goals-page">
-        <div className="goals-container" ref={scrollRef} onScroll={handleScroll}>
-            <PageHeader title="Goals" />
+            <div className="goals-container" ref={scrollRef} onScroll={handleScroll}>
+                <PageHeader title="Goals" />
 
-            {/* Goals List */}
-            <div className="goals-list">
-                {loading ? (
-                    <p style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>Loading goals...</p>
-                ) : goals.length === 0 ? (
-                    <p style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>No goals yet. Create one!</p>
-                ) : (
-                    goals.map((goal) => (
-                        <GoalListCard key={goal.id} goal={goal} />
-                    ))
-                )}
+                {/* Goals List */}
+                <div className="goals-list">
+                    {goals.length === 0 ? (
+                        <p style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>No goals yet. Create one!</p>
+                    ) : (
+                        goals.map((goal) => (
+                            <GoalListCard key={goal.id} goal={goal} />
+                        ))
+                    )}
+                </div>
             </div>
-        </div>
 
             <div
                 className="goals-fade-overlay"

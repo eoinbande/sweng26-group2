@@ -33,14 +33,15 @@ function ReviewPlan() {
     const userId = location.state?.userId;
     const goalTitle = location.state?.goal || '';
     const originalPrompt = location.state?.originalPrompt || goalTitle;
+    const goalId = previewData?.goal_id;
 
-    // Parse tasks from the preview response
+    // Parse tasks from the preview response (new linear structure)
     const tasks = React.useMemo(() => {
-        if (!previewData?.goal_data?.nodes) return [];
-        return previewData.goal_data.nodes.map(node => ({
-            id: node.id,
-            title: node.task,
-            dueDate: node.est_time ? `~${node.est_time} min` : '',
+        if (!previewData?.tasks) return [];
+        return previewData.tasks.map(t => ({
+            id: t.ai_id,
+            title: t.description,
+            dueDate: t.due_date ? new Date(t.due_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : '',
         }));
     }, [previewData]);
 
@@ -53,7 +54,7 @@ function ReviewPlan() {
         }
     }, [contentVisible, tasks, updateFades]);
 
-    // Accept: save the goal to Supabase via POST /goals
+    // Accept: save the goal to Supabase via POST /goals/{id}/accept
     const handleAccept = async () => {
         // In demo mode, just navigate to goals
         if (isDemoMode) {
@@ -63,14 +64,12 @@ function ReviewPlan() {
 
         setSaving(true);
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/goals`, {
+            // "Accept" the plan for the goal ID we already have
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/goals/${goalId}/accept`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    user_id: userId,
-                    title: goalTitle,
-                    description: previewData?.goal_data?.description || goalTitle,
-                    generate_plan: true
+                    tasks: previewData.tasks // Send back the tasks (potentially modified if we added editing)
                 })
             });
 
@@ -92,8 +91,19 @@ function ReviewPlan() {
         }
     };
 
-    // Discard: go back to CreateGoal with the original prompt restored
-    const handleDiscard = () => {
+    // Discard: delete the temporary goal and go back to CreateGoal
+    const handleDiscard = async () => {
+        if (!isDemoMode && goalId) {
+            try {
+                // Delete the goal that was created for preview
+                await fetch(`${import.meta.env.VITE_API_URL}/goals/${goalId}`, {
+                    method: 'DELETE',
+                });
+                console.log('Discarded goal deleted:', goalId);
+            } catch (err) {
+                console.error('Error deleting discarded goal:', err);
+            }
+        }
         navigate('/create-goal', { state: { originalPrompt } });
     };
 
