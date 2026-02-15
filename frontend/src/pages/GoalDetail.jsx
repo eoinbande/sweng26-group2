@@ -11,16 +11,15 @@ const GoalDetail = () => {
     const location = useLocation();
 
     // Safely access location state
-    // Use "Loading..." as default if we are loading, unless we want to show stale title?
-    // User requested "just put loading goals" instead of showing stale or mock data briefly.
+    // Use "Loading..." as default if we are loading, unless we want to show stale title
     const [goalTitle, setGoalTitle] = useState(location.state?.goal?.title || location.state?.goalTitle || "Loading...");
     const goalId = location.state?.goal?.id || location.state?.goalId || null;
 
     /* rstore tasks from location.state if returning from feedback page */
     const [tasks, setTasks] = useState(location.state?.tasks || []);
     const [endDate, setEndDate] = useState("");
-    const [progress, setProgress] = useState(0); 
-    
+    const [progress, setProgress] = useState(0);
+
     // Add loading state
     const [isLoading, setIsLoading] = useState(true);
 
@@ -35,21 +34,21 @@ const GoalDetail = () => {
         const fetchGoalDetails = async () => {
             setIsLoading(true);
             try {
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/goal-details/${goalId}`);
-                
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/goal-details/${goalId}`, { cache: 'no-store' });
+
                 if (!response.ok) {
                     throw new Error('Failed to fetch details');
                 }
-                
+
                 const data = await response.json();
-                
+
                 // Debug log to check data structure
                 console.log("Goal details fetched:", data);
 
                 if (data.goal?.title) {
                     setGoalTitle(data.goal.title);
                 }
-                
+
                 // Set End Date if available
                 if (data.goal && data.goal.goal_data && data.goal.goal_data.goal_due_date) {
                     const rawDate = data.goal.goal_data.goal_due_date;
@@ -62,7 +61,7 @@ const GoalDetail = () => {
                             year: 'numeric'
                         }));
                     } else {
-                         setEndDate(rawDate);
+                        setEndDate(rawDate);
                     }
                 }
 
@@ -71,15 +70,15 @@ const GoalDetail = () => {
                     return backendTasks.map(t => ({
                         ...t,
                         // Map description to title (as backend uses description for task name)
-                        title: t.description || t.title, 
+                        title: t.description || t.title,
                         // Ensure dueDate is mapped (backend key is due_date usually)
                         dueDate: t.due_date || t.dueDate,
                         // Process subtasks: map status to completed boolean
                         subtasks: t.subtasks ? t.subtasks.map(s => ({
-                           ...s,
-                           title: s.description || s.title,
-                           dueDate: s.due_date || s.dueDate,
-                           completed: s.status === 'completed'
+                            ...s,
+                            title: s.description || s.title,
+                            dueDate: s.due_date || s.dueDate,
+                            completed: s.status === 'completed'
                         })) : [],
                         completed: t.status === 'completed'
                     }));
@@ -88,9 +87,9 @@ const GoalDetail = () => {
                 if (data.tasks) {
                     setTasks(processTasks(data.tasks));
                 }
-                
+
                 // Fetch progress from backend
-                const progRes = await fetch(`${import.meta.env.VITE_API_URL}/tasks/${goalId}/progress`);
+                const progRes = await fetch(`${import.meta.env.VITE_API_URL}/tasks/${goalId}/progress`, { cache: 'no-store' });
                 const progData = await progRes.json();
                 if (progData) setProgress(progData.percentage);
             } catch (err) {
@@ -111,7 +110,7 @@ const GoalDetail = () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status: newStatus })
             });
-            
+
             if (!res.ok) {
                 console.error("Failed to update task status:", res.status);
                 // Optionally revert local state here
@@ -121,7 +120,7 @@ const GoalDetail = () => {
             // Fetch progress after successful update
             if (goalId) {
                 try {
-                    const progRes = await fetch(`${import.meta.env.VITE_API_URL}/tasks/${goalId}/progress`);
+                    const progRes = await fetch(`${import.meta.env.VITE_API_URL}/tasks/${goalId}/progress`, { cache: 'no-store' });
                     const progData = await progRes.json();
                     if (progData) setProgress(progData.percentage);
                 } catch (e) { console.error("Failed to fetch progress:", e); }
@@ -150,7 +149,7 @@ const GoalDetail = () => {
     /* toggle a subtask */
     const toggleSubtask = (taskId, subtaskId) => {
         let newStatus = 'not_started';
-        
+
         setTasks(prev => prev.map(task => {
             if (task.id !== taskId) return task;
             return {
@@ -165,7 +164,7 @@ const GoalDetail = () => {
                 })
             };
         }));
-        
+
         // Trigger API call
         updateTaskStatus(subtaskId, newStatus);
     };
@@ -177,14 +176,14 @@ const GoalDetail = () => {
 
         const task = tasks[taskIndex];
         const isComplete = isTaskComplete(task); /* currently complete? */
-        
+
         if (isComplete) { // uncheck a completed task -> uncheck only the LAST subtask (go back one step)
             // so we call API for only last subtask
-            
+
             const lastSubIndex = task.subtasks.length - 1;
             if (lastSubIndex >= 0) {
                 const lastSubId = task.subtasks[lastSubIndex].id;
-                
+
                 setTasks(prev => prev.map((t, i) => {
                     if (i !== taskIndex) return t;
                     return {
@@ -197,12 +196,12 @@ const GoalDetail = () => {
                 // Call API for the last subtask
                 updateTaskStatus(lastSubId, 'not_started');
             } else {
-                 // No subtasks case: uncheck the task itself
-                 setTasks(prev => prev.map((t, i) => {
+                // No subtasks case: uncheck the task itself
+                setTasks(prev => prev.map((t, i) => {
                     if (i !== taskIndex) return t;
                     return { ...t, completed: false, status: 'in_progress' };
-                 }));
-                 updateTaskStatus(task.id, 'not_started');
+                }));
+                updateTaskStatus(task.id, 'not_started');
             }
         } else { // mark task as complete -> mark ALL subtasks as done
             setTasks(prev => prev.map((t, i) => {
@@ -214,7 +213,7 @@ const GoalDetail = () => {
                     subtasks: t.subtasks.map(s => ({ ...s, completed: true }))
                 };
             }));
-            
+
             if (task.subtasks.length > 0) {
                 // Call API for ALL subtasks
                 task.subtasks.forEach(s => {
@@ -224,14 +223,11 @@ const GoalDetail = () => {
                 });
             } else {
                 // Call API for task
-                 updateTaskStatus(task.id, 'completed');
-            }k.subtasks.forEach(s => {
-                if (!s.completed) {
-                     updateTaskStatus(s.id, 'completed');
-                }
-            });
+                updateTaskStatus(task.id, 'completed');
+            }
         }
     };
+
 
 
     /* progress - fetched from backend now */
@@ -244,8 +240,8 @@ const GoalDetail = () => {
         return (
             <div className="goal-detail-page">
                 <div className="loading-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-                     {/* Use Loading component if available, else text */}
-                     <Loading />
+                    {/* Use Loading component if available, else text */}
+                    <Loading />
                 </div>
                 <BottomNav />
             </div>
