@@ -1,5 +1,5 @@
-import React from "react"
-import { Clock, Pencil, Check, X } from "lucide-react"
+import React, { useState } from "react"
+import { Clock, ChevronDown, Check, X } from "lucide-react"
 
 export function TaskCard({
   title,
@@ -11,6 +11,7 @@ export function TaskCard({
   onDeny = () => console.log("Task denied:", title),
 }) {
   const isReviewVariant = variant === "review";
+  const [showSubtasks, setShowSubtasks] = useState(false);
 
   return (
     <div style={{
