@@ -41,6 +41,7 @@ class AcceptPlanRequest(BaseModel):
     Example: {"tasks": [{ai_id: "task_1", description: "...", ...}]}
     """
     tasks: list[dict]
+    due_date: str | None = None  # Optional due date in YYYY-MM-DD format
 
 
 class FeedbackRequest(BaseModel):
@@ -184,10 +185,24 @@ def accept_plan(goal_id: str, request: AcceptPlanRequest):
         # First save → generate UUIDs and save everything
         saved_tasks = save_tasks_to_db(goal_id, request.tasks)
 
+
+    # Determine final due_date
+    if request.due_date is not None:
+        # User explicitly set or the date (can be null
+        current_data["goal_due_date"] = request.due_date
+        final_due_date = request.due_date
+    else:
+        # User chose "Let AI decide" - keep existing date from AI
+        final_due_date = current_data.get("goal_due_date", "")
+    
+    # update call
+    update_goal_data(goal_id, current_data)
+
     return {
         "message": "Plan accepted and saved!",
         "goal_id": goal_id,
         "tasks": saved_tasks,
+        "due_date": final_due_date,
         "saved_to_db": True
     }
 
