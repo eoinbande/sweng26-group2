@@ -6,6 +6,7 @@ import TaskTimeline from '../components/TaskTimeline';
 import Loading from '../components/Loading'; // Import Loading component if it exists
 import FeedbackPopUp from '../components/FeedbackPopUp';
 import '../styles/GoalDetail.css';
+import { supabase } from '../supabase_client';
 
 const GoalDetail = () => {
     const navigate = useNavigate();
@@ -237,6 +238,71 @@ const GoalDetail = () => {
         }
     };
 
+    // Feedback submisison
+    const handleSubmitFeedback = async (text) => {
+    const val = text; // handle value from InputBar or state
+    if (!val.trim()) return;
+    
+        //setSubmittingFeedback(true);
+        //setShowLoading(true); // Show loading overlay while processing feedback
+    
+        try {
+            // Get current user ID
+            let userId = null;
+            try {
+                const { data } = await supabase.auth.getUser();
+                userId = data?.user?.id;
+            } catch (err) {
+                console.error('Auth error:', err);
+            }
+
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/goals/${goalId}/feedback`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ feedback: val })
+        });
+
+        const data = await res.json();
+        console.log('Feedback response:', data);
+
+        if (!res.ok) {
+            console.error('Failed to process feedback:', data);
+            alert('Failed to process feedback. Check console.');
+            //setSubmittingFeedback(false);
+            //setShowLoading(false);
+            return;
+        }
+
+        //setFeedbackText('');
+        closeFeedback();
+
+        // Update the preview data with new tasks from feedback
+        // Navigate to ReviewPlan again with updated data and loading overlay
+        navigate('/review-plan', {
+            replace: true,
+            state: {
+                goal: goalTitle,
+                showLoading: true,
+                previewData: {
+                    goal_id: goalId,
+                    tasks: data.tasks,
+                },
+                userId: userId,
+                originalPrompt: goalTitle,
+                dueDate: endDate,
+            },
+        });
+
+        //setSubmittingFeedback(false);
+
+    } catch (err) {
+        console.error('Network error:', err);
+        alert('Network error. Is the backend running?');
+        //setSubmittingFeedback(false);
+        //setShowLoading(false);
+    }
+    };
+            
 
 
     /* progress - fetched from backend now */
@@ -295,8 +361,9 @@ const GoalDetail = () => {
                         <FeedbackPopUp
                             variant="reroute"
                             onClose={closeFeedback}
-                            onSubmit={(msg) => {
-                                closeFeedback();
+                            onSubmit={(value) => { 
+                                console.log('Submitted value:', value);
+                                handleSubmitFeedback(value); 
                             }}
                         />
                     </div>
