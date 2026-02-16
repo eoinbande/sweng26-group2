@@ -184,13 +184,16 @@ const TaskTimeline = ({ tasks, getTaskStatus, isTaskComplete, toggleTask, toggle
                                                 onClick={() => toggleSubtask(task.id, sub.id)}
                                             >
                                                 <span className={sub.completed ? 'tl-strikethrough' : ''}>
-                                                    {index + 1}.{subIndex + 1} {sub.title}
+                                                    {sub.title}
                                                 </span>
                                                 <span className="tl-subtask__date">
                                                     <Clock size={10} />
                                                     {getDaysLeftText(sub.dueDate)}
                                                 </span>
                                             </div>
+                                            <span className="tl-subtask__number">
+                                                {index + 1}.{subIndex + 1}
+                                            </span>
                                         </div>
                                     ))}
                                 </div>
