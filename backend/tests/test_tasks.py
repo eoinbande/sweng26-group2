@@ -4,7 +4,7 @@ from app.main import app
 """TEST FILE: test file for tasks
 This file will contain several Test functions to test the functionality of the task endpoint """
 
-client = TestClient
+client = TestClient(app)
 #Requests tested:
 #PATCH /api/tasks/{id}/status — updates task status
 #POST /api/tasks/{id}/expand — expands task into subtasks
@@ -94,6 +94,10 @@ def test_expand_task_notfound():
 #===============================================================
 
 #TEST: Return completion stats
+
+#==============================================================
+
+#this test will check if we can return completion stats(successfully)
 def test_get_progress():
     response = client.get("/api/tasks/goal-id/progress")
 
@@ -104,4 +108,7 @@ def test_get_progress():
     assert "completed" in data
     assert "total" in data
     assert "percentage" in data
-    
+
+#def test_get_progress_nonexistent_goal():
+#THERE is no 404 (if goal_id does not exist in functin get_progress)
+# in returns 0 for everything    
