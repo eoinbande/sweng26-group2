@@ -149,21 +149,19 @@ def sample_goal_list():
 class TestCreateGoal:
     """Tests for POST /api/goals endpoint."""
 
-    @patch("app.routes.goals.create_goal")
-    @patch("app.routes.goals.get_mock_plan")
-    @patch("app.routes.goals.update_goal_data")
+    @patch("app.routers.goals.create_goal")
+    @patch("app.routers.goals.get_mock_plan")
+    @patch("app.routers.goals.update_goal_data")
     def test_create_goal_success(
         self, mock_update, mock_get_plan, mock_create, 
         mock_user_id, mock_goal_id, sample_bike_tyre_plan
     ):
         """Should successfully create a goal and return AI-generated plan."""
-        # Setup mocks
         mock_create.return_value = MagicMock(
             data=[{"id": mock_goal_id, "title": "Fix my bike tyre"}]
         )
         mock_get_plan.return_value = sample_bike_tyre_plan
         
-        # Make request
         response = client.post(
             "/api/goals",
             json={
@@ -172,7 +170,6 @@ class TestCreateGoal:
             }
         )
         
-        # Assertions
         assert response.status_code == 200
         data = response.json()
         
@@ -184,7 +181,6 @@ class TestCreateGoal:
         assert len(data["tasks"]) == 2
         assert data["saved_to_db"] is False
         
-        # Verify database calls
         mock_create.assert_called_once_with(
             user_id=mock_user_id,
             title="Fix my bike tyre"
@@ -192,10 +188,11 @@ class TestCreateGoal:
         mock_get_plan.assert_called_once_with("Fix my bike tyre")
         mock_update.assert_called_once()
 
-    @patch("app.routes.goals.create_goal")
-    @patch("app.routes.goals.get_mock_plan")
+    @patch("app.routers.goals.create_goal")
+    @patch("app.routers.goals.get_mock_plan")
+    @patch("app.routers.goals.update_goal_data")
     def test_create_goal_returns_task_structure(
-        self, mock_get_plan, mock_create,
+        self, mock_update, mock_get_plan, mock_create,
         mock_user_id, mock_goal_id, sample_bike_tyre_plan
     ):
         """Should return tasks with correct structure including ai_id, order, subtasks."""
@@ -216,7 +213,6 @@ class TestCreateGoal:
         data = response.json()
         tasks = data["tasks"]
         
-        # Check first task structure
         assert tasks[0]["ai_id"] == "task_1"
         assert tasks[0]["description"] == "Remove the wheel from the bike"
         assert tasks[0]["order"] == 1
@@ -225,7 +221,7 @@ class TestCreateGoal:
         assert "subtasks" in tasks[0]
         assert isinstance(tasks[0]["subtasks"], list)
 
-    @patch("app.routes.goals.create_goal")
+    @patch("app.routers.goals.create_goal")
     def test_create_goal_db_failure(self, mock_create, mock_user_id):
         """Should return 500 error when database creation fails."""
         mock_create.return_value = MagicMock(data=None)
@@ -248,7 +244,7 @@ class TestCreateGoal:
             json={"title": "Fix my bike tyre"}
         )
         
-        assert response.status_code == 422  # Validation error
+        assert response.status_code == 422
 
     def test_create_goal_missing_title(self, mock_user_id):
         """Should reject request with missing title."""
@@ -257,7 +253,7 @@ class TestCreateGoal:
             json={"user_id": mock_user_id}
         )
         
-        assert response.status_code == 422  # Validation error
+        assert response.status_code == 422
 
     def test_create_goal_empty_title(self, mock_user_id):
         """Should reject request with empty title."""
@@ -269,11 +265,11 @@ class TestCreateGoal:
             }
         )
         
-        assert response.status_code == 422  # Validation error
+        assert response.status_code == 422
 
-    @patch("app.routes.goals.create_goal")
-    @patch("app.routes.goals.get_mock_plan")
-    @patch("app.routes.goals.update_goal_data")
+    @patch("app.routers.goals.create_goal")
+    @patch("app.routers.goals.get_mock_plan")
+    @patch("app.routers.goals.update_goal_data")
     def test_create_goal_with_wedding_plan(
         self, mock_update, mock_get_plan, mock_create,
         mock_user_id, mock_goal_id
@@ -288,7 +284,7 @@ class TestCreateGoal:
                     "description": "Decide on the perfect wedding date",
                     "order": 1,
                     "status": "not_started",
-                    "requires_input": True,  # Info-gathering task
+                    "requires_input": True,
                     "subtasks": []
                 }
             ]
@@ -317,8 +313,8 @@ class TestCreateGoal:
 class TestFeedbackOnPlan:
     """Tests for POST /api/goals/{goal_id}/feedback endpoint."""
 
-    @patch("app.routes.goals.get_goal")
-    @patch("app.routes.goals.get_mock_feedback_response")
+    @patch("app.routers.goals.get_goal")
+    @patch("app.routers.goals.get_mock_feedback_response")
     def test_feedback_success(
         self, mock_get_feedback, mock_get_goal,
         mock_goal_id, sample_feedback_response
@@ -345,8 +341,8 @@ class TestFeedbackOnPlan:
         assert data["saved_to_db"] is False
         assert len(data["tasks"]) == 2
 
-    @patch("app.routes.goals.get_goal")
-    @patch("app.routes.goals.get_mock_feedback_response")
+    @patch("app.routers.goals.get_goal")
+    @patch("app.routers.goals.get_mock_feedback_response")
     def test_feedback_preserves_task_structure(
         self, mock_get_feedback, mock_get_goal, mock_goal_id
     ):
@@ -361,7 +357,7 @@ class TestFeedbackOnPlan:
                     "ai_id": "task_1",
                     "description": "Modified description",
                     "order": 1,
-                    "status": "completed",  # Preserving completed status
+                    "status": "completed",
                     "subtasks": []
                 }
             ]
@@ -375,11 +371,10 @@ class TestFeedbackOnPlan:
         assert response.status_code == 200
         data = response.json()
         
-        # Should preserve completed status from before feedback
         assert data["tasks"][0]["status"] == "completed"
         assert data["tasks"][0]["ai_id"] == "task_1"
 
-    @patch("app.routes.goals.get_goal")
+    @patch("app.routers.goals.get_goal")
     def test_feedback_goal_not_found(self, mock_get_goal):
         """Should return 404 when goal doesn't exist."""
         mock_get_goal.side_effect = Exception("Goal not found")
@@ -399,10 +394,10 @@ class TestFeedbackOnPlan:
             json={}
         )
         
-        assert response.status_code == 422  # Validation error
+        assert response.status_code == 422
 
-    @patch("app.routes.goals.get_goal")
-    @patch("app.routes.goals.get_mock_feedback_response")
+    @patch("app.routers.goals.get_goal")
+    @patch("app.routers.goals.get_mock_feedback_response")
     def test_feedback_empty_string_accepted(
         self, mock_get_feedback, mock_get_goal, 
         mock_goal_id, sample_feedback_response
@@ -420,8 +415,8 @@ class TestFeedbackOnPlan:
         data = response.json()
         assert data["feedback_received"] == ""
 
-    @patch("app.routes.goals.get_goal")
-    @patch("app.routes.goals.get_mock_feedback_response")
+    @patch("app.routers.goals.get_goal")
+    @patch("app.routers.goals.get_mock_feedback_response")
     def test_feedback_can_be_called_multiple_times(
         self, mock_get_feedback, mock_get_goal,
         mock_goal_id, sample_feedback_response
@@ -430,21 +425,18 @@ class TestFeedbackOnPlan:
         mock_get_goal.return_value = {"id": mock_goal_id, "title": "Test goal"}
         mock_get_feedback.return_value = sample_feedback_response
         
-        # First feedback
         response1 = client.post(
             f"/api/goals/{mock_goal_id}/feedback",
             json={"feedback": "First change"}
         )
         assert response1.status_code == 200
         
-        # Second feedback
         response2 = client.post(
             f"/api/goals/{mock_goal_id}/feedback",
             json={"feedback": "Second change"}
         )
         assert response2.status_code == 200
         
-        # Both should succeed
         assert response1.json()["feedback_received"] == "First change"
         assert response2.json()["feedback_received"] == "Second change"
 
@@ -456,14 +448,13 @@ class TestFeedbackOnPlan:
 class TestAcceptPlan:
     """Tests for POST /api/goals/{goal_id}/accept endpoint."""
 
-    @patch("app.routes.goals.get_goal")
-    @patch("app.routes.goals.save_tasks_to_db")
+    @patch("app.routers.goals.get_goal")
+    @patch("app.routers.goals.save_tasks_to_db")
     def test_accept_plan_first_save(
         self, mock_save_tasks, mock_get_goal,
         mock_goal_id, sample_tasks_with_uuids
     ):
         """Should save tasks to DB and return UUIDs on first accept."""
-        # Goal exists but has no tasks yet (first save)
         mock_get_goal.return_value = {
             "id": mock_goal_id,
             "title": "Fix my bike tyre",
@@ -494,17 +485,15 @@ class TestAcceptPlan:
         assert data["saved_to_db"] is True
         assert len(data["tasks"]) == 2
         
-        # Tasks should now have UUIDs
         assert data["tasks"][0]["id"] == "uuid-task-1"
         assert data["tasks"][0]["ai_id"] == "task_1"
 
-    @patch("app.routes.goals.get_goal")
-    @patch("app.routes.goals.merge_and_save_tasks")
+    @patch("app.routers.goals.get_goal")
+    @patch("app.routers.goals.merge_and_save_tasks")
     def test_accept_plan_reaccept_with_existing_tasks(
         self, mock_merge_tasks, mock_get_goal, mock_goal_id
     ):
         """Should merge tasks when re-accepting (preserving completed work)."""
-        # Goal already has tasks with UUIDs (re-accept scenario)
         mock_get_goal.return_value = {
             "id": mock_goal_id,
             "title": "Fix my bike tyre",
@@ -525,7 +514,7 @@ class TestAcceptPlan:
                 "id": "uuid-task-1",
                 "ai_id": "task_1",
                 "description": "New description",
-                "status": "completed",  # Preserved from before
+                "status": "completed",
                 "order": 1,
                 "subtasks": []
             }
@@ -550,11 +539,10 @@ class TestAcceptPlan:
         assert response.status_code == 200
         data = response.json()
         
-        # Should preserve completed status via merge
         assert data["tasks"][0]["status"] == "completed"
         assert data["tasks"][0]["description"] == "New description"
 
-    @patch("app.routes.goals.get_goal")
+    @patch("app.routers.goals.get_goal")
     def test_accept_plan_goal_not_found(self, mock_get_goal):
         """Should return 404 when goal doesn't exist."""
         mock_get_goal.side_effect = Exception("Goal not found")
@@ -574,10 +562,10 @@ class TestAcceptPlan:
             json={}
         )
         
-        assert response.status_code == 422  # Validation error
+        assert response.status_code == 422
 
-    @patch("app.routes.goals.get_goal")
-    @patch("app.routes.goals.save_tasks_to_db")
+    @patch("app.routers.goals.get_goal")
+    @patch("app.routers.goals.save_tasks_to_db")
     def test_accept_plan_with_subtasks(
         self, mock_save_tasks, mock_get_goal, mock_goal_id
     ):
@@ -630,12 +618,11 @@ class TestAcceptPlan:
         assert response.status_code == 200
         data = response.json()
         
-        # Subtasks should have UUIDs assigned
         assert len(data["tasks"][0]["subtasks"]) == 1
         assert data["tasks"][0]["subtasks"][0]["id"] == "uuid-subtask-1a"
 
-    @patch("app.routes.goals.get_goal")
-    @patch("app.routes.goals.save_tasks_to_db")
+    @patch("app.routers.goals.get_goal")
+    @patch("app.routers.goals.save_tasks_to_db")
     def test_accept_plan_empty_tasks_array(
         self, mock_save_tasks, mock_get_goal, mock_goal_id
     ):
@@ -650,8 +637,6 @@ class TestAcceptPlan:
             json={"tasks": []}
         )
         
-        # Should accept empty array technically, but save_tasks_to_db might reject
-        # Depends on business logic - adjust assertion based on requirements
         assert response.status_code in [200, 400]
 
 
@@ -662,7 +647,7 @@ class TestAcceptPlan:
 class TestGetGoals:
     """Tests for GET /api/goals/{user_id} endpoint."""
 
-    @patch("app.routes.goals.get_all_goals")
+    @patch("app.routers.goals.get_all_goals")
     def test_get_goals_success(
         self, mock_get_all_goals, mock_user_id, sample_goal_list
     ):
@@ -679,7 +664,7 @@ class TestGetGoals:
         assert data["goals"][0]["title"] == "Fix my bike tyre"
         assert data["goals"][1]["title"] == "Learn piano"
 
-    @patch("app.routes.goals.get_all_goals")
+    @patch("app.routers.goals.get_all_goals")
     def test_get_goals_includes_goal_data(
         self, mock_get_all_goals, mock_user_id, sample_goal_list
     ):
@@ -691,13 +676,12 @@ class TestGetGoals:
         assert response.status_code == 200
         data = response.json()
         
-        # Each goal should have goal_data
         for goal in data["goals"]:
             assert "goal_data" in goal
             assert "description" in goal["goal_data"]
             assert "tasks" in goal["goal_data"]
 
-    @patch("app.routes.goals.get_all_goals")
+    @patch("app.routers.goals.get_all_goals")
     def test_get_goals_empty_list(self, mock_get_all_goals, mock_user_id):
         """Should return empty list with message when user has no goals."""
         mock_get_all_goals.return_value = None
@@ -710,7 +694,7 @@ class TestGetGoals:
         assert data["goals"] == []
         assert "No goals associated with the user" in data["message"]
 
-    @patch("app.routes.goals.get_all_goals")
+    @patch("app.routers.goals.get_all_goals")
     def test_get_goals_returns_list_structure(
         self, mock_get_all_goals, mock_user_id
     ):
@@ -741,7 +725,7 @@ class TestGetGoals:
         assert "created_at" in goal
         assert "goal_data" in goal
 
-    @patch("app.routes.goals.get_all_goals")
+    @patch("app.routers.goals.get_all_goals")
     def test_get_goals_multiple_goals_ordered(
         self, mock_get_all_goals, mock_user_id
     ):
@@ -761,7 +745,7 @@ class TestGetGoals:
         assert data["goals"][0]["title"] == "Goal 1"
         assert data["goals"][2]["title"] == "Goal 3"
 
-    @patch("app.routes.goals.get_all_goals")
+    @patch("app.routers.goals.get_all_goals")
     def test_get_goals_different_users_isolated(self, mock_get_all_goals):
         """Should only return goals for the specified user."""
         user_1_goals = [{"id": "1", "user_id": "user-1", "title": "User 1 Goal"}]
@@ -773,22 +757,21 @@ class TestGetGoals:
         assert response.status_code == 200
         data = response.json()
         
-        # Should only get goals for user-1
         assert all(goal.get("user_id") == "user-1" for goal in data["goals"])
 
 
 # =============================================================================
 #  Integration-style Tests
 # =============================================================================
-#new comment testing
+
 class TestGoalsWorkflow:
     """Tests that verify the complete workflow across multiple endpoints."""
 
-    @patch("app.routes.goals.create_goal")
-    @patch("app.routes.goals.get_mock_plan")
-    @patch("app.routes.goals.update_goal_data")
-    @patch("app.routes.goals.get_goal")
-    @patch("app.routes.goals.save_tasks_to_db")
+    @patch("app.routers.goals.create_goal")
+    @patch("app.routers.goals.get_mock_plan")
+    @patch("app.routers.goals.update_goal_data")
+    @patch("app.routers.goals.get_goal")
+    @patch("app.routers.goals.save_tasks_to_db")
     def test_complete_workflow_create_to_accept(
         self, mock_save, mock_get_goal, mock_update,
         mock_get_plan, mock_create,
@@ -796,7 +779,6 @@ class TestGoalsWorkflow:
         sample_tasks_with_uuids
     ):
         """Should handle complete flow: create → review → accept."""
-        # Step 1: Create goal
         mock_create.return_value = MagicMock(data=[{"id": mock_goal_id}])
         mock_get_plan.return_value = sample_bike_tyre_plan
         
@@ -811,7 +793,6 @@ class TestGoalsWorkflow:
         assert create_response.status_code == 200
         assert create_response.json()["saved_to_db"] is False
         
-        # Step 2: Accept plan
         mock_get_goal.return_value = {
             "id": mock_goal_id,
             "goal_data": {"tasks": []}
@@ -826,16 +807,15 @@ class TestGoalsWorkflow:
         assert accept_response.status_code == 200
         assert accept_response.json()["saved_to_db"] is True
         
-        # Tasks should now have UUIDs
         accepted_tasks = accept_response.json()["tasks"]
         assert all("id" in task for task in accepted_tasks)
 
-    @patch("app.routes.goals.create_goal")
-    @patch("app.routes.goals.get_mock_plan")
-    @patch("app.routes.goals.update_goal_data")
-    @patch("app.routes.goals.get_goal")
-    @patch("app.routes.goals.get_mock_feedback_response")
-    @patch("app.routes.goals.save_tasks_to_db")
+    @patch("app.routers.goals.create_goal")
+    @patch("app.routers.goals.get_mock_plan")
+    @patch("app.routers.goals.update_goal_data")
+    @patch("app.routers.goals.get_goal")
+    @patch("app.routers.goals.get_mock_feedback_response")
+    @patch("app.routers.goals.save_tasks_to_db")
     def test_complete_workflow_with_feedback(
         self, mock_save, mock_feedback, mock_get_goal,
         mock_update, mock_get_plan, mock_create,
@@ -843,7 +823,6 @@ class TestGoalsWorkflow:
         sample_feedback_response, sample_tasks_with_uuids
     ):
         """Should handle flow: create → feedback → accept."""
-        # Step 1: Create goal
         mock_create.return_value = MagicMock(data=[{"id": mock_goal_id}])
         mock_get_plan.return_value = sample_bike_tyre_plan
         
@@ -856,7 +835,6 @@ class TestGoalsWorkflow:
         )
         assert create_response.status_code == 200
         
-        # Step 2: Give feedback
         mock_get_goal.return_value = {
             "id": mock_goal_id,
             "title": "Fix my bike tyre"
@@ -870,7 +848,6 @@ class TestGoalsWorkflow:
         assert feedback_response.status_code == 200
         assert feedback_response.json()["saved_to_db"] is False
         
-        # Step 3: Accept the updated plan
         mock_get_goal.return_value = {
             "id": mock_goal_id,
             "goal_data": {"tasks": []}
