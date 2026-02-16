@@ -86,22 +86,22 @@ function GoalAddDate() {
         // step 2: expand blue card to fill screen
         setTimeout(() => setIsExpanding(true), 400);
 
-        // in demo mode, use mocked data
-        if (isDemoMode) {
-            setTimeout(() => {
-                navigate('/review-plan', {
-                    state: {
-                        goal: goalText,
-                        showLoading: true,
-                        previewData: MOCK_PREVIEW,
-                        userId: 'demo-user-001',
-                        originalPrompt: goalText,
-                        dueDate: dateValueRef.current,
-                    },
-                });
-            }, 1400);
-            return;
-        }
+        // // in demo mode, use mocked data
+        // if (isDemoMode) {
+        //     setTimeout(() => {
+        //         navigate('/review-plan', {
+        //             state: {
+        //                 goal: goalText,
+        //                 showLoading: true,
+        //                 previewData: MOCK_PREVIEW,
+        //                 userId: 'demo-user-001',
+        //                 originalPrompt: goalText,
+        //                 dueDate: dateValueRef.current,
+        //             },
+        //         });
+        //     }, 1400);
+        //     return;
+        // }
 
         // get authenticated user
         let user;
@@ -137,7 +137,6 @@ function GoalAddDate() {
                 return;
             }
             setTimeout(() => {
-                if (data.ai_generated) {
                     navigate('/review-plan', {
                         state: {
                             goal: goalText,
@@ -148,9 +147,6 @@ function GoalAddDate() {
                             dueDate: dateValueRef.current, // Will be empty string if not set
                         },
                     });
-                } else {
-                    navigate('/goals');
-                }
             }, 1400);
         } catch (err) {
             console.error('Network error:', err);
