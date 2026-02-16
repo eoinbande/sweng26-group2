@@ -153,7 +153,7 @@ const TaskTimeline = ({ tasks, getTaskStatus, isTaskComplete, toggleTask, toggle
                             </div>
 
                             <h4 className={status === 'completed' ? 'tl-strikethrough' : ''}>
-                                {task.title}
+                                {index + 1}. {task.title}
                             </h4>
 
                             <p className={`tl-meta ${status === 'completed' ? 'tl-strikethrough' : ''}`}>
@@ -168,7 +168,7 @@ const TaskTimeline = ({ tasks, getTaskStatus, isTaskComplete, toggleTask, toggle
                             {/* subtasks;only shown for ACTIVE tasks */}
                             {status === 'active' && task.subtasks.length > 0 && (
                                 <div className="tl-subtask-list">
-                                    {task.subtasks.map(sub => (
+                                    {task.subtasks.map((sub, subIndex) => (
                                         <div
                                             key={sub.id}
                                             className={`tl-subtask ${sub.completed ? 'tl-subtask--done' : ''}`}
@@ -184,7 +184,7 @@ const TaskTimeline = ({ tasks, getTaskStatus, isTaskComplete, toggleTask, toggle
                                                 onClick={() => toggleSubtask(task.id, sub.id)}
                                             >
                                                 <span className={sub.completed ? 'tl-strikethrough' : ''}>
-                                                    {sub.title}
+                                                    {index + 1}.{subIndex + 1} {sub.title}
                                                 </span>
                                                 <span className="tl-subtask__date">
                                                     <Clock size={10} />
