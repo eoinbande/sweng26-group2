@@ -15,7 +15,7 @@ from .bike_tyre import (
     BIKE_TYRE_AFTER_FEEDBACK,
     BIKE_TYRE_FEEDBACK_AFTER_PROGRESS
 )
-from .wedding import WEDDING_INITIAL
+from .wedding import WEDDING_INITIAL, WEDDING_AFTER_FEEDBACK
 from .piano import PIANO_INITIAL
 from .expand_mocks import BIKE_EXPAND_TASK_5
 from .default import DEFAULT_MOCK
