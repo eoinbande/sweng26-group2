@@ -41,10 +41,12 @@ function ReviewPlan() {
         return previewData.tasks.map(t => ({
             id: t.ai_id,
             title: t.description,
+            order: t.order,
             dueDate: t.due_date ? new Date(t.due_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : '',
             subtasks: (t.subtasks || []).map(s => ({
                 id: s.ai_id,
                 title: s.description,
+                order: s.order,
                 dueDate: s.due_date ? new Date(s.due_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : '',
             })),
         }));

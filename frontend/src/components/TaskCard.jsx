@@ -5,6 +5,7 @@ export function TaskCard({
   title,
   dueDate,
   onEdit,
+  order,
   variant = "default", // "default" or "review"
   subtasks = [],
   onConfirm = () => console.log("Task confirmed:", title),
