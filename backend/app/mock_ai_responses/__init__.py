@@ -62,11 +62,10 @@ def get_mock_plan(goal_title: str) -> dict:
 def get_mock_feedback_response(goal_title: str) -> dict:
     """
     Get a mock AI response after user feedback.
-    
-    For now, only the bike tyre has a feedback variant.
-    Everything else returns the initial plan unchanged.
     """
     title = goal_title.lower()
     if "bike" in title and ("tyre" in title or "tire" in title):
         return BIKE_TYRE_AFTER_FEEDBACK
+    if "wedding" in title:
+        return WEDDING_AFTER_FEEDBACK
     return get_mock_plan(goal_title)
