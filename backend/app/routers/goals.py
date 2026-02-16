@@ -138,7 +138,8 @@ def feedback_on_plan(goal_id: str, request: FeedbackRequest):
     # Get AI feedback response from mock
     # TODO: Replace with real AI call that takes current plan + feedback text
     # For now, we just return a pre-made feedback response based on the title
-    updated_plan = get_mock_feedback_response(goal["title"])
+    updated_plan = get_mock_feedback_response(goal["title"], request.feedback)
+
 
     return {
         "message": "Plan updated based on your feedback",

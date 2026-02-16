@@ -15,7 +15,7 @@ from .bike_tyre import (
     BIKE_TYRE_AFTER_FEEDBACK,
     BIKE_TYRE_FEEDBACK_AFTER_PROGRESS
 )
-from .wedding import WEDDING_INITIAL, WEDDING_AFTER_FEEDBACK
+from .wedding import WEDDING_INITIAL, WEDDING_AFTER_FEEDBACK, WEDDING_FEEDBACK_BABY
 from .piano import PIANO_INITIAL
 from .expand_mocks import BIKE_EXPAND_TASK_5
 from .default import DEFAULT_MOCK
@@ -60,7 +60,7 @@ def get_mock_plan(goal_title: str) -> dict:
     return MOCK_GOALS.get(goal_title.lower().strip(), DEFAULT_MOCK)
 
 
-def get_mock_feedback_response(goal_title: str) -> dict:
+def get_mock_feedback_response(goal_title: str, feedback: str = "") -> dict:
     """
     Get a mock AI response after user feedback.
     """
@@ -68,5 +68,7 @@ def get_mock_feedback_response(goal_title: str) -> dict:
     if "bike" in title and ("tyre" in title or "tire" in title):
         return BIKE_TYRE_AFTER_FEEDBACK
     if "wedding" in title:
+        if "baby" in feedback.lower() or "expecting" in feedback.lower() or "pregnant" in feedback.lower():
+            return WEDDING_FEEDBACK_BABY
         return WEDDING_AFTER_FEEDBACK
     return get_mock_plan(goal_title)
