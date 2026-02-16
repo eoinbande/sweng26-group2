@@ -33,8 +33,7 @@ export function TaskCard({
         <div style={{
           position: 'absolute',
           left: '-20px',
-          top: '50%',
-          transform: 'translateY(-50%)',
+          top: 'var(--space-md)',
           display: 'flex',
           flexDirection: 'column',
           gap: 'var(--space-sm)',
