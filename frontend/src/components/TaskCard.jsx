@@ -143,14 +143,6 @@ export function TaskCard({
                 backgroundColor: '#F9F9F7',
                 minHeight: '36px',
               }}>
-                {/* empty circle (no interaction) */}
-                <div style={{
-                  width: '20px',
-                  height: '20px',
-                  borderRadius: '50%',
-                  border: '2px solid #D1D1D6',
-                  flexShrink: 0,
-                }} />
                 <div style={{
                   flex: 1,
                   display: 'flex',
@@ -182,7 +174,7 @@ export function TaskCard({
         )}
       </div>
 
-      {/* edit button */}
+      {/* edit button (commented out — not needed for now)
       <button
         type="button"
         onClick={onEdit}
@@ -211,6 +203,7 @@ export function TaskCard({
       >
         <Pencil size={14} strokeWidth={2.5} />
       </button>
+      */}
     </div>
   )
 }
