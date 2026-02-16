@@ -88,3 +88,4 @@ def test_expand_task_notfound():
     )
 
     assert response.status_code == 404
+    
