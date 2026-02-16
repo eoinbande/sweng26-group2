@@ -123,30 +123,59 @@ export function TaskCard({
           <span>{dueDate}</span>
         </div>
 
-        {/* subtasks (read-only list) */}
+        {/* subtasks (read-only list, matches TaskTimeline styling) */}
         {subtasks.length > 0 && (
           <div style={{
-            marginTop: 'var(--space-sm)',
+            marginTop: '8px',
             display: 'flex',
             flexDirection: 'column',
-            gap: '4px',
+            gap: '6px',
+            borderTop: '1px solid #F0F0EC',
+            paddingTop: '8px',
           }}>
             {subtasks.map((sub) => (
               <div key={sub.id} style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 'var(--space-xs)',
-                fontSize: '12px',
-                color: 'var(--text-secondary)',
+                gap: '8px',
+                padding: '8px 10px',
+                borderRadius: '10px',
+                backgroundColor: '#F9F9F7',
+                minHeight: '36px',
               }}>
+                {/* empty circle (no interaction) */}
                 <div style={{
-                  width: '4px',
-                  height: '4px',
+                  width: '20px',
+                  height: '20px',
                   borderRadius: '50%',
-                  backgroundColor: 'var(--text-secondary)',
+                  border: '2px solid #D1D1D6',
                   flexShrink: 0,
                 }} />
-                <span>{sub.title}</span>
+                <div style={{
+                  flex: 1,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '2px',
+                  minWidth: 0,
+                }}>
+                  <span style={{
+                    fontSize: '13px',
+                    color: 'var(--text-main)',
+                    fontWeight: 400,
+                  }}>{sub.title}</span>
+                  {sub.dueDate && (
+                    <span style={{
+                      fontSize: '11px',
+                      color: '#8E8E93',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '2px',
+                    }}>
+                      <Clock size={10} strokeWidth={2} />
+                      {sub.dueDate}
+                    </span>
+                  )}
+                </div>
               </div>
             ))}
           </div>
