@@ -159,3 +159,45 @@ button {
 button:active {
     transform: scale(0.95);
 }
+
+/* date wheel picker overrides */
+.date-picker-wrapper #container {
+    margin: 0;
+}
+
+.date-picker-wrapper #pickerWrapper {
+    gap: 0;
+}
+
+/* reorder columns: month first, then day, then year */
+.date-picker-wrapper #pickerWrapper > div:nth-child(1) {
+    order: 2;
+}
+
+.date-picker-wrapper #pickerWrapper > div:nth-child(2) {
+    order: 1;
+}
+
+.date-picker-wrapper #pickerWrapper > div:nth-child(3) {
+    order: 3;
+}
+
+.date-picker-wrapper #pickerWrapper > #highlightOverlay {
+    order: 4;
+}
+
+.date-picker-wrapper #pickerWrapper > div[style*="scroll"] {
+    width: 33.33% !important;
+}
+
+.date-picker-wrapper #pickerWrapper > div[style*="scroll"] div {
+    font-size: 18px !important;
+    justify-content: center !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    text-align: center !important;
+}
+
+.date-picker-wrapper #pickerWrapper > div::-webkit-scrollbar {
+    display: none;
+}
