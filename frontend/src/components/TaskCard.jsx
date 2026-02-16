@@ -123,8 +123,8 @@ export function TaskCard({
           <span>{dueDate}</span>
         </div>
 
-        {/* subtasks (read-only list, matches TaskTimeline styling) */}
-        {subtasks.length > 0 && (
+        {/* subtasks dropdown */}
+        {subtasks.length > 0 && showSubtasks && (
           <div style={{
             marginTop: '8px',
             display: 'flex',
@@ -174,36 +174,44 @@ export function TaskCard({
         )}
       </div>
 
-      {/* edit button (commented out — not needed for now)
-      <button
-        type="button"
-        onClick={onEdit}
-        style={{
-          position: 'absolute',
-          bottom: '8px',
-          right: '8px',
-          height: '32px',
-          width: '32px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          borderRadius: '50%',
-          backgroundColor: 'transparent',
-          border: 'none',
-          color: 'var(--text-main)',
-          cursor: 'pointer',
-          transition: 'all 0.2s ease',
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.05)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = 'transparent';
-        }}
-      >
-        <Pencil size={14} strokeWidth={2.5} />
-      </button>
-      */}
+      {/* dropdown arrow to toggle subtasks */}
+      {subtasks.length > 0 && (
+        <button
+          type="button"
+          onClick={() => setShowSubtasks(!showSubtasks)}
+          style={{
+            position: 'absolute',
+            bottom: '8px',
+            right: '8px',
+            height: '32px',
+            width: '32px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: '50%',
+            backgroundColor: 'transparent',
+            border: 'none',
+            color: 'var(--text-main)',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.05)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'transparent';
+          }}
+        >
+          <ChevronDown
+            size={16}
+            strokeWidth={2.5}
+            style={{
+              transition: 'transform 0.2s ease',
+              transform: showSubtasks ? 'rotate(180deg)' : 'rotate(0deg)',
+            }}
+          />
+        </button>
+      )}
     </div>
   )
 }
