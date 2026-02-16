@@ -11,9 +11,14 @@ import '../index.css';
 function ReviewPlan() {
     const navigate = useNavigate();
     const location = useLocation();
+
+    // content visibility states
     const [contentVisible, setContentVisible] = useState(false);
     const [showLoading, setShowLoading] = useState(location.state?.showLoading || false);
+
     const [saving, setSaving] = useState(false);
+    const [submittingFeedback, setSubmittingFeedback] = useState(false);
+    const [feedbackText, setFeedbackText] = useState('');
 
     // Scroll-based fade visibility
     const scrollRef = useRef(null);
@@ -136,6 +141,67 @@ function ReviewPlan() {
         navigate('/create-goal', { state: { originalPrompt } });
     };
 
+    // Feedback submisison
+    const handleSubmitFeedback = async (text) => {
+    const val = text || feedbackText; // handle value from InputBar or state
+    if (!val.trim()) return;
+
+    if (isDemoMode) {
+        console.log('Demo mode - feedback:', feedbackText);
+        return;
+    }
+
+    setSubmittingFeedback(true);
+    setShowLoading(true); // Show loading overlay while processing feedback
+
+    try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/goals/${goalId}/feedback`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ feedback: feedbackText })
+        });
+
+        const data = await res.json();
+        console.log('Feedback response:', data);
+
+        if (!res.ok) {
+            console.error('Failed to process feedback:', data);
+            alert('Failed to process feedback. Check console.');
+            setSubmittingFeedback(false);
+            setShowLoading(false);
+            return;
+        }
+
+        setFeedbackText('');
+
+        // Update the preview data with new tasks from feedback
+        // Navigate to ReviewPlan again with updated data and loading overlay
+        navigate('/review-plan', {
+            replace: true,
+            state: {
+                goal: goalTitle,
+                showLoading: true,
+                previewData: {
+                    ...previewData,
+                    tasks: data.tasks,  // Updated tasks from AI
+                },
+                userId,
+                originalPrompt,
+                dueDate: location.state?.dueDate,
+            },
+        });
+
+        setSubmittingFeedback(false);
+
+    } catch (err) {
+        console.error('Network error:', err);
+        alert('Network error. Is the backend running?');
+        setSubmittingFeedback(false);
+        setShowLoading(false);
+    }
+    };
+        
+
     // fade in content after mount (or after loading overlay completes)
     useEffect(() => {
         // if loading overlay is showing, wait for it to complete before fading in content
@@ -144,6 +210,17 @@ function ReviewPlan() {
         const timer = setTimeout(() => setContentVisible(true), 100);
         return () => clearTimeout(timer);
     }, [showLoading]);
+
+
+    useEffect(() => {
+        if (location.state?.previewData) {
+            // If the tasks in state change, ensure we show the loading if requested
+            if (location.state.showLoading) {
+                setShowLoading(true);
+                setContentVisible(false); // Hide content while loading overlay shows
+            }
+        }
+    }, [location.state]);
 
     return (
         <div style={{
@@ -364,9 +441,12 @@ function ReviewPlan() {
             }}>
                 <InputBar
                     placeholder="Feedback to AI..."
-                    onSubmit={(value) => console.log('Feedback submitted:', value)}
+                    value={feedbackText}  
+                    onChange={(e) => setFeedbackText(e.target.value)}  // Update state
+                    onSubmit={() => handleSubmitFeedback(feedbackText)}  // Call feedback handler
                     variant="auth"
                     borderRadius="var(--radius-xl)"
+                    disabled={submittingFeedback}
                 />
                 
             </div>
