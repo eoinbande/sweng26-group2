@@ -69,3 +69,13 @@ def test_expand_task():
     assert data["message"] == "Task expanded into subtasks"
     assert "subtasks" in data
     assert isinstance(data["subtasks"], list)
+
+#this test if that a specific task ALREADY has subtasks(400 case)
+def test_task_already_expanded():
+    #expand once
+    client.post("/api/tasks/valid_task-ai-id-task_5/expand")
+
+    #expand again(should give an error)
+    response = client.post("/api/tasks/valid_task-ai-id-task_5/expand")
+
+    assert response.status_code == 400
