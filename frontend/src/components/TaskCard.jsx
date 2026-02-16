@@ -6,6 +6,7 @@ export function TaskCard({
   dueDate,
   onEdit,
   variant = "default", // "default" or "review"
+  subtasks = [],
   onConfirm = () => console.log("Task confirmed:", title),
   onDeny = () => console.log("Task denied:", title),
 }) {
@@ -121,6 +122,35 @@ export function TaskCard({
           <Clock size={12} strokeWidth={2} />
           <span>{dueDate}</span>
         </div>
+
+        {/* subtasks (read-only list) */}
+        {subtasks.length > 0 && (
+          <div style={{
+            marginTop: 'var(--space-sm)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '4px',
+          }}>
+            {subtasks.map((sub) => (
+              <div key={sub.id} style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--space-xs)',
+                fontSize: '12px',
+                color: 'var(--text-secondary)',
+              }}>
+                <div style={{
+                  width: '4px',
+                  height: '4px',
+                  borderRadius: '50%',
+                  backgroundColor: 'var(--text-secondary)',
+                  flexShrink: 0,
+                }} />
+                <span>{sub.title}</span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* edit button */}
