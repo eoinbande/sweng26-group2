@@ -14,6 +14,7 @@
     "ldrs": "^1.1.9",
     "lucide-react": "^0.563.0",
     "react": "^19.2.0",
+    "react-date-wheel-picker": "^0.1.12",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.13.0"
   },

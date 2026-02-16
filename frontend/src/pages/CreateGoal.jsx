@@ -1,23 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Mic } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
 import { InputBar } from '../components/InputBar';
-import { supabase, isDemoMode } from '../supabase_client';
 import '../index.css';
-
-const MOCK_PREVIEW = {
-    ai_generated: true,
-    goal_data: {
-        description: 'Demo goal plan',
-        nodes: [
-            { id: 1, task: 'Research the topic thoroughly', est_time: 30 },
-            { id: 2, task: 'Create an action plan', est_time: 20 },
-            { id: 3, task: 'Start working on first milestone', est_time: 45 },
-            { id: 4, task: 'Review and adjust progress', est_time: 15 },
-        ],
-    },
-};
 
 function CreateGoal() {
     const navigate = useNavigate();
@@ -29,87 +15,30 @@ function CreateGoal() {
     const [message, setMessage] = useState(restoredPrompt);
     const [manualGoal, setManualGoal] = useState('');
     const [isFading, setIsFading] = useState(false);
-    const [isExpanding, setIsExpanding] = useState(false);
+    const [contentVisible, setContentVisible] = useState(false);
 
-    // handle goal submission - calls preview endpoint (does NOT save)
-    const handleGoalSubmit = async (goalText) => {
+    // fade in content on mount
+    useEffect(() => {
+        const timer = setTimeout(() => setContentVisible(true), 100);
+        return () => clearTimeout(timer);
+    }, []);
+
+    // handle goal submission - fades out content then navigates to date selection
+    const handleGoalSubmit = (goalText) => {
         console.log('Goal submitted:', goalText);
 
-        // step 1: fade out the text inside the blue card
+        // fade out all content
         setIsFading(true);
 
-        // step 2: after text fades, start expanding the blue card
+        // navigate after fade completes
         setTimeout(() => {
-            setIsExpanding(true);
-        }, 400);
-
-        // In demo mode, skip backend and navigate with mock data
-        if (isDemoMode) {
-            setTimeout(() => {
-                navigate('/review-plan', {
-                    state: {
-                        goal: goalText,
-                        showLoading: true,
-                        previewData: MOCK_PREVIEW,
-                        userId: 'demo-user-001',
-                        originalPrompt: goalText,
-                    },
-                });
-            }, 1400);
-            return;
-        }
-
-        // get the logged-in user
-        let user;
-        try {
-            const { data } = await supabase.auth.getUser();
-            user = data?.user;
-        } catch (err) {
-            console.error('Supabase auth error:', err);
-        }
-        if (!user) {
-            alert('You must be logged in to create a goal.');
-            navigate('/login');
-            return;
-        }
-
-        // call preview endpoint (actually creates goal + gets plan)
-        try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/goals`, {
-                 method: 'POST',
-                 headers: { 'Content-Type': 'application/json' },
-                 body: JSON.stringify({
-                     user_id: user.id,
-                     title: goalText
-                 })
-             });
-
-            const data = await res.json();
-            console.log('Preview response:', data);
-
-            if (!res.ok) {
-                console.error('Preview error:', data);
-                alert('Failed to get AI plan. Check console.');
-                return;
-            }
-
-            // step 3: navigate after expansion completes
-            setTimeout(() => {
-                navigate('/review-plan', {
-                    state: {
-                        goal: goalText,
-                        showLoading: true,
-                        previewData: data, // pass the full response (has tasks & goal_id)
-                        userId: user.id,
-                        originalPrompt: goalText,
-                    },
-                });
-            }, 1000);
-
-        } catch (err) {
-            console.error('Network error:', err);
-            alert('Network error. Is the backend running?');
-        }
+            navigate('/goal-add-date', {
+                state: {
+                    goalText,
+                    originalPrompt: goalText,
+                },
+            });
+        }, 500);
     };
 
     return (
@@ -130,16 +59,15 @@ function CreateGoal() {
                 padding: 'var(--space-lg)',
                 paddingTop: 'var(--space-xl)',
                 paddingBottom: 'var(--space-xl)',
-                borderRadius: isExpanding ? '0' : '0 0 var(--radius-xxl) var(--radius-xxl)',
+                borderRadius: '0 0 var(--radius-xxl) var(--radius-xxl)',
                 boxShadow: 'var(--shadow-float)',
                 overflow: 'hidden',
                 position: 'absolute',
                 top: 0,
                 left: 0,
                 right: 0,
-                height: isExpanding ? '100vh' : '66vh',
+                height: '66vh',
                 zIndex: 200,
-                transition: 'height 1.2s cubic-bezier(0.25, 0.1, 0.25, 1), border-radius 0.3s ease-out',
                 display: 'flex',
                 flexDirection: 'column',
             }}>
@@ -172,9 +100,9 @@ function CreateGoal() {
                     lineHeight: '1.2',
                     marginBottom: 'var(--space-md)',
                     color: 'var(--text-main)',
-                    opacity: isFading ? 0 : 1,
-                    transform: isFading ? 'translateY(-20px)' : 'translateY(0)',
-                    transition: 'all 0.4s ease-out',
+                    opacity: isFading ? 0 : (contentVisible ? 1 : 0),
+                    transform: isFading ? 'translateY(-20px)' : (contentVisible ? 'translateY(0)' : 'translateY(20px)'),
+                    transition: 'all 0.4s ease-out 0.1s',
                 }}>
                     Let's build<br />your goal.
                 </h1>
@@ -182,10 +110,10 @@ function CreateGoal() {
                     fontFamily: 'var(--font-sans)',
                     fontSize: 'clamp(14px, 2vh, 16px)',
                     color: 'var(--text-main)',
-                    opacity: isFading ? 0 : 0.8,
+                    opacity: isFading ? 0 : (contentVisible ? 0.8 : 0),
                     marginBottom: 'var(--space-xl)',
-                    transform: isFading ? 'translateY(-20px)' : 'translateY(0)',
-                    transition: 'all 0.4s ease-out 0.05s',
+                    transform: isFading ? 'translateY(-20px)' : (contentVisible ? 'translateY(0)' : 'translateY(20px)'),
+                    transition: 'all 0.4s ease-out 0.15s',
                 }}>
                     Tell us where you want to go, we'll<br />show you how to get there
                 </p>
@@ -198,9 +126,9 @@ function CreateGoal() {
                     flex: 1,
                     minHeight: 0,
                     alignContent: 'flex-start',
-                    opacity: isFading ? 0 : 1,
-                    transform: isFading ? 'translateY(-20px)' : 'translateY(0)',
-                    transition: 'all 0.4s ease-out 0.1s',
+                    opacity: isFading ? 0 : (contentVisible ? 1 : 0),
+                    transform: isFading ? 'translateY(-20px)' : (contentVisible ? 'translateY(0)' : 'translateY(20px)'),
+                    transition: 'all 0.4s ease-out 0.2s',
                 }}>
                     <button
                         onClick={() => handleGoalSubmit('Create a new bank account.')}
@@ -269,9 +197,9 @@ function CreateGoal() {
                     flexShrink: 0,
                     marginTop: 'auto',
                     paddingBottom: 'var(--space-xl)',
-                    opacity: isFading ? 0 : 1,
-                    transform: isFading ? 'translateY(-20px)' : 'translateY(0)',
-                    transition: 'all 0.4s ease-out 0.15s',
+                    opacity: isFading ? 0 : (contentVisible ? 1 : 0),
+                    transform: isFading ? 'translateY(-20px)' : (contentVisible ? 'translateY(0)' : 'translateY(20px)'),
+                    transition: 'all 0.4s ease-out 0.25s',
                 }}>
                     <InputBar
                         placeholder="Message"
