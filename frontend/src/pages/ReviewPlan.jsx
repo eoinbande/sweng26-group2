@@ -228,6 +228,7 @@ function ReviewPlan() {
                                 <TaskCard
                                     title={task.title}
                                     dueDate={task.dueDate}
+                                    order={task.order}
                                     subtasks={task.subtasks}
                                     variant="review"
                                     onEdit={() => console.log("Edit clicked")}

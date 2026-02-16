@@ -110,7 +110,12 @@ export function TaskCard({
           color: 'var(--text-main)',
           lineHeight: '1.3',
           marginBottom: 'var(--space-xs)',
-        }}>{title}</span>
+        }}>
+          {order != null && (
+            <span style={{ color: 'var(--accent-red-soft)', marginRight: '4px' }}>{order}.</span>
+          )}
+          {title}
+        </span>
         <div style={{
           display: 'flex',
           alignItems: 'center',
@@ -146,6 +151,7 @@ export function TaskCard({
                 borderRadius: '10px',
                 backgroundColor: '#F9F9F7',
                 minHeight: '36px',
+                position: 'relative',
                 opacity: showSubtasks ? 1 : 0,
                 transform: showSubtasks ? 'translateY(0)' : 'translateY(20px)',
                 transition: `all 0.5s ease-out ${index * 0.1}s`,
@@ -175,6 +181,18 @@ export function TaskCard({
                     </span>
                   )}
                 </div>
+                {order != null && sub.order != null && (
+                  <span style={{
+                    position: 'absolute',
+                    bottom: '6px',
+                    right: '10px',
+                    fontSize: '11px',
+                    fontWeight: 500,
+                    color: '#8E8E93',
+                  }}>
+                    {order}.{sub.order}
+                  </span>
+                )}
               </div>
             ))}
           </div>
