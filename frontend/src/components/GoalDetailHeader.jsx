@@ -10,10 +10,20 @@ const getProgressColor = (pct) => {
     return 'var(--red)';
 };
 
+const formatEndDate = (dateStr) => {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    const day = date.getDate();
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const month = monthNames[date.getMonth()];
+    return `${day} ${month}`;
+};
+
 // GoalDetailHeader component: goal title, progress bar, category, end date
 
 const GoalDetailHeader = ({ title, progress = 0, category, endDate, onBack }) => {
     const progressColor = getProgressColor(progress);
+    const formattedEndDate = formatEndDate(endDate);
 
     return (
         <div className="goal-detail-header">
@@ -49,10 +59,10 @@ const GoalDetailHeader = ({ title, progress = 0, category, endDate, onBack }) =>
             </div>
 
             {/* end date */}
-            {endDate && (
+            {formattedEndDate && (
                 <div className="goal-detail-header__end-date">
                     <Calendar size={22} />
-                    <span>Goal ends: {endDate}</span>
+                    <span>Goal ends: {formattedEndDate}</span>
                 </div>
             )}
         </div>

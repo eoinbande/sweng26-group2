@@ -42,16 +42,17 @@ function CreateGoal() {
     };
 
     return (
-        <div style={{
-            height: '100vh',
-            display: 'flex',
-            flexDirection: 'column',
-            maxWidth: '480px',
-            margin: '0 auto',
-            overflow: 'hidden',
-            position: 'relative',
-            backgroundColor: 'var(--bg-color)',
-        }}>
+        // <div style={{
+        //     height: '100vh',
+        //     display: 'flex',
+        //     flexDirection: 'column',
+        //     maxWidth: '480px',
+        //     margin: '0 auto',
+        //     overflow: 'hidden',
+        //     position: 'relative',
+        //     backgroundColor: 'var(--bg-color)',
+        // }}>
+            <div className="container" style={{ position: 'relative', backgroundColor: 'var(--bg-color)' }}>
             {/* blue section */}
             <div style={{
                 background: 'var(--accent-blue)',
