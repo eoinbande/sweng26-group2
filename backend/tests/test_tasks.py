@@ -4,9 +4,11 @@ from unittest.mock import patch
 
 
 """TEST FILE: test file for tasks
-This file will contain several Test functions to test the functionality of the task endpoint """
+This file will contain several Test functions to test the functionality of the task endpoint 
+10 TESTS(full COVERAGE tasks.py) MOCKING DATABASE!"""
 
-client = TestClient(app)
+client = TestClient(app) #client to tests the HTTPS requests
+
 #Requests tested:
 #PATCH /api/tasks/{id}/status — updates task status
 #POST /api/tasks/{id}/expand — expands task into subtasks
@@ -68,7 +70,7 @@ def test_modify_task_notfound():
 
 #===============================================================================
 
-#this test checks if we can successfully expand a task(for now only task_5)
+#this test checks if we can successfully expand a task(for now only task_5/MOCK)
 def test_expand_task():
     fake_task = {"goal_id": "goal-1", "ai_id": "task_5"}
     fake_subtasks = [{"description": "Step 1"}, {"description": "Step 2"}]
@@ -112,11 +114,11 @@ def test_task_already_expanded():
         # Mock returned subtasks
         mock_add_subtasks.return_value = [{"id": "subtask_1"}, {"id": "subtask_2"}]
 
-        # First expand (works)
+        # First expand 
         response = client.post("/api/tasks/task_5/expand", json={"stuck_reason": "whatever"})
         assert response.status_code == 200
 
-        # Second expand (should fail)
+        # Second expand (will fail cause the task already has subtasks)
         response = client.post("/api/tasks/task_5/expand", json={"stuck_reason": "whatever"})
         assert response.status_code == 400
         assert "already has subtasks" in response.json()["detail"]
@@ -161,13 +163,10 @@ def test_get_progress():
         assert data["total"] == 5
         assert data["percentage"] == 60.0
 
-#def test_get_progress_nonexistent_goal():
-#THERE is no 404 (if goal_id does not exist in functin get_progress)
-# in returns 0 for everything    
 
 #this test check if there is no expanded list for a task(only for MOCK)
 def test_expand_task_no_mock():
-    fake_task = {"id": "task-10", "goal_id": "uuid-goal", "ai_id": "unknown_task"}
+    fake_task = {"id": "task-10", "goal_id": "uuid-goal", "ai_id": "unknown_task"} # we mock(we dont use the DB)
 
     with patch("app.routers.tasks.get_task") as mock_get_task, \
          patch("app.routers.tasks.get_tasks_for_goal") as mock_get_tasks_for_goal:
@@ -183,9 +182,9 @@ def test_expand_task_no_mock():
     assert response.status_code == 404
     assert "No expansion available" in response.json()["detail"]
 
-#This test checks if we can retrieve the complete list of tasks
+#This test checks if we can fail to retrieve the tasks of a goal
 def test_get_no_tasks():
-    with patch("app.routers.tasks.get_tasks_for_goal") as mock_get_tasks:
+    with patch("app.routers.tasks.get_tasks_for_goal") as mock_get_tasks: #we mock(we dont use the DB)
         mock_get_tasks.return_value = []
 
         response = client.get("/api/tasks/goal-id")
@@ -195,7 +194,7 @@ def test_get_no_tasks():
         assert data["tasks"] == []
         assert data["message"] == "No tasks associated with this goal"
 
-
+#This test checks if we can successfully retrieve the tasks of a goal
 def test_get_tasks_with_results():
     # Mock the database function to return some tasks
     with patch("app.routers.tasks.get_tasks_for_goal") as mock_get:
