@@ -15,6 +15,7 @@ client = TestClient
 
 
 #==========================================================================================
+
 #TEST: Update task status
 
 #==========================================================================================
@@ -52,6 +53,7 @@ def test_modify_task_notfound():
     assert response.json()["detail"] == "Task not found"
 
 #================================================================================
+
 #TEST: Expand a task into subtasks
 
 #===============================================================================
@@ -88,4 +90,18 @@ def test_expand_task_notfound():
     )
 
     assert response.status_code == 404
+
+#===============================================================
+
+#TEST: Return completion stats
+def test_get_progress():
+    response = client.get("/api/tasks/goal-id/progress")
+
+    assert response.status_code == 200 #check if we get the correct code
+    data = response.json()
+
+    assert "goal_id" in data
+    assert "completed" in data
+    assert "total" in data
+    assert "percentage" in data
     
