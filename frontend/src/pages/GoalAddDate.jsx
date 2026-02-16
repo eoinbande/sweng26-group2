@@ -245,7 +245,6 @@ function GoalAddDate() {
                         marginTop: 'var(--space-xl)',
                         opacity: (isFadingOut || isFading) ? 0 : (contentVisible ? 1 : 0),
                         transform: (isFadingOut || isFading) ? 'translateY(-20px)' : (contentVisible ? 'translateY(0)' : 'translateY(20px)'),
-                        transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.2s, background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), max-width 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
                         maxWidth: showPicker ? '95%' : '90%',
                         width: '100%',
                         alignSelf: 'center',

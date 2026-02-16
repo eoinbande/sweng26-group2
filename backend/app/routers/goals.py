@@ -176,8 +176,10 @@ def accept_plan(goal_id: str, request: AcceptPlanRequest):
     current_data = goal.get("goal_data", {})
     if isinstance(current_data, str):
         current_data = json.loads(current_data)
+
     current_tasks = current_data.get("tasks", [])
 
+    # save tasks and capture returned tasks (with UUIDs)
     if current_tasks and any(t.get("id") for t in current_tasks):
         # Goal already has tasks with UUIDs → merge to preserve completed work
         saved_tasks = merge_and_save_tasks(goal_id, request.tasks)
@@ -185,6 +187,7 @@ def accept_plan(goal_id: str, request: AcceptPlanRequest):
         # First save → generate UUIDs and save everything
         saved_tasks = save_tasks_to_db(goal_id, request.tasks)
 
+    current_data["tasks"] = saved_tasks
 
     # Determine final due_date
     if request.due_date is not None:
@@ -205,7 +208,6 @@ def accept_plan(goal_id: str, request: AcceptPlanRequest):
         "due_date": final_due_date,
         "saved_to_db": True
     }
-
 
 
 # ---- Get all goals for a user ----
