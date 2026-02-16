@@ -56,7 +56,21 @@ function ReviewPlan() {
 
     // Accept: save the goal to Supabase via POST /goals/{id}/accept
     const handleAccept = async () => {
-        // In demo mode, just navigate to goals
+        // Get the due date from location state (passed from GoalAddDate), might be null
+        const dueDate = location.state?.dueDate;
+        
+        // - If dueDate is empty string, send null (skip deadline)
+        // - If dueDate is 'AI_DECIDE' => don't send anything (use AI's date from mock)
+        // - Otherwise => send the actual date
+        let dateToSend;
+        if (dueDate === 'AI_DECIDE') {
+            dateToSend = undefined; // Don't include in request (will use the existant one that AI gave)
+        } else if (!dueDate || dueDate === '') {
+            dateToSend = null; // Explicitly null
+        } else {
+            dateToSend = dueDate; // User-selected date
+        }
+
         if (isDemoMode) {
             navigate('/goals');
             return;
@@ -65,12 +79,20 @@ function ReviewPlan() {
         setSaving(true);
         try {
             // "Accept" the plan for the goal ID we already have
+
+            const requestBody = {
+                tasks: previewData.tasks,
+            };
+            
+            // Only add due_date if it's not undefined
+            if (dateToSend !== undefined) {
+                requestBody.due_date = dateToSend;
+            }
+            
             const res = await fetch(`${import.meta.env.VITE_API_URL}/goals/${goalId}/accept`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    tasks: previewData.tasks // Send back the tasks (potentially modified if we added editing)
-                })
+                body: JSON.stringify(requestBody)
             });
 
             const data = await res.json();

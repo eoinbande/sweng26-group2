@@ -64,6 +64,19 @@ function GoalAddDate() {
         dateValueRef.current = formatted;
     };
 
+    // "Let AI decide" - skip date input and proceed with goal submission
+    const handleLetAIDecide = async () => {
+        // Set a special flag or empty date so ReviewPlan knows to use AI's date
+        dateValueRef.current = 'AI_DECIDE';
+        await handleGoalSubmit();
+    };
+
+    // "Skip deadline" - explicitly set date to null and proceed with goal submission
+    const handleSkipDeadline = async () => {
+        dateValueRef.current = null; // Explicitly set to null
+        await handleGoalSubmit();
+    };
+
     // goal submission - fade out, expand, then navigate to review
     const handleGoalSubmit = async () => {
         if (navigatingRef.current) return;
@@ -107,14 +120,12 @@ function GoalAddDate() {
 
         // call backend for ai-generated plan
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/goals/preview`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/goals`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     user_id: user.id,
                     title: goalText,
-                    description: goalText,
-                    generate_plan: true,
                 }),
             });
             const data = await res.json();
@@ -134,7 +145,7 @@ function GoalAddDate() {
                             previewData: data,
                             userId: user.id,
                             originalPrompt: goalText,
-                            dueDate: dateValueRef.current,
+                            dueDate: dateValueRef.current, // Will be empty string if not set
                         },
                     });
                 } else {
@@ -262,7 +273,13 @@ function GoalAddDate() {
                             placeholder="MM/DD/YYYY"
                             value={dateValue}
                             onChange={() => {}}
-                            onSubmit={() => { if (dateValueRef.current) handleGoalSubmit(); }}
+                            onSubmit={() => { 
+                                if (dateValueRef.current) {
+                                    handleGoalSubmit(); 
+                                } else {
+                                    alert('Please select a date first, or use "Skip deadline" or "Let AI decide"');
+                                }
+                            }}
                             variant="auth"
                             borderRadius="var(--radius-xl)"
                             backgroundColor="transparent"
@@ -312,7 +329,7 @@ function GoalAddDate() {
                     transition: 'all 0.4s ease-out 0.3s',
                 }}>
                     <button
-                        onClick={handleGoalSubmit}
+                        onClick={handleSkipDeadline}
                         style={{
                             backgroundColor: 'var(--bg-color)',
                             color: 'var(--text-main)',
@@ -339,7 +356,7 @@ function GoalAddDate() {
                         Skip deadline
                     </button>
                     <button
-                        onClick={handleGoalSubmit}
+                        onClick={handleLetAIDecide}
                         style={{
                             backgroundColor: 'var(--text-main)',
                             color: 'white',
