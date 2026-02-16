@@ -32,7 +32,7 @@ def test_modify_task_status():
     assert data["task_id"] == "task-id"
     assert data["new_status"] == "completed"
 
-#This function test if we try to modify the task status by a invalid status(INVALID case)
+#This function test if we try to modify the task status by a invalid status(INVALID case 400)
 def test_modify_task_invalid():
     response = client.patch(
         "/api/tasks/task-id/status",
@@ -41,3 +41,13 @@ def test_modify_task_invalid():
     
     assert response.status_code == 400 #check if it returns the correct code
     assert "Invalid status" in response.json()["detail"]
+
+def test_modify_task_notfound():
+    response = client.patch(
+        "/api/tasks/no-task-id/status",
+        json = {"status": "completed"}
+    )
+
+    assert response.status_code == 404 #check if we get the correct code
+    assert response.json()["detail"] == "Task not found"
+
