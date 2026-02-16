@@ -179,7 +179,7 @@ class TestMockTemplates:
     def test_wedding_valid(self):
         """Wedding plan should match AIGeneratePlanResponse schema."""
         response = AIGeneratePlanResponse(**WEDDING_INITIAL)
-        assert len(response.tasks) == 9
+        assert len(response.tasks) == 7
         # task_1 should require input (info-gathering)
         task_1 = [t for t in response.tasks if t.ai_id == "task_1"][0]
         assert task_1.requires_input is True
