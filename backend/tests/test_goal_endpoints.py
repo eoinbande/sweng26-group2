@@ -5,6 +5,13 @@ from app.main import app
 from app.schemas import TaskStatus
 
 
+# Mock settings BEFORE importing app.main
+with patch('app.config.Settings') as MockSettings:
+    mock_settings = MockSettings.return_value
+    mock_settings.SUPABASE_URL = "https://mock-url.com"
+    mock_settings.SUPABASE_KEY = "mock-key"
+    mock_settings.TEST_USER_ID = "mock-user-id"
+    
 # =============================================================================
 # Test Client Setup
 # =============================================================================
