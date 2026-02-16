@@ -40,6 +40,7 @@ MOCK_GOALS = {
     "plan a wedding": WEDDING_INITIAL,
     "plan my friend's wedding": WEDDING_INITIAL,
     "help me plan my friend's wedding": WEDDING_INITIAL,
+    "help me plan my sister's wedding": WEDDING_INITIAL,
     "help me plan a wedding": WEDDING_INITIAL,
     "i want to plan a wedding": WEDDING_INITIAL,
 
