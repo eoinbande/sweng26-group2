@@ -16,10 +16,6 @@ function ReviewPlan() {
     const [contentVisible, setContentVisible] = useState(false);
     const [showLoading, setShowLoading] = useState(location.state?.showLoading || false);
 
-    // expansion animation for loading overlay states
-    const [isExpanding, setIsExpanding] = useState(false);
-    const [isFadingOut, setIsFadingOut] = useState(false);
-
     const [saving, setSaving] = useState(false);
     const [submittingFeedback, setSubmittingFeedback] = useState(false);
     const [feedbackText, setFeedbackText] = useState('');
