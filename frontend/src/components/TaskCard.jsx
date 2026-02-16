@@ -206,7 +206,7 @@ export function TaskCard({
           onClick={() => setShowSubtasks(!showSubtasks)}
           style={{
             position: 'absolute',
-            bottom: '8px',
+            top: '8px',
             right: '8px',
             height: '32px',
             width: '32px',
