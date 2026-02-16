@@ -222,7 +222,7 @@ def test_delete_goal():
     
     assert response.status_code == 200
     data = response.json()
-    assert data["message"] == "Goal deleted sucessfully"
+    assert data["message"] == "Goal deleted successfully"
     assert data["goal_id"] == goal_id
 
 def test_delete_goal_fail():
@@ -234,5 +234,6 @@ def test_delete_goal_fail():
     
     assert response.status_code == 500 #check if we get the correct status code
     data = response.json()
-    assert "error deleting goal" in data["detail"]
+    assert "Error deleting goal" in data["detail"]
     assert "Database error" in data["detail"]
+
