@@ -166,4 +166,13 @@ def test_get_progress():
 # in returns 0 for everything    
 
 
+def test_expand_task_no_mock():
+    response = client.post(
+        "/api/tasks/non_existing_task/expand",
+        json = {"stuck_reason": "I am confused"}
+    )
+
+    assert response.status_code == 404
+    assert "No expansion available" in response.json()["detail"]
+
 
