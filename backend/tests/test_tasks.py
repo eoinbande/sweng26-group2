@@ -51,3 +51,21 @@ def test_modify_task_notfound():
     assert response.status_code == 404 #check if we get the correct code
     assert response.json()["detail"] == "Task not found"
 
+#================================================================================
+#TEST: Expand a task into subtasks
+
+#===============================================================================
+
+#this test checks if we can successfully expand a task(for now only task_5)
+def test_expand_task():
+    response = client.post( #for now we can only expand task_5
+        "/api/tasks/valid-task-ai-id-task_5/expand",
+        json = {"stuck_reason": "I don't know how to reassemble the wheel"}
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+
+    assert data["message"] == "Task expanded into subtasks"
+    assert "subtasks" in data
+    assert isinstance(data["subtasks"], list)
