@@ -175,7 +175,7 @@ def test_expand_task_no_mock():
     assert response.status_code == 404
     assert "No expansion available" in response.json()["detail"]
 
-
+#This test checks if we can retrieve the complete list of tasks
 def test_get_no_tasks():
     with patch("app.routers.tasks.get_tasks_for_goal") as mock_get_tasks:
         mock_get_tasks.return_value = []
@@ -187,3 +187,17 @@ def test_get_no_tasks():
         assert data["tasks"] == []
         assert data["message"] == "No tasks associated with this goal"
 
+
+def test_get_tasks_with_results():
+    # Mock the database function to return some tasks
+    with patch("app.routers.tasks.get_tasks_for_goal") as mock_get:
+        mock_get.return_value = [
+            {"id": "task-1", "title": "Test task 1"},
+            {"id": "task-2", "title": "Test task 2"}
+        ]
+        response = client.get("/api/tasks/goal-123")
+        assert response.status_code == 200
+        data = response.json()
+        assert "tasks" in data
+        assert len(data["tasks"]) == 2
+        assert data["count"] == 2
