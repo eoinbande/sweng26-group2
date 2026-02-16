@@ -167,9 +167,17 @@ def test_get_progress():
 
 #this test check if there is no expanded list for a task(only for MOCK)
 def test_expand_task_no_mock():
-    response = client.post(
-        "/api/tasks/non_existing_task/expand",
-        json = {"stuck_reason": "I am confused"}
+    fake_task = {"id": "task-10", "goal_id": "uuid-goal", "ai_id": "unknown_task"}
+
+    with patch("app.routers.tasks.get_task") as mock_get_task, \
+         patch("app.routers.tasks.get_tasks_for_goal") as mock_get_tasks_for_goal:
+
+
+        mock_get_task.return_value = fake_task
+
+        response = client.post(
+            f"/api/tasks/{fake_task['id']}/expand",
+            json = {"stuck_reason": "I am confused"}
     )
 
     assert response.status_code == 404
