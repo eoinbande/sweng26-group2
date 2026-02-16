@@ -226,6 +226,7 @@ function ReviewPlan() {
                                 <TaskCard
                                     title={task.title}
                                     dueDate={task.dueDate}
+                                    subtasks={task.subtasks}
                                     variant="review"
                                     onEdit={() => console.log("Edit clicked")}
                                     onConfirm={() => console.log("Confirmed:", task.title)}
