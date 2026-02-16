@@ -79,3 +79,12 @@ def test_task_already_expanded():
     response = client.post("/api/tasks/valid_task-ai-id-task_5/expand")
 
     assert response.status_code == 400
+
+#this test will check if the task is not found(404 case)
+def test_expand_task_notfound():
+    response = client.post(
+        "/api/tasks/no-task-id/expand",
+        json = {}
+    )
+
+    assert response.status_code == 404
