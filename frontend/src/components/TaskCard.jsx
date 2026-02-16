@@ -124,16 +124,19 @@ export function TaskCard({
         </div>
 
         {/* subtasks dropdown */}
-        {subtasks.length > 0 && showSubtasks && (
+        {subtasks.length > 0 && (
           <div style={{
-            marginTop: '8px',
+            marginTop: showSubtasks ? '8px' : '0px',
             display: 'flex',
             flexDirection: 'column',
-            gap: '6px',
-            borderTop: '1px solid #F0F0EC',
-            paddingTop: '8px',
+            gap: showSubtasks ? '6px' : '0px',
+            borderTop: showSubtasks ? '1px solid #F0F0EC' : '1px solid transparent',
+            paddingTop: showSubtasks ? '8px' : '0px',
+            maxHeight: showSubtasks ? `${subtasks.length * 60}px` : '0px',
+            overflow: 'hidden',
+            transition: 'max-height 0.4s ease-out, margin-top 0.3s ease-out, padding-top 0.3s ease-out, gap 0.3s ease-out, border-color 0.3s ease-out',
           }}>
-            {subtasks.map((sub) => (
+            {subtasks.map((sub, index) => (
               <div key={sub.id} style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -142,6 +145,9 @@ export function TaskCard({
                 borderRadius: '10px',
                 backgroundColor: '#F9F9F7',
                 minHeight: '36px',
+                opacity: showSubtasks ? 1 : 0,
+                transform: showSubtasks ? 'translateY(0)' : 'translateY(20px)',
+                transition: `all 0.5s ease-out ${index * 0.1}s`,
               }}>
                 <div style={{
                   flex: 1,
