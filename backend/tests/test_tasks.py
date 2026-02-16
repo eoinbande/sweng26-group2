@@ -208,3 +208,31 @@ def test_get_tasks_with_results():
         assert "tasks" in data
         assert len(data["tasks"]) == 2
         assert data["count"] == 2
+
+
+#######THIS test FUNCTION TU TEST DELETE A GOAL NEEDS TO BE MOVED TO THE test_goals#########
+
+#this test will check if we can successfully delete a goal
+def test_delete_goal():
+    with patch("app.routers.goals.delete_goal") as mock_delete_goal:
+        mock_delete_goal.return_value = None # SIMULATE SUCCESSFUL DELETION
+
+        goal_id = "goal-123"
+        response = client.delete(f"/api/goals/{goal_id}")
+    
+    assert response.status_code == 200
+    data = response.json()
+    assert data["message"] == "Goal deleted sucessfully"
+    assert data["goal_id"] == goal_id
+
+def test_delete_goal_fail():
+    with patch("app.routers.goals.delete_goal") as mock_delete_goal:
+        mock_delete_goal.side_effect = Exception("Database error")
+
+        goal_id = "goal-123"
+        response = client.delete(f"/api/goals/{goal_id}")
+    
+    assert response.status_code == 500 #check if we get the correct status code
+    data = response.json()
+    assert "error deleting goal" in data["detail"]
+    assert "Database error" in data["detail"]
