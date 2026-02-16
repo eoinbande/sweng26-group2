@@ -35,13 +35,18 @@ function ReviewPlan() {
     const originalPrompt = location.state?.originalPrompt || goalTitle;
     const goalId = previewData?.goal_id;
 
-    // Parse tasks from the preview response (new linear structure)
+    // parse tasks from the preview response (includes subtasks for later use)
     const tasks = React.useMemo(() => {
         if (!previewData?.tasks) return [];
         return previewData.tasks.map(t => ({
             id: t.ai_id,
             title: t.description,
             dueDate: t.due_date ? new Date(t.due_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : '',
+            subtasks: (t.subtasks || []).map(s => ({
+                id: s.ai_id,
+                title: s.description,
+                dueDate: s.due_date ? new Date(s.due_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : '',
+            })),
         }));
     }, [previewData]);
 
