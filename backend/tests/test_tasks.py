@@ -2,9 +2,9 @@ from fastapi.testclient import TestClient
 from app.main import app
 
 """TEST FILE: test file for tasks
-This file will contain several Test functions to test the functionality of the task endpoint
-"""
+This file will contain several Test functions to test the functionality of the task endpoint """
 
+client = TestClient
 #Requests tested:
 #PATCH /api/tasks/{id}/status — updates task status
 #POST /api/tasks/{id}/expand — expands task into subtasks
@@ -31,5 +31,13 @@ def test_modify_task_status():
     assert data["message"] == "Task status updated successfully!"
     assert data["task_id"] == "task-id"
     assert data["new_status"] == "completed"
+
+#This function test if we try to modify the task status by a invalid status(INVALID case)
+def test_modify_task_invalid():
+    response = client.patch(
+        "/api/tasks/task-id/status",
+        json ={"status": "INVALID"}
+    )
     
-    
+    assert response.status_code == 400 #check if it returns the correct code
+    assert "Invalid status" in response.json()["detail"]
