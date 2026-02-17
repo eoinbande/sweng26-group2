@@ -59,7 +59,7 @@ const UpcomingTasks = () => {
                     left: '0',
                     right: '0',
                     bottom: '0',
-                    backgroundColor: '#a3bdd4',
+                    backgroundColor: 'var(--accent-blue)',
                     borderRadius: 'var(--radius-lg)',
                     transform: 'rotate(-5deg)',
                     zIndex: 0,
