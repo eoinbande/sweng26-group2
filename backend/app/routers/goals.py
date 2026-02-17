@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 # Database functions (Tables.py)
 from ..Tables import (
     create_goal, get_all_goals, get_goal, delete_goal,
@@ -30,7 +30,7 @@ class CreateGoalRequest(BaseModel):
     Example: {"user_id": "uuid-123", "title": "Fix my bike tyre"}
     """
     user_id: str
-    title: str
+    title: str = Field(min_length=1) # won't allow goals to be created with empty titles
 
 
 class AcceptPlanRequest(BaseModel):
