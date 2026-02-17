@@ -289,6 +289,7 @@ const GoalDetail = () => {
                 },
                 userId: userId,
                 originalPrompt: goalTitle,
+                from: 'detail',
                 dueDate: endDate,
             },
         });
