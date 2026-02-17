@@ -32,18 +32,19 @@
     --font-weight-bold: 700;
     /* Spacing */
     --space-xs: 4px;
-    --space-sm: 8px;
-    --space-md: 16px;
-    --space-mdlg: 24px;
-    --space-lg: 40px;
-    /* Reduced slightly to help fit screen */
-    --space-xl: 32px;
+
+    /* Reduce these to help everything fit */
+    --space-sm: 6px;   /* was 8px */
+    --space-md: 12px;  /* was 16px */
+    --space-mdlg: 16px;
+    --space-lg: 24px;  /* was 40px - this is likely causing the "cut off" */
+    --space-xl: 28px;  /* was 32px */
     /* Radius */
     --radius-sm: 8px;
     --radius-md: 16px;
     --radius-lg: 24px;
-    --radius-xl: 48px;
-    --radius-xxl: 96px;
+    --radius-xl: 32px;
+    --radius-xxl: 48px;
     --radius-pill: 9999px;
     /* Shadows - Increased intensity */
     --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.08);
@@ -89,18 +90,27 @@ h6 {
 
 .container {
     max-width: 480px;
-    gap:var(--space-md);
     margin: 0 auto;
-    height: 100%;
+    /* Ensure the container takes full viewport height */
+    height: 100vh; 
+    
     display: flex;
     flex-direction: column;
+    gap: var(--space-md);
+    
     padding: var(--space-md) 24px;
-    padding-bottom: 80px;
+    
+    /* fix: Increase padding-bottom so content clears the fixed BottomNav */
+    padding-bottom: 80px; 
 
     background-color: var(--bg-color);
     position: relative;
-    overflow: hidden;
-    /* Everything must fit without page scroll */
+
+    /* fix: Change from hidden to auto to allow scrolling */
+    overflow-y: auto;
+    overflow-x: hidden;
+    
+    -webkit-overflow-scrolling: touch;
 }
 
 
