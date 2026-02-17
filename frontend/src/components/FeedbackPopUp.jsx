@@ -1,4 +1,5 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import '../index.css';
 import { InputBar } from './InputBar';
 import { X, Mic } from 'lucide-react';
@@ -19,6 +20,7 @@ const variantConfig = {
 
 export default function FeedbackPopUp({ variant = 'help', onClose, onSubmit }) {
     const config = variantConfig[variant] || variantConfig.help;
+    const [inputValue, setInputValue] = useState(''); // Local state for the input
 
     return (
         <div style={{
@@ -88,7 +90,9 @@ export default function FeedbackPopUp({ variant = 'help', onClose, onSubmit }) {
                 <InputBar
                     variant="auth"
                     placeholder="Feedback to AI..."
-                    onSubmit={onSubmit}
+                    value={inputValue} // Bind the value
+                    onChange={(e) => setInputValue(e.target.value)} // Update on change
+                    onSubmit={() => onSubmit(inputValue)} // Pass the local state
                     icon={<Mic size={18} color="white" />}
                     buttonStyle="dark"
                     padding="18px 20px"
