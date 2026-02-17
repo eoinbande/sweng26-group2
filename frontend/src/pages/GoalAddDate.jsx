@@ -145,6 +145,7 @@ function GoalAddDate() {
                             userId: user.id,
                             originalPrompt: goalText,
                             dueDate: dateValueRef.current, // Will be empty string if not set
+                            from: 'create',
                         },
                     });
             }, 1400);
