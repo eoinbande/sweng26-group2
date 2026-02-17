@@ -5,11 +5,12 @@ import CreateGoalCard from '../components/CreateGoalCard';
 import UpcomingTasks from '../components/UpcomingTasks';
 import GoalsGrid from '../components/GoalsGrid';
 import BottomNav from '../components/BottomNav';
+import '../styles/Home.css';
 import '../index.css';
 
 function Home() {
     return (
-        <div className="container">
+        <div className="home-page">
             <Header />
             <CalendarStrip />
             <CreateGoalCard />
