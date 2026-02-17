@@ -127,19 +127,22 @@ function ReviewPlan() {
 
     // Discard: delete the temporary goal and go back to CreateGoal
     const handleDiscard = async () => {
-        if (!isDemoMode && goalId) {
-            try {
-                // Delete the goal that was created for preview
-                await fetch(`${import.meta.env.VITE_API_URL}/goals/${goalId}`, {
-                    method: 'DELETE',
-                });
-                console.log('Discarded goal deleted:', goalId);
-            } catch (err) {
-                console.error('Error deleting discarded goal:', err);
-            }
+
+        const from = location.state?.originalFrom || location.state?.from;  // Get where we came from
+    
+        if (from === 'detail') {
+            // Came from GoalDetail or Review (aka iterative feedback) → go back to GoalDetail;
+            navigate(`/goal/${goalId}`, {
+                state: { goalId }
+            });
+        } else {
+            // Came from CreateGoal or default → go to CreateGoal
+            navigate('/create-goal', { 
+                state: { originalPrompt } 
+            });
         }
-        navigate('/create-goal', { state: { originalPrompt } });
     };
+    
 
     // Feedback submisison
     const handleSubmitFeedback = async (text) => {
@@ -188,6 +191,7 @@ function ReviewPlan() {
                 userId,
                 originalPrompt,
                 dueDate: location.state?.dueDate,
+                originalFrom: location.state?.originalFrom || location.state?.from, // Preserve original source (detail vs create) for discard logic
             },
         });
 
