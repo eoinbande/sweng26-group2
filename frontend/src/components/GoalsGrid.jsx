@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../index.css';
 
@@ -15,28 +14,13 @@ const GoalsGrid = () => {
     ];
 
     return (
-        <div style={{ marginTop: 'auto' }}>
-            <h4 style={{
-                fontFamily: 'var(--font-serif)',
-                fontSize: '20px',
-                fontWeight: '600',
-                marginBottom: 'var(--space-sm)',
-            }}>January's goals</h4>
+        <div className="home-goals-grid">
+            <h4>January's goals</h4>
 
-            <div style={{
-                display: 'flex',
-                gap: 'var(--space-md)',
-                overflowX: 'auto',
-                padding: 'var(--space-md) 24px',
-                margin: '0 -24px',
-            }}>
+            <div className="goals-scroll">
                 {goals.map((goal, index) => (
-                    <div key={index} className="goal-grid-card" onClick={() => navigate('/goal-detail')} style={{
+                    <div key={index} className="goal-grid-card goal-card" onClick={() => navigate('/goal-detail')} style={{
                         backgroundColor: goal.color,
-                        borderRadius: '36px',
-                        minWidth: '160px',
-                        maxWidth: '160px',
-                        padding: '18px',
                         display: 'flex',
                         flexDirection: 'column',
                         justifyContent: 'space-between',
@@ -44,7 +28,6 @@ const GoalsGrid = () => {
                         flexShrink: 0
                     }}>
                         <h5 style={{
-                            fontSize: '16px',
                             fontFamily: 'var(--font-sans)',
                             fontWeight: 'var(--font-weight-semibold)',
                             lineHeight: '1.3',
@@ -56,18 +39,15 @@ const GoalsGrid = () => {
                             justifyContent: 'space-between',
                             gap: 'var(--space-sm)',
                         }}>
-                            <span style={{
-                                fontSize: '13px',
+                            <span className="goal-date" style={{
                                 fontFamily: 'var(--font-sans)',
                                 fontWeight: 'var(--font-weight-medium)',
                             }}>{goal.date}</span>
-                            <span style={{
-                                fontSize: '11px',
+                            <span className="goal-category" style={{
                                 fontFamily: 'var(--font-sans)',
                                 fontWeight: 'var(--font-weight-medium)',
                                 color: goal.categoryColor,
                                 backgroundColor: 'rgba(255,255,255,0.7)',
-                                padding: '4px 10px',
                                 borderRadius: 'var(--radius-pill)',
                             }}>{goal.category}</span>
                         </div>
