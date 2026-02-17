@@ -1,4 +1,6 @@
 /* responsive styles for the home page */
+
+
 /* uses dvh (dynamic viewport height) so content fits any phone screen */
 
 .home-page {
@@ -15,7 +17,9 @@
     overflow: hidden;
 }
 
+
 /* header */
+
 .home-page .home-header {
     padding-top: clamp(8px, 2dvh, 24px);
     padding-bottom: clamp(2px, 0.5dvh, 6px);
@@ -40,7 +44,9 @@
     color: white;
 }
 
+
 /* calendar strip */
+
 .home-page .home-calendar {
     margin-bottom: clamp(4px, 1dvh, 16px);
     flex-shrink: 0;
@@ -61,26 +67,31 @@
     font-size: clamp(11px, 1.5dvh, 14px);
 }
 
+
 /* create goal card */
+
+
+/* top/bottom padding = 2x the side padding to keep proportional height */
+
 .home-page .home-create-goal {
-    padding: clamp(16px, 3dvh, 40px);
+    padding: clamp(32px, 6dvh, 80px) clamp(16px, 3dvh, 40px);
     padding-right: clamp(24px, 5dvh, 60px);
     flex-shrink: 0;
 }
 
 .home-page .home-create-goal h3 {
-    font-size: clamp(16px, 2dvh, 20px);
-    margin-bottom: clamp(4px, 0.8dvh, 12px);
+    font-size: clamp(16px, 2.5dvh, 24px);
+    margin-bottom: clamp(4px, 1dvh, 14px);
     font-family: var(--font-sans);
 }
 
 .home-page .home-create-goal p {
-    font-size: clamp(13px, 1.6dvh, 16px);
+    font-size: clamp(13px, 2dvh, 18px);
 }
 
 .home-page .home-create-goal .create-goal-btn {
-    width: clamp(52px, 7dvh, 80px);
-    height: clamp(52px, 7dvh, 80px);
+    width: clamp(52px, 8dvh, 90px);
+    height: clamp(52px, 8dvh, 90px);
     border-radius: 50%;
     background-color: var(--accent-blue);
     border: none;
@@ -93,20 +104,22 @@
     cursor: pointer;
 }
 
+
 /* upcoming tasks */
+
 .home-page .home-upcoming-tasks {
+    margin-top: clamp(8px, 2.2dvh, 24px);
     display: flex;
     flex-direction: column;
-    flex: 1;
+    flex: 0.9;
     min-height: 0;
-    max-height: clamp(120px, 22dvh, 240px);
 }
 
-.home-page .home-upcoming-tasks > h4 {
+.home-page .home-upcoming-tasks>h4 {
     font-family: var(--font-serif);
     font-size: clamp(16px, 2dvh, 20px);
     font-weight: 600;
-    margin-bottom: clamp(4px, 0.8dvh, 12px);
+    margin-bottom: clamp(8px, 2.2dvh, 24px);
     flex-shrink: 0;
 }
 
@@ -128,13 +141,15 @@
     white-space: nowrap;
 }
 
+
 /* goals grid */
+
 .home-page .home-goals-grid {
     flex-shrink: 0;
     margin-top: auto;
 }
 
-.home-page .home-goals-grid > h4 {
+.home-page .home-goals-grid>h4 {
     font-family: var(--font-serif);
     font-size: clamp(16px, 2dvh, 20px);
     font-weight: 600;
@@ -169,7 +184,9 @@
     padding: clamp(2px, 0.4dvh, 4px) clamp(6px, 0.8dvh, 10px);
 }
 
+
 /* bottom nav responsive */
+
 .home-page-bottom-nav {
     padding: clamp(6px, 1dvh, 10px) 16px clamp(8px, 1.2dvh, 14px);
 }
@@ -184,7 +201,9 @@
     font-size: clamp(8px, 1dvh, 10px);
 }
 
+
 /* hide scrollbar on goals scroll */
+
 .home-page .home-goals-grid .goals-scroll::-webkit-scrollbar {
     display: none;
 }

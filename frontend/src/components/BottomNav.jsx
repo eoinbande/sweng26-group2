@@ -1,8 +1,7 @@
-import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import '../index.css';
 
-/* Custom filled house icon with fully rounded corners */
+/* custom filled house icon with fully rounded corners */
 const HomeIcon = ({ size = 26 }) => (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="#1A1A1A" xmlns="http://www.w3.org/2000/svg" style={{ display: 'flex' }}>
         <path d="M12 3Q13.5 3 15.75 5L20.5 9Q21.5 10 21.5 11.5V18Q21.5 22 17.75 22H15.25Q13.75 22 13.75 20V18Q13.75 15 12 15Q10.25 15 10.25 18V20Q10.25 22 8.75 22H6.25Q2.5 22 2.5 18V11.5Q2.5 10 3.5 9L8.25 5Q10.5 3 12 3Z" />
@@ -37,7 +36,7 @@ const BottomNav = () => {
     const currentPath = location.pathname;
 
     return (
-        <div style={{
+        <div className="home-page-bottom-nav" style={{
             position: 'fixed',
             bottom: 0,
             left: '50%',
@@ -46,7 +45,6 @@ const BottomNav = () => {
             maxWidth: '480px',
             backgroundColor: 'rgba(248, 248, 244, 0.97)',
             backdropFilter: 'blur(12px)',
-            padding: '10px 16px 14px',
             display: 'flex',
             alignItems: 'flex-end',
             justifyContent: 'space-around',
@@ -56,25 +54,21 @@ const BottomNav = () => {
             <NavIcon icon={<Target />} label="Goals" active={currentPath === '/goals'} onClick={() => navigate('/goals')} />
             <NavIcon icon={<Schedule />} label="Schedule" active={currentPath === '/schedule'} onClick={() => navigate('/schedule')} />
 
-            {/* Floating Home Button */}
+            {/* floating home button */}
             <div style={{
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
                 gap: '3px',
                 cursor: 'pointer',
-                marginBottom: '0px',
             }} onClick={() => navigate('/')}>
-                <div style={{
+                <div className="bottom-nav-home-btn" style={{
                     backgroundColor: 'var(--primary)',
-                    width: '56px',
-                    height: '56px',
                     borderRadius: '50%',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     boxShadow: '0 4px 14px rgba(255, 185, 46, 0.4)',
-                    marginTop: '-28px',
                 }}>
                     <HomeIcon  />
                 </div>
@@ -104,8 +98,7 @@ const NavIcon = ({ icon, label, onClick, active }) => (
         }}>
             {icon}
         </div>
-        <span style={{
-            fontSize: '10px',
+        <span className="nav-icon-label" style={{
             fontWeight: active ? '600' : '500',
             fontFamily: 'var(--font-sans)',
         }}>{label}</span>
