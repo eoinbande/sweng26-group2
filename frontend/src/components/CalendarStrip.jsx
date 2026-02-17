@@ -1,4 +1,3 @@
-import React from 'react';
 import '../index.css';
 
 const CalendarStrip = () => {
@@ -13,7 +12,7 @@ const CalendarStrip = () => {
     ];
 
     return (
-        <div style={{ marginBottom: 'var(--space-mdlg)' }}>
+        <div className="home-calendar">
             <div className="flex-between" style={{ padding: '0 var(--space-xs)' }}>
                 {days.map((item, index) => (
                     <div key={index} style={{
@@ -22,24 +21,15 @@ const CalendarStrip = () => {
                         alignItems: 'center',
                         gap: 'var(--space-sm)'
                     }}>
-                        <span style={{
-                            fontSize: '13px',
+                        <span className="calendar-day-label" style={{
                             color: item.active ? 'var(--text-main)' : 'var(--text-secondary)',
                             fontWeight: item.active ? '600' : '400'
                         }}>
                             {item.day}
                         </span>
-                        <div style={{
-                            width: '50px',
-                            height: '50px',
-                            borderRadius: '50%',
+                        <div className="calendar-day-circle" style={{
                             backgroundColor: item.active ? 'var(--primary)' : 'white',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
                             boxShadow: item.active ? 'var(--shadow-md)' : 'none',
-                            fontWeight: '600',
-                            fontSize: '14px'
                         }}>
                             {item.date}
                         </div>
