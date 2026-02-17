@@ -34,6 +34,30 @@ const GoalDetail = () => {
         }, 150);
     };
 
+    /* helper to calculate progress locally to fix sync issues */
+    const calculateLocalProgress = (currentTasks) => {
+    if (!currentTasks || currentTasks.length === 0) return 0;
+
+    let totalNodes = 0;
+    let completedNodes = 0;
+
+    currentTasks.forEach(task => {
+        // Count the parent task
+        totalNodes += 1;
+        if (task.completed) completedNodes += 1;
+
+        // Count every subtask
+        if (task.subtasks && task.subtasks.length > 0) {
+            task.subtasks.forEach(sub => {
+                totalNodes += 1;
+                if (sub.completed) completedNodes += 1;
+            });
+        }
+    });
+
+    return totalNodes > 0 ? Math.round((completedNodes / totalNodes) * 100) : 0;
+    };
+
     // Add loading state
     const [isLoading, setIsLoading] = useState(true);
 
@@ -130,15 +154,6 @@ const GoalDetail = () => {
                 // Optionally revert local state here
                 return;
             }
-
-            // Fetch progress after successful update
-            if (goalId) {
-                try {
-                    const progRes = await fetch(`${import.meta.env.VITE_API_URL}/tasks/${goalId}/progress`, { cache: 'no-store' });
-                    const progData = await progRes.json();
-                    if (progData) setProgress(progData.percentage);
-                } catch (e) { console.error("Failed to fetch progress:", e); }
-            }
         } catch (e) {
             console.error("Failed to update task status:", e);
         }
@@ -162,80 +177,68 @@ const GoalDetail = () => {
 
     /* toggle a subtask */
     const toggleSubtask = (taskId, subtaskId) => {
-        let newStatus = 'not_started';
+    let newStatus = 'not_started';
 
-        setTasks(prev => prev.map(task => {
+    setTasks(prev => {
+        const newTasks = prev.map(task => {
             if (task.id !== taskId) return task;
+
+            // 1. Update the specific subtask
+            const updatedSubtasks = task.subtasks.map(s => {
+                if (s.id === subtaskId) {
+                    const nextCompleted = !s.completed;
+                    newStatus = nextCompleted ? 'completed' : 'not_started';
+                    return { ...s, completed: nextCompleted };
+                }
+                return s;
+            });
+
+            // 2. Check if ALL subtasks are now complete to auto-update parent
+            const allDone = updatedSubtasks.every(s => s.completed);
+            
             return {
                 ...task,
-                subtasks: task.subtasks.map(s => {
-                    if (s.id === subtaskId) {
-                        const nextCompleted = !s.completed;
-                        newStatus = nextCompleted ? 'completed' : 'not_started';
-                        return { ...s, completed: nextCompleted };
-                    }
-                    return s;
-                })
+                subtasks: updatedSubtasks,
+                completed: allDone // Auto-complete parent if all subs are done
             };
-        }));
+        });
+        
+        setProgress(calculateLocalProgress(newTasks));
+        return newTasks;
+    });
 
-        // Trigger API call
-        updateTaskStatus(subtaskId, newStatus);
+    updateTaskStatus(subtaskId, newStatus);
     };
 
     /* toggle a whole task (complete all subtasks or un-complete) */
     const toggleTask = (taskIndex) => {
-        const status = getTaskStatus(taskIndex);
-        if (status === 'locked') return;
+    const status = getTaskStatus(taskIndex);
+    if (status === 'locked') return;
 
-        const task = tasks[taskIndex];
-        const isComplete = isTaskComplete(task); /* currently complete? */
+    const task = tasks[taskIndex];
+    const isComplete = isTaskComplete(task);
+    let targetStatus = isComplete ? 'not_started' : 'completed';
+    let targetBool = !isComplete;
 
-        if (isComplete) { // uncheck a completed task -> uncheck ALL subtasks
-            setTasks(prev => prev.map((t, i) => {
-                if (i !== taskIndex) return t;
-                return {
-                    ...t,
-                    completed: false,
-                    status: 'not_started',
-                    subtasks: t.subtasks.map(s => ({ ...s, completed: false, status: 'not_started' }))
-                };
-            }));
+    setTasks(prev => {
+        const newTasks = prev.map((t, i) => {
+            if (i !== taskIndex) return t;
+            return {
+                ...t,
+                completed: targetBool,
+                subtasks: t.subtasks.map(s => ({ ...s, completed: targetBool }))
+            };
+        });
 
-            if (task.subtasks.length > 0) {
-                // Call API for ALL subtasks
-                task.subtasks.forEach(s => {
-                    updateTaskStatus(s.id, 'not_started');
-                });
-                // Also update parent task
-                updateTaskStatus(task.id, 'not_started');
-            } else {
-                // No subtasks case: uncheck the task itself
-                updateTaskStatus(task.id, 'not_started');
-            }
-        } else { // mark task as complete -> mark ALL subtasks as done
-            setTasks(prev => prev.map((t, i) => {
-                if (i !== taskIndex) return t;
-                return {
-                    ...t,
-                    completed: true,
-                    status: 'completed',
-                    subtasks: t.subtasks.map(s => ({ ...s, completed: true }))
-                };
-            }));
+        setProgress(calculateLocalProgress(newTasks));
+        return newTasks;
+    });
 
-            if (task.subtasks.length > 0) {
-                // Call API for ALL subtasks
-                task.subtasks.forEach(s => {
-                    if (!s.completed) {
-                        updateTaskStatus(s.id, 'completed');
-                    }
-                });
-            } else {
-                // Call API for task
-                updateTaskStatus(task.id, 'completed');
-            }
-        }
+    // API Sync
+    if (task.subtasks.length > 0) {
+        task.subtasks.forEach(s => updateTaskStatus(s.id, targetStatus));
+    }
+    updateTaskStatus(task.id, targetStatus);
     };
 
     // Feedback submisison
