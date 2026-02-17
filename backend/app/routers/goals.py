@@ -139,7 +139,8 @@ def feedback_on_plan(goal_id: str, request: FeedbackRequest):
     # Get AI feedback response from mock
     # TODO: Replace with real AI call that takes current plan + feedback text
     # For now, we just return a pre-made feedback response based on the title
-    updated_plan = get_mock_feedback_response(goal["title"])
+    updated_plan = get_mock_feedback_response(goal["title"], request.feedback)
+
 
     return {
         "message": "Plan updated based on your feedback",
@@ -219,13 +220,28 @@ def get_goals(user_id: str):
     
     Each goal includes its goal_data JSONB which contains
     the full nested task list (tasks + subtasks with both IDs).
+    Only returns goals that have tasks saved (i.e., user has accepted the plan)!
     
     Called when: User opens their dashboard/goals screen.
     """
     all_goals = get_all_goals(user_id)
     if not all_goals:
         return {"goals": [], "message": "No goals associated with the user"}
-    return {"goals": all_goals}
+    
+    # Filter out goals that haven't been accepted yet (empty task list)
+    import json
+    accepted_goals = []
+    for goal in all_goals:
+        goal_data = goal.get("goal_data", {})
+        if isinstance(goal_data, str):
+            goal_data = json.loads(goal_data)
+        if goal_data.get("tasks"):
+            accepted_goals.append(goal)
+
+    if not accepted_goals:
+        return {"goals": [], "message": "No goals associated with the user"}
+
+    return {"goals": accepted_goals}
 
 
 # ---- Get a single goal with full task data ----
