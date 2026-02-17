@@ -1,4 +1,4 @@
-import React, { useRef, useState, useCallback, useEffect } from 'react';
+import { useRef, useState, useCallback, useEffect } from 'react';
 import { ArrowUpRight } from 'lucide-react';
 import '../index.css';
 
@@ -31,18 +31,8 @@ const UpcomingTasks = () => {
     ];
 
     return (
-        <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            maxHeight: '240px',
-        }}>
-            <h4 style={{
-                fontFamily: 'var(--font-serif)',
-                fontSize: '20px',
-                fontWeight: '600',
-                marginBottom: 'var(--space-md)',
-                flexShrink: 0,
-            }}>Upcoming Tasks</h4>
+        <div className="home-upcoming-tasks">
+            <h4>Upcoming Tasks</h4>
 
             <div style={{
                 position: 'relative',
@@ -98,14 +88,11 @@ const UpcomingTasks = () => {
                         >
                             <ul style={{ listStyle: 'none' }}>
                                 {tasks.map((task, index) => (
-                                    <li key={index}
+                                    <li key={index} className="task-item"
                                         style={{
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: 'space-between',
-                                            marginBottom: '8px',
-                                            padding: '0.5px 0',
-                                            borderRadius: '8px',
                                         }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                             {/* simple arrow icon */}
@@ -118,8 +105,7 @@ const UpcomingTasks = () => {
                                                 <ArrowUpRight size={20} strokeWidth={2.5} />
                                             </div>
 
-                                            <span style={{
-                                                fontSize: '15px',
+                                            <span className="task-title" style={{
                                                 color: task.urgent ? 'var(--accent-red-soft)' : 'var(--text-main)',
                                                 fontWeight: '400'
                                             }}>
@@ -128,15 +114,10 @@ const UpcomingTasks = () => {
                                         </div>
 
                                         {task.due && (
-                                            <span style={{
+                                            <span className="task-due-badge" style={{
                                                 backgroundColor: task.urgent ? 'var(--accent-red-soft)' : '#E0E0E0',
                                                 color: 'white',
-                                                padding: '4px 8px',
-                                                borderRadius: '12px',
-                                                fontSize: '12px',
-                                                fontWeight: '600',
                                                 boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                                                whiteSpace: 'nowrap'
                                             }}>
                                                 {task.due}
                                             </span>
