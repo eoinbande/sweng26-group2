@@ -153,6 +153,13 @@ const TaskTimeline = ({ tasks, getTaskStatus, isTaskComplete, toggleTask, toggle
                             </div>
 
                             <h4 className={status === 'completed' ? 'tl-strikethrough' : ''}>
+                                <span style={{ 
+                                    fontWeight: 'bold', 
+                                    color: status === 'completed' ? 'inherit' : 'var(--accent-red-soft)', 
+                                    marginRight: '8px' 
+                                }}>
+                                    {index + 1}.
+                                </span>
                                 {task.title}
                             </h4>
 
@@ -168,7 +175,7 @@ const TaskTimeline = ({ tasks, getTaskStatus, isTaskComplete, toggleTask, toggle
                             {/* subtasks;only shown for ACTIVE tasks */}
                             {status === 'active' && task.subtasks.length > 0 && (
                                 <div className="tl-subtask-list">
-                                    {task.subtasks.map(sub => (
+                                    {task.subtasks.map((sub, subIndex) => (
                                         <div
                                             key={sub.id}
                                             className={`tl-subtask ${sub.completed ? 'tl-subtask--done' : ''}`}
@@ -191,6 +198,9 @@ const TaskTimeline = ({ tasks, getTaskStatus, isTaskComplete, toggleTask, toggle
                                                     {getDaysLeftText(sub.dueDate)}
                                                 </span>
                                             </div>
+                                            <span className="tl-subtask__number">
+                                                {index + 1}.{subIndex + 1}
+                                            </span>
                                         </div>
                                     ))}
                                 </div>

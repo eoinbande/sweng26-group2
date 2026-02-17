@@ -262,3 +262,12 @@
     align-items: center;
     gap: 2px;
 }
+
+.tl-subtask__number {
+    font-size: 12px;
+    font-weight: 500;
+    color: #8E8E93;
+    flex-shrink: 0;
+    margin-left: auto;
+    padding-left: 8px;
+}
