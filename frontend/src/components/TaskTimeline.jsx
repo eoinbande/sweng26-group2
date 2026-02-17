@@ -153,7 +153,14 @@ const TaskTimeline = ({ tasks, getTaskStatus, isTaskComplete, toggleTask, toggle
                             </div>
 
                             <h4 className={status === 'completed' ? 'tl-strikethrough' : ''}>
-                                {index + 1}. {task.title}
+                                <span style={{ 
+                                    fontWeight: 'bold', 
+                                    color: status === 'completed' ? 'inherit' : 'var(--accent-red-soft)', 
+                                    marginRight: '8px' 
+                                }}>
+                                    {index + 1}.
+                                </span>
+                                {task.title}
                             </h4>
 
                             <p className={`tl-meta ${status === 'completed' ? 'tl-strikethrough' : ''}`}>
