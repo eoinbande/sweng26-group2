@@ -7,6 +7,8 @@ before AI can plan the rest. Converted from AI team's mock (Loher) into new sche
 Includes:
 - WEDDING_INITIAL: First plan generated (tasks 1-4 are info-gathering, 5-9 are action)
 - WEDDING_AFTER_FEEDBACK: After user says "task 2 is too vague, break it down"
+- WEDDING_FEEDBACK_BABY: After tasks 1, 2, 3 completed, user says:
+         "The couple are expecting a baby — wedding needs to happen in 6 weeks."
 """
 
 WEDDING_INITIAL = {
