@@ -15,20 +15,17 @@ export function TaskCard({
   const [showSubtasks, setShowSubtasks] = useState(false);
 
   return (
-    <div style={{
+    <div className="cg-task-card" style={{
       display: 'flex',
       alignItems: 'center',
       gap: 'var(--space-sm)',
-      padding: 'var(--space-md)',
       backgroundColor: 'var(--card-bg)',
-      borderRadius: 'var(--radius-lg)',
       boxShadow: 'var(--shadow-md)',
       position: 'relative',
       width: '100%',
       minWidth: 'auto',
       maxWidth: '400px',
       boxSizing: 'border-box',
-      minHeight: '100px',
     }}>
       {/* review variant: confirm/deny buttons floating on left */}
       {isReviewVariant && (
@@ -42,10 +39,9 @@ export function TaskCard({
         }}>
           <button
             type="button"
+            className="cg-task-action-btn"
             onClick={onConfirm}
             style={{
-              width: '36px',
-              height: '36px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -68,10 +64,9 @@ export function TaskCard({
           </button>
           <button
             type="button"
+            className="cg-task-action-btn"
             onClick={onDeny}
             style={{
-              width: '36px',
-              height: '36px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -104,23 +99,20 @@ export function TaskCard({
         marginLeft: 'var(--space-sm)',
         justifyContent: 'center',
       }}>
-        <span style={{
-          fontSize: '14px',
+        <span className="cg-task-title" style={{
           fontWeight: 600,
           color: 'var(--text-main)',
           lineHeight: '1.3',
-          marginBottom: 'var(--space-xs)',
         }}>
           {order != null && (
             <span style={{ color: 'var(--accent-red-soft)', marginRight: '4px' }}>{order}.</span>
           )}
           {title}
         </span>
-        <div style={{
+        <div className="cg-task-due" style={{
           display: 'flex',
           alignItems: 'center',
           gap: 'var(--space-xs)',
-          fontSize: '12px',
           color: 'var(--text-secondary)',
           whiteSpace: 'nowrap',
           flexShrink: 0,
@@ -143,14 +135,10 @@ export function TaskCard({
             transition: 'max-height 0.4s ease-out, margin-top 0.3s ease-out, padding-top 0.3s ease-out, gap 0.3s ease-out, border-color 0.3s ease-out',
           }}>
             {subtasks.map((sub, index) => (
-              <div key={sub.id} style={{
+              <div key={sub.id} className="cg-task-subtask" style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px',
-                padding: '8px 10px',
-                borderRadius: '10px',
                 backgroundColor: '#F9F9F7',
-                minHeight: '36px',
                 position: 'relative',
                 opacity: showSubtasks ? 1 : 0,
                 transform: showSubtasks ? 'translateY(0)' : 'translateY(20px)',
@@ -163,14 +151,12 @@ export function TaskCard({
                   gap: '2px',
                   minWidth: 0,
                 }}>
-                  <span style={{
-                    fontSize: '13px',
+                  <span className="cg-task-subtask-title" style={{
                     color: 'var(--text-main)',
                     fontWeight: 400,
                   }}>{sub.title}</span>
                   {sub.dueDate && (
-                    <span style={{
-                      fontSize: '11px',
+                    <span className="cg-task-subtask-due" style={{
                       color: '#8E8E93',
                       display: 'flex',
                       alignItems: 'center',
@@ -182,11 +168,10 @@ export function TaskCard({
                   )}
                 </div>
                 {order != null && sub.order != null && (
-                  <span style={{
+                  <span className="cg-task-subtask-order" style={{
                     position: 'absolute',
                     bottom: '6px',
                     right: '10px',
-                    fontSize: '11px',
                     fontWeight: 500,
                     color: '#8E8E93',
                   }}>
@@ -203,13 +188,12 @@ export function TaskCard({
       {subtasks.length > 0 && (
         <button
           type="button"
+          className="cg-task-chevron"
           onClick={() => setShowSubtasks(!showSubtasks)}
           style={{
             position: 'absolute',
             top: '8px',
             right: '8px',
-            height: '32px',
-            width: '32px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
