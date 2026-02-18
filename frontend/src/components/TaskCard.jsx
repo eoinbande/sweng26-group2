@@ -94,18 +94,20 @@ export function TaskCard({
         flex: 1,
         minWidth: 0,
         marginLeft: 'var(--space-sm)',
+        marginRight: subtasks.length > 0 ? 'clamp(30px, 4.5dvh, 36px)' : '0',
         justifyContent: 'center',
       }}>
-        <span className="cg-task-title" style={{
+        <div className="cg-task-title" style={{
+          display: 'flex',
           fontWeight: 600,
           color: 'var(--text-main)',
           lineHeight: '1.3',
         }}>
           {order != null && (
-            <span style={{ color: 'var(--accent-red-soft)', marginRight: '4px' }}>{order}.</span>
+            <span style={{ color: 'var(--accent-red-soft)', marginRight: '4px', flexShrink: 0 }}>{order}.</span>
           )}
-          {title}
-        </span>
+          <span>{title}</span>
+        </div>
         <div className="cg-task-due" style={{
           display: 'flex',
           alignItems: 'center',
