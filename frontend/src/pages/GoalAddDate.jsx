@@ -5,6 +5,7 @@ import { DateScrollPicker } from 'react-date-wheel-picker';
 import BottomNav from '../components/BottomNav';
 import { InputBar } from '../components/InputBar';
 import { supabase, isDemoMode } from '../supabase_client';
+import '../styles/CreateGoal.css';
 import '../index.css';
 
 // mocked ai response for demo
@@ -66,14 +67,14 @@ function GoalAddDate() {
 
     // "Let AI decide" - skip date input and proceed with goal submission
     const handleLetAIDecide = async () => {
-        // Set a special flag or empty date so ReviewPlan knows to use AI's date
+        // set a special flag or empty date so ReviewPlan knows to use AI's date
         dateValueRef.current = 'AI_DECIDE';
         await handleGoalSubmit();
     };
 
     // "Skip deadline" - explicitly set date to null and proceed with goal submission
     const handleSkipDeadline = async () => {
-        dateValueRef.current = null; // Explicitly set to null
+        dateValueRef.current = null;
         await handleGoalSubmit();
     };
 
@@ -85,23 +86,6 @@ function GoalAddDate() {
         setIsFading(true);
         // step 2: expand blue card to fill screen
         setTimeout(() => setIsExpanding(true), 400);
-
-        // // in demo mode, use mocked data
-        // if (isDemoMode) {
-        //     setTimeout(() => {
-        //         navigate('/review-plan', {
-        //             state: {
-        //                 goal: goalText,
-        //                 showLoading: true,
-        //                 previewData: MOCK_PREVIEW,
-        //                 userId: 'demo-user-001',
-        //                 originalPrompt: goalText,
-        //                 dueDate: dateValueRef.current,
-        //             },
-        //         });
-        //     }, 1400);
-        //     return;
-        // }
 
         // get authenticated user
         let user;
@@ -144,7 +128,7 @@ function GoalAddDate() {
                             previewData: data,
                             userId: user.id,
                             originalPrompt: goalText,
-                            dueDate: dateValueRef.current, // Will be empty string if not set
+                            dueDate: dateValueRef.current,
                             from: 'create',
                         },
                     });
@@ -171,18 +155,9 @@ function GoalAddDate() {
     }, [showPicker]);
 
     return (
-        <div style={{
-            height: '100vh',
-            display: 'flex',
-            flexDirection: 'column',
-            maxWidth: '480px',
-            margin: '0 auto',
-            overflow: 'hidden',
-            position: 'relative',
-            backgroundColor: 'var(--bg-color)',
-        }}>
+        <div className="create-goal-page">
             {/* blue section */}
-            <div style={{
+            <div className="cg-blue-card" style={{
                 background: 'var(--accent-blue)',
                 padding: 'var(--space-lg)',
                 paddingTop: 'var(--space-xl)',
@@ -194,14 +169,15 @@ function GoalAddDate() {
                 top: 0,
                 left: 0,
                 right: 0,
-                height: isExpanding ? '100vh' : '66vh',
+                height: isExpanding ? '100dvh' : undefined,
                 zIndex: 200,
                 display: 'flex',
                 flexDirection: 'column',
                 transition: 'height 1.2s cubic-bezier(0.25, 0.1, 0.25, 1), border-radius 0.3s ease-out',
             }}>
-                {/* back button - always visible */}
+                {/* back button */}
                 <button
+                    className="cg-back-btn"
                     onClick={handleBack}
                     style={{
                         backgroundColor: 'transparent',
@@ -212,7 +188,6 @@ function GoalAddDate() {
                         alignItems: 'center',
                         justifyContent: 'center',
                         alignSelf: 'flex-start',
-                        marginBottom: 'var(--space-lg)',
                         opacity: 1,
                     }}
                     onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
@@ -224,10 +199,8 @@ function GoalAddDate() {
                 {/* title */}
                 <h1 style={{
                     fontFamily: 'var(--font-serif)',
-                    fontSize: 'clamp(30px, 5vh, 40px)',
                     fontWeight: '600',
                     lineHeight: '1.2',
-                    marginBottom: 'var(--space-md)',
                     color: 'var(--text-main)',
                     textAlign: 'center',
                     alignSelf: 'center',
@@ -240,10 +213,10 @@ function GoalAddDate() {
 
                 {/* date input / picker morph container */}
                 <div
+                    className="cg-date-picker"
                     ref={pickerRef}
                     onClick={() => { if (!showPicker) setShowPicker(true); }}
                     style={{
-                        marginTop: 'var(--space-xl)',
                         opacity: (isFadingOut || isFading) ? 0 : (contentVisible ? 1 : 0),
                         transform: (isFadingOut || isFading) ? 'translateY(-20px)' : (contentVisible ? 'translateY(0)' : 'translateY(20px)'),
                         maxWidth: showPicker ? '95%' : '90%',
@@ -251,7 +224,6 @@ function GoalAddDate() {
                         alignSelf: 'center',
                         cursor: showPicker ? 'default' : 'pointer',
                         backgroundColor: showPicker ? 'white' : 'var(--blue-soft)',
-                        borderRadius: 'var(--radius-xl)',
                         padding: '0',
                         boxShadow: showPicker ? 'var(--shadow-md)' : 'none',
                         transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -266,21 +238,19 @@ function GoalAddDate() {
                         transition: 'max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease',
                     }}>
                         <InputBar
+                            className="cg-input-bar"
                             placeholder="MM/DD/YYYY"
                             value={dateValue}
                             onChange={() => {}}
-                            onSubmit={() => { 
+                            onSubmit={() => {
                                 if (dateValueRef.current) {
-                                    handleGoalSubmit(); 
+                                    handleGoalSubmit();
                                 } else {
                                     alert('Please select a date first, or use "Skip deadline" or "Let AI decide"');
                                 }
                             }}
                             variant="auth"
-                            borderRadius="var(--radius-xl)"
                             backgroundColor="transparent"
-                            padding="22px"
-                            fontSize="20px"
                             readOnly
                         />
                     </div>
@@ -314,26 +284,22 @@ function GoalAddDate() {
                 </div>
 
                 {/* skip / let ai decide buttons */}
-                <div style={{
+                <div className="cg-action-buttons" style={{
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: '10px',
                     alignItems: 'center',
-                    marginTop: 'var(--space-lg)',
                     opacity: (isFadingOut || isFading) ? 0 : (contentVisible ? 1 : 0),
                     transform: (isFadingOut || isFading) ? 'translateY(-20px)' : (contentVisible ? 'translateY(0)' : 'translateY(20px)'),
                     transition: 'all 0.4s ease-out 0.3s',
                 }}>
                     <button
+                        className="cg-action-btn"
                         onClick={handleSkipDeadline}
                         style={{
                             backgroundColor: 'var(--bg-color)',
                             color: 'var(--text-main)',
                             border: 'none',
-                            borderRadius: 'var(--radius-pill)',
-                            padding: '12px 32px',
                             fontFamily: 'var(--font-sans)',
-                            fontSize: '16px',
                             fontWeight: '500',
                             cursor: 'pointer',
                             transition: 'all 0.3s ease',
@@ -352,15 +318,13 @@ function GoalAddDate() {
                         Skip deadline
                     </button>
                     <button
+                        className="cg-action-btn"
                         onClick={handleLetAIDecide}
                         style={{
                             backgroundColor: 'var(--text-main)',
                             color: 'white',
                             border: 'none',
-                            borderRadius: 'var(--radius-pill)',
-                            padding: '12px 32px',
                             fontFamily: 'var(--font-sans)',
-                            fontSize: '16px',
                             fontWeight: '500',
                             cursor: 'pointer',
                             transition: 'all 0.3s ease',
@@ -383,16 +347,7 @@ function GoalAddDate() {
             </div>
 
             {/* bottom section */}
-            <div style={{
-                position: 'absolute',
-                top: '66vh',
-                left: 0,
-                right: 0,
-                bottom: 0,
-                display: 'flex',
-                flexDirection: 'column',
-                backgroundColor: 'var(--bg-color)',
-            }}>
+            <div className="cg-bottom">
                 {/* 'or' divider */}
                 <div style={{
                     flex: 1,
@@ -400,22 +355,13 @@ function GoalAddDate() {
                     alignItems: 'center',
                     justifyContent: 'center',
                 }}>
-                    <p style={{
-                        fontFamily: 'var(--font-serif)',
-                        fontSize: '20px',
-                        fontWeight: '500',
-                        color: 'var(--text-main)',
-                    }}>
-                        or
-                    </p>
+                    <p className="cg-or-divider">or</p>
                 </div>
 
                 {/* manual input */}
-                <div style={{
-                    padding: '0 var(--space-lg)',
-                    paddingBottom: '150px',
-                }}>
+                <div className="cg-manual-input">
                     <InputBar
+                        className="cg-input-bar"
                         placeholder="Manually create your goal..."
                         value={manualGoal}
                         onChange={(e) => setManualGoal(e.target.value)}
@@ -426,8 +372,6 @@ function GoalAddDate() {
                             }
                         }}
                         variant="auth"
-                        padding="18px 20px"
-                        borderRadius="var(--radius-xl)"
                     />
                 </div>
             </div>
