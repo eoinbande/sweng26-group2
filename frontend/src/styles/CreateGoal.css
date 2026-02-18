@@ -36,18 +36,18 @@
 
 /* suggestion buttons */
 .create-goal-page .cg-suggestions {
-    gap: clamp(6px, 1.2dvh, 12px);
+    gap: clamp(10px, 2dvh, 18px);
 }
 
 .create-goal-page .cg-suggestion-btn {
-    padding: clamp(8px, 1.5dvh, 18px) clamp(14px, 2dvh, 24px);
-    font-size: clamp(12px, 1.5dvh, 14px);
-    border-radius: clamp(12px, 2dvh, 24px);
+    padding: clamp(14px, 2.5dvh, 24px) clamp(18px, 3dvh, 28px);
+    font-size: clamp(13px, 1.8dvh, 16px);
+    border-radius: clamp(16px, 2.8dvh, 24px);
 }
 
 /* ai input wrapper inside blue card */
 .create-goal-page .cg-ai-input {
-    padding-bottom: clamp(12px, 2.5dvh, 28px);
+    padding-bottom: clamp(6px, 1dvh, 12px);
 }
 
 /* bottom section below the blue card */
@@ -76,19 +76,18 @@
     padding-bottom: clamp(80px, 12dvh, 150px);
 }
 
-/* input bar responsive overrides */
+/* input bar responsive overrides — !important needed to beat inline styles */
 .create-goal-page .cg-input-bar {
-    padding: clamp(12px, 2dvh, 18px) clamp(14px, 2dvh, 20px);
-    border-radius: clamp(20px, 3dvh, 32px);
-    font-size: clamp(13px, 1.8dvh, 16px);
+    padding: clamp(14px, 2.2dvh, 20px) clamp(16px, 2.5dvh, 22px) !important;
+    border-radius: clamp(22px, 3.5dvh, 32px) !important;
 }
 
 .create-goal-page .cg-input-bar input {
-    font-size: clamp(13px, 1.8dvh, 16px) !important;
+    font-size: clamp(14px, 1.8dvh, 16px) !important;
 }
 
 .create-goal-page .cg-input-bar button {
-    width: clamp(28px, 4dvh, 36px);
-    height: clamp(28px, 4dvh, 36px);
-    border-radius: clamp(10px, 1.5dvh, 16px);
+    width: clamp(30px, 4dvh, 36px) !important;
+    height: clamp(30px, 4dvh, 36px) !important;
+    border-radius: clamp(10px, 1.8dvh, 16px) !important;
 }
