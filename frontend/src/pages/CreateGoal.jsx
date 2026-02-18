@@ -3,13 +3,14 @@ import { ArrowLeft, Mic } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
 import { InputBar } from '../components/InputBar';
+import '../styles/CreateGoal.css';
 import '../index.css';
 
 function CreateGoal() {
     const navigate = useNavigate();
     const location = useLocation();
 
-    // Restore the prompt if coming back from ReviewPlan via Discard
+    // restore the prompt if coming back from ReviewPlan via Discard
     const restoredPrompt = location.state?.originalPrompt || '';
 
     const [message, setMessage] = useState(restoredPrompt);
@@ -42,19 +43,9 @@ function CreateGoal() {
     };
 
     return (
-        // <div style={{
-        //     height: '100vh',
-        //     display: 'flex',
-        //     flexDirection: 'column',
-        //     maxWidth: '480px',
-        //     margin: '0 auto',
-        //     overflow: 'hidden',
-        //     position: 'relative',
-        //     backgroundColor: 'var(--bg-color)',
-        // }}>
-            <div className="container" style={{ position: 'relative', backgroundColor: 'var(--bg-color)' }}>
+        <div className="create-goal-page">
             {/* blue section */}
-            <div style={{
+            <div className="cg-blue-card" style={{
                 background: 'var(--accent-blue)',
                 padding: 'var(--space-lg)',
                 paddingTop: 'var(--space-xl)',
@@ -66,13 +57,13 @@ function CreateGoal() {
                 top: 0,
                 left: 0,
                 right: 0,
-                height: '66vh',
                 zIndex: 200,
                 display: 'flex',
                 flexDirection: 'column',
             }}>
                 {/* back button - always visible */}
                 <button
+                    className="cg-back-btn"
                     onClick={() => navigate('/')}
                     style={{
                         backgroundColor: 'transparent',
@@ -83,7 +74,6 @@ function CreateGoal() {
                         alignItems: 'center',
                         justifyContent: 'center',
                         alignSelf: 'flex-start',
-                        marginBottom: 'var(--space-lg)',
                         opacity: 1,
                     }}
                     onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
@@ -95,10 +85,8 @@ function CreateGoal() {
                 {/* title and subtitle - fades out first */}
                 <h1 style={{
                     fontFamily: 'var(--font-serif)',
-                    fontSize: 'clamp(30px, 5vh, 40px)',
                     fontWeight: '600',
                     lineHeight: '1.2',
-                    marginBottom: 'var(--space-md)',
                     color: 'var(--text-main)',
                     opacity: isFading ? 0 : (contentVisible ? 1 : 0),
                     transform: isFading ? 'translateY(-20px)' : (contentVisible ? 'translateY(0)' : 'translateY(20px)'),
@@ -106,12 +94,10 @@ function CreateGoal() {
                 }}>
                     Let's build<br />your goal.
                 </h1>
-                <p style={{
+                <p className="cg-subtitle" style={{
                     fontFamily: 'var(--font-sans)',
-                    fontSize: 'clamp(14px, 2vh, 16px)',
                     color: 'var(--text-main)',
                     opacity: isFading ? 0 : (contentVisible ? 0.8 : 0),
-                    marginBottom: 'var(--space-xl)',
                     transform: isFading ? 'translateY(-20px)' : (contentVisible ? 'translateY(0)' : 'translateY(20px)'),
                     transition: 'all 0.4s ease-out 0.15s',
                 }}>
@@ -119,27 +105,22 @@ function CreateGoal() {
                 </p>
 
                 {/* ai suggested buttons - fades out first */}
-                <div style={{
+                <div className="cg-suggestions" style={{
                     display: 'flex',
-                    gap: 'var(--space-md)',
                     flexWrap: 'wrap',
-                    flex: 1,
-                    minHeight: 0,
                     alignContent: 'flex-start',
                     opacity: isFading ? 0 : (contentVisible ? 1 : 0),
                     transform: isFading ? 'translateY(-20px)' : (contentVisible ? 'translateY(0)' : 'translateY(20px)'),
                     transition: 'all 0.4s ease-out 0.2s',
                 }}>
                     <button
+                        className="cg-suggestion-btn"
                         onClick={() => handleGoalSubmit('Create a new bank account.')}
                         style={{
                             background: 'linear-gradient(135deg, rgba(107, 141, 176, 0.6) 0%, rgba(139, 169, 201, 0.6) 100%)',
                             color: 'white',
                             border: 'none',
-                            borderRadius: 'var(--radius-lg)',
-                            padding: 'clamp(12px, 2.2vh, 18px) 24px',
                             fontFamily: 'var(--font-sans)',
-                            fontSize: '14px',
                             fontWeight: '500',
                             cursor: 'pointer',
                             transition: 'all 0.3s ease',
@@ -161,15 +142,13 @@ function CreateGoal() {
                         Create a new bank account.
                     </button>
                     <button
+                        className="cg-suggestion-btn"
                         onClick={() => handleGoalSubmit('Help me get an A in Probability I.')}
                         style={{
                             background: 'linear-gradient(135deg, rgba(107, 141, 176, 0.6) 0%, rgba(139, 169, 201, 0.6) 100%)',
                             color: 'white',
                             border: 'none',
-                            borderRadius: 'var(--radius-lg)',
-                            padding: 'clamp(12px, 2.2vh, 18px) 24px',
                             fontFamily: 'var(--font-sans)',
-                            fontSize: '14px',
                             fontWeight: '500',
                             cursor: 'pointer',
                             transition: 'all 0.3s ease',
@@ -192,16 +171,16 @@ function CreateGoal() {
                     </button>
                 </div>
 
-                {/* ai input*/}
-                <div style={{
+                {/* ai input */}
+                <div className="cg-ai-input" style={{
                     flexShrink: 0,
                     marginTop: 'auto',
-                    paddingBottom: 'var(--space-xl)',
                     opacity: isFading ? 0 : (contentVisible ? 1 : 0),
                     transform: isFading ? 'translateY(-20px)' : (contentVisible ? 'translateY(0)' : 'translateY(20px)'),
                     transition: 'all 0.4s ease-out 0.25s',
                 }}>
                     <InputBar
+                        className="cg-input-bar"
                         placeholder="Message"
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
@@ -214,46 +193,26 @@ function CreateGoal() {
                         icon={<Mic size={18} color="white" />}
                         buttonStyle="dark"
                         variant="auth"
-                        padding="18px 20px"
-                        borderRadius="var(--radius-xl)"
                     />
                 </div>
             </div>
 
             {/* bottom section */}
-            <div style={{
-                position: 'absolute',
-                top: '66vh',
-                left: 0,
-                right: 0,
-                bottom: 0,
-                display: 'flex',
-                flexDirection: 'column',
-                backgroundColor: 'var(--bg-color)',
-            }}>
-                {/* 'or' divider*/}
+            <div className="cg-bottom">
+                {/* 'or' divider */}
                 <div style={{
                     flex: 1,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                 }}>
-                    <p style={{
-                        fontFamily: 'var(--font-serif)',
-                        fontSize: '20px',
-                        fontWeight: '500',
-                        color: 'var(--text-main)',
-                    }}>
-                        or
-                    </p>
+                    <p className="cg-or-divider">or</p>
                 </div>
 
-                {/* manual input*/}
-                <div style={{
-                    padding: '0 var(--space-lg)',
-                    paddingBottom: '150px',
-                }}>
+                {/* manual input */}
+                <div className="cg-manual-input">
                     <InputBar
+                        className="cg-input-bar"
                         placeholder="Manually create your goal..."
                         value={manualGoal}
                         onChange={(e) => setManualGoal(e.target.value)}
@@ -264,13 +223,11 @@ function CreateGoal() {
                             }
                         }}
                         variant="auth"
-                        padding="18px 20px"
-                        borderRadius="var(--radius-xl)"
                     />
                 </div>
             </div>
 
-            {/* bottom nav*/}
+            {/* bottom nav */}
             <BottomNav />
         </div>
     );
