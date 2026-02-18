@@ -424,16 +424,20 @@ function ReviewPlan() {
             </div>
 
             {/* bottom section - feedback input */}
-            <div className="cg-feedback-input">
-                <InputBar
-                    className="cg-input-bar"
-                    placeholder="Feedback to AI..."
-                    value={feedbackText}
-                    onChange={(e) => setFeedbackText(e.target.value)}
-                    onSubmit={() => handleSubmitFeedback(feedbackText)}
-                    variant="auth"
-                    disabled={submittingFeedback}
-                />
+            <div className="cg-bottom" style={{
+                justifyContent: 'center',
+            }}>
+                <div className="cg-manual-input">
+                    <InputBar
+                        className="cg-input-bar"
+                        placeholder="Feedback to AI..."
+                        value={feedbackText}
+                        onChange={(e) => setFeedbackText(e.target.value)}
+                        onSubmit={() => handleSubmitFeedback(feedbackText)}
+                        variant="auth"
+                        disabled={submittingFeedback}
+                    />
+                </div>
             </div>
 
             <BottomNav />
