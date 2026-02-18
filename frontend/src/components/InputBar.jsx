@@ -91,6 +91,7 @@ export function InputBar({
 
     return (
         <div
+            className={className}
             style={{
                 display: 'flex',
                 alignItems: 'center',
