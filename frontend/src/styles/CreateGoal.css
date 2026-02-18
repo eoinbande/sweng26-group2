@@ -1,4 +1,6 @@
 /* responsive styles for the create goal page */
+
+
 /* the blue card section is already responsive — these target the bottom section */
 
 .create-goal-page {
@@ -12,29 +14,39 @@
     background-color: var(--bg-color);
 }
 
+
 /* blue card section */
+
 .create-goal-page .cg-blue-card {
     height: 66dvh;
 }
 
+
 /* back button */
+
 .create-goal-page .cg-back-btn {
     margin-bottom: clamp(12px, 2.5dvh, 24px);
 }
 
+
 /* title */
+
 .create-goal-page .cg-blue-card h1 {
     font-size: clamp(26px, 4.5dvh, 40px);
     margin-bottom: clamp(6px, 1.2dvh, 12px);
 }
 
+
 /* subtitle */
+
 .create-goal-page .cg-blue-card .cg-subtitle {
     font-size: clamp(12px, 1.8dvh, 16px);
     margin-bottom: clamp(12px, 2.5dvh, 28px);
 }
 
+
 /* suggestion buttons */
+
 .create-goal-page .cg-suggestions {
     gap: clamp(10px, 2dvh, 18px);
 }
@@ -45,12 +57,16 @@
     border-radius: clamp(16px, 2.8dvh, 24px);
 }
 
+
 /* ai input wrapper inside blue card */
+
 .create-goal-page .cg-ai-input {
     padding-bottom: clamp(6px, 1dvh, 12px);
 }
 
+
 /* bottom section below the blue card */
+
 .create-goal-page .cg-bottom {
     position: absolute;
     top: 66dvh;
@@ -62,7 +78,9 @@
     background-color: var(--bg-color);
 }
 
+
 /* "or" divider */
+
 .create-goal-page .cg-or-divider {
     font-family: var(--font-serif);
     font-size: clamp(14px, 2dvh, 20px);
@@ -70,31 +88,39 @@
     color: var(--text-main);
 }
 
+
 /* manual input wrapper */
+
 .create-goal-page .cg-manual-input {
     padding: 0 clamp(16px, 2.5dvh, 24px);
     padding-bottom: clamp(80px, 12dvh, 150px);
 }
 
+
 /* goal-add-date: action buttons (skip deadline, let ai decide) */
+
 .create-goal-page .cg-action-buttons {
-    gap: clamp(6px, 1.2dvh, 10px);
-    margin-top: clamp(12px, 2.5dvh, 24px);
+    gap: clamp(8px, 2dvh, 18px);
+    margin-top: clamp(16px, 5.5dvh, 50px);
 }
 
 .create-goal-page .cg-action-btn {
-    padding: clamp(8px, 1.5dvh, 12px) clamp(20px, 4dvh, 32px);
-    font-size: clamp(13px, 1.8dvh, 16px);
+    padding: clamp(10px, 1.8dvh, 14px) clamp(24px, 4.5dvh, 38px);
+    font-size: clamp(13px, 1.9dvh, 17px);
     border-radius: var(--radius-pill);
 }
 
+
 /* goal-add-date: date picker container */
+
 .create-goal-page .cg-date-picker {
-    margin-top: clamp(12px, 2.5dvh, 28px);
+    margin-top: clamp(16px, 3.5dvh, 36px);
     border-radius: clamp(20px, 3.5dvh, 32px);
 }
 
+
 /* input bar responsive overrides — !important needed to beat inline styles */
+
 .create-goal-page .cg-input-bar {
     padding: clamp(14px, 2.2dvh, 20px) clamp(16px, 2.5dvh, 22px) !important;
     border-radius: clamp(22px, 3.5dvh, 32px) !important;
