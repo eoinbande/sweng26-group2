@@ -79,7 +79,7 @@ const GoalListCard = ({ goal, onClick }) => {
 
             {/* date tab - vertical strip on the right side */}
             <div className="goal-date-tab">
-                <span className="goal-date-text">{goal.date}</span>
+                <span className="goal-date-text">{goal.date || ''}</span>
             </div>
         </article>
     );

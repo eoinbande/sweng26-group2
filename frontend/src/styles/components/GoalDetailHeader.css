@@ -1,13 +1,14 @@
 .goal-detail-header {
     display: flex;
     flex-direction: column;
-    gap: var(--space-mdlg);
+    gap: var(--space-md);
     margin-bottom: var(--space-lg);
     padding-top: var(--space-lg);
+    padding-left: var(--space-md);
+    padding-right: var(--space-md);
 }
 
 /* title row (arrow + heading) */
-
 .goal-detail-header__title-row {
     display: flex;
     align-items: flex-start;
@@ -35,11 +36,13 @@
 
 .goal-detail-header__title {
     font-family: var(--font-serif);
-    font-size: 36px;
+    font-size: 28px;
     font-weight: 600;
     color: var(--text-main);
     margin: 0;
-    line-height: 1.2;
+    line-height: 1.25;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 /* progress section */
@@ -98,8 +101,45 @@
 
 /* ---- Responsive ---- */
 
+@media (max-width: 480px) {
+    .goal-detail-header__title {
+        font-size: 24px;
+    }
+}
+
 @media (max-width: 380px) {
     .goal-detail-header__title {
-        font-size: 30px;
+        font-size: 22px;
+    }
+
+    .goal-detail-header {
+        padding-left: var(--space-sm);
+        padding-right: var(--space-sm);
+    }
+
+    .goal-detail-header__end-date {
+        font-size: 15px;
+    }
+
+    .goal-detail-header__category {
+        font-size: 11px;
+        padding: 3px 12px;
+    }
+
+    .goal-detail-header__meta {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 320px) {
+    .goal-detail-header__title {
+        font-size: 20px;
+    }
+    .goal-detail-header__end-date {
+        font-size: 14px;
+    }
+    .goal-detail-header {
+        gap: var(--space-sm);
+        margin-bottom: var(--space-md);
     }
 }

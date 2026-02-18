@@ -47,12 +47,32 @@
 .goals-list {
     display: flex;
     flex-direction: column;
-    gap: 28px;
+    gap: 20px;
 }
 
 /* Responsive adjustments */
+@media (max-width: 480px) {
+    .goals-list {
+        gap: 16px;
+    }
+}
+
 @media (max-width: 380px) {
     .goals-list {
-        gap: 24px;
+        gap: 14px;
+    }
+    .goals-container {
+        padding: 0 var(--space-md);
+        padding-bottom: 100px;
+    }
+}
+
+@media (max-width: 320px) {
+    .goals-list {
+        gap: 12px;
+    }
+    .goals-container {
+        padding: 0 var(--space-sm);
+        padding-bottom: 90px;
     }
 }

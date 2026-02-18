@@ -34,28 +34,29 @@ const GoalDetail = () => {
         }, 150);
     };
 
-    /* helper to calculate progress locally to fix sync issues */
+    /* helper to calculate progress locally — matches backend logic
+       (counts every row in the tasks table: parent tasks + subtasks) */
     const calculateLocalProgress = (currentTasks) => {
-    if (!currentTasks || currentTasks.length === 0) return 0;
+        if (!currentTasks || currentTasks.length === 0) return 0;
 
-    let totalNodes = 0;
-    let completedNodes = 0;
+        let totalNodes = 0;
+        let completedNodes = 0;
 
-    currentTasks.forEach(task => {
-        // Count the parent task
-        totalNodes += 1;
-        if (task.completed) completedNodes += 1;
+        currentTasks.forEach(task => {
+            // Always count the parent task
+            totalNodes += 1;
+            if (task.completed) completedNodes += 1;
 
-        // Count every subtask
-        if (task.subtasks && task.subtasks.length > 0) {
-            task.subtasks.forEach(sub => {
-                totalNodes += 1;
-                if (sub.completed) completedNodes += 1;
-            });
-        }
-    });
+            // Count every subtask
+            if (task.subtasks && task.subtasks.length > 0) {
+                task.subtasks.forEach(sub => {
+                    totalNodes += 1;
+                    if (sub.completed) completedNodes += 1;
+                });
+            }
+        });
 
-    return totalNodes > 0 ? Math.round((completedNodes / totalNodes) * 100) : 0;
+        return totalNodes > 0 ? Math.round((completedNodes / totalNodes) * 100) : 0;
     };
 
     // Add loading state
@@ -87,21 +88,20 @@ const GoalDetail = () => {
                     setGoalTitle(data.goal.title);
                 }
 
-                // Set End Date if available
-                if (data.goal && data.goal.goal_data && data.goal.goal_data.goal_due_date) {
-                    const rawDate = data.goal.goal_data.goal_due_date;
-                    // Format date nicely (e.g. 14 Feb 2026)
-                    const dateObj = new Date(rawDate);
-                    if (!isNaN(dateObj)) {
-                        setEndDate(dateObj.toLocaleDateString('en-GB', {
-                            day: 'numeric',
-                            month: 'short',
-                            year: 'numeric'
-                        }));
-                    } else {
-                        setEndDate(rawDate);
+                // Set End Date if available — check multiple possible locations
+                let rawEndDate = '';
+                if (data.goal) {
+                    const gd = data.goal.goal_data;
+                    if (gd && gd.goal_due_date) {
+                        rawEndDate = gd.goal_due_date;
+                    } else if (data.goal.due_date) {
+                        rawEndDate = data.goal.due_date;
                     }
                 }
+                if (rawEndDate) {
+                    setEndDate(rawEndDate);
+                }
+                console.log("End date extracted:", rawEndDate, "goal_data:", data.goal?.goal_data);
 
                 // Transform backend tasks to frontend format
                 const processTasks = (backendTasks) => {
@@ -123,13 +123,20 @@ const GoalDetail = () => {
                 };
 
                 if (data.tasks) {
-                    setTasks(processTasks(data.tasks));
+                    const processed = processTasks(data.tasks);
+                    setTasks(processed);
+                    // Calculate progress locally from task data for immediate accuracy
+                    setProgress(calculateLocalProgress(processed));
                 }
 
-                // Fetch progress from backend
-                const progRes = await fetch(`${import.meta.env.VITE_API_URL}/tasks/${goalId}/progress`, { cache: 'no-store' });
-                const progData = await progRes.json();
-                if (progData) setProgress(progData.percentage);
+                // Also fetch backend progress as fallback / validation
+                try {
+                    const progRes = await fetch(`${import.meta.env.VITE_API_URL}/tasks/${goalId}/progress`, { cache: 'no-store' });
+                    const progData = await progRes.json();
+                    if (progData) setProgress(progData.percentage);
+                } catch (e) {
+                    // Local calculation is already set, so this is fine
+                }
             } catch (err) {
                 console.error("Error loading goal details:", err);
             } finally {
@@ -177,37 +184,61 @@ const GoalDetail = () => {
 
     /* toggle a subtask */
     const toggleSubtask = (taskId, subtaskId) => {
-    let newStatus = 'not_started';
+        // Prevent unticking completed subtasks
+        const parentTask = tasks.find(t => t.id === taskId);
+        if (parentTask) {
+            const sub = parentTask.subtasks.find(s => s.id === subtaskId);
+            if (sub && sub.completed) return;
+        }
 
-    setTasks(prev => {
-        const newTasks = prev.map(task => {
-            if (task.id !== taskId) return task;
+        let newStatus = 'not_started';
 
-            // 1. Update the specific subtask
-            const updatedSubtasks = task.subtasks.map(s => {
-                if (s.id === subtaskId) {
-                    const nextCompleted = !s.completed;
-                    newStatus = nextCompleted ? 'completed' : 'not_started';
-                    return { ...s, completed: nextCompleted };
-                }
-                return s;
+        setTasks(prev => {
+            const newTasks = prev.map(task => {
+                if (task.id !== taskId) return task;
+
+                // 1. Update the specific subtask
+                const updatedSubtasks = task.subtasks.map(s => {
+                    if (s.id === subtaskId) {
+                        const nextCompleted = !s.completed;
+                        newStatus = nextCompleted ? 'completed' : 'not_started';
+                        return { ...s, completed: nextCompleted };
+                    }
+                    return s;
+                });
+
+                // 2. DON'T auto-complete parent yet — let the user see
+                //    the last subtask checked before the task collapses
+                return {
+                    ...task,
+                    subtasks: updatedSubtasks,
+                    // Keep parent uncompleted for now
+                    completed: false
+                };
             });
 
-            // 2. Check if ALL subtasks are now complete to auto-update parent
-            const allDone = updatedSubtasks.every(s => s.completed);
-            
-            return {
-                ...task,
-                subtasks: updatedSubtasks,
-                completed: allDone // Auto-complete parent if all subs are done
-            };
+            setProgress(calculateLocalProgress(newTasks));
+            return newTasks;
         });
-        
-        setProgress(calculateLocalProgress(newTasks));
-        return newTasks;
-    });
 
-    updateTaskStatus(subtaskId, newStatus);
+        updateTaskStatus(subtaskId, newStatus);
+
+        // After a longer delay, auto-complete parent if all subtasks done
+        setTimeout(() => {
+            setTasks(prev => {
+                const newTasks = prev.map(task => {
+                    if (task.id !== taskId) return task;
+                    const allDone = task.subtasks.every(s => s.completed);
+                    if (allDone && !task.completed) {
+                        updateTaskStatus(taskId, 'completed');
+                        return { ...task, completed: true };
+                    }
+                    return task;
+                });
+                setProgress(calculateLocalProgress(newTasks));
+                return newTasks;
+            });
+        }, 1200);
     };
 
     /* toggle a whole task (complete all subtasks or un-complete) */
@@ -217,8 +248,12 @@ const GoalDetail = () => {
 
     const task = tasks[taskIndex];
     const isComplete = isTaskComplete(task);
-    let targetStatus = isComplete ? 'not_started' : 'completed';
-    let targetBool = !isComplete;
+
+    // Once completed, tasks cannot be unticked
+    if (isComplete) return;
+
+    let targetStatus = 'completed';
+    let targetBool = true;
 
     setTasks(prev => {
         const newTasks = prev.map((t, i) => {
@@ -318,10 +353,7 @@ const GoalDetail = () => {
     if (isLoading) {
         return (
             <div className="goal-detail-page">
-                <div className="loading-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-                    {/* Use Loading component if available, else text */}
-                    <Loading />
-                </div>
+                <Loading />
                 <BottomNav />
             </div>
         );

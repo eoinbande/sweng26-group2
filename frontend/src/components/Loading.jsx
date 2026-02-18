@@ -12,14 +12,19 @@ const Loading = ({ onLoadingComplete }) => {
 
     return (
         <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
             height: '100vh',
-            width: '100%',
+            width: '100vw',
             backgroundColor: 'var(--bg-color)',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: 'var(--space-lg)'
+            gap: 'var(--space-lg)',
+            zIndex: 1000,
+            overflow: 'hidden'
         }}>
             {/*circle*/}
             <div style={{
