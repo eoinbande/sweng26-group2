@@ -161,9 +161,55 @@
     margin-top: clamp(12px, 2dvh, 24px);
 }
 
-/* review-plan: feedback section */
 
-.create-goal-page .cg-feedback-input {
-    padding: clamp(12px, 2dvh, 24px);
-    padding-bottom: clamp(80px, 12dvh, 150px);
+/* ── task card responsive styles ── */
+
+.create-goal-page .cg-task-card {
+    padding: clamp(10px, 1.6dvh, 16px);
+    border-radius: clamp(12px, 2dvh, 20px);
+    min-height: clamp(70px, 11dvh, 100px);
+}
+
+.create-goal-page .cg-task-title {
+    font-size: clamp(12px, 1.7dvh, 14px);
+    margin-bottom: clamp(2px, 0.4dvh, 4px);
+}
+
+.create-goal-page .cg-task-due {
+    font-size: clamp(10px, 1.4dvh, 12px);
+}
+
+/* confirm / deny floating buttons */
+
+.create-goal-page .cg-task-action-btn {
+    width: clamp(28px, 4.5dvh, 36px);
+    height: clamp(28px, 4.5dvh, 36px);
+}
+
+/* subtask items */
+
+.create-goal-page .cg-task-subtask {
+    gap: clamp(4px, 0.8dvh, 8px);
+    padding: clamp(6px, 1dvh, 8px) clamp(8px, 1.2dvh, 10px);
+    border-radius: clamp(8px, 1.4dvh, 10px);
+    min-height: clamp(28px, 4.5dvh, 36px);
+}
+
+.create-goal-page .cg-task-subtask-title {
+    font-size: clamp(11px, 1.5dvh, 13px);
+}
+
+.create-goal-page .cg-task-subtask-due {
+    font-size: clamp(9px, 1.3dvh, 11px);
+}
+
+.create-goal-page .cg-task-subtask-order {
+    font-size: clamp(9px, 1.3dvh, 11px);
+}
+
+/* chevron dropdown button */
+
+.create-goal-page .cg-task-chevron {
+    width: clamp(26px, 4dvh, 32px);
+    height: clamp(26px, 4dvh, 32px);
 }
