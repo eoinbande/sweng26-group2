@@ -116,6 +116,7 @@
 .create-goal-page .cg-date-picker {
     margin-top: clamp(16px, 3.5dvh, 36px);
     border-radius: clamp(20px, 3.5dvh, 32px);
+    padding: clamp(4px, 0.8dvh, 8px);
 }
 
 
