@@ -29,13 +29,10 @@ export function TaskCard({
     }}>
       {/* review variant: confirm/deny buttons floating on left */}
       {isReviewVariant && (
-        <div style={{
+        <div className="cg-task-action-group" style={{
           position: 'absolute',
-          left: '-20px',
-          top: 'var(--space-md)',
           display: 'flex',
           flexDirection: 'column',
-          gap: 'var(--space-sm)',
         }}>
           <button
             type="button"

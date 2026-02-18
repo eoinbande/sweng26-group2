@@ -181,9 +181,15 @@
 
 /* confirm / deny floating buttons */
 
+.create-goal-page .cg-task-action-group {
+    left: clamp(-20px, -2.5dvh, -16px);
+    top: clamp(8px, 1.2dvh, 12px);
+    gap: clamp(4px, 0.6dvh, 6px);
+}
+
 .create-goal-page .cg-task-action-btn {
-    width: clamp(28px, 4.5dvh, 36px);
-    height: clamp(28px, 4.5dvh, 36px);
+    width: clamp(28px, 3.8dvh, 34px);
+    height: clamp(28px, 3.8dvh, 34px);
 }
 
 /* subtask items */
