@@ -39,6 +39,9 @@ function GoalAddDate() {
     // goal text passed from CreateGoal
     const goalText = location.state?.goalText || '';
 
+    // compute responsive item height for date picker (roughly 4.5% of viewport height)
+    const pickerItemHeight = Math.round(window.innerHeight * 0.045);
+
     // fade in content on mount
     useEffect(() => {
         const timer = setTimeout(() => setContentVisible(true), 100);
@@ -257,7 +260,7 @@ function GoalAddDate() {
 
                     {/* expanded: date wheel picker */}
                     <div className="date-picker-wrapper" style={{
-                        maxHeight: showPicker ? '200px' : '0px',
+                        maxHeight: showPicker ? 'calc(clamp(30px, 4.5dvh, 40px) * 3 + 16px)' : '0px',
                         opacity: showPicker ? 1 : 0,
                         overflow: 'hidden',
                         transition: 'max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease 0.1s',
@@ -269,7 +272,7 @@ function GoalAddDate() {
                             defaultYear={new Date().getFullYear()}
                             defaultMonth={new Date().getMonth()}
                             defaultDay={new Date().getDate()}
-                            itemHeight={40}
+                            itemHeight={pickerItemHeight}
                             visibleRows={3}
                             dateTimeFormatOptions={{ month: 'short' }}
                             highlightOverlayStyle={{
