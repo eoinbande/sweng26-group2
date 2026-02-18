@@ -136,3 +136,34 @@
     height: clamp(30px, 4dvh, 36px) !important;
     border-radius: clamp(10px, 1.8dvh, 16px) !important;
 }
+
+
+/* ── review-plan overrides ── */
+
+.create-goal-page.review-plan .cg-blue-card {
+    height: 75dvh;
+}
+
+.create-goal-page.review-plan .cg-bottom {
+    top: 75dvh;
+}
+
+/* review-plan: title */
+
+.create-goal-page.review-plan .cg-blue-card h1 {
+    margin-bottom: clamp(12px, 2dvh, 24px);
+}
+
+/* review-plan: accept / discard row */
+
+.create-goal-page .cg-accept-discard {
+    gap: clamp(8px, 1.5dvh, 16px);
+    margin-top: clamp(12px, 2dvh, 24px);
+}
+
+/* review-plan: feedback section */
+
+.create-goal-page .cg-feedback-input {
+    padding: clamp(12px, 2dvh, 24px);
+    padding-bottom: clamp(80px, 12dvh, 150px);
+}
