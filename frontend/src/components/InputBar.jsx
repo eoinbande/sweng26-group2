@@ -15,6 +15,7 @@ export function InputBar({
     backgroundColor = null, // custom background color override
     fontSize = null, // custom font size override
     readOnly = false, // make input read-only
+    className = '', // custom wrapper class for responsive overrides
 }) {
     const isAuthVariant = variant === "auth";
 
