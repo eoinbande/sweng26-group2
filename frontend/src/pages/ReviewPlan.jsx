@@ -6,6 +6,7 @@ import { TaskCard } from '../components/TaskCard';
 import { InputBar } from '../components/InputBar';
 import LoadingOverlay from '../components/LoadingOverlay';
 import { isDemoMode } from '../supabase_client';
+import '../styles/CreateGoal.css';
 import '../index.css';
 
 function ReviewPlan() {
@@ -227,19 +228,11 @@ function ReviewPlan() {
     }, [location.state]);
 
     return (
-        <div style={{
-            height: '100vh',
-            display: 'flex',
-            flexDirection: 'column',
-            maxWidth: '480px',
-            margin: '0 auto',
-            overflow: 'hidden',
-            backgroundColor: 'var(--bg-color)',
-        }}>
+        <div className="create-goal-page review-plan">
             {/* blue section - starts at final size (seamless from LoadingOverlay) */}
-            <div style={{
+            <div className="cg-blue-card" style={{
                 background: 'var(--accent-blue)',
-                padding: 'var(--space-lg)',
+                padding: 'var(--space-xxl)',
                 paddingTop: 'var(--space-xl)',
                 paddingBottom: 'var(--space-xl)',
                 borderRadius: '0 0 var(--radius-xxl) var(--radius-xxl)',
@@ -248,22 +241,20 @@ function ReviewPlan() {
                 position: 'relative',
                 zIndex: 1,
                 flexShrink: 0,
-                height: '75vh',
                 display: 'flex',
                 flexDirection: 'column',
             }}>
-                {/* Back button */}
+                {/* back button */}
                 <button
+                    className="cg-back-btn"
                     onClick={handleDiscard}
                     style={{
                         backgroundColor: 'transparent',
                         border: 'none',
-                        padding: 'var(--space-sm)',
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        marginBottom: 'var(--space-md)',
                         transition: 'transform 0.2s',
                         alignSelf: 'flex-start',
                     }}
@@ -276,10 +267,8 @@ function ReviewPlan() {
                 {/* title - fades in after loading overlay completes */}
                 <h1 style={{
                     fontFamily: 'var(--font-serif)',
-                    fontSize: '36px',
                     fontWeight: '600',
                     lineHeight: '1.2',
-                    marginBottom: 'var(--space-lg)',
                     color: 'var(--text-main)',
                     textAlign: 'center',
                     opacity: contentVisible ? 1 : 0,
@@ -372,30 +361,27 @@ function ReviewPlan() {
                 </div>
 
                 {/* accept/discard - fades in with content */}
-                <div style={{
+                <div className="cg-accept-discard" style={{
                     display: 'flex',
-                    gap: 'var(--space-md)',
                     justifyContent: 'center',
-                    marginTop: 'var(--space-lg)',
                     opacity: contentVisible ? 1 : 0,
                     transition: 'opacity 0.4s ease-out 0.3s',
                 }}>
                     <button
+                        className="cg-action-btn"
                         onClick={handleAccept}
                         disabled={saving}
                         style={{
                             backgroundColor: 'var(--primary)',
                             color: 'var(--text-main)',
                             border: 'none',
-                            borderRadius: 'var(--radius-pill)',
-                            padding: '12px 32px',
                             fontFamily: 'var(--font-sans)',
-                            fontSize: '16px',
                             fontWeight: '500',
                             cursor: saving ? 'wait' : 'pointer',
                             transition: 'all 0.3s ease',
                             boxShadow: 'var(--shadow-sm)',
                             opacity: saving ? 0.7 : 1,
+                            whiteSpace: 'nowrap',
                         }}
                         onMouseEnter={(e) => {
                             e.currentTarget.style.transform = 'translateY(-3px)';
@@ -409,19 +395,18 @@ function ReviewPlan() {
                         {saving ? 'Saving...' : 'Accept'}
                     </button>
                     <button
+                        className="cg-action-btn"
                         onClick={handleDiscard}
                         style={{
                             backgroundColor: 'var(--accent-red-soft)',
                             color: 'white',
                             border: 'none',
-                            borderRadius: 'var(--radius-pill)',
-                            padding: '12px 32px',
                             fontFamily: 'var(--font-sans)',
-                            fontSize: '16px',
                             fontWeight: '500',
                             cursor: 'pointer',
                             transition: 'all 0.3s ease',
                             boxShadow: 'var(--shadow-sm)',
+                            whiteSpace: 'nowrap',
                         }}
                         onMouseEnter={(e) => {
                             e.currentTarget.style.transform = 'translateY(-3px)';
@@ -438,21 +423,20 @@ function ReviewPlan() {
             </div>
 
             {/* bottom section - feedback input */}
-            <div style={{
-                padding: 'var(--space-lg)',
-                paddingBottom: '100px',
-                backgroundColor: 'var(--bg-color)',
+            <div className="cg-bottom" style={{
+                justifyContent: 'center',
             }}>
-                <InputBar
-                    placeholder="Feedback to AI..."
-                    value={feedbackText}  
-                    onChange={(e) => setFeedbackText(e.target.value)}  // Update state
-                    onSubmit={() => handleSubmitFeedback(feedbackText)}  // Call feedback handler
-                    variant="auth"
-                    borderRadius="var(--radius-xl)"
-                    disabled={submittingFeedback}
-                />
-                
+                <div className="cg-manual-input">
+                    <InputBar
+                        className="cg-input-bar"
+                        placeholder="Feedback to AI..."
+                        value={feedbackText}
+                        onChange={(e) => setFeedbackText(e.target.value)}
+                        onSubmit={() => handleSubmitFeedback(feedbackText)}
+                        variant="auth"
+                        disabled={submittingFeedback}
+                    />
+                </div>
             </div>
 
             <BottomNav />

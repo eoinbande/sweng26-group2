@@ -32,18 +32,17 @@
     --font-weight-bold: 700;
     /* Spacing */
     --space-xs: 4px;
-
-    /* Reduce these to help everything fit */
     --space-sm: 6px;   /* was 8px */
     --space-md: 12px;  /* was 16px */
     --space-mdlg: 16px;
-    --space-lg: 24px;  /* was 40px - this is likely causing the "cut off" */
+    --space-lg: 24px;  /* was 40px*/
     --space-xl: 28px;  /* was 32px */
+    --space-xxl: 38px;  /* was 32px */
     /* Radius */
     --radius-sm: 8px;
     --radius-md: 16px;
-    --radius-lg: 24px;
-    --radius-xl: 32px;
+    --radius-lg: 28px;
+    --radius-xl: 38px;
     --radius-xxl: 48px;
     --radius-pill: 9999px;
     /* Shadows - Increased intensity */
@@ -172,11 +171,14 @@ button:active {
 
 /* date wheel picker overrides */
 .date-picker-wrapper #container {
-    margin: 0;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 .date-picker-wrapper #pickerWrapper {
     gap: 0;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 /* reorder columns: month first, then day, then year */
@@ -198,14 +200,25 @@ button:active {
 
 .date-picker-wrapper #pickerWrapper > div[style*="scroll"] {
     width: 33.33% !important;
+    height: calc(clamp(30px, 4.5dvh, 40px) * 3) !important;
+}
+
+.date-picker-wrapper #pickerWrapper {
+    height: calc(clamp(30px, 4.5dvh, 40px) * 3) !important;
 }
 
 .date-picker-wrapper #pickerWrapper > div[style*="scroll"] div {
-    font-size: 18px !important;
+    font-size: clamp(14px, 2dvh, 18px) !important;
+    height: clamp(30px, 4.5dvh, 40px) !important;
     justify-content: center !important;
     padding-left: 0 !important;
     padding-right: 0 !important;
     text-align: center !important;
+}
+
+/* responsive highlight overlay */
+.date-picker-wrapper #pickerWrapper > #highlightOverlay {
+    height: clamp(30px, 4.5dvh, 40px) !important;
 }
 
 .date-picker-wrapper #pickerWrapper > div::-webkit-scrollbar {

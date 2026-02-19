@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Home from './pages/Home';
 import Goals from './pages/Goals';
 import CreateGoal from './pages/CreateGoal';
@@ -17,7 +17,8 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/home" element={<Home />} />
         <Route path="/goals" element={<Goals />} />
         <Route path="/goal/:id" element={<GoalDetail />} /> {/* Add dynamic route */}
         <Route path="/create-goal" element={<CreateGoal />} />

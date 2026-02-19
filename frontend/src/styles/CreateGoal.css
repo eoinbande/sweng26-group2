@@ -1,0 +1,224 @@
+/* responsive styles for the create goal page */
+
+
+/* the blue card section is already responsive — these target the bottom section */
+
+.create-goal-page {
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    max-width: 480px;
+    margin: 0 auto;
+    overflow: hidden;
+    position: relative;
+    background-color: var(--bg-color);
+}
+
+
+/* blue card section */
+
+.create-goal-page .cg-blue-card {
+    height: 66dvh;
+}
+
+
+/* back button */
+
+.create-goal-page .cg-back-btn {
+    margin-bottom: clamp(12px, 2.5dvh, 24px);
+}
+
+
+/* title */
+
+.create-goal-page .cg-blue-card h1 {
+    font-size: clamp(26px, 4.5dvh, 40px);
+    margin-bottom: clamp(6px, 1.2dvh, 12px);
+}
+
+
+/* subtitle */
+
+.create-goal-page .cg-blue-card .cg-subtitle {
+    font-size: clamp(12px, 1.8dvh, 16px);
+    margin-bottom: clamp(12px, 2.5dvh, 28px);
+}
+
+
+/* suggestion buttons */
+
+.create-goal-page .cg-suggestions {
+    gap: clamp(10px, 2dvh, 18px);
+}
+
+.create-goal-page .cg-suggestion-btn {
+    padding: clamp(12px, 2dvh, 24px) clamp(18px, 3dvh, 28px);
+    font-size: clamp(12px, 1.5dvh, 16px);
+    border-radius: clamp(16px, 2.8dvh, 24px);
+}
+
+
+/* ai input wrapper inside blue card */
+
+.create-goal-page .cg-ai-input {
+    padding-bottom: clamp(6px, 1dvh, 12px);
+}
+
+
+/* bottom section below the blue card */
+
+.create-goal-page .cg-bottom {
+    position: absolute;
+    top: 66dvh;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bg-color);
+}
+
+
+/* "or" divider */
+
+.create-goal-page .cg-or-divider {
+    font-family: var(--font-serif);
+    font-size: clamp(14px, 2dvh, 20px);
+    font-weight: 500;
+    color: var(--text-main);
+}
+
+
+/* manual input wrapper */
+
+.create-goal-page .cg-manual-input {
+    padding: 0 clamp(16px, 2.5dvh, 24px);
+    padding-bottom: clamp(80px, 12dvh, 150px);
+}
+
+
+/* goal-add-date: action buttons (skip deadline, let ai decide) */
+
+.create-goal-page .cg-action-buttons {
+    gap: clamp(8px, 2dvh, 18px);
+    margin-top: clamp(16px, 5.5dvh, 50px);
+}
+
+.create-goal-page .cg-action-btn {
+    padding: clamp(10px, 1.8dvh, 14px) clamp(24px, 4.5dvh, 38px);
+    font-size: clamp(13px, 1.9dvh, 17px);
+    border-radius: var(--radius-pill);
+}
+
+
+/* goal-add-date: date picker container */
+
+.create-goal-page .cg-date-picker {
+    margin-top: clamp(16px, 3.5dvh, 36px);
+    border-radius: clamp(20px, 3.5dvh, 32px);
+    padding: clamp(4px, 0.8dvh, 8px);
+}
+
+
+/* input bar responsive overrides — !important needed to beat inline styles */
+
+.create-goal-page .cg-input-bar {
+    padding: clamp(12px, 1.5dvh, 20px) clamp(16px, 2.5dvh, 22px) !important;
+    border-radius: clamp(22px, 3.5dvh, 32px) !important;
+}
+
+.create-goal-page .cg-input-bar input {
+    font-size: clamp(14px, 1.8dvh, 16px) !important;
+}
+
+.create-goal-page .cg-input-bar button {
+    width: clamp(30px, 4dvh, 36px) !important;
+    height: clamp(30px, 4dvh, 36px) !important;
+    border-radius: clamp(10px, 1.8dvh, 16px) !important;
+}
+
+.create-goal-page .cg-date-picker .cg-input-bar input {
+    font-size: clamp(14px, 2.5dvh, 22px) !important;
+}
+
+/* ── review-plan overrides ── */
+
+.create-goal-page.review-plan .cg-blue-card {
+    height: 75dvh;
+}
+
+.create-goal-page.review-plan .cg-bottom {
+    top: 75dvh;
+}
+
+/* review-plan: title */
+
+.create-goal-page.review-plan .cg-blue-card h1 {
+    margin-bottom: clamp(12px, 2dvh, 24px);
+}
+
+/* review-plan: accept / discard row */
+
+.create-goal-page .cg-accept-discard {
+    gap: clamp(8px, 1.5dvh, 16px);
+    margin-top: clamp(12px, 2dvh, 24px);
+}
+
+
+/* ── task card responsive styles ── */
+
+.create-goal-page .cg-task-card {
+    padding: clamp(10px, 1.6dvh, 16px);
+    border-radius: clamp(12px, 2dvh, 20px);
+    min-height: clamp(70px, 11dvh, 100px);
+}
+
+.create-goal-page .cg-task-title {
+    font-size: clamp(12px, 1.7dvh, 14px);
+    margin-bottom: clamp(2px, 0.4dvh, 4px);
+}
+
+.create-goal-page .cg-task-due {
+    font-size: clamp(10px, 1.4dvh, 12px);
+}
+
+/* confirm / deny floating buttons */
+
+.create-goal-page .cg-task-action-group {
+    left: clamp(-20px, -2.5dvh, -16px);
+    top: clamp(8px, 1.2dvh, 12px);
+    gap: clamp(4px, 0.6dvh, 6px);
+}
+
+.create-goal-page .cg-task-action-btn {
+    width: clamp(28px, 3.8dvh, 34px);
+    height: clamp(28px, 3.8dvh, 34px);
+}
+
+/* subtask items */
+
+.create-goal-page .cg-task-subtask {
+    gap: clamp(4px, 0.8dvh, 8px);
+    padding: clamp(6px, 1dvh, 8px) clamp(8px, 1.2dvh, 10px);
+    border-radius: clamp(8px, 1.4dvh, 10px);
+    min-height: clamp(28px, 4.5dvh, 36px);
+}
+
+.create-goal-page .cg-task-subtask-title {
+    font-size: clamp(11px, 1.5dvh, 13px);
+}
+
+.create-goal-page .cg-task-subtask-due {
+    font-size: clamp(9px, 1.3dvh, 11px);
+}
+
+.create-goal-page .cg-task-subtask-order {
+    font-size: clamp(9px, 1.3dvh, 11px);
+}
+
+/* chevron dropdown button */
+
+.create-goal-page .cg-task-chevron {
+    width: clamp(26px, 4dvh, 32px);
+    height: clamp(26px, 4dvh, 32px);
+}

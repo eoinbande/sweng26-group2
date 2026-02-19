@@ -21,7 +21,7 @@ function Login() {
         e.preventDefault();
 
         if (isDemoMode) {
-            navigate('/');
+            navigate('/home');
             return;
         }
 
@@ -35,7 +35,7 @@ function Login() {
             return;
         }
 
-        navigate('/');
+        navigate('/home');
     };
 
     return (
