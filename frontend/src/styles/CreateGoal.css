@@ -52,8 +52,8 @@
 }
 
 .create-goal-page .cg-suggestion-btn {
-    padding: clamp(14px, 2.5dvh, 24px) clamp(18px, 3dvh, 28px);
-    font-size: clamp(13px, 1.8dvh, 16px);
+    padding: clamp(12px, 2dvh, 24px) clamp(18px, 3dvh, 28px);
+    font-size: clamp(12px, 1.5dvh, 16px);
     border-radius: clamp(16px, 2.8dvh, 24px);
 }
 
@@ -123,7 +123,7 @@
 /* input bar responsive overrides — !important needed to beat inline styles */
 
 .create-goal-page .cg-input-bar {
-    padding: clamp(14px, 2.2dvh, 20px) clamp(16px, 2.5dvh, 22px) !important;
+    padding: clamp(12px, 1.5dvh, 20px) clamp(16px, 2.5dvh, 22px) !important;
     border-radius: clamp(22px, 3.5dvh, 32px) !important;
 }
 
@@ -137,6 +137,9 @@
     border-radius: clamp(10px, 1.8dvh, 16px) !important;
 }
 
+.create-goal-page .cg-date-picker .cg-input-bar input {
+    font-size: clamp(14px, 2.5dvh, 22px) !important;
+}
 
 /* ── review-plan overrides ── */
 

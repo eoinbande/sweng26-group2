@@ -162,7 +162,7 @@ function GoalAddDate() {
             {/* blue section */}
             <div className="cg-blue-card" style={{
                 background: 'var(--accent-blue)',
-                padding: 'var(--space-lg)',
+                padding: 'var(--space-xxl)',
                 paddingTop: 'var(--space-xl)',
                 paddingBottom: 'var(--space-xl)',
                 borderRadius: isExpanding ? '0' : '0 0 var(--radius-xxl) var(--radius-xxl)',
@@ -185,7 +185,6 @@ function GoalAddDate() {
                     style={{
                         backgroundColor: 'transparent',
                         border: 'none',
-                        padding: 'var(--space-sm)',
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
@@ -235,7 +234,7 @@ function GoalAddDate() {
                 >
                     {/* collapsed: input bar label */}
                     <div style={{
-                        maxHeight: showPicker ? '0px' : '80px',
+                        maxHeight: showPicker ? '4px' : '80px',
                         opacity: showPicker ? 0 : 1,
                         overflow: 'hidden',
                         transition: 'max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease',

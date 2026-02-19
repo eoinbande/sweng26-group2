@@ -82,7 +82,7 @@ function LoadingOverlay({ onComplete }) {
                 maxWidth: '480px',
                 height: isShrinking ? '75vh' : '100vh',
                 background: 'var(--accent-blue)',
-                padding: 'var(--space-lg)',
+                padding: 'var(--space-xxl)',
                 paddingTop: 'var(--space-xl)',
                 paddingBottom: 'var(--space-xl)',
                 borderRadius: isShrinking ? '0 0 var(--radius-xxl) var(--radius-xxl)' : '0',
@@ -98,9 +98,7 @@ function LoadingOverlay({ onComplete }) {
                     onClick={() => navigate('/create-goal')}
                     style={{
                         backgroundColor: 'transparent',
-                        border: 'none',
-                        padding: 'var(--space-sm)',
-                        cursor: 'pointer',
+                        border: 'none',                        cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',

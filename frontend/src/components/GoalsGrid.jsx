@@ -15,7 +15,7 @@ const GoalsGrid = () => {
 
     return (
         <div className="home-goals-grid">
-            <h4>January's goals</h4>
+            <h4>February's goals</h4>
 
             <div className="goals-scroll">
                 {goals.map((goal, index) => (
