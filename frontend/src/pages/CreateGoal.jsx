@@ -68,7 +68,6 @@ function CreateGoal() {
                     style={{
                         backgroundColor: 'transparent',
                         border: 'none',
-                        padding: 'var(--space-sm)',
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',

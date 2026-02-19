@@ -162,7 +162,7 @@ function GoalAddDate() {
             {/* blue section */}
             <div className="cg-blue-card" style={{
                 background: 'var(--accent-blue)',
-                padding: 'var(--space-lg)',
+                padding: 'var(--space-xxl)',
                 paddingTop: 'var(--space-xl)',
                 paddingBottom: 'var(--space-xl)',
                 borderRadius: isExpanding ? '0' : '0 0 var(--radius-xxl) var(--radius-xxl)',
@@ -185,7 +185,6 @@ function GoalAddDate() {
                     style={{
                         backgroundColor: 'transparent',
                         border: 'none',
-                        padding: 'var(--space-sm)',
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
