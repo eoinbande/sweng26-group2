@@ -22,7 +22,7 @@
 
 .home-page .home-header {
     padding-top: clamp(8px, 2dvh, 24px);
-    padding-bottom: clamp(2px, 1.5dvh, 15px);
+    padding-bottom: clamp(2px, 3dvh, 15px);
     flex-shrink: 0;
 }
 
@@ -48,7 +48,7 @@
 /* calendar strip */
 
 .home-page .home-calendar {
-    margin-bottom: clamp(4px, 1dvh, 16px);
+    margin-bottom: clamp(4px, 3dvh, 28px);
     flex-shrink: 0;
 }
 
@@ -74,19 +74,19 @@
 /* top/bottom padding = 2x the side padding to keep proportional height */
 
 .home-page .home-create-goal {
-    padding: clamp(32px, 3dvh, 80px) clamp(16px, 5dvh, 40px);
+    padding: clamp(32px, 6dvh, 150px) clamp(16px, 5dvh, 40px);
     padding-right: clamp(24px, 6dvh, 60px);
     flex-shrink: 0;
 }
 
 .home-page .home-create-goal h3 {
-    font-size: clamp(16px, 2.5dvh, 24px);
+    font-size: clamp(16px, 2.5dvh, 22px);
     margin-bottom: clamp(4px, 1dvh, 14px);
     font-family: var(--font-sans);
 }
 
 .home-page .home-create-goal p {
-    font-size: clamp(13px, 2dvh, 18px);
+    font-size: clamp(13px, 2dvh, 16px);
 }
 
 .home-page .home-create-goal .create-goal-btn {
@@ -113,6 +113,7 @@
     flex-direction: column;
     flex: 0.9;
     min-height: 0px;
+    max-height: 200px;
 }
 
 .home-page .home-upcoming-tasks>h4 {
