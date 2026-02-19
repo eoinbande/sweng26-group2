@@ -234,7 +234,7 @@ function GoalAddDate() {
                 >
                     {/* collapsed: input bar label */}
                     <div style={{
-                        maxHeight: showPicker ? '0px' : '80px',
+                        maxHeight: showPicker ? '4px' : '80px',
                         opacity: showPicker ? 0 : 1,
                         overflow: 'hidden',
                         transition: 'max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease',

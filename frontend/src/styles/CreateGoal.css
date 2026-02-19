@@ -137,6 +137,9 @@
     border-radius: clamp(10px, 1.8dvh, 16px) !important;
 }
 
+.create-goal-page .cg-date-picker .cg-input-bar input {
+    font-size: clamp(14px, 2.5dvh, 22px) !important;
+}
 
 /* ── review-plan overrides ── */
 
