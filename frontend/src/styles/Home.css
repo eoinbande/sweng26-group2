@@ -113,14 +113,14 @@
     flex-direction: column;
     flex: 0.9;
     min-height: 0px;
-    max-height: 400px;
+    max-height: 270px;
 }
 
 .home-page .home-upcoming-tasks>h4 {
     font-family: var(--font-serif);
-    font-size: clamp(16px, 2.5dvh, 20px);
+    font-size: clamp(16px, 2.7dvh, 20px);
     font-weight: 600;
-    margin-bottom: clamp(8px, 1.4dvh, 24px);
+    margin-bottom: clamp(8px, 2dvh, 24px);
     flex-shrink: 0;
 }
 
@@ -152,9 +152,9 @@
 
 .home-page .home-goals-grid>h4 {
     font-family: var(--font-serif);
-    font-size: clamp(16px, 2.5dvh, 20px);
+    font-size: clamp(16px, 2.7dvh, 20px);
     font-weight: 600;
-    margin-bottom: 0px;
+    margin-bottom: clamp(8px, 1dvh, 24px);
 }
 
 .home-page .home-goals-grid .goals-scroll {
