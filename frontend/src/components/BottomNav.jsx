@@ -61,7 +61,7 @@ const BottomNav = () => {
                 alignItems: 'center',
                 gap: '3px',
                 cursor: 'pointer',
-            }} onClick={() => navigate('/')}>
+            }} onClick={() => navigate('/home')}>
                 <div className="bottom-nav-home-btn" style={{
                     backgroundColor: 'var(--primary)',
                     borderRadius: '50%',

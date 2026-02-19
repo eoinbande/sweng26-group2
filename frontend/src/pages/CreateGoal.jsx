@@ -64,7 +64,7 @@ function CreateGoal() {
                 {/* back button - always visible */}
                 <button
                     className="cg-back-btn"
-                    onClick={() => navigate('/')}
+                    onClick={() => navigate('/home')}
                     style={{
                         backgroundColor: 'transparent',
                         border: 'none',
