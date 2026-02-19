@@ -232,7 +232,7 @@ function ReviewPlan() {
             {/* blue section - starts at final size (seamless from LoadingOverlay) */}
             <div className="cg-blue-card" style={{
                 background: 'var(--accent-blue)',
-                padding: 'var(--space-lg)',
+                padding: 'var(--space-xxl)',
                 paddingTop: 'var(--space-xl)',
                 paddingBottom: 'var(--space-xl)',
                 borderRadius: '0 0 var(--radius-xxl) var(--radius-xxl)',
@@ -251,7 +251,6 @@ function ReviewPlan() {
                     style={{
                         backgroundColor: 'transparent',
                         border: 'none',
-                        padding: 'var(--space-sm)',
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
