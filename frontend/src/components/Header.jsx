@@ -6,7 +6,7 @@ const Header = () => {
             <div className="flex-between">
                 <div>
                     <h1>
-                        Hi, Jaume L.
+                        Hi, Lili.
                     </h1>
                 </div>
 
