@@ -2,13 +2,13 @@ import '../index.css';
 
 const CalendarStrip = () => {
     const days = [
-        { day: 'Mon', date: 26 },
-        { day: 'Tue', date: 27, active: true },
-        { day: 'Wed', date: 28 },
-        { day: 'Thu', date: 29 },
-        { day: 'Fri', date: 30 },
-        { day: 'Sat', date: 31 },
-        { day: 'Sun', date: 1 },
+        { day: 'Mon', date: 16 },
+        { day: 'Tue', date: 17 },
+        { day: 'Wed', date: 18 },
+        { day: 'Thu', date: 19 },
+        { day: 'Fri', date: 20, active: true  },
+        { day: 'Sat', date: 21},
+        { day: 'Sun', date: 22 },
     ];
 
     return (

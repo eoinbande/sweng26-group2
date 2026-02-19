@@ -71,7 +71,7 @@ const UpcomingTasks = () => {
                     {/* white inner container for the list */}
                     <div style={{
                         backgroundColor: 'white',
-                        borderRadius: 'var(--radius-md)',
+                        borderRadius: 'var(--radius-lg)',
                         height: '100%',
                         position: 'relative',
                         overflow: 'hidden',
