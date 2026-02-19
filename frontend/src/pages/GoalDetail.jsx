@@ -35,7 +35,12 @@ const GoalDetail = () => {
     };
 
     /* helper to calculate progress locally — matches backend logic
-       (counts every row in the tasks table: parent tasks + subtasks) */
+       (counts every row in the tasks table: parent tasks + subtasks)
+       
+       IMPORTANT: A parent task is considered completed when ALL its subtasks
+       are completed (matches the backend auto-complete behaviour). This ensures
+       the progress bar here matches the Goals list page, even during the 1200ms
+       delay before the parent's `completed` boolean is flipped locally. */
     const calculateLocalProgress = (currentTasks) => {
         if (!currentTasks || currentTasks.length === 0) return 0;
 
@@ -43,16 +48,20 @@ const GoalDetail = () => {
         let completedNodes = 0;
 
         currentTasks.forEach(task => {
-            // Always count the parent task
             totalNodes += 1;
-            if (task.completed) completedNodes += 1;
 
-            // Count every subtask
             if (task.subtasks && task.subtasks.length > 0) {
+                // Parent is "completed" if every subtask is completed
+                const allSubsDone = task.subtasks.every(s => s.completed);
+                if (allSubsDone) completedNodes += 1;
+
                 task.subtasks.forEach(sub => {
                     totalNodes += 1;
                     if (sub.completed) completedNodes += 1;
                 });
+            } else {
+                // No subtasks — use the task's own completed flag
+                if (task.completed) completedNodes += 1;
             }
         });
 
@@ -125,17 +134,10 @@ const GoalDetail = () => {
                 if (data.tasks) {
                     const processed = processTasks(data.tasks);
                     setTasks(processed);
-                    // Calculate progress locally from task data for immediate accuracy
+                    // Calculate progress locally — this is the single source of truth
+                    // for the GoalDetail session. It matches backend counting because
+                    // get_goal_details already patches statuses from the tasks table.
                     setProgress(calculateLocalProgress(processed));
-                }
-
-                // Also fetch backend progress as fallback / validation
-                try {
-                    const progRes = await fetch(`${import.meta.env.VITE_API_URL}/tasks/${goalId}/progress`, { cache: 'no-store' });
-                    const progData = await progRes.json();
-                    if (progData) setProgress(progData.percentage);
-                } catch (e) {
-                    // Local calculation is already set, so this is fine
                 }
             } catch (err) {
                 console.error("Error loading goal details:", err);
