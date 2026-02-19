@@ -48,7 +48,7 @@
 /* calendar strip */
 
 .home-page .home-calendar {
-    margin-bottom: clamp(4px, 3dvh, 28px);
+    margin-bottom: clamp(4px, 2dvh, 4dvh);
     flex-shrink: 0;
 }
 
@@ -57,8 +57,8 @@
 }
 
 .home-page .home-calendar .calendar-day-circle {
-    width: clamp(36px, 6.5dvh, 50px);
-    height: clamp(36px, 6.5dvh, 50px);
+    width: clamp(36px, 7dvh, 50px);
+    height: clamp(36px, 7dvh, 50px);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -74,7 +74,7 @@
 /* top/bottom padding = 2x the side padding to keep proportional height */
 
 .home-page .home-create-goal {
-    padding: clamp(32px, 6dvh, 150px) clamp(16px, 5dvh, 40px);
+    padding: clamp(32px, 5dvh, 5dvh) clamp(16px, 5dvh, 40px);
     padding-right: clamp(24px, 6dvh, 60px);
     flex-shrink: 0;
 }
@@ -113,7 +113,7 @@
     flex-direction: column;
     flex: 0.9;
     min-height: 0px;
-    max-height: 200px;
+    max-height: 400px;
 }
 
 .home-page .home-upcoming-tasks>h4 {

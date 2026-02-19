@@ -15,7 +15,7 @@ const CreateGoalCard = () => {
             maxWidth: '480px',
             boxShadow: 'var(--shadow-md)',
             border: 'none',
-            borderRadius: 'var(--radius-xl)',
+            borderRadius: 'var(--radius-xxl)',
         }}>
             <div>
                 <h3>
