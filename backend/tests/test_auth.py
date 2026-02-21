@@ -36,3 +36,14 @@ def test_no_email():
     })
 
     assert response.status_code == 422 #missing email, invalid!
+
+
+def test_empty_name():
+    response = client.post("/profiles", json = {
+        "user_id": "123",
+        "name": "",
+        "email": "alex@test.com"
+    }) 
+
+    assert response.status_code == 200 #check if we get the correct code
+    
