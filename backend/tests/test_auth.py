@@ -4,11 +4,13 @@ from unittest.mock import patch
 
 client = TestClient(app)
 
-#TEST AUTHENTICATION: (AT LEAST 5 TESTS) try to get full coverage in profile creation
+#TEST AUTHENTICATION: (AT LEAST 4 TESTS) try to get full coverage in profile creation
+
 
 #We will run the test by mocking the DB
 
 #Test: check if we can successfully create an user
+@patch("app.routers.auth.create_user")
 def test_user_creation(mock_create_user):
     mock_create_user.return_value.data = [
         {
@@ -18,7 +20,7 @@ def test_user_creation(mock_create_user):
         }
     ]
 
-    response = client.post("/profiles", json = {
+    response = client.post("/api/profiles", json = {
         "user_id": "123",
         "name": "Alex",
         "email": "alex@test.com"
@@ -30,7 +32,7 @@ def test_user_creation(mock_create_user):
 
 #Test: check if user fails to sign up if they do not provide email
 def test_no_email():
-    response = client.post("/profiles", json= {
+    response = client.post("/api/profiles", json= {
         "user_id": "123",
         "name": "Alex"
     })
@@ -38,14 +40,15 @@ def test_no_email():
     assert response.status_code == 422 #missing email, invalid!
 
 #Test: check if user fails to sign up if they do not provide user
-def test_empty_name():
-    response = client.post("/profiles", json = {
+@patch("app.routers.auth.create_user")
+def test_empty_name(mock_create_user):
+    response = client.post("/api/profiles", json = {
         "user_id": "123",
         "name": "",
         "email": "alex@test.com"
     }) 
 
-    assert response.status_code == 200 #check if we get the correct code
+    assert response.status_code == 422 #check if we get the correct code
 
 
 #Test: Database failure
@@ -53,7 +56,7 @@ def test_empty_name():
 def test_create_db_failure(mock_create_user):
     mock_create_user.side_effect = Exception("DB Error")
 
-    response = client.post("/profiles", json = {
+    response = client.post("/api/profiles", json = {
         "user_id": "123",
         "name": "Alex",
         "email": "alex@test.com"
