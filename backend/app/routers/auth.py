@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from ..Tables import create_user #we import the functions related to Auth
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from fastapi import HTTPException
 
 #CREATION of USER(when a person created a new account) endpoint
@@ -11,7 +11,7 @@ account_router = APIRouter()
 
 class RequestUser(BaseModel):
     user_id: str
-    name: str
+    name: str = Field(min_length = 1) #user NEEDS to put a username
     email: str
     
 
