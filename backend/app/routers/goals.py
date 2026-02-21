@@ -86,7 +86,8 @@ def create_goal_endpoint(goal: CreateGoalRequest):
     # Create the goal in the database (empty task list for now)
     result = create_goal(
         user_id=goal.user_id,
-        title=goal.title
+        title=goal.title,
+        category = goal.category
     )
 
     # Extract the goal ID from the database response
@@ -112,6 +113,7 @@ def create_goal_endpoint(goal: CreateGoalRequest):
         "message": "Goal created — review your plan below",
         "goal_id": goal_id,
         "title": goal.title,
+        "category": goal.category,
         "description": ai_plan.get("description", ""),
         "goal_due_date": ai_plan.get("goal_due_date", ""),
         "tasks": ai_plan["tasks"],   # Tasks for frontend to display on review screen
