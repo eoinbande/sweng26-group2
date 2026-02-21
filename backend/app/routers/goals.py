@@ -33,7 +33,7 @@ class CreateGoalRequest(BaseModel):
     user_id: str
     title: str = Field(min_length=1) # won't allow goals to be created with empty titles
     category: CategoryEnum #each goal will be of one category
-
+    #REMEMBER, give the option to also if user dont want to put a labrl, then they dont need to
 
 class AcceptPlanRequest(BaseModel):
     """
