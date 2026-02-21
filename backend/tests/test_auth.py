@@ -37,7 +37,7 @@ def test_no_email():
 
     assert response.status_code == 422 #missing email, invalid!
 
-
+#Test: check if user fails to sign up if they do not provide user
 def test_empty_name():
     response = client.post("/profiles", json = {
         "user_id": "123",
@@ -46,4 +46,19 @@ def test_empty_name():
     }) 
 
     assert response.status_code == 200 #check if we get the correct code
-    
+
+
+#Test: Database failure
+@patch("app.routers.auth.create_user")
+def test_create_db_failure(mock_create_user):
+    mock_create_user.side_effect = Exception("DB Error")
+
+    response = client.post("/profiles", json = {
+        "user_id": "123",
+        "name": "Alex",
+        "email": "alex@test.com"
+    })
+
+    assert response.status_code == 500 #check if we get the correct code!
+
+
