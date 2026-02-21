@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException
+from enum import Enum
 from pydantic import BaseModel, Field
 # Database functions (Tables.py)
 from ..Tables import (
@@ -51,6 +52,12 @@ class FeedbackRequest(BaseModel):
     Example: {"feedback": "I don't like task_3, use soapy water instead"}
     """
     feedback: str
+
+#Enums of predefined categories(for now 3, later we can add more!)
+class CategoryEnum(str, Enum):
+    Health = "Health"
+    Personal = "Personal"
+    Work = "Work"
 
 
 
