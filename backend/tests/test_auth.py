@@ -27,3 +27,12 @@ def test_user_creation(mock_create_user):
     assert response.status_code == 200 #check if we get the correct code
     assert response.json()["message"] == "User successfully created"
     assert response.json()["user"][0]["email"] == "alex@test.com"
+
+#Test: check if user fails to sign up if they do not provide email
+def test_no_email():
+    response = client.post("/profiles", json= {
+        "user_id": "123",
+        "name": "Alex"
+    })
+
+    assert response.status_code == 422 #missing email, invalid!
