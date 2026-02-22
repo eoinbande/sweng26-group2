@@ -98,6 +98,7 @@
 
 /* ── goal range highlights ── */
 
+
 /* single day — circle */
 
 .mc-cell--single::after {
@@ -114,6 +115,7 @@
     color: var(--range-text);
     font-weight: 600;
 }
+
 
 /* range start — pill left half */
 
@@ -135,6 +137,7 @@
     font-weight: 600;
 }
 
+
 /* range middle — full width band */
 
 .mc-cell--mid::after {
@@ -153,6 +156,7 @@
     color: var(--range-text);
     font-weight: 600;
 }
+
 
 /* range end — pill right half */
 

@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import '../styles/MonthCalendar.css';
+import '../styles/components/MonthCalendar.css';
 
 const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
