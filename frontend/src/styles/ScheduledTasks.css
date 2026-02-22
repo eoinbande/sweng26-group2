@@ -1,0 +1,19 @@
+/* responsive styles for the scheduled tasks page */
+
+.scheduled-tasks-page {
+    position: relative;
+    max-width: 480px;
+    margin: 0 auto;
+    height: 100%;
+    background-color: var(--bg-color);
+}
+
+.scheduled-tasks-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 0 var(--space-lg);
+    padding-bottom: 120px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
