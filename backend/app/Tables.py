@@ -53,7 +53,7 @@ def create_goal(user_id: str, title: str, category: str):
     return supabase.table("goals").insert({
         "user_id": user_id,
         "title": title,
-        "category": category,
+        "category": category, #now it will insert a custom OR Predefined category to table
         "goal_data": json.dumps({"tasks": []})  # Empty until user accepts plan
     }).execute()
 

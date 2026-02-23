@@ -25,7 +25,8 @@ goal_router = APIRouter()
 # REQUEST MODELS
 # =============================================================================
 
-#Enums of predefined categories(for now 5, later we can add more!)
+#Enums of predefined categories(for now 5)
+#IF WE NEED TO ADD MORE PREFEFINED CATEGORIES, JUST ADDED IT IN THE ENUM!
 class CategoryEnum(str, Enum):
     Health = "Health"
     Personal = "Personal"
