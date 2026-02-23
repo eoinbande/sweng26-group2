@@ -372,3 +372,155 @@ class TestUpdateTaskStatus:
         saved = json.loads(captured["goal_data"])
         updated_task = next(t for t in saved["tasks"] if t["id"] == TASK_1_ID)
         assert updated_task["status"] == "completed"
+
+    def test_auto_completes_parent_when_all_subtasks_done(self):
+        """
+        If a subtask is completed and ALL siblings are now completed,
+        the parent task should be auto-completed.
+        """
+        parent_id = "parent-uuid-9999"
+        sub_id_a = "sub-uuid-aaaa"
+        sub_id_b = "sub-uuid-bbbb"
+
+        fake_subtask = {"id": sub_id_b, "goal_id": GOAL_ID, "parent_id": parent_id, "status": "not_started"}
+        fake_siblings = [
+            {"status": "completed"},  # sub_a already done
+            {"status": "completed"},  # sub_b just completed
+        ]
+        goal_tasks = [
+            {
+                "id": parent_id, "ai_id": "task_1", "status": "not_started",
+                "subtasks": [
+                    {"id": sub_id_a, "status": "completed"},
+                    {"id": sub_id_b, "status": "not_started"},
+                ]
+            }
+        ]
+
+        with patch("app.Tables.supabase") as mock_sb, \
+             patch("app.Tables.get_task") as mock_get_task, \
+             patch("app.Tables.get_goal") as mock_get_goal:
+            mock_get_task.return_value = fake_subtask
+            mock_get_goal.return_value = {"id": GOAL_ID, "goal_data": json.dumps({"tasks": goal_tasks})}
+            # Siblings query returns both subtasks as completed
+            mock_sb.table.return_value.select.return_value.eq.return_value.execute.return_value = MagicMock(data=fake_siblings)
+            mock_sb.table.return_value.update.return_value.eq.return_value.execute.return_value = MagicMock()
+
+            update_task_status(sub_id_b, "completed")
+
+        # update() should have been called at least twice:
+        # once for the subtask, once for the auto-completed parent
+        assert mock_sb.table.return_value.update.call_count >= 2
+
+    def test_returns_task_row(self):
+        """update_task_status should return the task dict fetched from DB."""
+        fake_task = self._fake_task(TASK_1_ID, GOAL_ID)
+        goal_tasks = [{"id": TASK_1_ID, "ai_id": "task_1", "status": "not_started", "subtasks": []}]
+
+        with patch("app.Tables.supabase") as mock_sb, \
+             patch("app.Tables.get_task") as mock_get_task, \
+             patch("app.Tables.get_goal") as mock_get_goal:
+            mock_get_task.return_value = fake_task
+            mock_get_goal.return_value = {"id": GOAL_ID, "goal_data": json.dumps({"tasks": goal_tasks})}
+            mock_sb.table.return_value.update.return_value.eq.return_value.execute.return_value = MagicMock()
+
+            result = update_task_status(TASK_1_ID, "in_progress")
+
+        assert result == fake_task
+
+# add_subtasks_to_task  assign UUID's and sets correct parent_id
+
+class TestAddSubTasksToTask:
+
+    def test_assigns_uuid_to_subtract(self):
+        #Each subtask without an 'id' must receive a UUID.
+        subtasks = [
+            {"ai_id": "task_5a", "description": "Put tube back", "order": 1},
+            {"ai_id": "task_5b", "description": "Fit tyre onto rim", "order": 2},
+        ]
+        goal_tasks = [{"id": TASK_1_ID, "ai_id": "task_5", "subtasks": []}]
+
+        with patch("app.Tables.supabase") as mock_sb, \
+             patch("app.Tables.get_goal") as mock_get_goal:
+            mock_get_goal.return_value = {"id": GOAL_ID, "goal_data": json.dumps({"tasks": goal_tasks})}
+            mock_sb.table.return_value.upsert.return_value.execute.return_value = MagicMock()
+            mock_sb.table.return_value.update.return_value.eq.return_value.execute.return_value = MagicMock()
+
+            result = add_subtasks_to_task(GOAL_ID, TASK_1_ID, subtasks)
+
+        for sub in result:
+            assert sub.get("id") is not None
+            assert len(sub["id"]) > 0
+
+    def test_sets_parent_id_on_upserted_rows(sefl):
+        #rows inserted into task table need to have a parent id
+        subtasks = [
+            {"ai_id": "task_5a", "description": "Step A", "order": 1},
+        ]
+        goal_tasks = [{"id": TASK_1_ID, "ai_id": "task_5", "subtasks": []}]
+
+        upserted_rows = []
+
+        def capture_upsert(row):
+            upserted_rows.append(row)
+            m = MagicMock()
+            m.execute.return_value = MagicMock()
+            return m
+
+        with patch("app.Tables.supabase") as mock_sb, \
+             patch("app.Tables.get_goal") as mock_get_goal:
+            mock_get_goal.return_value = {"id": GOAL_ID, "goal_data": json.dumps({"tasks": goal_tasks})}
+            mock_sb.table.return_value.upsert.side_effect = capture_upsert
+            mock_sb.table.return_value.update.return_value.eq.return_value.execute.return_value = MagicMock()
+
+            add_subtasks_to_task(GOAL_ID, TASK_1_ID, subtasks)
+
+        assert upserted_rows[0]["parent_id"] == TASK_1_ID
+    
+    def test_updates_goal_data_jsonb_with_subtasks(self):
+        """The parent task's 'subtasks' in goal_data JSON must be updated."""
+        subtasks = [
+            {"ai_id": "task_5a", "description": "Step A", "order": 1},
+        ]
+        goal_tasks = [{"id": TASK_1_ID, "ai_id": "task_5", "status": "not_started", "subtasks": []}]
+
+        captured = {}
+
+        def capture_update(payload):
+            captured.update(payload)
+            m = MagicMock()
+            m.eq.return_value.execute.return_value = MagicMock()
+            return m
+
+        with patch("app.Tables.supabase") as mock_sb, \
+             patch("app.Tables.get_goal") as mock_get_goal:
+            mock_get_goal.return_value = {"id": GOAL_ID, "goal_data": json.dumps({"tasks": goal_tasks})}
+            mock_sb.table.return_value.upsert.return_value.execute.return_value = MagicMock()
+            mock_sb.table.return_value.update.side_effect = capture_update
+
+            add_subtasks_to_task(GOAL_ID, TASK_1_ID, subtasks)
+
+        saved = json.loads(captured["goal_data"])
+        parent = next(t for t in saved["tasks"] if t["id"] == TASK_1_ID)
+        assert len(parent["subtasks"]) == 1
+        assert parent["subtasks"][0]["ai_id"] == "task_5a"
+    
+    def test_returns_subtasks_with_uuids(self):
+        """Return value should be the subtask list with UUIDs populated."""
+        subtasks = [
+            {"ai_id": "task_5a", "description": "Step A", "order": 1},
+            {"ai_id": "task_5b", "description": "Step B", "order": 2},
+        ]
+        goal_tasks = [{"id": TASK_1_ID, "ai_id": "task_5", "subtasks": []}]
+
+        with patch("app.Tables.supabase") as mock_sb, \
+             patch("app.Tables.get_goal") as mock_get_goal:
+            mock_get_goal.return_value = {"id": GOAL_ID, "goal_data": json.dumps({"tasks": goal_tasks})}
+            mock_sb.table.return_value.upsert.return_value.execute.return_value = MagicMock()
+            mock_sb.table.return_value.update.return_value.eq.return_value.execute.return_value = MagicMock()
+
+            result = add_subtasks_to_task(GOAL_ID, TASK_1_ID, subtasks)
+
+        assert len(result) == 2
+        for sub in result:
+            assert sub.get("id") is not None
