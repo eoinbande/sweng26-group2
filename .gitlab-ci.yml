@@ -1,10 +1,70 @@
 stages:
+  - lint
   - test
+  - build
 
-# Run backend tests
-test:
+# ──────────────────────────────────────────────
+# Frontend jobs
+# ──────────────────────────────────────────────
+
+# Lint the React frontend with ESLint
+frontend-lint:
+  stage: lint
+  image: node:20-alpine
+  tags:
+    - docker
+  before_script:
+    - cd frontend
+    - npm ci
+  script:
+    - npx eslint . --max-warnings 0
+  only:
+    - branches
+    - merge_requests
+
+# Build the React (Vite) frontend
+frontend-build:
+  stage: build
+  image: node:20-alpine
+  tags:
+    - docker
+  before_script:
+    - cd frontend
+    - npm ci
+  script:
+    - npm run build
+  artifacts:
+    paths:
+      - frontend/dist/
+    expire_in: 1 week
+  only:
+    - branches
+    - merge_requests
+
+# ──────────────────────────────────────────────
+# Backend jobs
+# ──────────────────────────────────────────────
+
+# Lint the FastAPI backend
+backend-lint:
+  stage: lint
+  image: python:3.11-slim
+  tags:
+    - docker
+  before_script:
+    - pip install --upgrade pip
+    - pip install ruff
+  script:
+    - ruff check backend/
+  allow_failure: true
+  only:
+    - branches
+    - merge_requests
+
+# Test the FastAPI backend
+backend-test:
   stage: test
-  image: python:3.11
+  image: python:3.11-slim
   tags:
     - docker
   before_script:
@@ -12,6 +72,21 @@ test:
     - pip install -r backend/requirements.txt
   script:
     - pytest backend/tests/ -v
+  only:
+    - branches
+    - merge_requests
+
+# Validate the backend starts up correctly
+backend-build:
+  stage: build
+  image: python:3.11-slim
+  tags:
+    - docker
+  before_script:
+    - pip install --upgrade pip
+    - pip install -r backend/requirements.txt
+  script:
+    - python -c "from backend.main import app; print('FastAPI app loaded successfully')"
   only:
     - branches
     - merge_requests
