@@ -559,6 +559,7 @@ class TestTaskCountFunctions:
             mock_sb.table.return_value.select.return_value.eq.return_value.execute.return_value = fake_result
 
             count = get_total_task_count(GOAL_ID)
+            
 
         assert count == 7
 
