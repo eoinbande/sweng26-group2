@@ -44,8 +44,9 @@
 /* slide transition container — remove fixed height */
 
 .month-calendar .MuiDayCalendar-slideTransition {
-    min-height: 0;
-    overflow: visible;
+    min-height: auto;
+    height: auto !important;
+    overflow: hidden;
 }
 
 
