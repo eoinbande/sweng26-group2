@@ -71,12 +71,15 @@ const StyledDay = styled(PickersDay, {
                 },
             }),
 
-            // single day — circle
+            // single day — perfect circle
             ...(isSingle && {
                 backgroundColor: highlightBg,
                 color: highlightText,
                 fontWeight: 600,
-                borderRadius: '50%',
+                borderRadius: '999px',
+                width: 'clamp(28px, 4.5dvh, 40px)',
+                aspectRatio: '1',
+                justifySelf: 'center',
                 '&:hover, &:focus': {
                     backgroundColor: highlightBg,
                 },
@@ -84,14 +87,14 @@ const StyledDay = styled(PickersDay, {
 
             // rounded left cap for range start
             ...(isStart && {
-                borderTopLeftRadius: '50%',
-                borderBottomLeftRadius: '50%',
+                borderTopLeftRadius: '999px',
+                borderBottomLeftRadius: '999px',
             }),
 
             // rounded right cap for range end
             ...(isEnd && {
-                borderTopRightRadius: '50%',
-                borderBottomRightRadius: '50%',
+                borderTopRightRadius: '999px',
+                borderBottomRightRadius: '999px',
             }),
         },
     };
@@ -127,7 +130,10 @@ function Day(props) {
                     backgroundColor: 'var(--primary)',
                     color: 'white',
                     fontWeight: 600,
-                    borderRadius: '50%',
+                    borderRadius: '999px',
+                    width: 'clamp(28px, 4.5dvh, 40px)',
+                    aspectRatio: '1',
+                    justifySelf: 'center',
                     '&:hover, &:focus': {
                         backgroundColor: 'var(--primary)',
                     },

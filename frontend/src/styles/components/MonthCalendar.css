@@ -79,6 +79,31 @@
 }
 
 
+/* selected / focused / active day — perfect circle */
+
+.month-calendar .MuiPickersDay-root.Mui-selected,
+.month-calendar .MuiPickersDay-root.Mui-focusVisible,
+.month-calendar .MuiPickersDay-root:focus,
+.month-calendar .MuiPickersDay-root:active,
+.month-calendar .MuiPickersDay-root:hover {
+    border-radius: 999px !important;
+    width: clamp(28px, 4.5dvh, 40px);
+    height: clamp(28px, 4.5dvh, 40px);
+    aspect-ratio: 1;
+    justify-self: center;
+}
+
+/* today — perfect circle */
+
+.month-calendar .MuiPickersDay-root.MuiPickersDay-today {
+    border-radius: 999px;
+    width: clamp(28px, 4.5dvh, 40px);
+    height: clamp(28px, 4.5dvh, 40px);
+    aspect-ratio: 1;
+    justify-self: center;
+}
+
+
 /* outside current month */
 
 .month-calendar .MuiPickersDay-root.MuiPickersDay-dayOutsideMonth {
