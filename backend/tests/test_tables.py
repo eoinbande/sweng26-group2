@@ -20,6 +20,25 @@ from app.Tables import(
     get_total_task_count,
     get_goal,
     get_tasks_for_goal 
-    
 )
 
+#shared fixtures
+
+GOAL_ID = "goal-uuid-1234"
+TASK_1_ID = "task-uuid-0001"
+TASK_2_ID = "task-uuid-0002"
+SUB_1A_ID = "sub-uuid-001a"
+
+def _create_mock_supabase():
+    """Returns a new MagicMock that mimics a supabase client"""
+    return MagicMock()
+
+def _chain(return_value):
+    """
+    Helper: every chained method (table/select/eq/…/execute) returns
+    a mock whose .execute() gives back ``return_value``.
+    """
+    m = MagicMock()
+    m.return_value = m
+    m.execute.return_value == return_value
+    return m
