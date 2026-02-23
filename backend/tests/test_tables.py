@@ -143,3 +143,66 @@ class TestSaveTasksToDb:
             result = save_tasks_to_db(GOAL_ID, tasks)
 
         assert result[0]["id"] == TASK_1_ID
+
+    def test_preserves_existing_goal_data_feilds(self):
+        #save_tasks_to_db must merge tasks into existing goal_data rather than overwriting fields like 'description' and 'goal_due_date'
+        existing_data = {"tasks": [], "description": "Keep me", "goal_due_date": "2025-12-31"}
+        tasks = [
+            {"ai_id": "task_1", "description": "Step 1", "order": 1,
+             "status": "not_started", "subtasks": []},
+        ]
+        captured_update_payload = {}
+
+        def fake_update(payload):
+            captured_update_payload.update(payload)
+            m = MagicMock()
+            m.eq.return_value.execute.return_value = MagicMock()
+            return m
+
+        with patch("app.Tables.supabase") as mock_sb, \
+             patch("app.Tables.get_goal") as mock_get_goal:
+            mock_get_goal.return_value = {"id": GOAL_ID, "goal_data": json.dumps(existing_data)}
+            mock_sb.table.return_value.update.side_effect = fake_update
+            mock_sb.table.return_value.upsert.return_value.execute.return_value = MagicMock()
+
+            save_tasks_to_db(GOAL_ID, tasks)
+
+        # The update payload should contain the saved goal_data JSON
+        saved = json.loads(captured_update_payload["goal_data"])
+        assert saved["description"] == "Keep me"
+        assert saved["goal_due_date"] == "2025-12-31"
+        assert len(saved["tasks"]) == 1
+    
+    def test_inserts_subtasks_with_correct_parent_id(self):
+        """Subtask rows upserted into tasks table must have parent_id = parent task UUID."""
+        parent_id = "parent-uuid-999"
+        tasks = [
+            {
+                "ai_id": "task_1", "id": parent_id, "description": "Parent", "order": 1,
+                "status": "not_started",
+                "subtasks": [
+                    {"ai_id": "task_1a", "description": "Child", "order": 1, "status": "not_started"}
+                ]
+            }
+        ]
+
+        upserted_rows = []
+    
+        def capture_upsert(row):
+                upserted_rows.append(row)
+                m = MagicMock()
+                m.execute.return_value = MagicMock()
+                return m
+
+        with patch("app.Tables.supabase") as mock_sb, \
+            patch("app.Tables.get_goal") as mock_get_goal:
+            mock_get_goal.return_value = {"id": GOAL_ID, "goal_data": json.dumps({"tasks": []})}
+            mock_sb.table.return_value.update.return_value.eq.return_value.execute.return_value = MagicMock()
+            mock_sb.table.return_value.upsert.side_effect = capture_upsert
+
+            save_tasks_to_db(GOAL_ID, tasks)
+
+        # Second upserted row is the subtask
+        subtask_row = upserted_rows[1]
+        assert subtask_row["parent_id"] == parent_id
+        assert subtask_row["ai_id"] == "task_1a"
