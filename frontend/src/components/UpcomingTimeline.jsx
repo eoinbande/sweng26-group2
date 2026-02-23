@@ -1,6 +1,5 @@
 import React from 'react';
 import { ArrowUpRight } from 'lucide-react';
-import ChatBubbleCard from './ChatBubbleCard';
 import '../styles/components/UpcomingTimeline.css';
 
 // variant config — controls title and subtitle per section type
@@ -29,7 +28,7 @@ const UpcomingTimeline = ({ variant = 'goals', items = [], onClick }) => {
 
     return (
         <section className={`ut-section ut-section--${variant}`}>
-            <ChatBubbleCard backgroundColor={config.bgColor}>
+            <div className="ut-container" style={{ backgroundColor: config.bgColor }}>
                 <h3 className="ut-title">{config.title}</h3>
                 <p className="ut-subtitle">{config.subtitle}</p>
 
@@ -80,7 +79,7 @@ const UpcomingTimeline = ({ variant = 'goals', items = [], onClick }) => {
                         );
                     })}
                 </div>
-            </ChatBubbleCard>
+            </div>
         </section>
     );
 };

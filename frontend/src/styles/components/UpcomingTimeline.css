@@ -4,6 +4,11 @@
     margin-top: var(--space-lg);
 }
 
+.ut-container {
+    border-radius: var(--radius-md);
+    padding: clamp(18px, 2.8dvh, 28px) clamp(16px, 2.2dvh, 22px);
+}
+
 
 /* header text */
 
@@ -117,7 +122,7 @@
 .ut-card {
     flex: 1;
     background-color: rgba(255, 255, 255, 0.25);
-    border-radius: var(--radius-md);
+    border-radius: clamp(6px, 1dvh, 10px) var(--radius-lg) var(--radius-lg) var(--radius-lg);
     padding: clamp(10px, 1.5dvh, 14px) clamp(12px, 1.8dvh, 16px);
     padding-right: clamp(24px, 3.5dvh, 32px);
     position: relative;

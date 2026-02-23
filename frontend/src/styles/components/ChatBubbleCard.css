@@ -1,6 +1,0 @@
-/* chat bubble card — outgoing message bubble shape */
-
-.chat-bubble {
-    border-radius: clamp(6px, 1dvh, 10px) var(--radius-lg) var(--radius-lg) var(--radius-lg);
-    padding: clamp(18px, 2.8dvh, 28px) clamp(16px, 2.2dvh, 22px);
-}
