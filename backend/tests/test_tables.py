@@ -75,3 +75,21 @@ class TestCreateGoal:
         inserted_data = mock_sb.table.return_value.insert.call_args[0][0]
         goal_data = json.loads(inserted_data["goal_data"])
         assert goal_data["tasks"] == []
+
+# save_tasks_to_db , gives UUIDs to th=asks and subtasks
+
+class TestSaveTasksToDb:
+
+    def _fake_goal_with_data(self, tasks=None):
+        #return a fake get_goals() response with goal_data
+        return {
+            "id": GOAL_ID,
+            "goal_data": json.dumps({"tasks": tasks or [], "description": "A goal"})
+        }
+    
+    def test_assigns_vvid_to_tasks_without_id(self):
+        #tasks with no 'id' will get a UUID
+        tasks = [
+            {"ai_id": "task_1", "description": "Step 1", "order": 1, "status": "not_started",
+             "subtasks": []},
+        ]
