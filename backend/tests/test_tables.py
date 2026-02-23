@@ -93,3 +93,53 @@ class TestSaveTasksToDb:
             {"ai_id": "task_1", "description": "Step 1", "order": 1, "status": "not_started",
              "subtasks": []},
         ]
+
+        with patch("app.Tables.supabase") as mock_sb, \
+             patch("app.Tables.get_goal") as mock_get_goal:
+            mock_get_goal.return_value = self._fake_goal_with_data()
+            mock_sb.table.return_value.update.return_value.eq.return_value.execute.return_value = MagicMock()
+            mock_sb.table.return_value.upsert.return_value.execute.return_value = MagicMock()
+
+            result = save_tasks_to_db(GOAL_ID, tasks)
+
+        assert result[0]["id"] is not None
+        assert len(result[0]["id"]) > 0
+    
+    def test_assigns_vvid_to_subtasks_without_id(self):
+        #subtasks with no id will be given one
+        tasks = [
+            {
+                "ai_id": "task_1", "description": "Step 1", "order": 1,
+                "status": "not_started",
+                "subtasks": [
+                    {"ai_id": "task_1a", "description": "Sub step", "order": 1, "status": "not_started"}
+                ]
+            }
+        ]
+
+        with patch("app.Tables.supabase") as mock_sb, \
+             patch("app.Tables.get_goal") as mock_get_goal:
+            mock_get_goal.return_value = self._fake_goal_with_data()
+            mock_sb.table.return_value.update.return_value.eq.return_value.execute.return_value = MagicMock()
+            mock_sb.table.return_value.upsert.return_value.execute.return_value = MagicMock()
+
+            result = save_tasks_to_db(GOAL_ID, tasks)
+
+        assert result[0]["subtasks"][0]["id"] is not None
+
+    def test_preseves_existing_ids(self):
+        #tasks with ids must keep them 
+        tasks = [
+            {"ai_id": "task_1", "id": TASK_1_ID, "description": "Step 1",
+             "order": 1, "status": "not_started", "subtasks": []},
+        ]
+
+        with patch("app.Tables.supabase") as mock_sb, \
+             patch("app.Tables.get_goal") as mock_get_goal:
+            mock_get_goal.return_value = self._fake_goal_with_data()
+            mock_sb.table.return_value.update.return_value.eq.return_value.execute.return_value = MagicMock()
+            mock_sb.table.return_value.upsert.return_value.execute.return_value = MagicMock()
+
+            result = save_tasks_to_db(GOAL_ID, tasks)
+
+        assert result[0]["id"] == TASK_1_ID
