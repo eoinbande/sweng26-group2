@@ -206,3 +206,115 @@ class TestSaveTasksToDb:
         subtask_row = upserted_rows[1]
         assert subtask_row["parent_id"] == parent_id
         assert subtask_row["ai_id"] == "task_1a"
+    
+    def test_returns_tasks_with_uuids(self):
+        """Return value must be the same tasks list, now with UUIDs on every item."""
+        tasks = [
+            {"ai_id": "task_1", "description": "Step 1", "order": 1,
+             "status": "not_started", "subtasks": [
+                {"ai_id": "task_1a", "description": "Sub", "order": 1, "status": "not_started"}
+             ]}
+        ]
+
+        with patch("app.Tables.supabase") as mock_sb, \
+             patch("app.Tables.get_goal") as mock_get_goal:
+            mock_get_goal.return_value = {"id": GOAL_ID, "goal_data": json.dumps({"tasks": []})}
+            mock_sb.table.return_value.update.return_value.eq.return_value.execute.return_value = MagicMock()
+            mock_sb.table.return_value.upsert.return_value.execute.return_value = MagicMock()
+
+            result = save_tasks_to_db(GOAL_ID, tasks)
+
+        assert "id" in result[0] and result[0]["id"]
+        assert "id" in result[0]["subtasks"][0] and result[0]["subtasks"][0]["id"]
+
+
+# merge and save tasks - preserves status(completed) and UUID
+
+class TestMergeAndSaveTasks:
+
+    def _existing_goal_data(self, tasks):
+        return {"id": GOAL_ID, "goal_data": json.dumps({"tasks": tasks})}
+    
+    def test_preserves_completed_task_uuid_and_status(self):
+        """A completed task must keep its UUID and 'completed' status after merge."""
+        existing_tasks = [
+            {"ai_id": "task_1", "id": TASK_1_ID, "description": "Old desc",
+             "order": 1, "status": "completed", "subtasks": []},
+        ]
+        new_tasks = [
+            {"ai_id": "task_1", "description": "Updated desc", "order": 1,
+             "status": "not_started", "subtasks": []},
+        ]
+
+        with patch("app.Tables.supabase") as mock_sb, \
+             patch("app.Tables.get_goal") as mock_get_goal:
+            mock_get_goal.return_value = self._existing_goal_data(existing_tasks)
+            mock_sb.table.return_value.delete.return_value.eq.return_value.neq.return_value.execute.return_value = MagicMock()
+            mock_sb.table.return_value.update.return_value.eq.return_value.execute.return_value = MagicMock()
+            mock_sb.table.return_value.upsert.return_value.execute.return_value = MagicMock()
+
+            result = merge_and_save_tasks(GOAL_ID, new_tasks)
+
+        assert result[0]["id"] == TASK_1_ID
+        assert result[0]["status"] == "completed"
+
+    def test_assigns_new_uuid_for_new_ai_id(self):
+        """A task with a brand-new ai_id must receive a fresh UUID."""
+        existing_tasks = [
+            {"ai_id": "task_1", "id": TASK_1_ID, "description": "Old",
+             "order": 1, "status": "not_started", "subtasks": []},
+        ]
+        new_tasks = [
+            {"ai_id": "task_1", "description": "Old", "order": 1,
+             "status": "not_started", "subtasks": []},
+            {"ai_id": "task_new", "description": "Brand new task", "order": 2,
+             "status": "not_started", "subtasks": []},
+        ]
+
+        with patch("app.Tables.supabase") as mock_sb, \
+             patch("app.Tables.get_goal") as mock_get_goal:
+            mock_get_goal.return_value = self._existing_goal_data(existing_tasks)
+            mock_sb.table.return_value.delete.return_value.eq.return_value.neq.return_value.execute.return_value = MagicMock()
+            mock_sb.table.return_value.update.return_value.eq.return_value.execute.return_value = MagicMock()
+            mock_sb.table.return_value.upsert.return_value.execute.return_value = MagicMock()
+
+            result = merge_and_save_tasks(GOAL_ID, new_tasks)
+
+        new_task = next(t for t in result if t["ai_id"] == "task_new")
+        assert new_task["id"] is not None
+        assert new_task["id"] != TASK_1_ID
+
+    def test_preserves_completed_subtask_status(self):
+        """Completed subtasks must retain their UUID and 'completed' status."""
+        existing_tasks = [
+            {
+                "ai_id": "task_2", "id": TASK_2_ID, "description": "Parent",
+                "order": 2, "status": "not_started",
+                "subtasks": [
+                    {"ai_id": "task_2a", "id": SUB_1A_ID, "description": "Sub",
+                     "order": 1, "status": "completed"}
+                ]
+            }
+        ]
+        new_tasks = [
+            {
+                "ai_id": "task_2", "description": "Parent", "order": 2,
+                "status": "not_started",
+                "subtasks": [
+                    {"ai_id": "task_2a", "description": "Sub", "order": 1, "status": "not_started"}
+                ]
+            }
+        ]
+
+        with patch("app.Tables.supabase") as mock_sb, \
+             patch("app.Tables.get_goal") as mock_get_goal:
+            mock_get_goal.return_value = self._existing_goal_data(existing_tasks)
+            mock_sb.table.return_value.delete.return_value.eq.return_value.neq.return_value.execute.return_value = MagicMock()
+            mock_sb.table.return_value.update.return_value.eq.return_value.execute.return_value = MagicMock()
+            mock_sb.table.return_value.upsert.return_value.execute.return_value = MagicMock()
+
+            result = merge_and_save_tasks(GOAL_ID, new_tasks)
+
+        sub = result[0]["subtasks"][0]
+        assert sub["id"] == SUB_1A_ID
+        assert sub["status"] == "completed"
