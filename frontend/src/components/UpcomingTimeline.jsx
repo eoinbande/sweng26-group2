@@ -1,4 +1,3 @@
-import React from 'react';
 import { ArrowUpRight } from 'lucide-react';
 import '../styles/components/UpcomingTimeline.css';
 
@@ -73,7 +72,6 @@ const UpcomingTimeline = ({ variant = 'goals', items = [], onClick }) => {
                                             <p className="ut-card-desc">{item.description}</p>
                                         </div>
                                     </div>
-                                    <div className="ut-bookmark" />
                                 </div>
                             </div>
                         );

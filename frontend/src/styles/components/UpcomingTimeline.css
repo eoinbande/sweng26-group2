@@ -137,7 +137,6 @@
     background-color: rgba(255, 255, 255, 0.25);
     border-radius: clamp(6px, 1dvh, 10px) var(--radius-lg) var(--radius-lg) var(--radius-lg);
     padding: clamp(10px, 1.5dvh, 14px) clamp(12px, 1.8dvh, 16px);
-    padding-right: clamp(24px, 3.5dvh, 32px);
     position: relative;
     min-height: clamp(56px, 8dvh, 72px);
     display: flex;
@@ -182,20 +181,8 @@
     text-overflow: ellipsis;
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
-}
-
-
-/* bookmark bar — vertical bar on right edge */
-
-.ut-bookmark {
-    position: absolute;
-    right: clamp(6px, 1dvh, 10px);
-    top: clamp(8px, 1.2dvh, 12px);
-    bottom: clamp(8px, 1.2dvh, 12px);
-    width: clamp(4px, 0.6dvh, 6px);
-    background-color: rgba(255, 255, 255, 0.3);
-    border-radius: 999px;
 }
 
 
@@ -207,10 +194,6 @@
 
 .ut-card--urgent .ut-card-title {
     color: #fff;
-}
-
-.ut-card--urgent .ut-bookmark {
-    background-color: rgba(255, 197, 80, 0.6);
 }
 
 
