@@ -42,3 +42,36 @@ def _chain(return_value):
     m.return_value = m
     m.execute.return_value == return_value
     return m
+
+# create_goal - return correct structure
+
+class TestCreateGoal:
+
+    def test_create_goal_returns_supabase_response(self):
+        #should call supabase.table('goals').insert(...).exacute() and return whats in the db
+        fake_result = MagicMock()
+        fake_result.data = [{"id": GOAL_ID, "user_id": "user-1", "title": "Fix my bike tyre"}]
+
+        with patch("app.Tables.supabase") as mock_sb:
+            mock_sb.table.return_value.insert.return_value.execute.return_value = fake_result
+
+            result = create_goal(user_id="user-1", title="Fix my bike tyre")
+
+        assert result is fake_result
+        inserted_data = mock_sb.table.return_value.insert.call_args[0][0]
+        assert inserted_data["user_id"] == "user-1"
+        assert inserted_data["title"] == "Fix my bike tyre"
+
+    def test_create_goal_stores_empty_task_list(self):
+        """create_goal must store goal_data with an empty tasks list."""
+        fake_result = MagicMock()
+        fake_result.data = [{"id": GOAL_ID}]
+
+        with patch("app.Tables.supabase") as mock_sb:
+            mock_sb.table.return_value.insert.return_value.execute.return_value = fake_result
+
+            create_goal(user_id="user-1", title="My Goal")
+
+        inserted_data = mock_sb.table.return_value.insert.call_args[0][0]
+        goal_data = json.loads(inserted_data["goal_data"])
+        assert goal_data["tasks"] == []
