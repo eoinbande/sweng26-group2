@@ -117,6 +117,7 @@ function Day(props) {
             outsideCurrentMonth={outsideCurrentMonth}
             disableMargin
             selected={false}
+            className={highlight ? 'day-highlighted' : undefined}
             highlightBg={highlight ? highlight.color.bg : undefined}
             highlightText={highlight ? highlight.color.text : undefined}
             isStart={highlight ? highlight.isStart && !highlight.isSingle : false}

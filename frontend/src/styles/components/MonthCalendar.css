@@ -81,11 +81,11 @@
 
 /* selected / focused / active day — perfect circle */
 
-.month-calendar .MuiPickersDay-root.Mui-selected,
-.month-calendar .MuiPickersDay-root.Mui-focusVisible,
-.month-calendar .MuiPickersDay-root:focus,
-.month-calendar .MuiPickersDay-root:active,
-.month-calendar .MuiPickersDay-root:hover {
+.month-calendar .MuiPickersDay-root:not(.day-highlighted).Mui-selected,
+.month-calendar .MuiPickersDay-root:not(.day-highlighted).Mui-focusVisible,
+.month-calendar .MuiPickersDay-root:not(.day-highlighted):focus,
+.month-calendar .MuiPickersDay-root:not(.day-highlighted):active,
+.month-calendar .MuiPickersDay-root:not(.day-highlighted):hover {
     border-radius: 999px !important;
     width: clamp(28px, 4.5dvh, 40px);
     height: clamp(28px, 4.5dvh, 40px);
