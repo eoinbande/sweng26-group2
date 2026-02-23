@@ -115,7 +115,16 @@ def sample_tasks_with_uuids():
 
 @pytest.fixture
 def sample_goal_list():
-    """Sample list of goals for a user."""
+    """Sample list of goals for a user.
+
+    goal_data can be either a dict or a JSON string — the router handles both.
+    Tasks must be non-empty so the router's accepted-goals filter
+    (``if goal_data.get("tasks")``) doesn't strip these goals out.
+    """
+    _task = lambda ai_id, uid, desc: {
+        "ai_id": ai_id, "id": uid, "description": desc,
+        "order": 1, "status": "not_started", "subtasks": []
+    }
     return [
         {
             "id": "goal-1",
@@ -125,7 +134,7 @@ def sample_goal_list():
             "goal_data": {
                 "description": "Step-by-step guide to fixing a flat bike tyre",
                 "goal_due_date": "2026-03-01",
-                "tasks": []
+                "tasks": [_task("task_1", "uuid-t1", "Remove the wheel from the bike")]
             }
         },
         {
@@ -136,7 +145,7 @@ def sample_goal_list():
             "goal_data": {
                 "description": "Beginner's roadmap to learning piano",
                 "goal_due_date": "2026-05-15",
-                "tasks": []
+                "tasks": [_task("task_1", "uuid-t2", "Get access to a piano")]
             }
         }
     ]
@@ -623,14 +632,16 @@ class TestAcceptPlan:
 
     @patch("app.routers.goals.get_goal")
     @patch("app.routers.goals.save_tasks_to_db")
+    @patch("app.routers.goals.update_goal_data")
     def test_accept_plan_empty_tasks_array(
-        self, mock_save_tasks, mock_get_goal, mock_goal_id
+        self, mock_update, mock_save_tasks, mock_get_goal, mock_goal_id
     ):
         """Should reject empty tasks array (no plan to accept)."""
         mock_get_goal.return_value = {
             "id": mock_goal_id,
             "goal_data": {"tasks": []}
         }
+        mock_update.return_value = None
         
         response = client.post(
             f"/api/goals/{mock_goal_id}/accept",
@@ -708,7 +719,10 @@ class TestGetGoals:
                 "goal_data": {
                     "description": "Test description",
                     "goal_due_date": "2026-03-01",
-                    "tasks": []
+                    "tasks": [
+                        {"ai_id": "task_1", "id": "uuid-t1", "description": "Do something",
+                         "order": 1, "status": "not_started", "subtasks": []}
+                    ]
                 }
             }
         ]
@@ -730,10 +744,12 @@ class TestGetGoals:
         self, mock_get_all_goals, mock_user_id
     ):
         """Should handle multiple goals correctly."""
+        _task = lambda n: [{"ai_id": "task_1", "id": f"uuid-{n}", "description": "Step",
+                            "order": 1, "status": "not_started", "subtasks": []}]
         mock_get_all_goals.return_value = [
-            {"id": "1", "title": "Goal 1", "goal_data": {}},
-            {"id": "2", "title": "Goal 2", "goal_data": {}},
-            {"id": "3", "title": "Goal 3", "goal_data": {}},
+            {"id": "1", "title": "Goal 1", "goal_data": {"tasks": _task(1)}},
+            {"id": "2", "title": "Goal 2", "goal_data": {"tasks": _task(2)}},
+            {"id": "3", "title": "Goal 3", "goal_data": {"tasks": _task(3)}},
         ]
         
         response = client.get(f"/api/goals/{mock_user_id}")
@@ -748,7 +764,17 @@ class TestGetGoals:
     @patch("app.routers.goals.get_all_goals")
     def test_get_goals_different_users_isolated(self, mock_get_all_goals):
         """Should only return goals for the specified user."""
-        user_1_goals = [{"id": "1", "user_id": "user-1", "title": "User 1 Goal"}]
+        user_1_goals = [
+            {
+                "id": "1",
+                "user_id": "user-1",
+                "title": "User 1 Goal",
+                "goal_data": {
+                    "tasks": [{"ai_id": "task_1", "id": "uuid-t1", "description": "Step",
+                               "order": 1, "status": "not_started", "subtasks": []}]
+                }
+            }
+        ]
         
         mock_get_all_goals.return_value = user_1_goals
         
