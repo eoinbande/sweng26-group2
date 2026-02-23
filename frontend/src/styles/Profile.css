@@ -2,7 +2,7 @@
 
 .profile-page {
     min-height: 100vh;
-    background: var(--bg-color);
+    background: #EDEAE4;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -10,48 +10,53 @@
 }
 
 .profile-header-bg {
-    width: 100vw;
+    width: 100%;
     max-width: 480px;
-    background: #FAD6D6;
-    border-top-left-radius: 32px;
-    border-top-right-radius: 32px;
-    padding-top: 32px;
-    padding-bottom: 80px;
+    background: #F9C8C8;
+    padding-top: 48px;
+    padding-bottom: 100px;
+    padding-left: 28px;
+    padding-right: 28px;
     position: relative;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
+    overflow: visible;
 }
 
 .profile-title {
-    font-family: var(--font-serif);
+    font-family: var(--font-serif, Georgia, serif);
     font-size: 2rem;
-    font-weight: 600;
-    color: var(--text-main);
-    margin: 0 0 24px 0;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 0 0;
     z-index: 2;
+    position: relative;
+    text-align: left;
 }
 
+/* Avatar: half-circle arch peeking from bottom of header */
 .profile-avatar {
-    width: 170px;
-    height: 170px;
-    background: #D1D3D4;
+    width: 120px;
+    height: 120px;
+    background: #C4C4C4;
     border-radius: 50%;
     position: absolute;
     left: 50%;
-    top: 110px;
     transform: translateX(-50%);
-    z-index: 1;
+    /* Position so only the top half is visible in header; bottom half overlaps card */
+    bottom: -60px;
+    z-index: 3;
 }
 
 .profile-card {
     background: #fff;
     border-radius: 28px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-    padding: 32px 24px 24px 24px;
-    margin-top: -90px;
-    min-width: 80vw;
-    max-width: 370px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+    padding: 80px 24px 28px 24px;
+    margin-top: 0;
+    width: calc(100% - 48px);
+    max-width: 400px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -59,61 +64,66 @@
     z-index: 2;
 }
 
+/* Streak badge: pill shape attached to top-right of card */
 .profile-streak {
     position: absolute;
-    top: -28px;
-    right: 0;
-    background: #D95C5C;
+    top: -22px;
+    right: -8px;
+    background: #C95C5C;
     color: #fff;
-    border-radius: 0 28px 28px 28px;
-    padding: 10px 28px 10px 18px;
-    font-size: 1.2rem;
-    font-weight: 500;
+    /* Rounded on left, top-left, bottom — flat on top-right */
+    border-radius: 50px 50px 50px 50px;
+    border-top-right-radius: 8px;
+    padding: 10px 22px 10px 16px;
+    font-size: 1.05rem;
+    font-weight: 600;
     display: flex;
     align-items: center;
-    gap: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    gap: 6px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    z-index: 10;
 }
 
 .profile-streak-icon {
-    font-size: 1.3em;
+    font-size: 1.1em;
 }
 
 .profile-info {
     width: 100%;
-    margin-bottom: 18px;
+    margin-bottom: 8px;
 }
 
 .profile-info-row {
     display: flex;
     flex-direction: column;
-    margin-bottom: 10px;
+    margin-bottom: 14px;
 }
 
 .profile-info-label {
-    font-weight: 600;
+    font-weight: 700;
     font-size: 1rem;
-    color: var(--text-main);
+    color: #1a1a1a;
 }
 
 .profile-info-value {
-    font-size: 1rem;
-    color: var(--text-main);
+    font-size: 0.97rem;
+    color: #333;
+    margin-top: 1px;
 }
 
 .profile-edit-btn {
     position: absolute;
-    right: 18px;
-    bottom: 18px;
+    right: 20px;
+    bottom: 20px;
     background: #FFC72C;
     border: none;
     border-radius: 50%;
-    width: 44px;
-    height: 44px;
+    width: 46px;
+    height: 46px;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.10);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.13);
     cursor: pointer;
     transition: background 0.15s;
 }
@@ -123,75 +133,40 @@
 }
 
 .profile-signout-btn {
-    margin: 38px 0 0 0;
-    background: #D7E3F6;
-    color: var(--text-main);
-    font-weight: 600;
+    margin: 32px 0 0 0;
+    background: #C8D8EE;
+    color: #1a1a1a;
+    font-weight: 700;
     border: none;
-    border-radius: 24px;
-    padding: 16px 48px;
-    font-size: 1.1rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border-radius: 28px;
+    padding: 16px 52px;
+    font-size: 1.05rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
     cursor: pointer;
     transition: background 0.15s;
+    letter-spacing: 0.01em;
 }
 
 .profile-signout-btn:hover {
-    background: #bcd2f7;
+    background: #adc4e0;
 }
 
 .profile-nav-spacer {
     height: 80px;
 }
 
-/* Responsive adjustments */
-@media (max-width: 600px) {
+@media (max-width: 480px) {
     .profile-header-bg {
-        max-width: 100vw;
-        padding-top: 24px;
-        padding-bottom: 60px;
-    }
-    .profile-avatar {
-        width: 120px;
-        height: 120px;
-        top: 90px;
+        padding-top: 36px;
+        padding-bottom: 80px;
+        padding-left: 20px;
+        padding-right: 20px;
     }
     .profile-card {
-        min-width: 90vw;
-        max-width: 98vw;
-        padding: 24px 10px 18px 10px;
-        margin-top: -70px;
+        width: calc(100% - 32px);
+        padding: 70px 16px 22px 16px;
     }
     .profile-title {
-        font-size: 1.5rem;
-    }
-    .profile-signout-btn {
-        padding: 12px 24px;
-        font-size: 1rem;
-    }
-}
-
-@media (max-width: 400px) {
-    .profile-header-bg {
-        padding-top: 12px;
-        padding-bottom: 40px;
-    }
-    .profile-avatar {
-        width: 80px;
-        height: 80px;
-        top: 60px;
-    }
-    .profile-card {
-        min-width: 98vw;
-        max-width: 99vw;
-        padding: 12px 2px 10px 2px;
-        margin-top: -40px;
-    }
-    .profile-title {
-        font-size: 1.1rem;
-    }
-    .profile-signout-btn {
-        padding: 8px 10px;
-        font-size: 0.95rem;
+        font-size: 1.6rem;
     }
 }
