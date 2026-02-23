@@ -9,11 +9,13 @@ const Profile = ({ username = 'Marissa', email = 'Marissa', streak = 217, onEdit
                 <h1 className="profile-title">Your Account</h1>
                 <div className="profile-avatar" />
             </div>
+
             <div className="profile-card">
                 <div className="profile-streak">
                     <span className="profile-streak-icon">🔥</span>
                     <span className="profile-streak-days">{streak} days</span>
                 </div>
+
                 <div className="profile-info">
                     <div className="profile-info-row">
                         <span className="profile-info-label">Username</span>
@@ -24,10 +26,12 @@ const Profile = ({ username = 'Marissa', email = 'Marissa', streak = 217, onEdit
                         <span className="profile-info-value">{email}</span>
                     </div>
                 </div>
+
                 <button className="profile-edit-btn" onClick={onEdit} aria-label="Edit profile">
-                    <FiEdit2 size={22} />
+                    <FiEdit2 size={20} color="#1a1a1a" />
                 </button>
             </div>
+
             <button className="profile-signout-btn" onClick={onSignOut}>Sign Out</button>
             <div className="profile-nav-spacer" />
         </div>
