@@ -524,3 +524,68 @@ class TestAddSubTasksToTask:
         assert len(result) == 2
         for sub in result:
             assert sub.get("id") is not None
+
+# get_completed_task_count / get_total_task_count — return correct numbers
+
+class TestTaskCountFunctions:
+
+    def test_get_completed_task_count_returns_correct_number(self):
+        """get_completed_task_count should return the count from Supabase."""
+        with patch("app.Tables.supabase") as mock_sb:
+            fake_result = MagicMock()
+            fake_result.count = 3
+            mock_sb.table.return_value.select.return_value.eq.return_value.eq.return_value.execute.return_value = fake_result
+
+            count = get_completed_task_count(GOAL_ID)
+
+        assert count == 3
+
+    def test_get_completed_task_count_returns_zero_when_none(self):
+        """get_completed_task_count should return 0 if count is None."""
+        with patch("app.Tables.supabase") as mock_sb:
+            fake_result = MagicMock()
+            fake_result.count = None
+            mock_sb.table.return_value.select.return_value.eq.return_value.eq.return_value.execute.return_value = fake_result
+
+            count = get_completed_task_count(GOAL_ID)
+
+        assert count == 0
+
+    def test_get_total_task_count_returns_correct_number(self):
+        """get_total_task_count should return total tasks + subtasks."""
+        with patch("app.Tables.supabase") as mock_sb:
+            fake_result = MagicMock()
+            fake_result.count = 7
+            mock_sb.table.return_value.select.return_value.eq.return_value.execute.return_value = fake_result
+
+            count = get_total_task_count(GOAL_ID)
+
+        assert count == 7
+
+    def test_get_total_task_count_returns_zero_when_none(self):
+        """get_total_task_count should return 0 if count is None."""
+        with patch("app.Tables.supabase") as mock_sb:
+            fake_result = MagicMock()
+            fake_result.count = None
+            mock_sb.table.return_value.select.return_value.eq.return_value.execute.return_value = fake_result
+
+            count = get_total_task_count(GOAL_ID)
+
+        assert count == 0
+
+    def test_completed_count_is_subset_of_total(self):
+        """Sanity check: completed count should never exceed total count."""
+        with patch("app.Tables.supabase") as mock_sb:
+            completed_result = MagicMock()
+            completed_result.count = 2
+            total_result = MagicMock()
+            total_result.count = 5
+
+            # Alternate return values for successive calls
+            mock_sb.table.return_value.select.return_value.eq.return_value.eq.return_value.execute.return_value = completed_result
+            mock_sb.table.return_value.select.return_value.eq.return_value.execute.return_value = total_result
+
+            completed = get_completed_task_count(GOAL_ID)
+            total = get_total_task_count(GOAL_ID)
+
+        assert completed <= total
