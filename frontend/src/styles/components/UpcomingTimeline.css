@@ -1,0 +1,244 @@
+/* upcoming timeline — shared styles for upcoming goals & tasks sections */
+
+.ut-section {
+    margin-top: var(--space-lg);
+}
+
+
+/* header text */
+
+.ut-title {
+    font-family: var(--font-serif);
+    font-size: clamp(20px, 3dvh, 26px);
+    font-weight: 700;
+    color: white;
+    margin: 0 0 var(--space-xs);
+}
+
+.ut-subtitle {
+    font-family: var(--font-sans);
+    font-size: clamp(11px, 1.4dvh, 13px);
+    color: rgba(255, 255, 255, 0.75);
+    margin: 0 0 clamp(14px, 2.2dvh, 22px);
+}
+
+
+/* timeline layout */
+
+.ut-timeline {
+    display: flex;
+    flex-direction: column;
+}
+
+.ut-item {
+    display: flex;
+    align-items: flex-start;
+    gap: clamp(6px, 1dvh, 10px);
+    position: relative;
+
+    /* staggered fade-in */
+    opacity: 0;
+    transform: translateY(8px);
+    animation: ut-fade-in 0.35s ease forwards;
+}
+
+.ut-item:nth-child(1) { animation-delay: 0.05s; }
+.ut-item:nth-child(2) { animation-delay: 0.12s; }
+.ut-item:nth-child(3) { animation-delay: 0.19s; }
+.ut-item:nth-child(4) { animation-delay: 0.26s; }
+.ut-item:nth-child(5) { animation-delay: 0.33s; }
+
+@keyframes ut-fade-in {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* date column — fixed width on the left */
+
+.ut-date {
+    width: clamp(30px, 5dvh, 40px);
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: clamp(10px, 1.5dvh, 14px);
+}
+
+.ut-date-num {
+    font-family: var(--font-serif);
+    font-size: clamp(18px, 2.5dvh, 24px);
+    font-weight: 700;
+    color: white;
+    line-height: 1;
+}
+
+.ut-date-day {
+    font-family: var(--font-sans);
+    font-size: clamp(9px, 1.2dvh, 11px);
+    color: rgba(255, 255, 255, 0.75);
+    text-transform: capitalize;
+    margin-top: 2px;
+}
+
+
+/* connector column — dot + vertical line */
+
+.ut-connector {
+    position: relative;
+    width: 16px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.ut-dot {
+    width: clamp(8px, 1.2dvh, 10px);
+    height: clamp(8px, 1.2dvh, 10px);
+    border-radius: 50%;
+    margin-top: clamp(14px, 2dvh, 18px);
+    flex-shrink: 0;
+    z-index: 1;
+}
+
+.ut-line {
+    width: 2px;
+    flex: 1;
+    background-color: rgba(255, 255, 255, 0.3);
+    min-height: 20px;
+}
+
+
+/* item card */
+
+.ut-card {
+    flex: 1;
+    background-color: rgba(255, 255, 255, 0.25);
+    border-radius: var(--radius-md);
+    padding: clamp(10px, 1.5dvh, 14px) clamp(12px, 1.8dvh, 16px);
+    padding-right: clamp(24px, 3.5dvh, 32px);
+    position: relative;
+    min-height: clamp(56px, 8dvh, 72px);
+    display: flex;
+    align-items: center;
+    margin-bottom: clamp(10px, 1.5dvh, 16px);
+}
+
+.ut-card-content {
+    display: flex;
+    align-items: flex-start;
+    gap: clamp(6px, 1dvh, 10px);
+}
+
+.ut-card-icon {
+    flex-shrink: 0;
+    color: white;
+    margin-top: 2px;
+}
+
+.ut-card-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.ut-card-title {
+    font-family: var(--font-sans);
+    font-size: clamp(13px, 1.7dvh, 15px);
+    font-weight: 600;
+    color: white;
+    margin: 0;
+}
+
+.ut-card-desc {
+    font-family: var(--font-sans);
+    font-size: clamp(11px, 1.3dvh, 13px);
+    color: rgba(255, 255, 255, 0.75);
+    margin: 0;
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+
+/* bookmark bar — vertical bar on right edge */
+
+.ut-bookmark {
+    position: absolute;
+    right: clamp(6px, 1dvh, 10px);
+    top: clamp(8px, 1.2dvh, 12px);
+    bottom: clamp(8px, 1.2dvh, 12px);
+    width: clamp(4px, 0.6dvh, 6px);
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 999px;
+}
+
+
+/* urgent card variant */
+
+.ut-card--urgent {
+    background-color: rgba(255, 197, 80, 0.45);
+}
+
+.ut-card--urgent .ut-card-title {
+    color: #fff;
+}
+
+.ut-card--urgent .ut-bookmark {
+    background-color: rgba(255, 197, 80, 0.6);
+}
+
+
+/* tasks variant — dark text on blue background */
+
+.ut-section--tasks .ut-title {
+    color: var(--text-main);
+}
+
+.ut-section--tasks .ut-subtitle {
+    color: var(--text-secondary);
+}
+
+.ut-section--tasks .ut-date-num {
+    color: var(--text-main);
+}
+
+.ut-section--tasks .ut-date-day {
+    color: var(--text-secondary);
+}
+
+.ut-section--tasks .ut-card-icon {
+    color: var(--text-main);
+}
+
+.ut-section--tasks .ut-card-title {
+    color: var(--text-main);
+}
+
+.ut-section--tasks .ut-card-desc {
+    color: var(--text-secondary);
+}
+
+.ut-section--tasks .ut-line {
+    background-color: rgba(0, 0, 0, 0.12);
+}
+
+.ut-section--tasks .ut-dot--default {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+
+/* color-coded dot variants */
+
+.ut-dot--blue    { background-color: var(--blue); }
+.ut-dot--yellow  { background-color: var(--yellow); }
+.ut-dot--green   { background-color: var(--green); }
+.ut-dot--pink    { background-color: var(--pink); }
+.ut-dot--default { background-color: rgba(255, 255, 255, 0.6); }
