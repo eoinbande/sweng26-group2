@@ -1,8 +1,33 @@
-import React from 'react';
-import '../styles/Profile.css';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FiEdit2 } from 'react-icons/fi';
+import BottomNav from '../components/BottomNav';
+import { supabase } from '../supabase_client';
+import '../styles/Profile.css';
 
-const Profile = ({ username = 'Marissa', email = 'Marissa', streak = 217, onEdit, onSignOut }) => {
+const Profile = () => {
+    const navigate = useNavigate();
+    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
+    const streak = 217; // TODO: fetch real streak from backend
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            const { data } = await supabase.auth.getUser();
+            const user = data?.user;
+            if (user) {
+                setEmail(user.email || '');
+                setUsername(user.user_metadata?.username || user.email?.split('@')[0] || '');
+            }
+        };
+        fetchUser();
+    }, []);
+
+    const handleSignOut = async () => {
+        await supabase.auth.signOut();
+        navigate('/login');
+    };
+
     return (
         <div className="profile-page">
             <div className="profile-header-bg">
@@ -27,13 +52,17 @@ const Profile = ({ username = 'Marissa', email = 'Marissa', streak = 217, onEdit
                     </div>
                 </div>
 
-                <button className="profile-edit-btn" onClick={onEdit} aria-label="Edit profile">
+                <button className="profile-edit-btn" aria-label="Edit profile">
                     <FiEdit2 size={20} color="#1a1a1a" />
                 </button>
             </div>
 
-            <button className="profile-signout-btn" onClick={onSignOut}>Sign Out</button>
+            <button className="profile-signout-btn" onClick={handleSignOut}>
+                Sign Out
+            </button>
+
             <div className="profile-nav-spacer" />
+            <BottomNav />
         </div>
     );
 };
