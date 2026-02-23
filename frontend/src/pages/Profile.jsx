@@ -33,10 +33,10 @@ const Profile = () => {
 
         fetchUser();
 
-        // Show loading spinner for 1.5s, then fade in profile
+        // Show spinner for 1.5s, then fade in profile
         const loadTimer = setTimeout(() => {
             setIsLoading(false);
-            setTimeout(() => setVisible(true), 50); // slight delay for fade-in
+            setTimeout(() => setVisible(true), 50);
         }, 1500);
 
         return () => clearTimeout(loadTimer);
@@ -47,18 +47,14 @@ const Profile = () => {
         navigate('/login');
     };
 
-    // ── Loading screen ──
+    /* ── Loading screen ── */
     if (isLoading) {
         return (
             <div style={{
                 position: 'fixed',
-                top: 0,
-                left: 0,
-                height: '100vh',
-                width: '100vw',
+                inset: 0,
                 backgroundColor: 'var(--bg-color)',
                 display: 'flex',
-                flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
                 zIndex: 1000,
@@ -69,48 +65,46 @@ const Profile = () => {
                     border: '4px solid rgba(255, 185, 46, 0.2)',
                     borderTop: '4px solid var(--primary)',
                     borderRadius: '50%',
-                    animation: 'profile-spin 1s linear infinite',
+                    animation: 'profileSpin 1s linear infinite',
                 }} />
                 <style>{`
-                    @keyframes profile-spin {
+                    @keyframes profileSpin {
                         from { transform: rotate(0deg); }
                         to   { transform: rotate(360deg); }
-                    }
-                    @keyframes profile-fadein {
-                        from { opacity: 0; transform: translateY(16px); }
-                        to   { opacity: 1; transform: translateY(0); }
                     }
                 `}</style>
             </div>
         );
     }
 
-    // ── Profile page ──
+    /* ── Profile page ── */
     return (
         <div
             className="profile-page"
             style={{
                 opacity: visible ? 1 : 0,
-                transform: visible ? 'translateY(0)' : 'translateY(16px)',
+                transform: visible ? 'translateY(0)' : 'translateY(14px)',
                 transition: 'opacity 0.4s ease, transform 0.4s ease',
             }}
         >
-            {/* Pink header — ~50% of screen height */}
+            {/* Pink top half */}
             <div className="profile-header-bg">
                 <h1 className="profile-title">Your Account</h1>
 
-                {/* Avatar: semicircle on top of rectangle */}
+                {/* Arched avatar — semicircle on top of rectangle */}
                 <div className="profile-avatar-wrap">
                     <div className="profile-avatar-top" />
                     <div className="profile-avatar-body" />
                 </div>
             </div>
 
-            {/* Grey lower section */}
+            {/* Grey lower half */}
             <div className="profile-lower">
-                {/* Info card sits right at the boundary */}
+
+                {/* Card overlaps the pink/grey boundary */}
                 <div className="profile-card">
-                    {/* Streak badge */}
+
+                    {/* Streak badge — top-right of card */}
                     <div className="profile-streak">
                         <span className="profile-streak-icon">🔥</span>
                         <span className="profile-streak-days">{streak} days</span>
@@ -127,12 +121,13 @@ const Profile = () => {
                         </div>
                     </div>
 
+                    {/* Edit button — bottom-right of card */}
                     <button className="profile-edit-btn" aria-label="Edit profile">
-                        <FiEdit2 size={20} color="#1a1a1a" />
+                        <FiEdit2 size={19} color="#1a1a1a" />
                     </button>
                 </div>
 
-                {/* Sign out — directly below the card */}
+                {/* Sign Out — directly below card */}
                 <button className="profile-signout-btn" onClick={handleSignOut}>
                     Sign Out
                 </button>
