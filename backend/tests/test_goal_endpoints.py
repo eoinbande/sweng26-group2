@@ -192,7 +192,8 @@ class TestCreateGoal:
         
         mock_create.assert_called_once_with(
             user_id=mock_user_id,
-            title="Fix my bike tyre"
+            title="Fix my bike tyre",
+            category=None
         )
         mock_get_plan.assert_called_once_with("Fix my bike tyre")
         mock_update.assert_called_once()

@@ -55,7 +55,7 @@ class TestCreateGoal:
         with patch("app.Tables.supabase") as mock_sb:
             mock_sb.table.return_value.insert.return_value.execute.return_value = fake_result
 
-            result = create_goal(user_id="user-1", title="Fix my bike tyre")
+            result = create_goal(user_id="user-1", title="Fix my bike tyre", category=None)
 
         assert result is fake_result
         inserted_data = mock_sb.table.return_value.insert.call_args[0][0]
@@ -70,7 +70,7 @@ class TestCreateGoal:
         with patch("app.Tables.supabase") as mock_sb:
             mock_sb.table.return_value.insert.return_value.execute.return_value = fake_result
 
-            create_goal(user_id="user-1", title="My Goal")
+            create_goal(user_id="user-1", title="My Goal", category=None)
 
         inserted_data = mock_sb.table.return_value.insert.call_args[0][0]
         goal_data = json.loads(inserted_data["goal_data"])

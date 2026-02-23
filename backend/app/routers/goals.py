@@ -1,5 +1,7 @@
 from fastapi import APIRouter, HTTPException
+from enum import Enum
 from pydantic import BaseModel, Field
+from typing import Optional
 # Database functions (Tables.py)
 from ..Tables import (
     create_goal, get_all_goals, get_goal, delete_goal,
@@ -23,6 +25,13 @@ goal_router = APIRouter()
 # REQUEST MODELS
 # =============================================================================
 
+#Enums of predefined categories(for now 3, later we can add more!)
+class CategoryEnum(str, Enum):
+    Health = "Health"
+    Personal = "Personal"
+    Work = "Work"
+
+
 class CreateGoalRequest(BaseModel):
     """
     What frontend sends when user types a goal and hits submit.
@@ -31,7 +40,7 @@ class CreateGoalRequest(BaseModel):
     """
     user_id: str
     title: str = Field(min_length=1) # won't allow goals to be created with empty titles
-
+    category: Optional[CategoryEnum] = None #each goal will be of one category
 
 class AcceptPlanRequest(BaseModel):
     """
@@ -51,6 +60,7 @@ class FeedbackRequest(BaseModel):
     Example: {"feedback": "I don't like task_3, use soapy water instead"}
     """
     feedback: str
+
 
 
 
@@ -78,7 +88,8 @@ def create_goal_endpoint(goal: CreateGoalRequest):
     # Create the goal in the database (empty task list for now)
     result = create_goal(
         user_id=goal.user_id,
-        title=goal.title
+        title=goal.title,
+        category = goal.category
     )
 
     # Extract the goal ID from the database response
@@ -104,6 +115,7 @@ def create_goal_endpoint(goal: CreateGoalRequest):
         "message": "Goal created — review your plan below",
         "goal_id": goal_id,
         "title": goal.title,
+        "category": goal.category,
         "description": ai_plan.get("description", ""),
         "goal_due_date": ai_plan.get("goal_due_date", ""),
         "tasks": ai_plan["tasks"],   # Tasks for frontend to display on review screen
