@@ -5,8 +5,8 @@
 }
 
 .ut-container {
-    border-radius: var(--radius-md);
-    padding: clamp(18px, 2.8dvh, 28px) clamp(16px, 2.2dvh, 22px);
+    border-radius: 15% 15% 0 0;
+    padding: 12%;
 }
 
 
@@ -17,14 +17,14 @@
     font-size: clamp(20px, 3dvh, 26px);
     font-weight: 700;
     color: white;
-    margin: 0 0 var(--space-xs);
+    margin: 0 0 1.5%;
 }
 
 .ut-subtitle {
     font-family: var(--font-sans);
     font-size: clamp(11px, 1.4dvh, 13px);
     color: rgba(255, 255, 255, 0.75);
-    margin: 0 0 clamp(14px, 2.2dvh, 22px);
+    margin: 0 0 5%;
 }
 
 
@@ -40,18 +40,31 @@
     align-items: flex-start;
     gap: clamp(6px, 1dvh, 10px);
     position: relative;
-
     /* staggered fade-in */
     opacity: 0;
     transform: translateY(8px);
     animation: ut-fade-in 0.35s ease forwards;
 }
 
-.ut-item:nth-child(1) { animation-delay: 0.05s; }
-.ut-item:nth-child(2) { animation-delay: 0.12s; }
-.ut-item:nth-child(3) { animation-delay: 0.19s; }
-.ut-item:nth-child(4) { animation-delay: 0.26s; }
-.ut-item:nth-child(5) { animation-delay: 0.33s; }
+.ut-item:nth-child(1) {
+    animation-delay: 0.05s;
+}
+
+.ut-item:nth-child(2) {
+    animation-delay: 0.12s;
+}
+
+.ut-item:nth-child(3) {
+    animation-delay: 0.19s;
+}
+
+.ut-item:nth-child(4) {
+    animation-delay: 0.26s;
+}
+
+.ut-item:nth-child(5) {
+    animation-delay: 0.33s;
+}
 
 @keyframes ut-fade-in {
     to {
@@ -129,7 +142,7 @@
     min-height: clamp(56px, 8dvh, 72px);
     display: flex;
     align-items: center;
-    margin-bottom: clamp(10px, 1.5dvh, 16px);
+    margin-bottom: 7%;
 }
 
 .ut-card-content {
@@ -242,8 +255,22 @@
 
 /* color-coded dot variants */
 
-.ut-dot--blue    { background-color: var(--blue); }
-.ut-dot--yellow  { background-color: var(--yellow); }
-.ut-dot--green   { background-color: var(--green); }
-.ut-dot--pink    { background-color: var(--pink); }
-.ut-dot--default { background-color: rgba(255, 255, 255, 0.6); }
+.ut-dot--blue {
+    background-color: var(--blue);
+}
+
+.ut-dot--yellow {
+    background-color: var(--yellow);
+}
+
+.ut-dot--green {
+    background-color: var(--green);
+}
+
+.ut-dot--pink {
+    background-color: var(--pink);
+}
+
+.ut-dot--default {
+    background-color: rgba(255, 255, 255, 0.6);
+}
