@@ -1,10 +1,19 @@
 import React, { useMemo } from 'react';
 import dayjs from 'dayjs';
+import weekday from 'dayjs/plugin/weekday';
+import updateLocale from 'dayjs/plugin/updateLocale';
+import 'dayjs/locale/en-gb';
+import { styled } from '@mui/material/styles';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import { PickersDay } from '@mui/x-date-pickers/PickersDay';
 import '../styles/components/MonthCalendar.css';
+
+// configure dayjs to start weeks on monday
+dayjs.extend(weekday);
+dayjs.extend(updateLocale);
+dayjs.locale('en-gb');
 
 // color scheme map matching the goal color schemes used elsewhere
 const COLOR_MAP = {
@@ -34,60 +43,97 @@ function getDayHighlight(dayOfMonth, goalRanges) {
 }
 
 /**
- * custom day component that renders goal range highlights
+ * styled day component — handles range highlighting via styled-components
+ * uses disableMargin for seamless continuous bars between days
  */
-function CustomDay(props) {
+const StyledDay = styled(PickersDay, {
+    shouldForwardProp: (prop) =>
+        prop !== 'highlightBg' &&
+        prop !== 'highlightText' &&
+        prop !== 'isStart' &&
+        prop !== 'isEnd' &&
+        prop !== 'isMid' &&
+        prop !== 'isSingle',
+})(({ highlightBg, highlightText, isStart, isEnd, isMid, isSingle }) => {
+    const inRange = isStart || isEnd || isMid;
+
+    return {
+        // use nested selector for higher specificity over MUI defaults
+        '&.MuiPickersDay-root': {
+            // all range days: flat rectangle, colored background
+            ...(inRange && {
+                borderRadius: 0,
+                backgroundColor: highlightBg,
+                color: highlightText,
+                fontWeight: 600,
+                '&:hover, &:focus': {
+                    backgroundColor: highlightBg,
+                },
+            }),
+
+            // single day — circle
+            ...(isSingle && {
+                backgroundColor: highlightBg,
+                color: highlightText,
+                fontWeight: 600,
+                borderRadius: '50%',
+                '&:hover, &:focus': {
+                    backgroundColor: highlightBg,
+                },
+            }),
+
+            // rounded left cap for range start
+            ...(isStart && {
+                borderTopLeftRadius: '50%',
+                borderBottomLeftRadius: '50%',
+            }),
+
+            // rounded right cap for range end
+            ...(isEnd && {
+                borderTopRightRadius: '50%',
+                borderBottomRightRadius: '50%',
+            }),
+        },
+    };
+});
+
+/**
+ * custom day slot — wraps StyledDay with highlight props
+ */
+function Day(props) {
     const { day, outsideCurrentMonth, goalRanges = [], ...other } = props;
     const dayOfMonth = day.date();
     const isCurrentMonth = !outsideCurrentMonth;
 
     const highlight = isCurrentMonth ? getDayHighlight(dayOfMonth, goalRanges) : null;
 
-    // build class list
-    let wrapperClass = 'mc-day-wrapper';
-    if (highlight) {
-        wrapperClass += ' mc-cell--highlighted';
-        if (highlight.isSingle) wrapperClass += ' mc-cell--single';
-        else if (highlight.isStart) wrapperClass += ' mc-cell--start';
-        else if (highlight.isEnd) wrapperClass += ' mc-cell--end';
-        else wrapperClass += ' mc-cell--mid';
-    }
-
     return (
-        <div
-            className={wrapperClass}
-            style={highlight ? {
-                '--range-bg': highlight.color.bg,
-                '--range-text': highlight.color.text,
-            } : undefined}
-        >
-            <PickersDay
-                {...other}
-                day={day}
-                outsideCurrentMonth={outsideCurrentMonth}
-                sx={{
-                    // override mui default selected/today styles
-                    '&.Mui-selected': {
-                        backgroundColor: 'transparent',
-                        color: 'inherit',
-                        '&:hover': { backgroundColor: 'transparent' },
-                        '&:focus': { backgroundColor: 'transparent' },
-                    },
-                    '&.MuiPickersDay-today': {
-                        border: 'none',
+        <StyledDay
+            {...other}
+            day={day}
+            outsideCurrentMonth={outsideCurrentMonth}
+            disableMargin
+            selected={false}
+            highlightBg={highlight ? highlight.color.bg : undefined}
+            highlightText={highlight ? highlight.color.text : undefined}
+            isStart={highlight ? highlight.isStart && !highlight.isSingle : false}
+            isEnd={highlight ? highlight.isEnd && !highlight.isSingle : false}
+            isMid={highlight ? !highlight.isStart && !highlight.isEnd : false}
+            isSingle={highlight ? highlight.isSingle : false}
+            sx={{
+                // today circle override
+                '&.MuiPickersDay-today': {
+                    border: 'none',
+                    backgroundColor: 'var(--primary)',
+                    color: 'white',
+                    fontWeight: 600,
+                    borderRadius: '50%',
+                    '&:hover, &:focus': {
                         backgroundColor: 'var(--primary)',
-                        color: 'white',
-                        fontWeight: 600,
-                        '&:hover': { backgroundColor: 'var(--primary)' },
-                        '&:focus': { backgroundColor: 'var(--primary)' },
                     },
-                    ...(highlight ? {
-                        color: 'var(--range-text)',
-                        fontWeight: 600,
-                    } : {}),
-                }}
-            />
-        </div>
+                },
+            }}
+        />
     );
 }
 
@@ -103,13 +149,13 @@ const MonthCalendar = ({ year, month, goalRanges = [] }) => {
 
     return (
         <div className="month-calendar">
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
                 <DateCalendar
                     value={null}
                     defaultCalendarMonth={displayDate}
                     readOnly
                     views={['day']}
-                    slots={{ day: CustomDay }}
+                    slots={{ day: Day }}
                     slotProps={{
                         day: { goalRanges },
                     }}
