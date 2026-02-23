@@ -318,3 +318,57 @@ class TestMergeAndSaveTasks:
         sub = result[0]["subtasks"][0]
         assert sub["id"] == SUB_1A_ID
         assert sub["status"] == "completed"
+
+class TestUpdateTaskStatus:
+
+    def _fake_task(self, task_id, goal_id, parent_id = None):
+        return{"id": task_id, "goal_id": goal_id, "parent_id": parent_id, "status": "not_started"}
+    
+    def _fake_goal_data(self, tasks):
+        return {"id": GOAL_ID, "goal_data": json.dumps({"tasks": tasks})}
+    
+    def test_updates_task_status_in_tasks_table(self):
+        #update_task_status must call UPDATE on the tasks table.
+        fake_task = self._fake_task(TASK_1_ID, GOAL_ID)
+        goal_data = self._fake_goal_data([
+            {"id": TASK_1_ID, "ai_id": "task_1", "status": "not_started", "subtasks": []}
+        ])
+
+        with patch("app.Tables.supabase") as mock_sb, \
+             patch("app.Tables.get_task") as mock_get_task, \
+             patch("app.Tables.get_goal") as mock_get_goal:
+            mock_get_task.return_value = fake_task
+            mock_get_goal.return_value = goal_data
+            mock_sb.table.return_value.update.return_value.eq.return_value.execute.return_value = MagicMock()
+
+            update_task_status(TASK_1_ID, "completed")
+
+        # The tasks table update must be called
+        mock_sb.table.return_value.update.assert_called()
+
+    def test_updates_status_in_goal_data_jsonb(self):
+        #The task's status in goal_data JSON blob must also be updated.
+        fake_task = self._fake_task(TASK_1_ID, GOAL_ID)
+        goal_tasks = [{"id": TASK_1_ID, "ai_id": "task_1", "status": "not_started", "subtasks": []}]
+
+        captured = {}
+
+        def capture_update(payload):
+            captured.update(payload)
+            m = MagicMock()
+            m.eq.return_value.execute.return_value = MagicMock()
+            return m
+
+        with patch("app.Tables.supabase") as mock_sb, \
+             patch("app.Tables.get_task") as mock_get_task, \
+             patch("app.Tables.get_goal") as mock_get_goal:
+            mock_get_task.return_value = fake_task
+            mock_get_goal.return_value = {"id": GOAL_ID, "goal_data": json.dumps({"tasks": goal_tasks})}
+            mock_sb.table.return_value.update.side_effect = capture_update
+
+            update_task_status(TASK_1_ID, "completed")
+
+        # The last update call should have the updated goal_data JSON
+        saved = json.loads(captured["goal_data"])
+        updated_task = next(t for t in saved["tasks"] if t["id"] == TASK_1_ID)
+        assert updated_task["status"] == "completed"
