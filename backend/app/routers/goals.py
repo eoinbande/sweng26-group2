@@ -25,6 +25,13 @@ goal_router = APIRouter()
 # REQUEST MODELS
 # =============================================================================
 
+#Enums of predefined categories(for now 3, later we can add more!)
+class CategoryEnum(str, Enum):
+    Health = "Health"
+    Personal = "Personal"
+    Work = "Work"
+
+
 class CreateGoalRequest(BaseModel):
     """
     What frontend sends when user types a goal and hits submit.
@@ -54,11 +61,6 @@ class FeedbackRequest(BaseModel):
     """
     feedback: str
 
-#Enums of predefined categories(for now 3, later we can add more!)
-class CategoryEnum(str, Enum):
-    Health = "Health"
-    Personal = "Personal"
-    Work = "Work"
 
 
 
