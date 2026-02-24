@@ -19,7 +19,7 @@ const VARIANT_CONFIG = {
  * UpcomingTimeline — reusable timeline section for upcoming goals or tasks
  *
  * @param {string}   variant  — "goals" | "tasks"
- * @param {Array}    items    — [{ id, title, description, dueDate, colorScheme?, urgent? }]
+ * @param {Array}    items    — [{ id, title, description, dueDate, urgent? }]
  * @param {function} onClick  — optional callback when a card is tapped
  */
 const UpcomingTimeline = ({ variant = 'goals', items = [], onClick }) => {
@@ -32,14 +32,10 @@ const UpcomingTimeline = ({ variant = 'goals', items = [], onClick }) => {
                 <p className="ut-subtitle">{config.subtitle}</p>
 
                 <div className="ut-timeline">
-                    {items.map((item, index) => {
+                    {items.map((item) => {
                         const dateObj = new Date(item.dueDate);
                         const dayNum = dateObj.getDate();
                         const dayName = dateObj.toLocaleDateString('en-GB', { weekday: 'short' });
-                        const dotClass = item.colorScheme
-                            ? `ut-dot ut-dot--${item.colorScheme}`
-                            : 'ut-dot ut-dot--default';
-
                         return (
                             <div className="ut-item" key={item.id}>
                                 {/* left: date label */}
@@ -48,10 +44,9 @@ const UpcomingTimeline = ({ variant = 'goals', items = [], onClick }) => {
                                     <span className="ut-date-day">{dayName}</span>
                                 </div>
 
-                                {/* center: dot + connector line */}
+                                {/* center: dot */}
                                 <div className="ut-connector">
-                                    <div className={dotClass} />
-                                    {index < items.length - 1 && <div className="ut-line" />}
+                                    <div className="ut-dot" />
                                 </div>
 
                                 {/* right: item card */}
