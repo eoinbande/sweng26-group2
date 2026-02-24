@@ -65,10 +65,8 @@ class SubTask(BaseModel):
         default=TaskStatus.NOT_STARTED,
         description="Current status of the subtask"
     )
-
-    # Allow extra fields to pass through without breaking validation
-    # This is useful if AI includes fields we haven't planned for yet
-    model_config = ConfigDict(extra="allow")
+    
+    model_config = ConfigDict(extra="forbid")
 
     @field_validator('ai_id')
     @classmethod
@@ -130,7 +128,7 @@ class Task(BaseModel):
         description="Ordered list of subtasks (can be empty if not expanded yet)"
     )
 
-    model_config = ConfigDict(extra="allow")
+    model_config = ConfigDict(extra="forbid")
 
     @field_validator('ai_id')
     @classmethod
@@ -187,7 +185,7 @@ class GoalData(BaseModel):
         default_factory=datetime.utcnow
     )
 
-    model_config = ConfigDict(extra="allow")
+    model_config = ConfigDict(extra="forbid")
 
     # -------------------------------------------------------------------------
     # Helper methods — useful for backend logic without querying DB again
@@ -270,7 +268,7 @@ class AIGeneratePlanResponse(BaseModel):
         min_length=1  # AI must return at least one task
     )
 
-    model_config = ConfigDict(extra="allow")
+    model_config = ConfigDict(extra="forbid")
 
 
 class AIFeedbackResponse(BaseModel):
@@ -287,7 +285,7 @@ class AIFeedbackResponse(BaseModel):
         min_length=1
     )
 
-    model_config = ConfigDict(extra="allow")
+    model_config = ConfigDict(extra="forbid")
 
 
 class AIExpandTaskResponse(BaseModel):
@@ -307,7 +305,7 @@ class AIExpandTaskResponse(BaseModel):
         min_length=1
     )
 
-    model_config = ConfigDict(extra="allow")
+    model_config = ConfigDict(extra="forbid")
 
 
 # =============================================================================
