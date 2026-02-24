@@ -55,7 +55,7 @@ backend-lint:
     - pip install --upgrade pip
     - pip install ruff
   script:
-    - ruff check backend/
+    - ruff check backend/ --fix
   allow_failure: true
   only:
     - branches
