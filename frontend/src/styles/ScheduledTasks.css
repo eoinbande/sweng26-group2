@@ -12,8 +12,12 @@
     height: 100%;
     display: flex;
     flex-direction: column;
-    padding: 0 var(--space-lg);
     padding-bottom: 120px;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+}
+
+/* padded wrapper for content that should not be full-width */
+.scheduled-tasks-padded {
+    padding: 0 var(--space-lg);
 }

@@ -35,12 +35,14 @@ function ScheduledTasks() {
     return (
         <div className="scheduled-tasks-page">
             <div className="scheduled-tasks-container">
-                <PageHeader title="February" />
-                <MonthCalendar
-                    year={now.getFullYear()}
-                    month={now.getMonth()}
-                    goalRanges={MOCK_GOAL_RANGES}
-                />
+                <div className="scheduled-tasks-padded">
+                    <PageHeader title="February" />
+                    <MonthCalendar
+                        year={now.getFullYear()}
+                        month={now.getMonth()}
+                        goalRanges={MOCK_GOAL_RANGES}
+                    />
+                </div>
                 <UpcomingTimeline variant="goals" items={MOCK_GOALS} />
                 <UpcomingTimeline variant="tasks" items={MOCK_TASKS} />
             </div>
