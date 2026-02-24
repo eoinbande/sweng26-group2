@@ -20,7 +20,7 @@
 .ut-title {
     font-family: var(--font-serif);
     font-size: clamp(20px, 3dvh, 26px);
-    font-weight: 500;
+    font-weight: 550;
     color: white;
     margin: 0 0 1.5%;
 }
