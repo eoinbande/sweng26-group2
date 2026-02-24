@@ -6,7 +6,11 @@
 
 .ut-container {
     border-radius: 36px 36px 0 0;
-    padding: 12%;
+    padding: 12% 12% 0;
+    height: 60dvh;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
 }
 
 
@@ -34,9 +38,41 @@
     display: flex;
     flex-direction: column;
     position: relative;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
+    padding-bottom: 12%;
+    padding-right: 20px;
+    margin-right: -20px;
 }
 
+.ut-timeline::-webkit-scrollbar {
+    width: 5px;
+}
+
+.ut-timeline::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.ut-timeline::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.35);
+    border-radius: var(--radius-pill);
+}
+
+.ut-section--tasks .ut-timeline {
+    scrollbar-color: rgba(28, 28, 30, 0.25) transparent;
+}
+
+.ut-section--tasks .ut-timeline::-webkit-scrollbar-thumb {
+    background-color: rgba(28, 28, 30, 0.25);
+}
+
+
 /* single continuous line running through all dots */
+
 .ut-timeline::before {
     content: '';
     position: absolute;
@@ -194,14 +230,38 @@
 }
 
 
-/* urgent card variant */
+/* locked card variant — deeper red tint of the section background */
 
-.ut-card--urgent {
-    background-color: rgba(255, 197, 80, 0.45);
+.ut-card--locked {
+    background-color: rgba(150, 30, 30, 0.45);
 }
 
-.ut-card--urgent .ut-card-title {
-    color: #fff;
+.ut-card--locked .ut-card-title {
+    color: rgba(255, 210, 210, 0.95);
+}
+
+.ut-card--locked .ut-card-desc {
+    color: rgba(255, 200, 200, 0.7);
+}
+
+.ut-card--locked .ut-card-icon {
+    color: rgba(255, 210, 210, 0.95);
+}
+
+.ut-section--tasks .ut-card--locked {
+    background-color: rgba(200, 55, 55, 0.18);
+}
+
+.ut-section--tasks .ut-card--locked .ut-card-title {
+    color: #b83030;
+}
+
+.ut-section--tasks .ut-card--locked .ut-card-desc {
+    color: rgba(160, 40, 40, 0.8);
+}
+
+.ut-section--tasks .ut-card--locked .ut-card-icon {
+    color: #b83030;
 }
 
 

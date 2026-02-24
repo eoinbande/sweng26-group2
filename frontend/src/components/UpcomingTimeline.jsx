@@ -1,4 +1,4 @@
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpLeft } from 'lucide-react';
 import '../styles/components/UpcomingTimeline.css';
 
 // variant config — controls title and subtitle per section type
@@ -19,7 +19,7 @@ const VARIANT_CONFIG = {
  * UpcomingTimeline — reusable timeline section for upcoming goals or tasks
  *
  * @param {string}   variant  — "goals" | "tasks"
- * @param {Array}    items    — [{ id, title, description, dueDate, urgent? }]
+ * @param {Array}    items    — [{ id, title, description, dueDate, locked? }]
  * @param {function} onClick  — optional callback when a card is tapped
  */
 const UpcomingTimeline = ({ variant = 'goals', items = [], onClick }) => {
@@ -51,13 +51,13 @@ const UpcomingTimeline = ({ variant = 'goals', items = [], onClick }) => {
 
                                 {/* right: item card */}
                                 <div
-                                    className={`ut-card ${item.urgent ? 'ut-card--urgent' : ''}`}
+                                    className={`ut-card ${item.locked ? 'ut-card--locked' : ''}`}
                                     onClick={() => onClick && onClick(item)}
                                     role={onClick ? 'button' : undefined}
                                     tabIndex={onClick ? 0 : undefined}
                                 >
                                     <div className="ut-card-content">
-                                        <ArrowUpRight
+                                        <ArrowUpLeft
                                             className="ut-card-icon"
                                             size={16}
                                             strokeWidth={2.5}
