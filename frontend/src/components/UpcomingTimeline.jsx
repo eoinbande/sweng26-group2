@@ -29,15 +29,11 @@ const UpcomingTimeline = ({ variant = 'goals', items = [], onClick }) => {
     const timelineRef = useRef(null);
     // top fade only appears once content is cut off by scrolling
     const [showTopFade, setShowTopFade] = useState(false);
-    // bottom fade starts visible — there's almost always overflow content
-    const [showBottomFade, setShowBottomFade] = useState(true);
 
     const updateFades = useCallback(() => {
         const el = timelineRef.current;
         if (!el) return;
-        const threshold = 5;
-        setShowTopFade(el.scrollTop > threshold);
-        setShowBottomFade(el.scrollTop + el.clientHeight < el.scrollHeight - threshold);
+        setShowTopFade(el.scrollTop > 5);
     }, []);
 
     // correct initial state after render (handles cases with few items)
@@ -99,7 +95,7 @@ const UpcomingTimeline = ({ variant = 'goals', items = [], onClick }) => {
                     </div>
 
                     <div className="ut-fade ut-fade--top" style={{ opacity: showTopFade ? 1 : 0 }} />
-                    <div className="ut-fade ut-fade--bottom" style={{ opacity: showBottomFade ? 1 : 0 }} />
+                    <div className="ut-fade ut-fade--bottom" />
                 </div>
             </div>
         </section>
