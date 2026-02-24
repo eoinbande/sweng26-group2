@@ -121,10 +121,11 @@ def sample_goal_list():
     Tasks must be non-empty so the router's accepted-goals filter
     (``if goal_data.get("tasks")``) doesn't strip these goals out.
     """
-    _task = lambda ai_id, uid, desc: {
-        "ai_id": ai_id, "id": uid, "description": desc,
-        "order": 1, "status": "not_started", "subtasks": []
-    }
+    def _make_task(ai_id, uid, desc):
+        return {
+            "ai_id": ai_id, "id": uid, "description": desc,
+            "order": 1, "status": "not_started", "subtasks": []
+        }
     return [
         {
             "id": "goal-1",
@@ -745,8 +746,9 @@ class TestGetGoals:
         self, mock_get_all_goals, mock_user_id
     ):
         """Should handle multiple goals correctly."""
-        _task = lambda n: [{"ai_id": "task_1", "id": f"uuid-{n}", "description": "Step",
-                            "order": 1, "status": "not_started", "subtasks": []}]
+        def _make_tasks(n):
+            return [{"ai_id": "task_1", "id": f"uuid-{n}", "description": "Step",
+                      "order": 1, "status": "not_started", "subtasks": []}]
         mock_get_all_goals.return_value = [
             {"id": "1", "title": "Goal 1", "goal_data": {"tasks": _task(1)}},
             {"id": "2", "title": "Goal 2", "goal_data": {"tasks": _task(2)}},
