@@ -121,10 +121,11 @@ def sample_goal_list():
     Tasks must be non-empty so the router's accepted-goals filter
     (``if goal_data.get("tasks")``) doesn't strip these goals out.
     """
-    _task = lambda ai_id, uid, desc: {
-        "ai_id": ai_id, "id": uid, "description": desc,
-        "order": 1, "status": "not_started", "subtasks": []
-    }
+    def _make_task(ai_id, uid, desc):
+        return {
+            "ai_id": ai_id, "id": uid, "description": desc,
+            "order": 1, "status": "not_started", "subtasks": []
+        }
     return [
         {
             "id": "goal-1",
@@ -134,7 +135,7 @@ def sample_goal_list():
             "goal_data": {
                 "description": "Step-by-step guide to fixing a flat bike tyre",
                 "goal_due_date": "2026-03-01",
-                "tasks": [_task("task_1", "uuid-t1", "Remove the wheel from the bike")]
+                "tasks": [_make_task("task_1", "uuid-t1", "Remove the wheel from the bike")]
             }
         },
         {
@@ -145,7 +146,7 @@ def sample_goal_list():
             "goal_data": {
                 "description": "Beginner's roadmap to learning piano",
                 "goal_due_date": "2026-05-15",
-                "tasks": [_task("task_1", "uuid-t2", "Get access to a piano")]
+                "tasks": [_make_task("task_1", "uuid-t2", "Get access to a piano")]
             }
         }
     ]
@@ -745,12 +746,13 @@ class TestGetGoals:
         self, mock_get_all_goals, mock_user_id
     ):
         """Should handle multiple goals correctly."""
-        _task = lambda n: [{"ai_id": "task_1", "id": f"uuid-{n}", "description": "Step",
-                            "order": 1, "status": "not_started", "subtasks": []}]
+        def _make_tasks(n):
+            return [{"ai_id": "task_1", "id": f"uuid-{n}", "description": "Step",
+                      "order": 1, "status": "not_started", "subtasks": []}]
         mock_get_all_goals.return_value = [
-            {"id": "1", "title": "Goal 1", "goal_data": {"tasks": _task(1)}},
-            {"id": "2", "title": "Goal 2", "goal_data": {"tasks": _task(2)}},
-            {"id": "3", "title": "Goal 3", "goal_data": {"tasks": _task(3)}},
+            {"id": "1", "title": "Goal 1", "goal_data": {"tasks": _make_tasks(1)}},
+            {"id": "2", "title": "Goal 2", "goal_data": {"tasks": _make_tasks(2)}},
+            {"id": "3", "title": "Goal 3", "goal_data": {"tasks": _make_tasks(3)}},
         ]
         
         response = client.get(f"/api/goals/{mock_user_id}")
