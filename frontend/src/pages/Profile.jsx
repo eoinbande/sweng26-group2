@@ -33,13 +33,13 @@ const Profile = () => {
 
         fetchUser();
 
-        // Show spinner for 1.5s, then fade in profile
-        const loadTimer = setTimeout(() => {
+        // Show loader for 1.5s then fade profile in
+        const t = setTimeout(() => {
             setIsLoading(false);
-            setTimeout(() => setVisible(true), 50);
+            setTimeout(() => setVisible(true), 60);
         }, 1500);
 
-        return () => clearTimeout(loadTimer);
+        return () => clearTimeout(t);
     }, []);
 
     const handleSignOut = async () => {
@@ -50,30 +50,32 @@ const Profile = () => {
     /* ── Loading screen ── */
     if (isLoading) {
         return (
-            <div style={{
-                position: 'fixed',
-                inset: 0,
-                backgroundColor: 'var(--bg-color)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                zIndex: 1000,
-            }}>
-                <div style={{
-                    width: '56px',
-                    height: '56px',
-                    border: '4px solid rgba(255, 185, 46, 0.2)',
-                    borderTop: '4px solid var(--primary)',
-                    borderRadius: '50%',
-                    animation: 'profileSpin 1s linear infinite',
-                }} />
+            <>
                 <style>{`
-                    @keyframes profileSpin {
+                    @keyframes profile-spin {
                         from { transform: rotate(0deg); }
                         to   { transform: rotate(360deg); }
                     }
                 `}</style>
-            </div>
+                <div style={{
+                    position: 'fixed',
+                    inset: 0,
+                    backgroundColor: 'var(--bg-color)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 1000,
+                }}>
+                    <div style={{
+                        width: '52px',
+                        height: '52px',
+                        border: '4px solid rgba(255,185,46,0.2)',
+                        borderTop: '4px solid var(--primary)',
+                        borderRadius: '50%',
+                        animation: 'profile-spin 1s linear infinite',
+                    }} />
+                </div>
+            </>
         );
     }
 
@@ -87,24 +89,23 @@ const Profile = () => {
                 transition: 'opacity 0.4s ease, transform 0.4s ease',
             }}
         >
-            {/* Pink top half */}
+            {/* ── Pink top half ── */}
             <div className="profile-header-bg">
                 <h1 className="profile-title">Your Account</h1>
 
-                {/* Arched avatar — semicircle on top of rectangle */}
+                {/* Avatar: semicircle + rectangle, flush at bottom of pink */}
                 <div className="profile-avatar-wrap">
                     <div className="profile-avatar-top" />
                     <div className="profile-avatar-body" />
                 </div>
             </div>
 
-            {/* Grey lower half */}
+            {/* ── Grey lower half ── */}
             <div className="profile-lower">
 
-                {/* Card overlaps the pink/grey boundary */}
+                {/* Card + avatar touch with no gap */}
                 <div className="profile-card">
-
-                    {/* Streak badge — top-right of card */}
+                    {/* Streak badge */}
                     <div className="profile-streak">
                         <span className="profile-streak-icon">🔥</span>
                         <span className="profile-streak-days">{streak} days</span>
@@ -121,18 +122,18 @@ const Profile = () => {
                         </div>
                     </div>
 
-                    {/* Edit button — bottom-right of card */}
                     <button className="profile-edit-btn" aria-label="Edit profile">
-                        <FiEdit2 size={19} color="#1a1a1a" />
+                        <FiEdit2 size={18} color="#1a1a1a" />
                     </button>
                 </div>
 
-                {/* Sign Out — directly below card */}
+                {/* Sign out — directly below card, compact */}
                 <button className="profile-signout-btn" onClick={handleSignOut}>
                     Sign Out
                 </button>
             </div>
 
+            {/* ── Bottom nav — always visible ── */}
             <BottomNav />
         </div>
     );
