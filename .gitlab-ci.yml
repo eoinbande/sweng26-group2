@@ -86,7 +86,8 @@ backend-build:
     - pip install --upgrade pip
     - pip install -r backend/requirements.txt
   script:
-    - python -c "from backend.main import app; print('FastAPI app loaded successfully')"
+    - cd backend
+    - python -c "from app.main import app; print('FastAPI app loaded successfully')"
   only:
     - branches
     - merge_requests
