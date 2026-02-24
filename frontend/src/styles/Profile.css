@@ -1,42 +1,43 @@
-/* ── Profile Page ── */
+/* ══════════════════════════════════════
+   Profile Page
+   ══════════════════════════════════════ */
 
 .profile-page {
     width: 100%;
     max-width: 480px;
     height: 100dvh;
     margin: 0 auto;
-    background: #EDEAE4;
     display: flex;
     flex-direction: column;
     overflow: hidden;
     position: relative;
+    background: #EDEAE4;
 }
 
-/* ── Pink top half — always exactly 50dvh ── */
+/* ── Pink section: always exactly half the screen ── */
 .profile-header-bg {
     width: 100%;
     height: 50dvh;
-    background: #F9C8C8;
     flex-shrink: 0;
+    background: #F9C8C8;
+    border-radius: 0 0 36px 36px;
     position: relative;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     padding-top: clamp(28px, 4dvh, 52px);
-    padding-left: clamp(18px, 4vw, 30px);
-    padding-right: clamp(18px, 4vw, 30px);
-    border-radius: 0 0 36px 36px;
-    /* overflow visible so avatar and card can overflow */
+    padding-left: clamp(18px, 5vw, 32px);
+    padding-right: clamp(18px, 5vw, 32px);
     overflow: visible;
     z-index: 1;
 }
 
-/* half-circle accent left of title */
+/* darker half-circle accent beside title */
 .profile-header-bg::before {
     content: '';
     position: absolute;
     left: 0;
-    top: clamp(26px, 4dvh, 48px);
+    top: clamp(26px, 4dvh, 50px);
     width: 20px;
     height: 40px;
     background: #D97272;
@@ -45,87 +46,80 @@
 
 .profile-title {
     font-family: var(--font-serif, Georgia, serif);
-    font-size: clamp(1.6rem, 5dvh, 2.3rem);
+    font-size: clamp(1.7rem, 5dvh, 2.3rem);
     font-weight: 700;
     color: #1a1a1a;
     margin: 0;
-    padding-left: 8px;
+    padding-left: 10px;
     position: relative;
     z-index: 2;
 }
 
-/* ── Grey lower half ── */
+/* ── Grey section: lower half ── */
 .profile-lower {
     width: 100%;
-    flex: 1;
+    height: 50dvh;
+    flex-shrink: 0;
     background: #EDEAE4;
     position: relative;
-    /* bottom padding makes room for BottomNav */
-    padding-bottom: clamp(80px, 12dvh, 100px);
     z-index: 2;
 }
 
-/*
- * Avatar + card are absolutely positioned so that:
- *   - the card's vertical midpoint sits exactly at 50dvh (the boundary)
- *   - the avatar sits flush on top of the card with no gap
- *
- * We use a wrapper that is absolutely positioned:
- *   top: 50dvh  (the boundary line)
- *   transform: translateY(-50%) centres the *group* on the boundary
- *   BUT we want the card midpoint on the boundary, not the group midpoint.
- *
- * So instead we position the wrapper at 50dvh and pull it up by half the
- * card height only. We achieve this cleanly with a CSS custom property trick:
- * the wrapper just uses top: 50dvh and the inner card uses a negative
- * margin-top to shift up by half its own height via JS-free CSS.
- *
- * Approach: place the wrapper at top:0 of .profile-lower (which starts at 50dvh).
- * Then translateY(-50%) on the card+avatar group so the group midpoint is at 50dvh.
- * Since avatar height ≈ card height, midpoint of group ≈ bottom of avatar / top of card.
- * We instead use: wrapper absolute top:0, then translate the GROUP up so the
- * card midpoint is at 0 (i.e. at the 50dvh line).
- */
+/* ══════════════════════════════════════
+   Content group: avatar + card + sign-out
+
+   KEY POSITIONING:
+   - .profile-lower starts at 50dvh (the pink/grey boundary)
+   - group top: 0  →  group's top edge = boundary line
+   - translateY(-50%)  →  group's MIDPOINT = boundary line
+   - The group is: [avatar] [card] [sign-out]
+   - We want the CARD midpoint on the boundary, not the whole group midpoint.
+   - So we shift down by half the avatar height using translateY(-50% + avatarHeight/2)
+   - Avatar height ≈ semicircle (≈45px) + body (≈62px) = ~107px  →  half = ~54px
+   - We express this as a calc so it scales: translateY(calc(-50% + 54px))
+   ══════════════════════════════════════ */
 .profile-content-group {
     position: absolute;
-    top: 0;                          /* = 50dvh boundary */
+    top: 0;
     left: 50%;
-    transform: translate(-50%, -50%);/* centre the whole group on the boundary */
+    /* shift up by 50% of group height, then shift back down by avatar height
+       so the card midpoint lands on the boundary */
+    transform: translate(-50%, calc(-50% + 54px));
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: min(310px, 82vw);
-    z-index: 10;
+    width: min(300px, 80vw);
+    z-index: 20;
 }
 
-/* ── Avatar: semicircle on top of rectangle, no gap to card ── */
+/* ── Avatar: semicircle on top of rectangle, flush on card ── */
 .profile-avatar-wrap {
     display: flex;
     flex-direction: column;
     align-items: center;
-    /* no margin-bottom — sits flush on card */
 }
 
+/* Original width was clamp(70px,18vw,100px) — widened by 4px total (2px each side) */
 .profile-avatar-top {
-    width: clamp(72px, 16vw, 100px);
-    height: clamp(36px, 8vw, 50px);
+    width: calc(clamp(70px, 18vw, 100px) + 4px);
+    height: clamp(35px, 9vw, 50px);
     background: #C4C4C4;
     border-radius: 999px 999px 0 0;
 }
 
 .profile-avatar-body {
-    width: clamp(72px, 16vw, 100px);
-    height: clamp(50px, 11vw, 70px);
+    width: calc(clamp(70px, 18vw, 100px) + 4px);
+    height: clamp(48px, 12vw, 68px);
     background: #C4C4C4;
     border-radius: 0 0 12px 12px;
 }
 
 /* ── Info card ── */
 .profile-card {
+    width: 100%;
     background: #fff;
     border-radius: 24px;
-    box-shadow: 0 4px 18px rgba(0,0,0,0.09);
-    width: 100%;                     /* inherits from .profile-content-group */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.09);
     padding: 18px 18px 20px 18px;
     display: flex;
     flex-direction: column;
@@ -133,7 +127,7 @@
     position: relative;
 }
 
-/* ── Streak badge ── */
+/* ── Streak badge: pill, sharp top-right corner only ── */
 .profile-streak {
     position: absolute;
     top: -18px;
@@ -141,19 +135,19 @@
     background: #C95C5C;
     color: #fff;
     border-radius: 22px 6px 22px 22px;
-    padding: 7px 16px 7px 11px;
+    padding: 7px 16px 7px 12px;
     font-size: clamp(0.78rem, 1.8dvh, 0.92rem);
     font-weight: 600;
     display: flex;
     align-items: center;
     gap: 5px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    z-index: 10;
     white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    z-index: 10;
 }
 
 .profile-streak-icon {
-    font-size: 1.1em;
+    font-size: 1.15em;
     line-height: 1;
 }
 
@@ -180,10 +174,10 @@
 .profile-info-value {
     font-size: clamp(0.8rem, 1.7dvh, 0.92rem);
     color: #444;
-    margin-top: 1px;
+    margin-top: 2px;
 }
 
-/* ── Edit button — black pencil ── */
+/* ── Edit button (yellow circle, black pencil) ── */
 .profile-edit-btn {
     position: absolute;
     right: 12px;
@@ -196,7 +190,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.13);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.13);
     cursor: pointer;
     transition: background 0.15s, transform 0.15s;
 }
@@ -206,13 +200,12 @@
     transform: scale(1.07);
 }
 
-/* force the svg icon black */
 .profile-edit-btn svg {
     color: #000 !important;
     stroke: #000 !important;
 }
 
-/* ── Sign out — narrow, below card ── */
+/* ── Sign out: narrow, directly below card ── */
 .profile-signout-btn {
     margin-top: 14px;
     background: #C8D8EE;
@@ -220,10 +213,10 @@
     font-weight: 700;
     border: none;
     border-radius: 22px;
-    width: min(150px, 42vw);
-    padding: 12px 0;
-    font-size: clamp(0.82rem, 1.9dvh, 0.95rem);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    width: min(130px, 38vw);
+    padding: 11px 0;
+    font-size: clamp(0.8rem, 1.8dvh, 0.93rem);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
     cursor: pointer;
     transition: background 0.15s;
     text-align: center;

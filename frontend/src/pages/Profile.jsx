@@ -46,7 +46,7 @@ const Profile = () => {
         navigate('/login');
     };
 
-    /* ── Loading screen ── */
+    /* ── Loading spinner ── */
     if (isLoading) {
         return (
             <>
@@ -95,32 +95,26 @@ const Profile = () => {
 
             {/* Grey lower half */}
             <div className="profile-lower">
-
                 {/*
-                  * Content group: avatar + card + sign-out
-                  * Centred horizontally; transform: translate(-50%, -50%)
-                  * places the GROUP midpoint exactly on the 50dvh boundary.
-                  * Since avatar ≈ same height as card, the boundary runs
-                  * right between them — card midpoint ≈ boundary line.
-                  *
-                  * We tweak with a small positive translateY offset to push
-                  * the card slightly below so the card's top edge is at the
-                  * boundary (avatar above pink, card in grey).
+                  * Content group:
+                  *   top: 0  →  sits at the 50dvh boundary
+                  *   transform: translate(-50%, calc(-50% + 54px))
+                  *     → centres horizontally
+                  *     → lifts group so card midpoint = boundary
+                  *       (54px ≈ half of avatar total height ~107px)
+                  * Result: top half of card in pink, bottom half in grey.
+                  * Avatar sits above card (in pink zone).
+                  * Sign-out sits below card (in grey zone).
                   */}
-                <div
-                    className="profile-content-group"
-                    style={{
-                        /* shift up a bit less than 50% so card top = boundary */
-                        transform: 'translate(-50%, -42%)',
-                    }}
-                >
-                    {/* Avatar — flush on top of card */}
+                <div className="profile-content-group">
+
+                    {/* Avatar: semicircle + rectangle, zero gap to card */}
                     <div className="profile-avatar-wrap">
                         <div className="profile-avatar-top" />
                         <div className="profile-avatar-body" />
                     </div>
 
-                    {/* Info card */}
+                    {/* Info card — top half in pink, bottom half in grey */}
                     <div className="profile-card">
                         <div className="profile-streak">
                             <span className="profile-streak-icon">🔥</span>
@@ -138,13 +132,12 @@ const Profile = () => {
                             </div>
                         </div>
 
-                        {/* Edit button — black pencil */}
                         <button className="profile-edit-btn" aria-label="Edit profile">
                             <FiEdit2 size={17} color="#000000" />
                         </button>
                     </div>
 
-                    {/* Sign out — compact, directly below card */}
+                    {/* Sign out — directly below card */}
                     <button className="profile-signout-btn" onClick={handleSignOut}>
                         Sign Out
                     </button>
