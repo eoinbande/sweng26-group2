@@ -8,7 +8,6 @@
     background: #EDEAE4;
     display: flex;
     flex-direction: column;
-    align-items: center;
     overflow: hidden;
     position: relative;
 }
@@ -26,9 +25,10 @@
     padding-top: clamp(28px, 4dvh, 52px);
     padding-left: clamp(18px, 4vw, 30px);
     padding-right: clamp(18px, 4vw, 30px);
-
-    /* rounded bottom corners */
     border-radius: 0 0 36px 36px;
+    /* overflow visible so avatar and card can overflow */
+    overflow: visible;
+    z-index: 1;
 }
 
 /* half-circle accent left of title */
@@ -54,67 +54,86 @@
     z-index: 2;
 }
 
-/* ── Avatar — sits at the bottom of the pink section, no gap to card ── */
-.profile-avatar-wrap {
-    position: absolute;
-    bottom: 0;               /* flush with bottom of pink section */
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 5;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-/* semicircle on top */
-.profile-avatar-top {
-    width: clamp(80px, 18vw, 110px);
-    height: clamp(40px, 9vw, 55px);
-    background: #C4C4C4;
-    border-radius: 999px 999px 0 0;
-}
-
-/* rectangle body — bottom edge touches the card */
-.profile-avatar-body {
-    width: clamp(80px, 18vw, 110px);
-    height: clamp(55px, 12vw, 78px);
-    background: #C4C4C4;
-    border-radius: 0 0 14px 14px;
-}
-
 /* ── Grey lower half ── */
 .profile-lower {
     width: 100%;
     flex: 1;
     background: #EDEAE4;
+    position: relative;
+    /* bottom padding makes room for BottomNav */
+    padding-bottom: clamp(80px, 12dvh, 100px);
+    z-index: 2;
+}
+
+/*
+ * Avatar + card are absolutely positioned so that:
+ *   - the card's vertical midpoint sits exactly at 50dvh (the boundary)
+ *   - the avatar sits flush on top of the card with no gap
+ *
+ * We use a wrapper that is absolutely positioned:
+ *   top: 50dvh  (the boundary line)
+ *   transform: translateY(-50%) centres the *group* on the boundary
+ *   BUT we want the card midpoint on the boundary, not the group midpoint.
+ *
+ * So instead we position the wrapper at 50dvh and pull it up by half the
+ * card height only. We achieve this cleanly with a CSS custom property trick:
+ * the wrapper just uses top: 50dvh and the inner card uses a negative
+ * margin-top to shift up by half its own height via JS-free CSS.
+ *
+ * Approach: place the wrapper at top:0 of .profile-lower (which starts at 50dvh).
+ * Then translateY(-50%) on the card+avatar group so the group midpoint is at 50dvh.
+ * Since avatar height ≈ card height, midpoint of group ≈ bottom of avatar / top of card.
+ * We instead use: wrapper absolute top:0, then translate the GROUP up so the
+ * card midpoint is at 0 (i.e. at the 50dvh line).
+ */
+.profile-content-group {
+    position: absolute;
+    top: 0;                          /* = 50dvh boundary */
+    left: 50%;
+    transform: translate(-50%, -50%);/* centre the whole group on the boundary */
     display: flex;
     flex-direction: column;
     align-items: center;
-    /* centre content vertically in the lower half */
-    justify-content: center;
-    padding: 0 20px clamp(80px, 12dvh, 100px) 20px;
-    position: relative;
-    z-index: 3;
+    width: min(310px, 82vw);
+    z-index: 10;
+}
+
+/* ── Avatar: semicircle on top of rectangle, no gap to card ── */
+.profile-avatar-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* no margin-bottom — sits flush on card */
+}
+
+.profile-avatar-top {
+    width: clamp(72px, 16vw, 100px);
+    height: clamp(36px, 8vw, 50px);
+    background: #C4C4C4;
+    border-radius: 999px 999px 0 0;
+}
+
+.profile-avatar-body {
+    width: clamp(72px, 16vw, 100px);
+    height: clamp(50px, 11vw, 70px);
+    background: #C4C4C4;
+    border-radius: 0 0 12px 12px;
 }
 
 /* ── Info card ── */
 .profile-card {
     background: #fff;
     border-radius: 24px;
-    box-shadow: 0 4px 18px rgba(0,0,0,0.08);
-
-    /* compact width on small screens */
-    width: min(320px, 85vw);
-
-    padding: 20px 20px 22px 20px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.09);
+    width: 100%;                     /* inherits from .profile-content-group */
+    padding: 18px 18px 20px 18px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     position: relative;
-    z-index: 2;
 }
 
-/* ── Streak badge: pill with sharp top-right corner ── */
+/* ── Streak badge ── */
 .profile-streak {
     position: absolute;
     top: -18px;
@@ -122,8 +141,8 @@
     background: #C95C5C;
     color: #fff;
     border-radius: 22px 6px 22px 22px;
-    padding: 8px 18px 8px 12px;
-    font-size: clamp(0.82rem, 2dvh, 0.95rem);
+    padding: 7px 16px 7px 11px;
+    font-size: clamp(0.78rem, 1.8dvh, 0.92rem);
     font-weight: 600;
     display: flex;
     align-items: center;
@@ -140,13 +159,12 @@
 
 .profile-info {
     width: 100%;
-    margin-bottom: 2px;
 }
 
 .profile-info-row {
     display: flex;
     flex-direction: column;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
 }
 
 .profile-info-row:last-child {
@@ -155,26 +173,26 @@
 
 .profile-info-label {
     font-weight: 700;
-    font-size: clamp(0.88rem, 2dvh, 1rem);
+    font-size: clamp(0.85rem, 1.9dvh, 0.97rem);
     color: #1a1a1a;
 }
 
 .profile-info-value {
-    font-size: clamp(0.82rem, 1.8dvh, 0.95rem);
+    font-size: clamp(0.8rem, 1.7dvh, 0.92rem);
     color: #444;
-    margin-top: 2px;
+    margin-top: 1px;
 }
 
-/* ── Edit button ── */
+/* ── Edit button — black pencil ── */
 .profile-edit-btn {
     position: absolute;
-    right: 14px;
-    bottom: 14px;
+    right: 12px;
+    bottom: 12px;
     background: #FFC72C;
     border: none;
     border-radius: 50%;
-    width: 42px;
-    height: 42px;
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -188,18 +206,23 @@
     transform: scale(1.07);
 }
 
-/* ── Sign out — compact width ── */
+/* force the svg icon black */
+.profile-edit-btn svg {
+    color: #000 !important;
+    stroke: #000 !important;
+}
+
+/* ── Sign out — narrow, below card ── */
 .profile-signout-btn {
-    margin-top: 16px;
+    margin-top: 14px;
     background: #C8D8EE;
     color: #1a1a1a;
     font-weight: 700;
     border: none;
-    border-radius: 24px;
-    /* same compact width as the card, but shorter padding */
-    width: min(200px, 55vw);
-    padding: 13px 0;
-    font-size: clamp(0.88rem, 2dvh, 1rem);
+    border-radius: 22px;
+    width: min(150px, 42vw);
+    padding: 12px 0;
+    font-size: clamp(0.82rem, 1.9dvh, 0.95rem);
     box-shadow: 0 2px 8px rgba(0,0,0,0.07);
     cursor: pointer;
     transition: background 0.15s;
@@ -208,67 +231,4 @@
 
 .profile-signout-btn:hover {
     background: #adc4e0;
-}
-
-/* ── Responsive ── */
-@media (max-width: 480px) {
-    .profile-card {
-        width: calc(100% - 32px);
-        padding: 18px 14px 22px 14px;
-        margin-top: -55px;
-    }
-    .profile-signout-btn {
-        width: calc(100% - 32px);
-    }
-    .profile-title {
-        font-size: 1.7rem;
-    }
-    .profile-avatar-top {
-        width: 88px;
-        height: 44px;
-        border-radius: 44px 44px 0 0;
-    }
-    .profile-avatar-body {
-        width: 88px;
-        height: 62px;
-    }
-    .profile-lower {
-        padding-top: 90px;
-    }
-}
-
-@media (max-width: 380px) {
-    .profile-avatar-top {
-        width: 76px;
-        height: 38px;
-        border-radius: 38px 38px 0 0;
-    }
-    .profile-avatar-body {
-        width: 76px;
-        height: 54px;
-    }
-    .profile-lower {
-        padding-top: 78px;
-    }
-    .profile-card {
-        margin-top: -48px;
-    }
-}
-
-@media (max-width: 320px) {
-    .profile-avatar-top {
-        width: 68px;
-        height: 34px;
-        border-radius: 34px 34px 0 0;
-    }
-    .profile-avatar-body {
-        width: 68px;
-        height: 48px;
-    }
-    .profile-lower {
-        padding-top: 70px;
-    }
-    .profile-card {
-        margin-top: -44px;
-    }
 }
