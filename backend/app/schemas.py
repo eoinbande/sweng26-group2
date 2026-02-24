@@ -65,6 +65,8 @@ class SubTask(BaseModel):
         default=TaskStatus.NOT_STARTED,
         description="Current status of the subtask"
     )
+    due_date: Optional[str] = None
+    guidance: Optional[str] = None
     
     model_config = ConfigDict(extra="forbid")
 
@@ -118,6 +120,9 @@ class Task(BaseModel):
         default=TaskStatus.NOT_STARTED,
         description="Current status of the task"
     )
+    due_date: Optional[str] = None
+    guidance: Optional[str] = None
+
     requires_input: bool = Field(
         default=False,
         description="If true, this task needs user input before AI can plan further. "
@@ -262,6 +267,8 @@ class AIGeneratePlanResponse(BaseModel):
     
     Just a list of tasks with ai_ids. No UUIDs — backend adds those on save.
     """
+    description: Optional[str] = None
+    goal_due_date: Optional[str] = None
     tasks: list[Task] = Field(
         ...,
         description="Ordered list of generated tasks",
