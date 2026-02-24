@@ -34,6 +34,45 @@
 
 /* timeline layout */
 
+.ut-timeline-wrap {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* scroll fades */
+
+.ut-fade {
+    position: absolute;
+    left: 0;
+    right: 0;
+    pointer-events: none;
+    z-index: 2;
+    transition: opacity 0.25s ease;
+}
+
+.ut-fade--top {
+    top: 0;
+    height: 36px;
+    background: linear-gradient(to bottom, var(--accent-red-soft), transparent);
+}
+
+.ut-fade--bottom {
+    bottom: 0;
+    height: 64px;
+    background: linear-gradient(to top, var(--accent-red-soft), transparent);
+}
+
+.ut-section--tasks .ut-fade--top {
+    background: linear-gradient(to bottom, var(--accent-blue), transparent);
+}
+
+.ut-section--tasks .ut-fade--bottom {
+    background: linear-gradient(to top, var(--accent-blue), transparent);
+}
+
 .ut-timeline {
     display: flex;
     flex-direction: column;
@@ -48,6 +87,7 @@
     padding-right: 20px;
     margin-right: -20px;
 }
+
 
 .ut-timeline::-webkit-scrollbar {
     width: 5px;
