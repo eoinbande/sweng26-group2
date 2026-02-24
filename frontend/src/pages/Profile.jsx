@@ -11,7 +11,7 @@ const Profile = () => {
     const [email, setEmail] = useState('');
     const [isLoading, setIsLoading] = useState(true);
     const [visible, setVisible] = useState(false);
-    const streak = 217; // TODO: fetch real streak from backend
+    const streak = 217;
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -33,7 +33,6 @@ const Profile = () => {
 
         fetchUser();
 
-        // Show loader for 1.5s then fade profile in
         const t = setTimeout(() => {
             setIsLoading(false);
             setTimeout(() => setVisible(true), 60);
@@ -89,51 +88,69 @@ const Profile = () => {
                 transition: 'opacity 0.4s ease, transform 0.4s ease',
             }}
         >
-            {/* ── Pink top half ── */}
+            {/* Pink top half */}
             <div className="profile-header-bg">
                 <h1 className="profile-title">Your Account</h1>
-
-                {/* Avatar: semicircle + rectangle, flush at bottom of pink */}
-                <div className="profile-avatar-wrap">
-                    <div className="profile-avatar-top" />
-                    <div className="profile-avatar-body" />
-                </div>
             </div>
 
-            {/* ── Grey lower half ── */}
+            {/* Grey lower half */}
             <div className="profile-lower">
 
-                {/* Card + avatar touch with no gap */}
-                <div className="profile-card">
-                    {/* Streak badge */}
-                    <div className="profile-streak">
-                        <span className="profile-streak-icon">🔥</span>
-                        <span className="profile-streak-days">{streak} days</span>
+                {/*
+                  * Content group: avatar + card + sign-out
+                  * Centred horizontally; transform: translate(-50%, -50%)
+                  * places the GROUP midpoint exactly on the 50dvh boundary.
+                  * Since avatar ≈ same height as card, the boundary runs
+                  * right between them — card midpoint ≈ boundary line.
+                  *
+                  * We tweak with a small positive translateY offset to push
+                  * the card slightly below so the card's top edge is at the
+                  * boundary (avatar above pink, card in grey).
+                  */}
+                <div
+                    className="profile-content-group"
+                    style={{
+                        /* shift up a bit less than 50% so card top = boundary */
+                        transform: 'translate(-50%, -42%)',
+                    }}
+                >
+                    {/* Avatar — flush on top of card */}
+                    <div className="profile-avatar-wrap">
+                        <div className="profile-avatar-top" />
+                        <div className="profile-avatar-body" />
                     </div>
 
-                    <div className="profile-info">
-                        <div className="profile-info-row">
-                            <span className="profile-info-label">Username</span>
-                            <span className="profile-info-value">{username}</span>
+                    {/* Info card */}
+                    <div className="profile-card">
+                        <div className="profile-streak">
+                            <span className="profile-streak-icon">🔥</span>
+                            <span className="profile-streak-days">{streak} days</span>
                         </div>
-                        <div className="profile-info-row">
-                            <span className="profile-info-label">Email</span>
-                            <span className="profile-info-value">{email}</span>
+
+                        <div className="profile-info">
+                            <div className="profile-info-row">
+                                <span className="profile-info-label">Username</span>
+                                <span className="profile-info-value">{username}</span>
+                            </div>
+                            <div className="profile-info-row">
+                                <span className="profile-info-label">Email</span>
+                                <span className="profile-info-value">{email}</span>
+                            </div>
                         </div>
+
+                        {/* Edit button — black pencil */}
+                        <button className="profile-edit-btn" aria-label="Edit profile">
+                            <FiEdit2 size={17} color="#000000" />
+                        </button>
                     </div>
 
-                    <button className="profile-edit-btn" aria-label="Edit profile">
-                        <FiEdit2 size={18} color="#1a1a1a" />
+                    {/* Sign out — compact, directly below card */}
+                    <button className="profile-signout-btn" onClick={handleSignOut}>
+                        Sign Out
                     </button>
                 </div>
-
-                {/* Sign out — directly below card, compact */}
-                <button className="profile-signout-btn" onClick={handleSignOut}>
-                    Sign Out
-                </button>
             </div>
 
-            {/* ── Bottom nav — always visible ── */}
             <BottomNav />
         </div>
     );
