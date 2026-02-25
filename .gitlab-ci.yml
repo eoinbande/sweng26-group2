@@ -71,7 +71,7 @@ backend-test:
     - pip install --upgrade pip
     - pip install -r backend/requirements.txt
   script:
-    - pytest backend/tests/ -v
+    - pytest backend/tests/ -v --cov=backend/app --cov-report=term-missing
   only:
     - branches
     - merge_requests
