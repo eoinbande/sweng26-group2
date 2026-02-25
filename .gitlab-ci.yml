@@ -71,7 +71,8 @@ backend-test:
     - pip install --upgrade pip
     - pip install -r backend/requirements.txt
   script:
-    - pytest backend/tests/ -v
+    - pytest --cov backend/tests/ -v
+  coverage: '/TOTAL.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
   only:
     - branches
     - merge_requests
