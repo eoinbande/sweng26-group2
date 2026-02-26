@@ -18,6 +18,12 @@
 
 /* header text */
 
+.ut-title-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
 .ut-title {
     font-family: var(--font-serif);
     font-size: clamp(20px, 3dvh, 26px);

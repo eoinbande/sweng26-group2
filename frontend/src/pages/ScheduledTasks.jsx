@@ -31,12 +31,20 @@ const MOCK_DAILY_TASKS = [
     { id: 'dt4', title: 'Set overall budget', goalTitle: 'Plan a wedding', dueDate: '2026-02-27', locked: true },
 ];
 
+// mock upcoming goals (timeline view)
+const MOCK_GOALS = [
+    { id: 'g1', title: 'Create a bank account', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, se....', dueDate: '2026-02-27' },
+    { id: 'g2', title: 'Create a bank account', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, se....', dueDate: '2026-02-28', locked: true },
+    { id: 'g3', title: 'Create a bank account', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, se....', dueDate: '2026-03-01' },
+];
+
 const PANELS = ['tasks', 'goals'];
 const SWIPE_THRESHOLD = 50;
 
 function ScheduledTasks() {
     const now = new Date();
     const [activeIndex, setActiveIndex] = useState(0);
+    const [selectedDate, setSelectedDate] = useState(null);
     const touchStartX = useRef(0);
 
     const onTouchStart = useCallback((e) => {
@@ -54,6 +62,15 @@ function ScheduledTasks() {
         );
     }, []);
 
+    const onDayClick = useCallback((day) => {
+        setSelectedDate((prev) =>
+            prev && prev.isSame(day, 'day') ? null : day
+        );
+    }, []);
+
+    const dateLabel = selectedDate
+        ? selectedDate.format('D MMM')
+        : '';
 
     return (
         <div className="scheduled-tasks-page">
@@ -64,42 +81,62 @@ function ScheduledTasks() {
                         year={now.getFullYear()}
                         month={now.getMonth()}
                         goalRanges={MOCK_GOAL_RANGES}
+                        onDayClick={onDayClick}
                     />
                 </div>
 
-                {/* swipe indicator dots */}
-                <div className="ut-swipe-dots">
-                    {PANELS.map((v, i) => (
-                        <div
-                            key={v}
-                            className={`ut-swipe-dot${i === activeIndex ? ' ut-swipe-dot--active' : ''}`}
-                            onClick={() => setActiveIndex(i)}
-                        />
-                    ))}
-                </div>
-
-                {/* swipeable timeline panels */}
-                <div
-                    className="ut-swipe-viewport"
-                    onTouchStart={onTouchStart}
-                    onTouchEnd={onTouchEnd}
-                >
+                {selectedDate ? (
+                    <UpcomingTimelineTasks
+                        key={`daily-${selectedDate.format('YYYY-MM-DD')}`}
+                        date={dateLabel}
+                        items={MOCK_DAILY_TASKS}
+                        onBack={() => setSelectedDate(null)}
+                    />
+                ) : (
                     <div
-                        className="ut-swipe-track"
-                        style={{ transform: `translateX(-${activeIndex * 100}%)` }}
+                        className="ut-swipe-viewport"
+                        onTouchStart={onTouchStart}
+                        onTouchEnd={onTouchEnd}
                     >
-                        <UpcomingTimeline
-                            key={activeIndex === 0 ? `tasks-${activeIndex}` : 'tasks'}
-                            variant="tasks"
-                            items={MOCK_TASKS}
-                        />
-                        <UpcomingTimelineTasks
-                            key={activeIndex === 1 ? `daily-${activeIndex}` : 'daily'}
-                            date="27 Feb"
-                            items={MOCK_DAILY_TASKS}
-                        />
+                        <div
+                            className="ut-swipe-track"
+                            style={{ transform: `translateX(-${activeIndex * 100}%)` }}
+                        >
+                            <UpcomingTimeline
+                                key={activeIndex === 0 ? `tasks-${activeIndex}` : 'tasks'}
+                                variant="tasks"
+                                items={MOCK_TASKS}
+                                headerExtra={
+                                    <div className="ut-swipe-dots">
+                                        {PANELS.map((v, i) => (
+                                            <div
+                                                key={v}
+                                                className={`ut-swipe-dot${i === activeIndex ? ' ut-swipe-dot--active' : ''}`}
+                                                onClick={() => setActiveIndex(i)}
+                                            />
+                                        ))}
+                                    </div>
+                                }
+                            />
+                            <UpcomingTimeline
+                                key={activeIndex === 1 ? `goals-${activeIndex}` : 'goals'}
+                                variant="goals"
+                                items={MOCK_GOALS}
+                                headerExtra={
+                                    <div className="ut-swipe-dots">
+                                        {PANELS.map((v, i) => (
+                                            <div
+                                                key={v}
+                                                className={`ut-swipe-dot${i === activeIndex ? ' ut-swipe-dot--active' : ''}`}
+                                                onClick={() => setActiveIndex(i)}
+                                            />
+                                        ))}
+                                    </div>
+                                }
+                            />
+                        </div>
                     </div>
-                </div>
+                )}
             </div>
 
             <BottomNav />

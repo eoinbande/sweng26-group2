@@ -1,13 +1,30 @@
 /* upcoming timeline tasks — card styles for the daily task view */
 
 
+/* back button */
+
+.utt-back-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: var(--text-main);
+    cursor: pointer;
+    padding: 0;
+    margin-left: -4px;
+}
+
+
 /* hide the vertical timeline line */
 
 .ut-no-timeline .ut-timeline-wrap::before {
     display: none;
 }
 
+
 /* extra top padding so the first date tab isn't clipped */
+
 .ut-no-timeline .ut-timeline {
     padding-top: clamp(18px, 2.5dvh, 24px);
 }

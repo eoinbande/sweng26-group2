@@ -27,7 +27,7 @@ const VARIANT_CONFIG = {
  * shared shell — header, scrollable area with fades, background color
  * used by both UpcomingTimeline and UpcomingTimelineTasks
  */
-const UpcomingTimelineShell = ({ variant = 'goals', title, subtitle, className, children }) => {
+const UpcomingTimelineShell = ({ variant = 'goals', title, subtitle, className, headerLeft, headerExtra, children }) => {
     const config = VARIANT_CONFIG[variant] || VARIANT_CONFIG.goals;
 
     const timelineRef = useRef(null);
@@ -46,8 +46,12 @@ const UpcomingTimelineShell = ({ variant = 'goals', title, subtitle, className, 
     return (
         <section className={`ut-section ut-section--${variant}${className ? ` ${className}` : ''}`}>
             <div className="ut-container" style={{ backgroundColor: config.bgColor }}>
-                <h3 className="ut-title">{title || config.title}</h3>
+                <div className="ut-title-row">
+                    {headerLeft}
+                    <h3 className="ut-title">{title || config.title}</h3>
+                </div>
                 <p className="ut-subtitle">{subtitle || config.subtitle}</p>
+                {headerExtra}
 
                 <div className="ut-timeline-wrap">
                     <div
@@ -66,9 +70,9 @@ const UpcomingTimelineShell = ({ variant = 'goals', title, subtitle, className, 
     );
 };
 
-const UpcomingTimeline = ({ variant = 'goals', items = [], onClick }) => {
+const UpcomingTimeline = ({ variant = 'goals', items = [], onClick, headerExtra }) => {
     return (
-        <UpcomingTimelineShell variant={variant}>
+        <UpcomingTimelineShell variant={variant} headerExtra={headerExtra}>
             {items.map((item) => {
                 const dateObj = new Date(item.dueDate);
                 const dayNum = dateObj.getDate();

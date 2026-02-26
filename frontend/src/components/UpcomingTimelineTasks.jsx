@@ -1,4 +1,4 @@
-import { ArrowUpLeft } from 'lucide-react';
+import { ArrowUpLeft, ChevronLeft } from 'lucide-react';
 import { UpcomingTimelineShell } from './UpcomingTimeline';
 import '../styles/components/UpcomingTimelineTasks.css';
 
@@ -9,13 +9,18 @@ import '../styles/components/UpcomingTimelineTasks.css';
  * @param {Array}    items    — [{ id, title, goalTitle, dueDate, locked? }]
  * @param {function} onClick  — optional callback when a card is tapped
  */
-const UpcomingTimelineTasks = ({ date, items = [], onClick }) => {
+const UpcomingTimelineTasks = ({ date, items = [], onClick, onBack }) => {
     return (
         <UpcomingTimelineShell
             variant="tasks"
             title={date}
             subtitle="See what tasks you have due this day"
             className="ut-no-timeline"
+            headerLeft={onBack && (
+                <button className="utt-back-btn" onClick={onBack} type="button">
+                    <ChevronLeft size={22} strokeWidth={2.5} />
+                </button>
+            )}
         >
             {items.map((item, i) => {
                 const dateLabel = new Date(item.dueDate).toLocaleDateString('en-GB', {

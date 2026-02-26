@@ -104,7 +104,7 @@ const StyledDay = styled(PickersDay, {
  * custom day slot — wraps StyledDay with highlight props
  */
 function Day(props) {
-    const { day, outsideCurrentMonth, goalRanges = [], ...other } = props;
+    const { day, outsideCurrentMonth, goalRanges = [], onDayClick, ...other } = props;
     const dayOfMonth = day.date();
     const isCurrentMonth = !outsideCurrentMonth;
 
@@ -115,6 +115,7 @@ function Day(props) {
             {...other}
             day={day}
             outsideCurrentMonth={outsideCurrentMonth}
+            onClick={() => onDayClick && !outsideCurrentMonth && onDayClick(day)}
             disableMargin
             selected={false}
             className={highlight ? 'day-highlighted' : undefined}
@@ -159,7 +160,7 @@ function Day(props) {
  * @param {number} month — 0-indexed (0 = january)
  * @param {Array} goalRanges — [{ startDay, endDay, colorScheme }]
  */
-const MonthCalendar = ({ year, month, goalRanges = [] }) => {
+const MonthCalendar = ({ year, month, goalRanges = [], onDayClick }) => {
     const displayDate = useMemo(() => dayjs(new Date(year, month, 1)), [year, month]);
 
     return (
@@ -168,11 +169,10 @@ const MonthCalendar = ({ year, month, goalRanges = [] }) => {
                 <DateCalendar
                     value={null}
                     defaultCalendarMonth={displayDate}
-                    readOnly
                     views={['day']}
                     slots={{ day: Day }}
                     slotProps={{
-                        day: { goalRanges },
+                        day: { goalRanges, onDayClick },
                     }}
                     showDaysOutsideCurrentMonth
                     fixedWeekNumber={5}
