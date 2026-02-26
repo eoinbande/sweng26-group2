@@ -118,8 +118,72 @@ class TestCreateGoal:
         goal_data = json.loads(inserted_data["goal_data"])
         assert goal_data["tasks"] == []
 
-# save_tasks_to_db , gives UUIDs to th=asks and subtasks
+#get all goals test (lines 61)
 
+class TestGetAllGoals:
+    def test_returns_list_of_goals_for_user(self):
+        fake_goals = [
+            {"id": GOAL_ID, "user_id": USER_ID, "title": "Fix my bike tyre"},
+            {"id": "goal-uuid-9999", "user_id": USER_ID, "title": "Learn guitar"},
+        ]
+
+        with patch("app.Tables.supabase") as mock_sb:
+            mock_sb.table.return_value.select.return_value.eq.return_value.execute.return_value.data = fake_goals
+
+            result = get_all_goals(USER_ID)
+
+        assert result == fake_goals
+
+    def test_returns_empty_list_when_user_has_no_goals(self):
+        """get_all_goals returns [] when there are no goals for the user."""
+        with patch("app.Tables.supabase") as mock_sb:
+            mock_sb.table.return_value.select.return_value.eq.return_value.execute.return_value.data = []
+
+            result = get_all_goals(USER_ID)
+
+        assert result == []
+
+#get goals lines 65-66
+class testGetGoal:
+    def test_returns_goal_data_dict(self):
+        """get_goal should return result.data from a .single() query (lines 65-66)."""
+        fake_goal = {"id": GOAL_ID, "title": "Fix my bike tyre", "goal_data": "{}"}
+
+        with patch("app.Tables.supabase") as mock_sb:
+            mock_sb.table.return_value.select.return_value.eq.return_value.single.return_value.execute.return_value.data = fake_goal
+
+            result = get_goal(GOAL_ID)
+
+        assert result == fake_goal
+
+    def test_returns_none_when_goal_not_found(self):
+        """get_goal returns None when Supabase finds no matching row."""
+        with patch("app.Tables.supabase") as mock_sb:
+            mock_sb.table.return_value.select.return_value.eq.return_value.single.return_value.execute.return_value.data = None
+
+            result = get_goal("nonexistent-id")
+
+        assert result is None
+
+#test delete goal
+class TestDeleteGoal:
+
+    def test_calls_delete_on_goals_table(self):
+        """delete_goal should issue a DELETE … WHERE id = goal_id (line 88)."""
+        fake_result = MagicMock()
+
+        with patch("app.Tables.supabase") as mock_sb:
+            mock_sb.table.return_value.delete.return_value.eq.return_value.execute.return_value = fake_result
+
+            result = delete_goal(GOAL_ID)
+
+        mock_sb.table.assert_called_with("goals")
+        mock_sb.table.return_value.delete.assert_called_once()
+        eq_call = mock_sb.table.return_value.delete.return_value.eq.call_args
+        assert eq_call[0] == ("id", GOAL_ID)
+        assert result is fake_result
+
+# save_tasks_to_db , gives UUIDs to tasks and subtasks
 class TestSaveTasksToDb:
 
     def _fake_goal_with_data(self, tasks=None):
