@@ -3,6 +3,7 @@ from enum import Enum
 from pydantic import BaseModel, Field
 from typing import Optional
 import json
+from app.services.ai_service import AIService
 # Database functions (Tables.py)
 from ..Tables import (
     create_goal, get_all_goals, get_goal, delete_goal,
@@ -214,7 +215,6 @@ def accept_plan(goal_id: str, request: AcceptPlanRequest):
         raise HTTPException(status_code=404, detail="Goal not found")
 
     # Check if goal already has saved tasks (i.e., this is a re-accept after feedback)
-    import json
     current_data = goal.get("goal_data", {})
     if isinstance(current_data, str):
         current_data = json.loads(current_data)
