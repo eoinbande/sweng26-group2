@@ -80,9 +80,34 @@
 }
 
 
-/* selected / focused / active day — perfect circle */
+/* suppress MUI selection — we never want a "selected" day visual */
 
-.month-calendar .MuiPickersDay-root:not(.day-highlighted).Mui-selected,
+.month-calendar .MuiPickersDay-root.Mui-selected,
+.month-calendar .MuiPickersDay-root.Mui-selected:hover,
+.month-calendar .MuiPickersDay-root.Mui-selected:focus {
+    background-color: transparent !important;
+    color: var(--text-main) !important;
+    border-radius: 999px !important;
+    width: clamp(28px, 4.5dvh, 40px);
+    height: clamp(28px, 4.5dvh, 40px);
+    aspect-ratio: 1;
+    justify-self: center;
+}
+
+/* keep range highlight colors when MUI adds selected class */
+.month-calendar .MuiPickersDay-root.day-highlighted.Mui-selected,
+.month-calendar .MuiPickersDay-root.day-highlighted.Mui-selected:hover,
+.month-calendar .MuiPickersDay-root.day-highlighted.Mui-selected:focus {
+    background-color: inherit !important;
+    color: inherit !important;
+    border-radius: inherit !important;
+    width: 100% !important;
+    aspect-ratio: unset !important;
+    justify-self: stretch !important;
+}
+
+/* focused / active / hover day — perfect circle */
+
 .month-calendar .MuiPickersDay-root:not(.day-highlighted).Mui-focusVisible,
 .month-calendar .MuiPickersDay-root:not(.day-highlighted):focus,
 .month-calendar .MuiPickersDay-root:not(.day-highlighted):active,

@@ -115,7 +115,8 @@ function Day(props) {
             {...other}
             day={day}
             outsideCurrentMonth={outsideCurrentMonth}
-            onClick={() => onDayClick && !outsideCurrentMonth && onDayClick(day)}
+            // intercept MUI's selection — call our handler instead
+            onDaySelect={(d) => onDayClick && onDayClick(d)}
             disableMargin
             selected={false}
             className={highlight ? 'day-highlighted' : undefined}
@@ -168,7 +169,7 @@ const MonthCalendar = ({ year, month, goalRanges = [], onDayClick }) => {
             <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
                 <DateCalendar
                     value={null}
-                    defaultCalendarMonth={displayDate}
+                    referenceDate={displayDate}
                     views={['day']}
                     slots={{ day: Day }}
                     slotProps={{

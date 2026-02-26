@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import PageHeader from '../components/PageHeader';
 import MonthCalendar from '../components/MonthCalendar';
 import UpcomingTimeline from '../components/UpcomingTimeline';
@@ -46,6 +46,19 @@ function ScheduledTasks() {
     const [activeIndex, setActiveIndex] = useState(0);
     const [selectedDate, setSelectedDate] = useState(null);
     const touchStartX = useRef(0);
+    const calendarRef = useRef(null);
+
+    // click outside calendar → deselect
+    useEffect(() => {
+        if (!selectedDate) return;
+        const handleClick = (e) => {
+            if (calendarRef.current && !calendarRef.current.contains(e.target)) {
+                setSelectedDate(null);
+            }
+        };
+        document.addEventListener('pointerdown', handleClick);
+        return () => document.removeEventListener('pointerdown', handleClick);
+    }, [selectedDate]);
 
     const onTouchStart = useCallback((e) => {
         touchStartX.current = e.touches[0].clientX;
@@ -63,9 +76,7 @@ function ScheduledTasks() {
     }, []);
 
     const onDayClick = useCallback((day) => {
-        setSelectedDate((prev) =>
-            prev && prev.isSame(day, 'day') ? null : day
-        );
+        setSelectedDate(day);
     }, []);
 
     const dateLabel = selectedDate
@@ -77,12 +88,14 @@ function ScheduledTasks() {
             <div className="scheduled-tasks-container">
                 <div className="scheduled-tasks-padded">
                     <PageHeader title="February" />
-                    <MonthCalendar
-                        year={now.getFullYear()}
-                        month={now.getMonth()}
-                        goalRanges={MOCK_GOAL_RANGES}
-                        onDayClick={onDayClick}
-                    />
+                    <div ref={calendarRef}>
+                        <MonthCalendar
+                            year={now.getFullYear()}
+                            month={now.getMonth()}
+                            goalRanges={MOCK_GOAL_RANGES}
+                            onDayClick={onDayClick}
+                        />
+                    </div>
                 </div>
 
                 {selectedDate ? (
