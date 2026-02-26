@@ -2,6 +2,7 @@
 
 .ut-section {
     margin-top: var(--space-lg);
+    flex-shrink: 0;
 }
 
 .ut-container {

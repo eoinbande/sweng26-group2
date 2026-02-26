@@ -125,20 +125,28 @@ function Day(props) {
             isMid={highlight ? !highlight.isStart && !highlight.isEnd : false}
             isSingle={highlight ? highlight.isSingle : false}
             sx={{
-                // today circle override
-                '&.MuiPickersDay-today': {
-                    border: 'none',
-                    backgroundColor: 'var(--primary)',
-                    color: 'white',
-                    fontWeight: 600,
-                    borderRadius: '999px',
-                    width: 'clamp(28px, 4.5dvh, 40px)',
-                    aspectRatio: '1',
-                    justifySelf: 'center',
-                    '&:hover, &:focus': {
+                // today circle override — skip if day is already highlighted
+                ...(!highlight && {
+                    '&.MuiPickersDay-today': {
+                        border: 'none',
                         backgroundColor: 'var(--primary)',
+                        color: 'white',
+                        fontWeight: 600,
+                        borderRadius: '999px',
+                        width: 'clamp(28px, 4.5dvh, 40px)',
+                        aspectRatio: '1',
+                        justifySelf: 'center',
+                        '&:hover, &:focus': {
+                            backgroundColor: 'var(--primary)',
+                        },
                     },
-                },
+                }),
+                // remove default today border when highlighted
+                ...(highlight && {
+                    '&.MuiPickersDay-today': {
+                        border: 'none',
+                    },
+                }),
             }}
         />
     );

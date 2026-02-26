@@ -44,9 +44,9 @@
 /* slide transition container — remove fixed height */
 
 .month-calendar .MuiDayCalendar-slideTransition {
-    min-height: auto;
-    height: auto !important;
-    overflow: hidden;
+    /* 5 rows of days + gaps; must not be auto or absolute children collapse */
+    min-height: calc(5 * clamp(28px, 4.5dvh, 40px) + 4 * clamp(4px, 0.8dvh, 8px));
+    overflow: visible;
 }
 
 
@@ -94,14 +94,18 @@
     justify-self: center;
 }
 
-/* today — perfect circle */
+/* today — perfect circle, but not when part of a highlighted range */
 
-.month-calendar .MuiPickersDay-root.MuiPickersDay-today {
+.month-calendar .MuiPickersDay-root.MuiPickersDay-today:not(.day-highlighted) {
     border-radius: 999px;
     width: clamp(28px, 4.5dvh, 40px);
     height: clamp(28px, 4.5dvh, 40px);
     aspect-ratio: 1;
     justify-self: center;
+}
+
+.month-calendar .MuiPickersDay-root.MuiPickersDay-today.day-highlighted {
+    border: none;
 }
 
 
