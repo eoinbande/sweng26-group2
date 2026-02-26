@@ -23,11 +23,14 @@ const VARIANT_CONFIG = {
  * @param {Array}    items    — [{ id, title, description, dueDate, locked? }]
  * @param {function} onClick  — optional callback when a card is tapped
  */
-const UpcomingTimeline = ({ variant = 'goals', items = [], onClick }) => {
+/**
+ * shared shell — header, scrollable area with fades, background color
+ * used by both UpcomingTimeline and UpcomingTimelineTasks
+ */
+const UpcomingTimelineShell = ({ variant = 'goals', children }) => {
     const config = VARIANT_CONFIG[variant] || VARIANT_CONFIG.goals;
 
     const timelineRef = useRef(null);
-    // top fade only appears once content is cut off by scrolling
     const [showTopFade, setShowTopFade] = useState(false);
 
     const updateFades = useCallback(() => {
@@ -36,10 +39,9 @@ const UpcomingTimeline = ({ variant = 'goals', items = [], onClick }) => {
         setShowTopFade(el.scrollTop > 5);
     }, []);
 
-    // correct initial state after render (handles cases with few items)
     useEffect(() => {
         updateFades();
-    }, [updateFades, items]);
+    }, [updateFades, children]);
 
     return (
         <section className={`ut-section ut-section--${variant}`}>
@@ -53,45 +55,7 @@ const UpcomingTimeline = ({ variant = 'goals', items = [], onClick }) => {
                         ref={timelineRef}
                         onScroll={updateFades}
                     >
-                        {items.map((item) => {
-                            const dateObj = new Date(item.dueDate);
-                            const dayNum = dateObj.getDate();
-                            const dayName = dateObj.toLocaleDateString('en-GB', { weekday: 'short' });
-                            return (
-                                <div className="ut-item" key={item.id}>
-                                    {/* left: date label */}
-                                    <div className="ut-date">
-                                        <span className="ut-date-num">{dayNum}</span>
-                                        <span className="ut-date-day">{dayName}</span>
-                                    </div>
-
-                                    {/* center: dot */}
-                                    <div className="ut-connector">
-                                        <div className="ut-dot" />
-                                    </div>
-
-                                    {/* right: item card */}
-                                    <div
-                                        className={`ut-card ${item.locked ? 'ut-card--locked' : ''}`}
-                                        onClick={() => onClick && onClick(item)}
-                                        role={onClick ? 'button' : undefined}
-                                        tabIndex={onClick ? 0 : undefined}
-                                    >
-                                        <div className="ut-card-content">
-                                            <ArrowUpLeft
-                                                className="ut-card-icon"
-                                                size={16}
-                                                strokeWidth={2.5}
-                                            />
-                                            <div className="ut-card-text">
-                                                <h4 className="ut-card-title">{item.title}</h4>
-                                                <p className="ut-card-desc">{item.description}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            );
-                        })}
+                        {children}
                     </div>
 
                     <div className="ut-fade ut-fade--top" style={{ opacity: showTopFade ? 1 : 0 }} />
@@ -102,4 +66,48 @@ const UpcomingTimeline = ({ variant = 'goals', items = [], onClick }) => {
     );
 };
 
+const UpcomingTimeline = ({ variant = 'goals', items = [], onClick }) => {
+    return (
+        <UpcomingTimelineShell variant={variant}>
+            {items.map((item) => {
+                const dateObj = new Date(item.dueDate);
+                const dayNum = dateObj.getDate();
+                const dayName = dateObj.toLocaleDateString('en-GB', { weekday: 'short' });
+                return (
+                    <div className="ut-item" key={item.id}>
+                        <div className="ut-date">
+                            <span className="ut-date-num">{dayNum}</span>
+                            <span className="ut-date-day">{dayName}</span>
+                        </div>
+
+                        <div className="ut-connector">
+                            <div className="ut-dot" />
+                        </div>
+
+                        <div
+                            className={`ut-card ${item.locked ? 'ut-card--locked' : ''}`}
+                            onClick={() => onClick && onClick(item)}
+                            role={onClick ? 'button' : undefined}
+                            tabIndex={onClick ? 0 : undefined}
+                        >
+                            <div className="ut-card-content">
+                                <ArrowUpLeft
+                                    className="ut-card-icon"
+                                    size={16}
+                                    strokeWidth={2.5}
+                                />
+                                <div className="ut-card-text">
+                                    <h4 className="ut-card-title">{item.title}</h4>
+                                    <p className="ut-card-desc">{item.description}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            })}
+        </UpcomingTimelineShell>
+    );
+};
+
+export { UpcomingTimelineShell };
 export default UpcomingTimeline;
