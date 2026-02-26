@@ -35,7 +35,7 @@ const UpcomingTimelineTasks = ({ date, items = [], onClick, onBack }) => {
                     >
                         <div
                             className={`utt-card${item.locked ? ' utt-card--locked' : ''}`}
-                            onClick={() => onClick && onClick(item)}
+                            onClick={(e) => { e.stopPropagation(); onClick && onClick(item); }}
                             role={onClick ? 'button' : undefined}
                             tabIndex={onClick ? 0 : undefined}
                         >

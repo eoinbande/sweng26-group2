@@ -17,7 +17,9 @@
     overflow: hidden;
 }
 
+
 /* padded wrapper for content that should not be full-width */
+
 .scheduled-tasks-padded {
     padding: 0 var(--space-lg);
     flex-shrink: 0;
@@ -40,7 +42,7 @@
     will-change: transform;
 }
 
-.ut-swipe-track > * {
+.ut-swipe-track>* {
     width: 100%;
     flex-shrink: 0;
 }
@@ -53,7 +55,8 @@
     justify-content: flex-start;
     gap: 8px;
     padding: 0;
-    margin-top: -4%;
+    margin-top: 0;
+    margin-bottom: 2%;
     flex-shrink: 0;
 }
 
@@ -70,4 +73,11 @@
 .ut-swipe-dot--active {
     opacity: 1;
     transform: scale(1.25);
+}
+
+
+/* pull dots closer to subtitle when dots follow it */
+
+.ut-subtitle:has(+ .ut-swipe-dots) {
+    margin-bottom: 3%;
 }

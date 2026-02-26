@@ -56,8 +56,8 @@ function ScheduledTasks() {
                 setSelectedDate(null);
             }
         };
-        document.addEventListener('pointerdown', handleClick);
-        return () => document.removeEventListener('pointerdown', handleClick);
+        document.addEventListener('click', handleClick);
+        return () => document.removeEventListener('click', handleClick);
     }, [selectedDate]);
 
     const onTouchStart = useCallback((e) => {

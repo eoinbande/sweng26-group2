@@ -44,6 +44,16 @@
     width: 100%;
     box-sizing: border-box;
     overflow: visible;
+    transition: transform 0.15s ease;
+    cursor: pointer;
+}
+
+.utt-card:hover {
+    transform: scale(0.98);
+}
+
+.utt-card:active {
+    transform: scale(0.95);
 }
 
 .utt-card--locked {

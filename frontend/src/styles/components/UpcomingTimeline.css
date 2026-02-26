@@ -64,13 +64,13 @@
 
 .ut-fade--top {
     top: 0;
-    height: 36px;
+    height: 24px;
     background: linear-gradient(to bottom, var(--accent-red-soft), transparent);
 }
 
 .ut-fade--bottom {
     bottom: 0;
-    height: 64px;
+    height: 40px;
     background: linear-gradient(to top, var(--accent-red-soft), transparent);
 }
 
@@ -90,32 +90,15 @@
     min-height: 0;
     overflow-y: auto;
     overflow-x: hidden;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
     padding-bottom: 10%;
     padding-right: 20px;
     margin-right: -20px;
 }
 
 .ut-timeline::-webkit-scrollbar {
-    width: 5px;
-}
-
-.ut-timeline::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.ut-timeline::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 255, 255, 0.35);
-    border-radius: var(--radius-pill);
-}
-
-.ut-section--tasks .ut-timeline {
-    scrollbar-color: rgba(28, 28, 30, 0.25) transparent;
-}
-
-.ut-section--tasks .ut-timeline::-webkit-scrollbar-thumb {
-    background-color: rgba(28, 28, 30, 0.25);
+    display: none;
 }
 
 
@@ -235,6 +218,16 @@
     display: flex;
     align-items: center;
     margin-bottom: 8%;
+    transition: transform 0.15s ease;
+    cursor: pointer;
+}
+
+.ut-card:hover {
+    transform: scale(0.98);
+}
+
+.ut-card:active {
+    transform: scale(0.95);
 }
 
 .ut-card-content {
