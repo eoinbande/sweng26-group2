@@ -28,7 +28,7 @@ def mock_goal_id():
     return "goal-uuid-456"
 
 
-@pytest.fixture
+@pytest.fixturex
 def sample_bike_tyre_plan():
     """Sample AI-generated plan for bike tyre goal."""
     return {
@@ -889,3 +889,213 @@ class TestGoalsWorkflow:
         )
         assert accept_response.status_code == 200
         assert accept_response.json()["saved_to_db"] is True
+
+class TestGoalsWorkflow:
+    """Tests that verify the complete workflow across multiple endpoints."""
+
+    @patch("app.routers.goals.create_goal")
+    @patch("app.routers.goals.get_mock_plan")
+    @patch("app.routers.goals.update_goal_data")
+    @patch("app.routers.goals.get_goal")
+    @patch("app.routers.goals.save_tasks_to_db")
+    def test_complete_workflow_create_to_accept(
+        self, mock_save, mock_get_goal, mock_update,
+        mock_get_plan, mock_create,
+        mock_user_id, mock_goal_id, sample_bike_tyre_plan,
+        sample_tasks_with_uuids
+    ):
+        """Should handle complete flow: create → review → accept."""
+        mock_create.return_value = MagicMock(data=[{"id": mock_goal_id}])
+        mock_get_plan.return_value = sample_bike_tyre_plan
+        
+        create_response = client.post(
+            "/api/goals",
+            json={
+                "user_id": mock_user_id,
+                "title": "Fix my bike tyre"
+            }
+        )
+        
+        assert create_response.status_code == 200
+        assert create_response.json()["saved_to_db"] is False
+        
+        mock_get_goal.return_value = {
+            "id": mock_goal_id,
+            "goal_data": {"tasks": []}
+        }
+        mock_save.return_value = sample_tasks_with_uuids
+        
+        accept_response = client.post(
+            f"/api/goals/{mock_goal_id}/accept",
+            json={"tasks": sample_bike_tyre_plan["tasks"]}
+        )
+        
+        assert accept_response.status_code == 200
+        assert accept_response.json()["saved_to_db"] is True
+        
+        accepted_tasks = accept_response.json()["tasks"]
+        assert all("id" in task for task in accepted_tasks)
+
+    @patch("app.routers.goals.create_goal")
+    @patch("app.routers.goals.get_mock_plan")
+    @patch("app.routers.goals.update_goal_data")
+    @patch("app.routers.goals.get_goal")
+    @patch("app.routers.goals.get_mock_feedback_response")
+    @patch("app.routers.goals.save_tasks_to_db")
+    def test_complete_workflow_with_feedback(
+        self, mock_save, mock_feedback, mock_get_goal,
+        mock_update, mock_get_plan, mock_create,
+        mock_user_id, mock_goal_id, sample_bike_tyre_plan,
+        sample_feedback_response, sample_tasks_with_uuids
+    ):
+        """Should handle flow: create → feedback → accept."""
+        mock_create.return_value = MagicMock(data=[{"id": mock_goal_id}])
+        mock_get_plan.return_value = sample_bike_tyre_plan
+        
+        create_response = client.post(
+            "/api/goals",
+            json={
+                "user_id": mock_user_id,
+                "title": "Fix my bike tyre"
+            }
+        )
+        assert create_response.status_code == 200
+        
+        mock_get_goal.return_value = {
+            "id": mock_goal_id,
+            "title": "Fix my bike tyre"
+        }
+        mock_feedback.return_value = sample_feedback_response
+        
+        feedback_response = client.post(
+            f"/api/goals/{mock_goal_id}/feedback",
+            json={"feedback": "Make it easier"}
+        )
+        assert feedback_response.status_code == 200
+        assert feedback_response.json()["saved_to_db"] is False
+        
+        mock_get_goal.return_value = {
+            "id": mock_goal_id,
+            "goal_data": {"tasks": []}
+        }
+        mock_save.return_value = sample_tasks_with_uuids
+        
+        accept_response = client.post(
+            f"/api/goals/{mock_goal_id}/accept",
+            json={"tasks": sample_feedback_response["tasks"]}
+        )
+        assert accept_response.status_code == 200
+        assert accept_response.json()["saved_to_db"] is True
+
+# =============================================================================
+# POST /api/goals/{goal_id}/accept — Additional coverage
+# =============================================================================
+
+class TestAcceptPlanAdditional:
+    """Additional tests to cover previously missing lines in accept_plan."""
+
+    @patch("app.routers.goals.get_goal")
+    @patch("app.routers.goals.save_tasks_to_db")
+    @patch("app.routers.goals.update_goal_data")
+    def test_accept_plan_goal_data_as_json_string(
+        self, mock_update, mock_save_tasks, mock_get_goal,
+        mock_goal_id, sample_tasks_with_uuids
+    ):
+        """
+        Line 194: goal_data arrives as a JSON string (not a dict).
+        The endpoint must parse it before checking for existing tasks.
+        """
+        import json
+        mock_get_goal.return_value = {
+            "id": mock_goal_id,
+            "goal_data": json.dumps({"tasks": []})   # ← string, not dict
+        }
+        mock_save_tasks.return_value = sample_tasks_with_uuids
+
+        response = client.post(
+            f"/api/goals/{mock_goal_id}/accept",
+            json={
+                "tasks": [
+                    {"ai_id": "task_1", "description": "Step 1",
+                     "order": 1, "status": "not_started", "subtasks": []}
+                ]
+            }
+        )
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["saved_to_db"] is True
+        # save_tasks_to_db (not merge) must be called because tasks list was empty
+        mock_save_tasks.assert_called_once()
+
+    @patch("app.routers.goals.get_goal")
+    @patch("app.routers.goals.save_tasks_to_db")
+    @patch("app.routers.goals.update_goal_data")
+    def test_accept_plan_due_date_ai_decide(
+        self, mock_update, mock_save_tasks, mock_get_goal,
+        mock_goal_id, sample_tasks_with_uuids
+    ):
+        """
+        Line 210: when due_date == 'AI_DECIDE', the endpoint must keep
+        the AI-generated goal_due_date from current_data and not overwrite it.
+        """
+        mock_get_goal.return_value = {
+            "id": mock_goal_id,
+            "goal_data": {
+                "tasks": [],
+                "goal_due_date": "2026-06-01"   # AI's original date
+            }
+        }
+        mock_save_tasks.return_value = sample_tasks_with_uuids
+
+        response = client.post(
+            f"/api/goals/{mock_goal_id}/accept",
+            json={
+                "tasks": [
+                    {"ai_id": "task_1", "description": "Step 1",
+                     "order": 1, "status": "not_started", "subtasks": []}
+                ],
+                "due_date": "AI_DECIDE"
+            }
+        )
+
+        assert response.status_code == 200
+        data = response.json()
+        # The AI's date should be preserved, not overwritten with "AI_DECIDE"
+        assert data["due_date"] == "2026-06-01"
+
+    @patch("app.routers.goals.get_goal")
+    @patch("app.routers.goals.save_tasks_to_db")
+    @patch("app.routers.goals.update_goal_data")
+    def test_accept_plan_due_date_user_supplied(
+        self, mock_update, mock_save_tasks, mock_get_goal,
+        mock_goal_id, sample_tasks_with_uuids
+    ):
+        """
+        Lines 212-213: when due_date is a real date string (not AI_DECIDE),
+        it must override the existing goal_due_date and be returned.
+        """
+        mock_get_goal.return_value = {
+            "id": mock_goal_id,
+            "goal_data": {
+                "tasks": [],
+                "goal_due_date": "2026-06-01"
+            }
+        }
+        mock_save_tasks.return_value = sample_tasks_with_uuids
+
+        response = client.post(
+            f"/api/goals/{mock_goal_id}/accept",
+            json={
+                "tasks": [
+                    {"ai_id": "task_1", "description": "Step 1",
+                     "order": 1, "status": "not_started", "subtasks": []}
+                ],
+                "due_date": "2026-12-31"
+            }
+        )
+
+        assert response.status_code == 200
+        assert response.json()["due_date"] == "2026-12-31"
+
+        
