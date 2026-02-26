@@ -28,7 +28,7 @@ def mock_goal_id():
     return "goal-uuid-456"
 
 
-@pytest.fixturex
+@pytest.fixture
 def sample_bike_tyre_plan():
     """Sample AI-generated plan for bike tyre goal."""
     return {
