@@ -43,7 +43,7 @@ function ScheduledTasks() {
                         goalRanges={MOCK_GOAL_RANGES}
                     />
                 </div>
-                <UpcomingTimeline variant="goals" items={MOCK_GOALS} />
+                {/* <UpcomingTimeline variant="goals" items={MOCK_GOALS} /> */}
                 <UpcomingTimeline variant="tasks" items={MOCK_TASKS} />
             </div>
 
