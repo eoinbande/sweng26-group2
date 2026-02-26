@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException
 from enum import Enum
 from pydantic import BaseModel, Field
 from typing import Optional
+import json
 # Database functions (Tables.py)
 from ..Tables import (
     create_goal, get_all_goals, get_goal, delete_goal,
@@ -164,10 +165,22 @@ def feedback_on_plan(goal_id: str, request: FeedbackRequest):
     #updated_plan = get_mock_feedback_response(goal["title"], request.feedback) <- we use this for mocking
 
     #Real AI integration
+
+    #we want to ONLY modify the task been asked for feedback, leave other task as they are
+    current_data = goal.get("goal_data", {}) #not sure if this gonna work, needs testing!
+    if isinstance(current_data, str): 
+        current_data = json.loads(current_data)
+
+    current_tasks = current_data.get("tasks", [])
+
+    #call real AI service to update plan based on the feedback
     try:
-        ai_feedback = ai_service.
-
-
+        updated_plan = ai_service.aiFeedback(
+            userInput = request.feedback,
+            currentGoals = current_tasks
+        )
+    except Exception as e:
+        raise HTTPException(status_code = 500, detail = f"AI feedback failed: {str(e)}")
 
 
     return {
