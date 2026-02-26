@@ -32,6 +32,7 @@ GOAL_ID = "goal-uuid-1234"
 TASK_1_ID = "task-uuid-0001"
 TASK_2_ID = "task-uuid-0002"
 SUB_1A_ID = "sub-uuid-001a"
+USER_ID = "user_uuid_5678"
 
 def _create_mock_supabase():
     """Returns a new MagicMock that mimics a supabase client"""
@@ -46,6 +47,43 @@ def _chain(return_value):
     m.return_value = m
     m.execute.return_value == return_value
     return m
+
+
+#create user (lines 22-30)
+class TestCreateUser:
+    def test_returns_existing_account_when_email_already_registered(self):
+        """
+        If the email already exists in profiles, create_user must return
+        the existing account dict without inserting a new row (line 27).
+        """
+        existing = {"id": USER_ID, "name": "Alice", "email": "alice@example.com"}
+
+        with patch("app.Tables.supabase") as mock_sb:
+            mock_sb.table.return_value.select.return_value.eq.return_value.execute.return_value.data = [existing]
+
+            result = create_user(USER_ID, "Alice", "alice@example.com")
+
+        mock_sb.table.return_value.insert.assert_not_called()
+        assert result == existing
+
+    def test_inserts_new_user_when_email_not_registered(self):
+        """
+        If the email is not registered, create_user must call INSERT
+        and return the Supabase response (lines 30-34).
+        """
+        fake_insert_result = MagicMock()
+
+        with patch("app.Tables.supabase") as mock_sb:
+            mock_sb.table.return_value.select.return_value.eq.return_value.execute.return_value.data = []
+            mock_sb.table.return_value.insert.return_value.execute.return_value = fake_insert_result
+
+            result = create_user(USER_ID, "Bob", "bob@example.com")
+
+        inserted = mock_sb.table.return_value.insert.call_args[0][0]
+        assert inserted["id"]    == USER_ID
+        assert inserted["name"]  == "Bob"
+        assert inserted["email"] == "bob@example.com"
+        assert result is fake_insert_result
 
 # create_goal - return correct structure
 
