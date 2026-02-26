@@ -86,7 +86,6 @@ class TestCreateUser:
         assert result is fake_insert_result
 
 # create_goal - return correct structure
-
 class TestCreateGoal:
 
     def test_create_goal_returns_supabase_response(self):
@@ -119,7 +118,6 @@ class TestCreateGoal:
         assert goal_data["tasks"] == []
 
 #get all goals test (lines 61)
-
 class TestGetAllGoals:
     def test_returns_list_of_goals_for_user(self):
         fake_goals = [
@@ -333,9 +331,7 @@ class TestSaveTasksToDb:
         assert "id" in result[0] and result[0]["id"]
         assert "id" in result[0]["subtasks"][0] and result[0]["subtasks"][0]["id"]
 
-
 # merge and save tasks - preserves status(completed) and UUID
-
 class TestMergeAndSaveTasks:
 
     def _existing_goal_data(self, tasks):
@@ -425,6 +421,7 @@ class TestMergeAndSaveTasks:
         assert sub["id"] == SUB_1A_ID
         assert sub["status"] == "completed"
 
+#update task status
 class TestUpdateTaskStatus:
 
     def _fake_task(self, task_id, goal_id, parent_id = None):
@@ -535,7 +532,6 @@ class TestUpdateTaskStatus:
         assert result == fake_task
 
 # add_subtasks_to_task  assign UUID's and sets correct parent_id
-
 class TestAddSubTasksToTask:
 
     def test_assigns_uuid_to_subtract(self):
@@ -631,8 +627,57 @@ class TestAddSubTasksToTask:
         for sub in result:
             assert sub.get("id") is not None
 
-# get_completed_task_count / get_total_task_count — return correct numbers
+#get_tasks_for_goal (line 276)
+class TestGetTasksForGoal:
 
+    def test_returns_task_rows_for_goal(self):
+        """get_tasks_for_goal should return the .data list (line 276)."""
+        fake_rows = [
+            {"id": TASK_1_ID, "goal_id": GOAL_ID, "description": "Step 1"},
+            {"id": TASK_2_ID, "goal_id": GOAL_ID, "description": "Step 2"},
+        ]
+
+        with patch("app.Tables.supabase") as mock_sb:
+            mock_sb.table.return_value.select.return_value.eq.return_value.execute.return_value.data = fake_rows
+
+            result = get_tasks_for_goal(GOAL_ID)
+
+        assert result == fake_rows
+
+    def test_returns_empty_list_when_no_tasks(self):
+        """get_tasks_for_goal returns [] when the goal has no tasks yet."""
+        with patch("app.Tables.supabase") as mock_sb:
+            mock_sb.table.return_value.select.return_value.eq.return_value.execute.return_value.data = []
+
+            result = get_tasks_for_goal(GOAL_ID)
+
+        assert result == []
+
+#get_task (lines 280-281)
+class TestGetTask:
+
+    def test_returns_task_dict(self):
+        """get_task should return result.data from a .single() query (lines 280-281)."""
+        fake_task = {"id": TASK_1_ID, "goal_id": GOAL_ID, "description": "Step 1",
+                     "status": "not_started", "parent_id": None}
+
+        with patch("app.Tables.supabase") as mock_sb:
+            mock_sb.table.return_value.select.return_value.eq.return_value.single.return_value.execute.return_value.data = fake_task
+
+            result = get_task(TASK_1_ID)
+
+        assert result == fake_task
+
+    def test_returns_none_when_task_not_found(self):
+        """get_task returns None when Supabase finds no matching task."""
+        with patch("app.Tables.supabase") as mock_sb:
+            mock_sb.table.return_value.select.return_value.eq.return_value.single.return_value.execute.return_value.data = None
+
+            result = get_task("nonexistent-task-id")
+
+        assert result is None
+
+# get_completed_task_count / get_total_task_count — return correct numbers
 class TestTaskCountFunctions:
 
     def test_get_completed_task_count_returns_correct_number(self):
