@@ -1,19 +1,32 @@
 /* upcoming timeline tasks — card styles for the daily task view */
 
+
 /* hide the vertical timeline line */
+
 .ut-no-timeline .ut-timeline-wrap::before {
     display: none;
 }
 
+/* extra top padding so the first date tab isn't clipped */
+.ut-no-timeline .ut-timeline {
+    padding-top: clamp(18px, 2.5dvh, 24px);
+}
+
 .utt-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
     position: relative;
     background-color: var(--card-bg);
-    border-radius: var(--radius-lg);
-    padding: clamp(14px, 2dvh, 18px) clamp(14px, 2dvh, 18px) clamp(14px, 2dvh, 18px) clamp(16px, 2.2dvh, 20px);
-    box-shadow: var(--shadow-sm);
-    margin-bottom: clamp(12px, 1.8dvh, 16px);
+    border-radius: clamp(12px, 2dvh, 20px);
+    padding: clamp(10px, 1.6dvh, 16px);
+    box-shadow: var(--shadow-md);
+    margin-top: clamp(14px, 0.5dvh, 18px);
+    margin-bottom: clamp(6px, 0.2dvh, 10px);
+    min-height: clamp(70px, 11dvh, 100px);
     width: 100%;
     box-sizing: border-box;
+    overflow: visible;
 }
 
 .utt-card--locked {
@@ -21,19 +34,28 @@
 }
 
 
-/* date badge — top-right corner */
+/* date tab — sits above the card like a file tab */
 
 .utt-date-badge {
     position: absolute;
-    top: 0;
-    right: 0;
+    bottom: 100%;
+    right: clamp(14px, 2dvh, 20px);
     font-family: var(--font-sans);
-    font-size: clamp(9px, 1.1dvh, 11px);
+    font-size: clamp(9px, 1.2dvh, 12px);
     font-weight: 600;
-    color: var(--accent-red-soft);
-    background-color: rgba(221, 100, 95, 0.12);
-    padding: 3px 10px;
-    border-radius: 0 var(--radius-lg) 0 var(--radius-md);
+    color: #fff;
+    background-color: #E5A830;
+    padding: clamp(5px, 0.8dvh, 8px) clamp(8px, 1.2dvh, 11px);
+    border-radius: clamp(8px, 1.3dvh, 12px) clamp(8px, 1.3dvh, 12px) 0 0;
+    z-index: 1;
+    line-height: 1.3;
+}
+
+
+/* locked cards get a red tab */
+
+.utt-card--locked .utt-date-badge {
+    background-color: var(--accent-red-soft);
 }
 
 
@@ -41,7 +63,8 @@
 
 .utt-lock {
     position: absolute;
-    bottom: clamp(10px, 1.5dvh, 14px);
+    top: 50%;
+    transform: translateY(-50%);
     right: clamp(12px, 1.8dvh, 16px);
     color: var(--accent-red-soft);
     opacity: 0.7;
@@ -59,7 +82,6 @@
 .utt-icon {
     flex-shrink: 0;
     color: var(--accent-red-soft);
-    margin-top: 2px;
 }
 
 .utt-text {
@@ -71,16 +93,20 @@
 
 .utt-title {
     font-family: var(--font-sans);
-    font-size: clamp(13px, 1.7dvh, 15px);
+    font-size: clamp(12px, 1.7dvh, 14px);
     font-weight: 600;
     color: var(--text-main);
-    margin: 0;
+    line-height: 1.3;
+    margin: 0 0 clamp(2px, 0.4dvh, 4px);
 }
 
 .utt-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
     font-family: var(--font-sans);
-    font-size: clamp(11px, 1.3dvh, 13px);
+    font-size: clamp(10px, 1.4dvh, 12px);
     color: var(--text-secondary);
+    white-space: nowrap;
     margin: 0;
-    line-height: 1.3;
 }
