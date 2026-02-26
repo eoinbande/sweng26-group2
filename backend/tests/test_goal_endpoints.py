@@ -1098,4 +1098,68 @@ class TestAcceptPlanAdditional:
         assert response.status_code == 200
         assert response.json()["due_date"] == "2026-12-31"
 
-        
+        # =============================================================================
+# GET /api/goals/{user_id} — Additional coverage
+# =============================================================================
+
+class TestGetGoalsAdditional:
+    """Additional tests to cover missing lines in get_goals."""
+
+    @patch("app.routers.goals.get_all_goals")
+    def test_get_goals_goal_data_as_json_string(
+        self, mock_get_all_goals, mock_user_id
+    ):
+        """
+        Line 250: goal_data stored as a JSON string must be parsed before
+        checking for tasks — goals with tasks must still appear in the result.
+        """
+        import json
+        tasks = [{"ai_id": "task_1", "id": "uuid-t1", "description": "Step",
+                  "order": 1, "status": "not_started", "subtasks": []}]
+        mock_get_all_goals.return_value = [
+            {
+                "id": "goal-1",
+                "user_id": mock_user_id,
+                "title": "Fix my bike tyre",
+                # goal_data is a JSON string, not a dict
+                "goal_data": json.dumps({"tasks": tasks, "description": "A guide"})
+            }
+        ]
+
+        response = client.get(f"/api/goals/{mock_user_id}")
+
+        assert response.status_code == 200
+        data = response.json()
+        assert len(data["goals"]) == 1
+        assert data["goals"][0]["title"] == "Fix my bike tyre"
+
+    @patch("app.routers.goals.get_all_goals")
+    def test_get_goals_all_goals_have_empty_tasks(
+        self, mock_get_all_goals, mock_user_id
+    ):
+        """
+        Line 255: when every goal has an empty task list (none accepted yet),
+        accepted_goals will be empty → return the 'No goals' message.
+        """
+        mock_get_all_goals.return_value = [
+            {
+                "id": "goal-1",
+                "user_id": mock_user_id,
+                "title": "Draft goal not yet accepted",
+                "goal_data": {"tasks": []}   # empty — not accepted
+            },
+            {
+                "id": "goal-2",
+                "user_id": mock_user_id,
+                "title": "Another draft",
+                "goal_data": {"tasks": []}
+            }
+        ]
+
+        response = client.get(f"/api/goals/{mock_user_id}")
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["goals"] == []
+        assert "No goals associated with the user" in data["message"]
+
