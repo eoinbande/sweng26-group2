@@ -12,6 +12,7 @@ from unittest.mock import MagicMock, patch, call
 
 from app.Tables import(
     create_goal,
+    create_user,
     save_tasks_to_db,
     merge_and_save_tasks,
     update_task_status,
@@ -19,7 +20,10 @@ from app.Tables import(
     get_completed_task_count,
     get_total_task_count,
     get_goal,
-    get_tasks_for_goal 
+    get_all_goals,
+    get_task,
+    get_tasks_for_goal,
+    delete_goal,
 )
 
 #shared fixtures
