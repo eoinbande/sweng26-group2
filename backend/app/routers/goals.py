@@ -20,6 +20,7 @@ from ..mock_ai_responses import get_mock_plan, get_mock_feedback_response
 
 
 goal_router = APIRouter()
+ai_service = AIService()
 
 # =============================================================================
 # REQUEST MODELS
@@ -105,7 +106,13 @@ def create_goal_endpoint(goal: CreateGoalRequest):
 
     # Get AI-generated plan from mock templates
     # TODO: Replace with real AI call when AI integration is ready
-    ai_plan = get_mock_plan(goal.title)
+    #ai_plan = get_mock_plan(goal.title) <- we used this for mocking
+
+    #Real AI integration(the following block of code calls the AI to generate the goal!)
+    try:
+        ai_plan = ai_service.aiGenerated(goal.title)
+    except Exception as e:
+        raise HTTPException(status_code = 500, detail = f"AI generation failed: {str(e)}")
 
     # Save description and due date from AI plan to goal_data
     update_goal_data(goal_id, {
@@ -154,7 +161,13 @@ def feedback_on_plan(goal_id: str, request: FeedbackRequest):
     # Get AI feedback response from mock
     # TODO: Replace with real AI call that takes current plan + feedback text
     # For now, we just return a pre-made feedback response based on the title
-    updated_plan = get_mock_feedback_response(goal["title"], request.feedback)
+    #updated_plan = get_mock_feedback_response(goal["title"], request.feedback) <- we use this for mocking
+
+    #Real AI integration
+    try:
+        ai_feedback = ai_service.
+
+
 
 
     return {

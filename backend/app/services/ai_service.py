@@ -14,4 +14,4 @@ class AIService:
         return aiExpand(user_input, current_goals)
 
 
-"""Centrak okace for error handling and logging"""
+"""Central place for error handling and logging"""
