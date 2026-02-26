@@ -27,7 +27,7 @@ const VARIANT_CONFIG = {
  * shared shell — header, scrollable area with fades, background color
  * used by both UpcomingTimeline and UpcomingTimelineTasks
  */
-const UpcomingTimelineShell = ({ variant = 'goals', children }) => {
+const UpcomingTimelineShell = ({ variant = 'goals', title, subtitle, className, children }) => {
     const config = VARIANT_CONFIG[variant] || VARIANT_CONFIG.goals;
 
     const timelineRef = useRef(null);
@@ -44,10 +44,10 @@ const UpcomingTimelineShell = ({ variant = 'goals', children }) => {
     }, [updateFades, children]);
 
     return (
-        <section className={`ut-section ut-section--${variant}`}>
+        <section className={`ut-section ut-section--${variant}${className ? ` ${className}` : ''}`}>
             <div className="ut-container" style={{ backgroundColor: config.bgColor }}>
-                <h3 className="ut-title">{config.title}</h3>
-                <p className="ut-subtitle">{config.subtitle}</p>
+                <h3 className="ut-title">{title || config.title}</h3>
+                <p className="ut-subtitle">{subtitle || config.subtitle}</p>
 
                 <div className="ut-timeline-wrap">
                     <div

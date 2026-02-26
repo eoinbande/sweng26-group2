@@ -1,0 +1,86 @@
+/* upcoming timeline tasks — card styles for the daily task view */
+
+/* hide the vertical timeline line */
+.ut-no-timeline .ut-timeline-wrap::before {
+    display: none;
+}
+
+.utt-card {
+    position: relative;
+    background-color: var(--card-bg);
+    border-radius: var(--radius-lg);
+    padding: clamp(14px, 2dvh, 18px) clamp(14px, 2dvh, 18px) clamp(14px, 2dvh, 18px) clamp(16px, 2.2dvh, 20px);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: clamp(12px, 1.8dvh, 16px);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.utt-card--locked {
+    background-color: rgba(221, 100, 95, 0.12);
+}
+
+
+/* date badge — top-right corner */
+
+.utt-date-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-family: var(--font-sans);
+    font-size: clamp(9px, 1.1dvh, 11px);
+    font-weight: 600;
+    color: var(--accent-red-soft);
+    background-color: rgba(221, 100, 95, 0.12);
+    padding: 3px 10px;
+    border-radius: 0 var(--radius-lg) 0 var(--radius-md);
+}
+
+
+/* lock icon — bottom-right */
+
+.utt-lock {
+    position: absolute;
+    bottom: clamp(10px, 1.5dvh, 14px);
+    right: clamp(12px, 1.8dvh, 16px);
+    color: var(--accent-red-soft);
+    opacity: 0.7;
+}
+
+
+/* card body — icon + text */
+
+.utt-card-body {
+    display: flex;
+    align-items: flex-start;
+    gap: clamp(8px, 1.2dvh, 12px);
+}
+
+.utt-icon {
+    flex-shrink: 0;
+    color: var(--accent-red-soft);
+    margin-top: 2px;
+}
+
+.utt-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.utt-title {
+    font-family: var(--font-sans);
+    font-size: clamp(13px, 1.7dvh, 15px);
+    font-weight: 600;
+    color: var(--text-main);
+    margin: 0;
+}
+
+.utt-meta {
+    font-family: var(--font-sans);
+    font-size: clamp(11px, 1.3dvh, 13px);
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.3;
+}
