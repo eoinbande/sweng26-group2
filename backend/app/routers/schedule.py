@@ -65,6 +65,7 @@ def _get_all_tasks_with_dates(user_id: str) -> list[dict]:
                     })
 
     # Sort by due_date
+    tasks_with_dates = [t for t in tasks_with_dates if t["status"] != "completed"]
     tasks_with_dates.sort(key=lambda t: t["due_date"])
     return tasks_with_dates
 
