@@ -44,7 +44,7 @@
 }
 
 .btn-update-plan {
-    width: 180px;
+    width: 160px;
     background-color: var(--yellow);
     color: var(--text-main);
     font-weight: 600;
@@ -57,10 +57,27 @@
     transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
+.btn-delete-goal {
+    width: 160px;
+    background-color: var(--red);
+    color: var(--card-bg);
+    font-weight: 600;
+    border: none;
+    border-radius: 24px;
+    padding: 14px;
+    font-size: 15px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(221, 100, 95, 0.35);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
 .btn-update-plan:active {
     transform: scale(0.97);
 }
 
+.btn-delete-goal:active {
+    transform: scale(0.97);
+}
 
 /* feedback popup overlay */
 

@@ -306,6 +306,31 @@ const GoalDetail = () => {
         //setShowLoading(false);
     }
     };
+
+    const handleDeleteGoal = async () => {
+    
+    if (!window.confirm("Are you sure you want to delete this goal? This cannot be undone!")) {
+        return;
+    }
+
+    try {
+        // 2. Call the backend delete endpoint
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/goals/${goalId}`, {
+            method: 'DELETE',
+        });
+
+        if (response.ok) {
+            // 3. If successful, navigate back to the goals list
+            navigate('/goals');
+        } else {
+            const errorData = await response.json();
+            alert(`Error: ${errorData.detail || "Failed to delete goal"}`);
+        }
+    } catch (err) {
+        console.error("Network error deleting goal:", err);
+        alert("Network error. Please try again.");
+    }
+    };
             
 
 
@@ -374,10 +399,21 @@ const GoalDetail = () => {
                 </div>
             )}
 
-            {/* floating action button */}
-            <div className="fab-container">
+            {/* floating buttons */}
+            {/* Update Button */}
+            <div className="fab-container" style={{ 
+                display: 'flex', 
+                gap: '12px', 
+                justifyContent: 'center',
+                padding: '0 20px' 
+            }}>
                 <button className="btn-update-plan" onClick={() => setShowFeedback(true)}>
                     Update Plan
+                </button>
+                
+                {/* Delete Button */}
+                <button className="btn-delete-goal" onClick={handleDeleteGoal}>
+                    Delete Goal
                 </button>
             </div>
 
