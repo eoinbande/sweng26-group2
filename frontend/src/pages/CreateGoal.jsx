@@ -196,36 +196,6 @@ function CreateGoal() {
                 </div>
             </div>
 
-            {/* bottom section */}
-            <div className="cg-bottom">
-                {/* 'or' divider */}
-                <div style={{
-                    flex: 1,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                }}>
-                    <p className="cg-or-divider">or</p>
-                </div>
-
-                {/* manual input */}
-                <div className="cg-manual-input">
-                    <InputBar
-                        className="cg-input-bar"
-                        placeholder="Manually create your goal..."
-                        value={manualGoal}
-                        onChange={(e) => setManualGoal(e.target.value)}
-                        onSubmit={() => {
-                            if (manualGoal.trim()) {
-                                handleGoalSubmit(manualGoal);
-                                setManualGoal('');
-                            }
-                        }}
-                        variant="auth"
-                    />
-                </div>
-            </div>
-
             {/* bottom nav */}
             <BottomNav />
         </div>
