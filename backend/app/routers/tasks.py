@@ -173,7 +173,22 @@ def expand_task(task_id: str, request: ExpandTaskRequest):
 
     for substask in subtask_data:
         if "title" not in subtask or "ai_id" not in subtask:
-            
+            raise HTTPException(
+                status_code = 500,
+                detail = "AI returned invalid subtask structure"
+            )
+    
+    goal_tasks = get_tasks_for_goal(goal_id)
+    existing_ai_ids = {i.get("ai_id") for i in goal_task}
+
+    for subtask in subtask_data:
+        if subtask["ai_id"] in existing_ai_ids:
+            raise HTTPException(
+                status_code = 500,
+                detail = "AI returned duplicate ai_id"
+            )
+
+    #do we want to add a check if the user wants to expand an already expanded task?
 
 
     if not subtask_data:
