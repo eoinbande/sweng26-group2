@@ -44,11 +44,11 @@ def _get_all_tasks_with_dates(user_id: str) -> list[dict]:
                     "due_date": task.get("due_date"),
                     "status": task.get("status", "not_started"),
                     "order": task.get("order"),
-                    "is_subtask": False,
-                    "parent_ai_id": None
+                    #"is_subtask": False,
+                    #"parent_ai_id": None
                 })
 
-            # Also grab subtasks with due dates
+            """# Also grab subtasks with due dates
             for sub in task.get("subtasks", []):
                 if sub.get("due_date"):
                     tasks_with_dates.append({
@@ -63,6 +63,7 @@ def _get_all_tasks_with_dates(user_id: str) -> list[dict]:
                         "is_subtask": True,
                         "parent_ai_id": task.get("ai_id")
                     })
+            """
 
     # Sort by due_date
     tasks_with_dates = [t for t in tasks_with_dates if t["status"] != "completed"]
