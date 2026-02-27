@@ -1,4 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import PageHeader from '../components/PageHeader';
 import MonthCalendar from '../components/MonthCalendar';
 import UpcomingTimeline from '../components/UpcomingTimeline';
@@ -41,6 +42,7 @@ function buildTaskRanges(tasks, year, month) {
 // maps backend goal data → shape expected by UpcomingTimeline
 const mapGoalToTimeline = (g) => ({
     id: g.goal_id,
+    goalId: g.goal_id,
     title: g.title,
     description: g.description || `${g.task_count} task${g.task_count === 1 ? '' : 's'}`,
     dueDate: g.goal_due_date,
@@ -49,6 +51,7 @@ const mapGoalToTimeline = (g) => ({
 // maps backend task data → shape expected by UpcomingTimeline
 const mapTaskToTimeline = (t) => ({
     id: t.task_id || t.ai_id,
+    goalId: t.goal_id,
     title: t.description,
     description: t.goal_title,
     dueDate: t.due_date,
@@ -58,6 +61,7 @@ const mapTaskToTimeline = (t) => ({
 // maps backend task data → shape expected by UpcomingTimelineTasks
 const mapTaskToDaily = (t) => ({
     id: t.task_id || t.ai_id,
+    goalId: t.goal_id,
     title: t.description,
     goalTitle: t.goal_title,
     dueDate: t.due_date,
@@ -72,6 +76,7 @@ const MONTH_NAMES = [
 ];
 
 function ScheduledTasks() {
+    const navigate = useNavigate();
     const now = new Date();
     const [calMonth, setCalMonth] = useState(now.getMonth());
     const [activeIndex, setActiveIndex] = useState(0);
@@ -166,6 +171,13 @@ function ScheduledTasks() {
         if (btn) btn.click();
     }, []);
 
+    // navigate to goal detail when a task/goal card is tapped
+    const onItemClick = useCallback((item) => {
+        if (item.goalId) {
+            navigate(`/goal/${item.goalId}`, { state: { goalId: item.goalId } });
+        }
+    }, [navigate]);
+
     // click outside calendar → deselect
     useEffect(() => {
         if (!selectedDate) return;
@@ -227,6 +239,7 @@ function ScheduledTasks() {
                             key={`daily-${selectedDate.format('YYYY-MM-DD')}`}
                             date={dateLabel}
                             items={dailyTasks}
+                            onClick={onItemClick}
                             onBack={() => setSelectedDate(null)}
                         />
                     </div>
@@ -245,6 +258,7 @@ function ScheduledTasks() {
                                 variant="tasks"
                                 items={upcomingTasks}
                                 loaded={scheduleLoaded}
+                                onClick={onItemClick}
                                 headerExtra={
                                     <div className="ut-swipe-dots">
                                         {PANELS.map((v, i) => (
@@ -262,6 +276,7 @@ function ScheduledTasks() {
                                 variant="goals"
                                 items={upcomingGoals}
                                 loaded={scheduleLoaded}
+                                onClick={onItemClick}
                                 headerExtra={
                                     <div className="ut-swipe-dots">
                                         {PANELS.map((v, i) => (
