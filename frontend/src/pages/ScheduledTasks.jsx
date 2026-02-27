@@ -188,7 +188,7 @@ function ScheduledTasks() {
                 )}
             </div>
 
-            <BottomNav />
+            <BottomNav transparent />
         </div>
     );
 }

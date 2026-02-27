@@ -30,7 +30,7 @@ const User = ({ size = 30 }) => (
 
 
 
-const BottomNav = () => {
+const BottomNav = ({ transparent = false }) => {
     const navigate = useNavigate();
     const location = useLocation();
     const currentPath = location.pathname;
@@ -43,7 +43,7 @@ const BottomNav = () => {
             transform: 'translateX(-50%)',
             width: '100%',
             maxWidth: '480px',
-            backgroundColor: 'transparent',
+            backgroundColor: transparent ? 'transparent' : 'var(--bg-color)',
             display: 'flex',
             alignItems: 'flex-end',
             justifyContent: 'space-around',
