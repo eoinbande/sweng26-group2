@@ -3,8 +3,16 @@ from app import schemas #FOR CI to pass
 import os
 import json
  
-client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+client = None
 
+def get_client():
+    global client
+    if client is None:
+        api_key = os.environ.get("OPENAI_API_KEY")
+        if not api_key:
+            raise RuntimeError("OPENAI_API_KEY environment variable is not set")
+        client = OpenAI(api_key=api_key)
+    return client
 
 """
 userinput = The literal string the user sent
@@ -14,7 +22,7 @@ output: A new goals list, as a JSON object
 """
 
 def aiGenerate(userInput):
-    response = client.responses.parse(
+    response = get_client().responses.parse(
     instructions = """You are a goal planner. You will be prompted a complex goal by the user in {userInput}, and you must break down this 
                       goal into several smaller tasks. For each task, respect the response schema by adding an ID in
                       the ai_id field in the format "task_1", "task_2", etc. Do not initialise the id field, onlt the ai_id field.
@@ -38,7 +46,7 @@ def aiGenerate(userInput):
     return json.loads(response.output_text)
 
 def aiFeedback(userInput, currentGoals):
-    response = client.responses.parse(
+    response = get_client().responses.parse(
     instructions = """You are a goal planner, with the job of revising an existing list of tasks. Observe the JSON list given in {currentGoals},
                       alongside the feedback provided by {userInput}. With the feedback, revise the list to adhere to the user request, with
                       an overarching focus on creating a list of easily achievable tasks. Your output should be a JSON with similar formatting
@@ -63,7 +71,7 @@ def aiFeedback(userInput, currentGoals):
     return json.loads(response.output_text)
 
 def aiExpand(userInput, currentGoals):
-    response = client.responses.parse(
+    response = get_client().responses.parse(
     instructions = """You are a goal planner, with a focus on expanding a task into a group of smaller subtasks. You will be passed a
                      {userInput} which will include an identified task (the user may mention "task 1", "the first task", etc.) from
                      {currentGoals}. If the user does not explicitly state a task, but says something to the effect of "my current task", assume
