@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { X } from 'lucide-react'; 
 import { useNavigate, useLocation } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
 import GoalDetailHeader from '../components/GoalDetailHeader';
@@ -11,20 +12,28 @@ import { supabase } from '../supabase_client';
 const GoalDetail = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const closeDeleteConfirm = () => {
+        setClosingDelete(true);
+        setTimeout(() => {
+            setShowDeleteConfirm(false);
+            setClosingDelete(false);
+        }, 150); 
+    };
 
-    // Safely access location state
-    // Use "Loading..." as default if we are loading, unless we want to show stale title
-    const [goalTitle, setGoalTitle] = useState(location.state?.goal?.title || location.state?.goalTitle || "Loading...");
-    const goalId = location.state?.goal?.id || location.state?.goalId || null;
+    const triggerToast = (message, type = 'success') => {
+        setToast({ show: true, message, type });
+        setTimeout(() => setToast({ show: false, message: '', type: 'success' }), 3000);
+    };
 
-    /* rstore tasks from location.state if returning from feedback page */
-    const [tasks, setTasks] = useState(location.state?.tasks || []);
-    const [endDate, setEndDate] = useState("");
-    const [progress, setProgress] = useState(0);
+    /* helper to calculate progress locally to fix sync issues */
 
     // Feedback popup state
     const [showFeedback, setShowFeedback] = useState(false);
     const [closingFeedback, setClosingFeedback] = useState(false);
+const [closingDelete, setClosingDelete] = useState(false);
+
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
 
     const closeFeedback = () => {
         setClosingFeedback(true);
@@ -34,6 +43,7 @@ const GoalDetail = () => {
         }, 150);
     };
 
+<<<<<<< HEAD
     /* helper to calculate progress locally — matches backend logic
        (counts every row in the tasks table: parent tasks + subtasks)
        
@@ -41,6 +51,22 @@ const GoalDetail = () => {
        are completed (matches the backend auto-complete behaviour). This ensures
        the progress bar here matches the Goals list page, even during the 1200ms
        delay before the parent's `completed` boolean is flipped locally. */
+=======
+    const closeDeleteConfirm = () => {
+        setClosingDelete(true);
+        setTimeout(() => {
+            setShowDeleteConfirm(false);
+            setClosingDelete(false);
+        }, 150); 
+    };
+
+    const triggerToast = (message, type = 'success') => {
+        setToast({ show: true, message, type });
+        setTimeout(() => setToast({ show: false, message: '', type: 'success' }), 3000);
+    };
+
+    /* helper to calculate progress locally to fix sync issues */
+>>>>>>> 8e77b5caa36f8b6234561844ffea2f371b6f0a28
     const calculateLocalProgress = (currentTasks) => {
         if (!currentTasks || currentTasks.length === 0) return 0;
 
@@ -343,6 +369,24 @@ const GoalDetail = () => {
         //setShowLoading(false);
     }
     };
+
+    const handleConfirmDelete = async () => {
+        setShowDeleteConfirm(false); // Close the sheet
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/goals/${goalId}`, {
+                method: 'DELETE',
+            });
+
+            if (response.ok) {
+                triggerToast("Goal deleted successfully");
+                setTimeout(() => navigate('/goals'), 1500);
+            } else {
+                triggerToast("Error deleting goal", "error");
+            }
+        } catch (err) {
+            triggerToast("Network error", "error");
+        }
+    };
             
 
 
@@ -408,14 +452,76 @@ const GoalDetail = () => {
                 </div>
             )}
 
-            {/* floating action button */}
+            {/* floating buttons */}
+            {/* Update Button */}
             <div className="fab-container">
                 <button className="btn-update-plan" onClick={() => setShowFeedback(true)}>
                     Update Plan
                 </button>
+                
+                {/* Delete Button */}
+                <button className="btn-delete-goal" onClick={() => setShowDeleteConfirm(true)}>
+                    Delete Goal
+                </button>
             </div>
 
             <BottomNav />
+
+            {toast.show && (
+                <div className={`custom-toast ${toast.type}`}>
+                    {toast.message}
+                </div>
+            )}
+
+            {/* delete confirmation popup */}
+            {showDeleteConfirm && (
+            <div 
+                className={`feedback-overlay ${closingDelete ? 'closing' : ''}`} 
+                onClick={closeDeleteConfirm}
+            >
+                <div 
+                    className={`feedback-bottom-sheet confirm-sheet ${closingDelete ? 'closing' : ''}`} 
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    
+                    {/* X close Button */}
+                    <button
+                        onClick={closeDeleteConfirm}
+                        style={{
+                            position: 'absolute',
+                            top: '8%',
+                            right: '8%',
+                            backgroundColor: 'transparent',
+                            border: 'none',
+                            cursor: 'pointer',
+                            padding: '4px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            zIndex: 10
+                        }}
+                    >
+                        <X size={24} color="var(--text-main)" strokeWidth={2.5} />
+                    </button>
+
+                    <div className="confirm-content">
+                        <h3>Delete this goal?</h3>
+                        <p>This will permanently remove <strong>{goalTitle}</strong>. This action cannot be undone.</p>
+                        
+                        <div className="confirm-actions">
+                            {/* Primary Button */}
+                            <button className="btn-confirm-delete" onClick={handleConfirmDelete}>
+                                Delete Permanently
+                            </button>
+                            {/* Secondary Button */}
+                            <button className="btn-cancel" onClick={closeDeleteConfirm}>
+                                Keep Goal
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )}
         </div>
     );
 };

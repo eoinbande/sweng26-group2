@@ -169,7 +169,7 @@ def test_expand_task_no_mock():
     fake_task = {"id": "task-10", "goal_id": "uuid-goal", "ai_id": "unknown_task"} # we mock(we dont use the DB)
 
     with patch("app.routers.tasks.get_task") as mock_get_task, \
-         patch("app.routers.tasks.get_tasks_for_goal") as mock_get_tasks_for_goal:
+         patch("app.routers.tasks.get_tasks_for_goal"):
 
 
         mock_get_task.return_value = fake_task

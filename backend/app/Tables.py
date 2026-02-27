@@ -38,7 +38,7 @@ def create_user(user_id, name, email):
 # GOAL FUNCTIONS
 # =============================================================================
 
-def create_goal(user_id: str, title: str):
+def create_goal(user_id: str, title: str, category: str):
     """
     Create a new goal in the database with an EMPTY task list.
     
@@ -53,6 +53,7 @@ def create_goal(user_id: str, title: str):
     return supabase.table("goals").insert({
         "user_id": user_id,
         "title": title,
+        "category": category, #now it will insert a custom OR Predefined category to table
         "goal_data": json.dumps({"tasks": []})  # Empty until user accepts plan
     }).execute()
 
@@ -78,13 +79,34 @@ def update_goal_data(goal_id: str, goal_data: dict):
         goal_id: The goal's UUID
         goal_data: Dict like {"tasks": [...]} to store as JSON
     """
-    return supabase.table("goals").update(
-        {"goal_data": json.dumps(goal_data)}
-    ).eq("id", goal_id).execute()
+
+    final_date = goal_data.get("goal_due_date")
+
+    return supabase.table("goals").update({
+        "goal_data": json.dumps(goal_data),
+        "due_date": final_date
+    }).eq("id", goal_id).execute()
 
 
 def delete_goal(goal_id: str):
     return supabase.table("goals").delete().eq("id", goal_id).execute()
+
+# =============================================================================
+# CATEGORY FUNCTIONS
+# =============================================================================
+
+def get_categories(user_id: str):
+    """Get all categories — system defaults + user's custom ones."""
+    return supabase.table("categories").select("*").or_(
+        f"user_id.eq.system,user_id.eq.{user_id}"
+    ).execute().data
+
+def create_category(user_id: str, name: str):
+    """Create a custom category."""
+    return supabase.table("categories").insert({
+        "name": name,
+        "user_id": user_id
+    }).execute()
 
 
 # =============================================================================
