@@ -110,9 +110,9 @@ def create_goal_endpoint(goal: CreateGoalRequest):
     # TODO: Replace with real AI call when AI integration is ready
     #ai_plan = get_mock_plan(goal.title) <- we used this for mocking
 
-    #Real AI integration(the following block of code calls the AI to generate the goal!)
+    #----------------------Real AI integration(the following block of code calls the AI to generate the goal!)--------------
     try:
-        ai_plan = ai_service.aiGenerated(goal.title)
+        ai_plan = ai_service.aiGenerate(goal.title)
     except Exception as e:
         raise HTTPException(status_code = 500, detail = f"AI generation failed: {str(e)}")
 
@@ -165,7 +165,7 @@ def feedback_on_plan(goal_id: str, request: FeedbackRequest):
     # For now, we just return a pre-made feedback response based on the title
     #updated_plan = get_mock_feedback_response(goal["title"], request.feedback) <- we use this for mocking
 
-    #Real AI integration
+    #------------------------Real AI integration-----------------
 
     #we want to ONLY modify the task been asked for feedback, leave other task as they are
     current_data = goal.get("goal_data", {}) #not sure if this gonna work, needs testing!

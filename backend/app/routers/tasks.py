@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Optional
+from app.services.ai_service import AIService
 
 # Database functions (Tables.py)
 from ..Tables import (
@@ -18,7 +19,7 @@ from ..mock_ai_responses import BIKE_EXPAND_TASK_5
 
 
 task_router = APIRouter()
-
+ai_service = AIService()
 
 # =============================================================================
 # REQUEST MODELS
@@ -145,11 +146,36 @@ def expand_task(task_id: str, request: ExpandTaskRequest):
     # Get subtasks from AI/mock
     # TODO: Replace with real AI call that takes the task description + stuck_reason
     # For now, we only have a mock for task_5 (bike tyre: reassemble wheel)
-    mock_expansions = {
-        "task_5": BIKE_EXPAND_TASK_5["subtasks"]
-    }
+    # mock_expansions = {
+    #     "task_5": BIKE_EXPAND_TASK_5["subtasks"] <- used for mock
+    # }
 
-    subtask_data = mock_expansions.get(ai_id)
+    #---------------------Real AI integration---------------------
+    # subtask_data = mock_expansions.get(ai_id) <- used for mock
+    try:
+        ai_response = ai_service.aiExpand(
+            userInput = request.stuck_reason or task["description"] #if not given stuck reason
+            currentGoals = []
+        )
+    
+    except Exception as e:
+        raise HTTPException(status_code = 503, detail = "AI service unavailable")
+
+    if "subtasks" not in ai_response:
+        raise HTTPException(status_code = 500, detail = "AI response error")
+    
+    subtask_data = ai_response["subtasks"]
+
+    if not isinstance(subtask_data, list):
+        raise HTTPException(status_code = 500, detail = "AI subtasks invalid format")
+
+    #add another constraint for green computing?
+
+    for substask in subtask_data:
+        if "title" not in subtask or "ai_id" not in subtask:
+            
+
+
     if not subtask_data:
         # No mock available — return a generic "break it down" response
         # In production, AI would always generate something
