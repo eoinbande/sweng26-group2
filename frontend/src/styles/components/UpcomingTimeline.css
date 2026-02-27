@@ -127,7 +127,7 @@
     font-size: clamp(13px, 1.6dvh, 15px);
     color: rgb(255, 255, 255);
     text-align: center;
-    padding: clamp(24px, 4dvh, 40px) clamp(16px, 2dvh, 24px);
+    padding: clamp(30px, 6dvh, 60px) clamp(12px, 3dvw, 24px) clamp(16px, 3dvh, 30px);
     margin: 0;
     line-height: 1.5;
     opacity: 0;

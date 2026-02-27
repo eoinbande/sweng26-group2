@@ -1,6 +1,15 @@
+import { useMemo } from 'react';
 import { ArrowUpLeft, ChevronLeft } from 'lucide-react';
 import { UpcomingTimelineShell } from './UpcomingTimeline';
 import '../styles/components/UpcomingTimelineTasks.css';
+
+const EMPTY_DAILY_MESSAGES = [
+    "No tasks due today — enjoy the free time!",
+    "Nothing scheduled for this day. Relax or plan ahead!",
+    "A blank day — perfect for catching up or resting.",
+    "No tasks here. Maybe tackle something from tomorrow?",
+    "All clear for this day. You deserve a break!",
+];
 
 /**
  * UpcomingTimelineTasks — daily task view inside the blue shell, no timeline
@@ -10,6 +19,10 @@ import '../styles/components/UpcomingTimelineTasks.css';
  * @param {function} onClick  — optional callback when a card is tapped
  */
 const UpcomingTimelineTasks = ({ date, items = [], onClick, onBack }) => {
+    const emptyMessage = useMemo(() =>
+        EMPTY_DAILY_MESSAGES[Math.floor(Math.random() * EMPTY_DAILY_MESSAGES.length)],
+    []);
+
     return (
         <UpcomingTimelineShell
             variant="tasks"
@@ -22,6 +35,9 @@ const UpcomingTimelineTasks = ({ date, items = [], onClick, onBack }) => {
                 </button>
             )}
         >
+            {items.length === 0 && (
+                <p className="ut-empty-message">{emptyMessage}</p>
+            )}
             {items.map((item, i) => {
                 const dateLabel = new Date(item.dueDate).toLocaleDateString('en-GB', {
                     day: 'numeric',
