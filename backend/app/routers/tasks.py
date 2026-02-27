@@ -152,26 +152,31 @@ def expand_task(task_id: str, request: ExpandTaskRequest):
 
     #---------------------Real AI integration---------------------
     # subtask_data = mock_expansions.get(ai_id) <- used for mock
+    goal_tasks = get_tasks_for_goal(goal_id)
     try:
         ai_response = ai_service.aiExpand(
-            userInput = request.stuck_reason or task["description"] #if not given stuck reason
-            currentGoals = []
+            userInput = request.stuck_reason or task["description"], #if not given stuck reason
+            currentGoals = goal_tasks
         )
     
+    #exception related to the AI service being unavailable
     except Exception as e:
         raise HTTPException(status_code = 503, detail = "AI service unavailable")
 
+    #exception related to the AI service outputing an error while responding
     if "subtasks" not in ai_response:
         raise HTTPException(status_code = 500, detail = "AI response error")
     
     subtask_data = ai_response["subtasks"]
 
+    #exception related to the AI service outputing an invalid format for subtasks
     if not isinstance(subtask_data, list):
         raise HTTPException(status_code = 500, detail = "AI subtasks invalid format")
 
     #add another constraint for green computing?
 
-    for substask in subtask_data:
+    #exception related to the AI service returning an invalid structure
+    for subtask in subtask_data:
         if "title" not in subtask or "ai_id" not in subtask:
             raise HTTPException(
                 status_code = 500,
@@ -179,8 +184,9 @@ def expand_task(task_id: str, request: ExpandTaskRequest):
             )
     
     goal_tasks = get_tasks_for_goal(goal_id)
-    existing_ai_ids = {i.get("ai_id") for i in goal_task}
+    existing_ai_ids = {i.get("ai_id") for i in goal_tasks}
 
+    #exception related to the AI service duplicationg ai_id(just in case!)
     for subtask in subtask_data:
         if subtask["ai_id"] in existing_ai_ids:
             raise HTTPException(
@@ -188,16 +194,20 @@ def expand_task(task_id: str, request: ExpandTaskRequest):
                 detail = "AI returned duplicate ai_id"
             )
 
-    #do we want to add a check if the user wants to expand an already expanded task?
-
+    #NOT NEED THIS ANYMORE, THIS WAS USED WHEN WE MOCKED DATA!
+    # if not subtask_data:
+    #     # No mock available — return a generic "break it down" response
+    #     # In production, AI would always generate something
+    #     raise HTTPException(
+    #         status_code=404,
+    #         detail=f"No expansion available for task '{ai_id}' (mock limitation). "
+    #                f"Real AI will handle any task."
+    #     )
 
     if not subtask_data:
-        # No mock available — return a generic "break it down" response
-        # In production, AI would always generate something
         raise HTTPException(
-            status_code=404,
-            detail=f"No expansion available for task '{ai_id}' (mock limitation). "
-                   f"Real AI will handle any task."
+            status_code = 500,
+            detail = "AI returned epty subtask list"
         )
 
     # Save subtasks to the database (assigns UUIDs, updates both tables)

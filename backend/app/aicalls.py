@@ -33,7 +33,7 @@ def aiGenerate(userInput):
                       information to later make a more accurate set of tasks. Do not assume any concrete info you have not been given.""",
     model = "gpt-5.2",
     input = userInput,
-    text_format = schemas.AIGeneratePlanResponse
+    text_format = schemas.AIGeneratePlanResponse #the AI is supposed to follow this schema but is not guarantee, how can we make it to be more guarantee?
     )
     return json.loads(response.output_text)
 
