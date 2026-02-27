@@ -7,7 +7,7 @@ pytestmark = pytest.mark.skipif(
     reason="OPENAI_API_KEY not set — skipping live AI tests"
 )
 
-from app.services.ai_service import AIService
+from app.services.ai_service import AIService  # noqa: E402
 
 ai = AIService()
 
