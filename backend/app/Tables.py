@@ -87,6 +87,23 @@ def update_goal_data(goal_id: str, goal_data: dict):
 def delete_goal(goal_id: str):
     return supabase.table("goals").delete().eq("id", goal_id).execute()
 
+# =============================================================================
+# CATEGORY FUNCTIONS
+# =============================================================================
+
+def get_categories(user_id: str):
+    """Get all categories — system defaults + user's custom ones."""
+    return supabase.table("categories").select("*").or_(
+        f"user_id.eq.system,user_id.eq.{user_id}"
+    ).execute().data
+
+def create_category(user_id: str, name: str):
+    """Create a custom category."""
+    return supabase.table("categories").insert({
+        "name": name,
+        "user_id": user_id
+    }).execute()
+
 
 # =============================================================================
 # SAVING TASKS TO DATABASE

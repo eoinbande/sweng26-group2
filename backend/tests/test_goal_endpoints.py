@@ -1065,7 +1065,7 @@ class TestGetGoalsAdditional:
         assert response.status_code == 200
         data = response.json()
         assert data["goals"] == []
-        assert "No goals associated with the user" in data["message"]
+        assert "No goals found" in data["message"]
 
 
 # =============================================================================
