@@ -188,6 +188,9 @@ def feedback_on_plan(goal_id: str, request: FeedbackRequest):
     except Exception as e:
         raise HTTPException(status_code = 500, detail = f"AI feedback failed: {str(e)}")
 
+    #exception related to the AI service outputting an error
+    if "tasks" not in updated_plan:
+        raise HTTPException(status_code = 500, detail = "AI response error")
 
     return {
         "message": "Plan updated based on your feedback",
