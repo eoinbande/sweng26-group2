@@ -174,7 +174,7 @@ function ScheduledTasks() {
     // navigate to goal detail when a task/goal card is tapped
     const onItemClick = useCallback((item) => {
         if (item.goalId) {
-            navigate(`/goal/${item.goalId}`, { state: { goalId: item.goalId } });
+            navigate(`/goal/${item.goalId}`, { state: { goalId: item.goalId, from: 'schedule' } });
         }
     }, [navigate]);
 

@@ -371,12 +371,18 @@ const [closingDelete, setClosingDelete] = useState(false);
                     progress={progress}
                     category="Event"
                     endDate={endDate}
-                    onBack={() => navigate('/goals', {
-                        state: {
-                            updatedGoalId: goalId,
-                            updatedProgress: progress,
+                    onBack={() => {
+                        if (location.state?.from === 'schedule') {
+                            navigate('/schedule');
+                        } else {
+                            navigate('/goals', {
+                                state: {
+                                    updatedGoalId: goalId,
+                                    updatedProgress: progress,
+                                },
+                            });
                         }
-                    })}
+                    }}
                 />
 
                 <TaskTimeline
