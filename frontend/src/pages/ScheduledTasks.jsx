@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import PageHeader from '../components/PageHeader';
 import MonthCalendar from '../components/MonthCalendar';
 import UpcomingTimeline from '../components/UpcomingTimeline';
@@ -8,10 +8,35 @@ import { supabase } from '../supabase_client';
 import '../styles/ScheduledTasks.css';
 import '../index.css';
 
-// mock goal ranges for calendar highlights
-const MOCK_GOAL_RANGES = [
-    { startDay: 26, endDay: 28, colorScheme: 'blue' },
-];
+// builds calendar highlight ranges from task due dates for a given month
+function buildTaskRanges(tasks, year, month) {
+    // collect unique day-of-month numbers that have tasks in this month
+    const days = new Set();
+    for (const t of tasks) {
+        const d = new Date(t.dueDate);
+        if (d.getFullYear() === year && d.getMonth() === month) {
+            days.add(d.getDate());
+        }
+    }
+    if (days.size === 0) return [];
+
+    // sort and merge consecutive days into ranges
+    const sorted = [...days].sort((a, b) => a - b);
+    const ranges = [];
+    let start = sorted[0];
+    let end = sorted[0];
+    for (let i = 1; i < sorted.length; i++) {
+        if (sorted[i] === end + 1) {
+            end = sorted[i];
+        } else {
+            ranges.push({ startDay: start, endDay: end, colorScheme: 'blue' });
+            start = sorted[i];
+            end = sorted[i];
+        }
+    }
+    ranges.push({ startDay: start, endDay: end, colorScheme: 'blue' });
+    return ranges;
+}
 
 // maps backend goal data → shape expected by UpcomingTimeline
 const mapGoalToTimeline = (g) => ({
@@ -55,6 +80,11 @@ function ScheduledTasks() {
     const [upcomingGoals, setUpcomingGoals] = useState([]);
     const [dailyTasks, setDailyTasks] = useState([]);
     const [scheduleLoaded, setScheduleLoaded] = useState(false);
+    const calYear = now.getFullYear();
+    const taskRanges = useMemo(
+        () => buildTaskRanges(upcomingTasks, calYear, calMonth),
+        [upcomingTasks, calYear, calMonth],
+    );
     const touchStartX = useRef(0);
     const calTouchStartX = useRef(0);
     const calendarRef = useRef(null);
@@ -184,7 +214,7 @@ function ScheduledTasks() {
                         <MonthCalendar
                             year={now.getFullYear()}
                             month={now.getMonth()}
-                            goalRanges={MOCK_GOAL_RANGES}
+                            goalRanges={taskRanges}
                             onDayClick={onDayClick}
                             onMonthChange={onMonthChange}
                         />
