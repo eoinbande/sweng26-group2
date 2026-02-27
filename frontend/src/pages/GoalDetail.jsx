@@ -26,12 +26,19 @@ const GoalDetail = () => {
     const [showFeedback, setShowFeedback] = useState(false);
     const [closingFeedback, setClosingFeedback] = useState(false);
 
+    const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
+
     const closeFeedback = () => {
         setClosingFeedback(true);
         setTimeout(() => {
             setShowFeedback(false);
             setClosingFeedback(false);
         }, 150);
+    };
+
+    const triggerToast = (message, type = 'success') => {
+        setToast({ show: true, message, type });
+        setTimeout(() => setToast({ show: false, message: '', type: 'success' }), 3000);
     };
 
     /* helper to calculate progress locally to fix sync issues */
@@ -308,28 +315,21 @@ const GoalDetail = () => {
     };
 
     const handleDeleteGoal = async () => {
-    
-    if (!window.confirm("Are you sure you want to delete this goal? This cannot be undone!")) {
-        return;
-    }
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/goals/${goalId}`, {
+                method: 'DELETE',
+            });
 
-    try {
-        // 2. Call the backend delete endpoint
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/goals/${goalId}`, {
-            method: 'DELETE',
-        });
-
-        if (response.ok) {
-            // 3. If successful, navigate back to the goals list
-            navigate('/goals');
-        } else {
-            const errorData = await response.json();
-            alert(`Error: ${errorData.detail || "Failed to delete goal"}`);
+            if (response.ok) {
+                triggerToast("Goal deleted successfully!");
+                // wait a moment so the user can actually see the toast before we navigate away
+                setTimeout(() => navigate('/goals'), 1500);
+            } else {
+                triggerToast("Failed to delete goal", "error");
+            }
+        } catch (err) {
+            triggerToast("Network error", "error");
         }
-    } catch (err) {
-        console.error("Network error deleting goal:", err);
-        alert("Network error. Please try again.");
-    }
     };
             
 
@@ -418,6 +418,12 @@ const GoalDetail = () => {
             </div>
 
             <BottomNav />
+
+            {toast.show && (
+                <div className={`custom-toast ${toast.type}`}>
+                    {toast.message}
+                </div>
+            )}
         </div>
     );
 };

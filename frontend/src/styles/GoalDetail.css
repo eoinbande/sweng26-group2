@@ -27,6 +27,32 @@
     /* room for FAB + BottomNav */
 }
 
+/*toast styling*/
+.custom-toast {
+    position: fixed;
+    top: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--text-main);
+    color: white;
+    padding: 12px 24px;
+    border-radius: var(--radius-pill);
+    font-weight: 500;
+    box-shadow: var(--shadow-lg);
+    z-index: 1000;
+    animation: slideDown 0.3s ease-out;
+    white-space: nowrap;
+}
+
+.custom-toast.error {
+    background-color: var(--red);
+}
+
+
+@keyframes slideDown {
+    from { transform: translate(-50%, -20px); opacity: 0; }
+    to { transform: translate(-50%, 0); opacity: 1; }
+}
 
 /* floating action button */
 
