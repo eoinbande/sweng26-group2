@@ -1,7 +1,7 @@
 /* upcoming timeline — shared styles for upcoming goals & tasks sections */
 
 .ut-section {
-    margin-top: clamp(1px, 0.4dvh, 5px);
+    margin-top: clamp(12px, 2dvh, 24px);
     display: flex;
     flex-direction: column;
     height: 100%;
