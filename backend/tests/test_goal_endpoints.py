@@ -115,7 +115,17 @@ def sample_tasks_with_uuids():
 
 @pytest.fixture
 def sample_goal_list():
-    """Sample list of goals for a user."""
+    """Sample list of goals for a user.
+
+    goal_data can be either a dict or a JSON string — the router handles both.
+    Tasks must be non-empty so the router's accepted-goals filter
+    (``if goal_data.get("tasks")``) doesn't strip these goals out.
+    """
+    def _make_task(ai_id, uid, desc):
+        return {
+            "ai_id": ai_id, "id": uid, "description": desc,
+            "order": 1, "status": "not_started", "subtasks": []
+        }
     return [
         {
             "id": "goal-1",
@@ -125,7 +135,7 @@ def sample_goal_list():
             "goal_data": {
                 "description": "Step-by-step guide to fixing a flat bike tyre",
                 "goal_due_date": "2026-03-01",
-                "tasks": []
+                "tasks": [_make_task("task_1", "uuid-t1", "Remove the wheel from the bike")]
             }
         },
         {
@@ -136,7 +146,7 @@ def sample_goal_list():
             "goal_data": {
                 "description": "Beginner's roadmap to learning piano",
                 "goal_due_date": "2026-05-15",
-                "tasks": []
+                "tasks": [_make_task("task_1", "uuid-t2", "Get access to a piano")]
             }
         }
     ]
@@ -183,7 +193,8 @@ class TestCreateGoal:
         
         mock_create.assert_called_once_with(
             user_id=mock_user_id,
-            title="Fix my bike tyre"
+            title="Fix my bike tyre",
+            category=None
         )
         mock_get_plan.assert_called_once_with("Fix my bike tyre")
         mock_update.assert_called_once()
@@ -623,14 +634,16 @@ class TestAcceptPlan:
 
     @patch("app.routers.goals.get_goal")
     @patch("app.routers.goals.save_tasks_to_db")
+    @patch("app.routers.goals.update_goal_data")
     def test_accept_plan_empty_tasks_array(
-        self, mock_save_tasks, mock_get_goal, mock_goal_id
+        self, mock_update, mock_save_tasks, mock_get_goal, mock_goal_id
     ):
         """Should reject empty tasks array (no plan to accept)."""
         mock_get_goal.return_value = {
             "id": mock_goal_id,
             "goal_data": {"tasks": []}
         }
+        mock_update.return_value = None
         
         response = client.post(
             f"/api/goals/{mock_goal_id}/accept",
@@ -708,7 +721,10 @@ class TestGetGoals:
                 "goal_data": {
                     "description": "Test description",
                     "goal_due_date": "2026-03-01",
-                    "tasks": []
+                    "tasks": [
+                        {"ai_id": "task_1", "id": "uuid-t1", "description": "Do something",
+                         "order": 1, "status": "not_started", "subtasks": []}
+                    ]
                 }
             }
         ]
@@ -730,10 +746,13 @@ class TestGetGoals:
         self, mock_get_all_goals, mock_user_id
     ):
         """Should handle multiple goals correctly."""
+        def _make_tasks(n):
+            return [{"ai_id": "task_1", "id": f"uuid-{n}", "description": "Step",
+                      "order": 1, "status": "not_started", "subtasks": []}]
         mock_get_all_goals.return_value = [
-            {"id": "1", "title": "Goal 1", "goal_data": {}},
-            {"id": "2", "title": "Goal 2", "goal_data": {}},
-            {"id": "3", "title": "Goal 3", "goal_data": {}},
+            {"id": "1", "title": "Goal 1", "goal_data": {"tasks": _make_tasks(1)}},
+            {"id": "2", "title": "Goal 2", "goal_data": {"tasks": _make_tasks(2)}},
+            {"id": "3", "title": "Goal 3", "goal_data": {"tasks": _make_tasks(3)}},
         ]
         
         response = client.get(f"/api/goals/{mock_user_id}")
@@ -748,7 +767,17 @@ class TestGetGoals:
     @patch("app.routers.goals.get_all_goals")
     def test_get_goals_different_users_isolated(self, mock_get_all_goals):
         """Should only return goals for the specified user."""
-        user_1_goals = [{"id": "1", "user_id": "user-1", "title": "User 1 Goal"}]
+        user_1_goals = [
+            {
+                "id": "1",
+                "user_id": "user-1",
+                "title": "User 1 Goal",
+                "goal_data": {
+                    "tasks": [{"ai_id": "task_1", "id": "uuid-t1", "description": "Step",
+                               "order": 1, "status": "not_started", "subtasks": []}]
+                }
+            }
+        ]
         
         mock_get_all_goals.return_value = user_1_goals
         
@@ -860,3 +889,389 @@ class TestGoalsWorkflow:
         )
         assert accept_response.status_code == 200
         assert accept_response.json()["saved_to_db"] is True
+
+# =============================================================================
+# POST /api/goals/{goal_id}/accept — Additional coverage
+# =============================================================================
+
+class TestAcceptPlanAdditional:
+    """Additional tests to cover previously missing lines in accept_plan."""
+
+    @patch("app.routers.goals.get_goal")
+    @patch("app.routers.goals.save_tasks_to_db")
+    @patch("app.routers.goals.update_goal_data")
+    def test_accept_plan_goal_data_as_json_string(
+        self, mock_update, mock_save_tasks, mock_get_goal,
+        mock_goal_id, sample_tasks_with_uuids
+    ):
+        """
+        Line 194: goal_data arrives as a JSON string (not a dict).
+        The endpoint must parse it before checking for existing tasks.
+        """
+        import json
+        mock_get_goal.return_value = {
+            "id": mock_goal_id,
+            "goal_data": json.dumps({"tasks": []})   # ← string, not dict
+        }
+        mock_save_tasks.return_value = sample_tasks_with_uuids
+
+        response = client.post(
+            f"/api/goals/{mock_goal_id}/accept",
+            json={
+                "tasks": [
+                    {"ai_id": "task_1", "description": "Step 1",
+                     "order": 1, "status": "not_started", "subtasks": []}
+                ]
+            }
+        )
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["saved_to_db"] is True
+        # save_tasks_to_db (not merge) must be called because tasks list was empty
+        mock_save_tasks.assert_called_once()
+
+    @patch("app.routers.goals.get_goal")
+    @patch("app.routers.goals.save_tasks_to_db")
+    @patch("app.routers.goals.update_goal_data")
+    def test_accept_plan_due_date_ai_decide(
+        self, mock_update, mock_save_tasks, mock_get_goal,
+        mock_goal_id, sample_tasks_with_uuids
+    ):
+        """
+        Line 210: when due_date == 'AI_DECIDE', the endpoint must keep
+        the AI-generated goal_due_date from current_data and not overwrite it.
+        """
+        mock_get_goal.return_value = {
+            "id": mock_goal_id,
+            "goal_data": {
+                "tasks": [],
+                "goal_due_date": "2026-06-01"   # AI's original date
+            }
+        }
+        mock_save_tasks.return_value = sample_tasks_with_uuids
+
+        response = client.post(
+            f"/api/goals/{mock_goal_id}/accept",
+            json={
+                "tasks": [
+                    {"ai_id": "task_1", "description": "Step 1",
+                     "order": 1, "status": "not_started", "subtasks": []}
+                ],
+                "due_date": "AI_DECIDE"
+            }
+        )
+
+        assert response.status_code == 200
+        data = response.json()
+        # The AI's date should be preserved, not overwritten with "AI_DECIDE"
+        assert data["due_date"] == "2026-06-01"
+
+    @patch("app.routers.goals.get_goal")
+    @patch("app.routers.goals.save_tasks_to_db")
+    @patch("app.routers.goals.update_goal_data")
+    def test_accept_plan_due_date_user_supplied(
+        self, mock_update, mock_save_tasks, mock_get_goal,
+        mock_goal_id, sample_tasks_with_uuids
+    ):
+        """
+        Lines 212-213: when due_date is a real date string (not AI_DECIDE),
+        it must override the existing goal_due_date and be returned.
+        """
+        mock_get_goal.return_value = {
+            "id": mock_goal_id,
+            "goal_data": {
+                "tasks": [],
+                "goal_due_date": "2026-06-01"
+            }
+        }
+        mock_save_tasks.return_value = sample_tasks_with_uuids
+
+        response = client.post(
+            f"/api/goals/{mock_goal_id}/accept",
+            json={
+                "tasks": [
+                    {"ai_id": "task_1", "description": "Step 1",
+                     "order": 1, "status": "not_started", "subtasks": []}
+                ],
+                "due_date": "2026-12-31"
+            }
+        )
+
+        assert response.status_code == 200
+        assert response.json()["due_date"] == "2026-12-31"
+
+
+# =============================================================================
+# GET /api/goals/{user_id} — Additional coverage
+# =============================================================================
+
+class TestGetGoalsAdditional:
+    """Additional tests to cover missing lines in get_goals."""
+
+    @patch("app.routers.goals.get_all_goals")
+    def test_get_goals_goal_data_as_json_string(
+        self, mock_get_all_goals, mock_user_id
+    ):
+        """
+        Line 250: goal_data stored as a JSON string must be parsed before
+        checking for tasks — goals with tasks must still appear in the result.
+        """
+        import json
+        tasks = [{"ai_id": "task_1", "id": "uuid-t1", "description": "Step",
+                  "order": 1, "status": "not_started", "subtasks": []}]
+        mock_get_all_goals.return_value = [
+            {
+                "id": "goal-1",
+                "user_id": mock_user_id,
+                "title": "Fix my bike tyre",
+                # goal_data is a JSON string, not a dict
+                "goal_data": json.dumps({"tasks": tasks, "description": "A guide"})
+            }
+        ]
+
+        response = client.get(f"/api/goals/{mock_user_id}")
+
+        assert response.status_code == 200
+        data = response.json()
+        assert len(data["goals"]) == 1
+        assert data["goals"][0]["title"] == "Fix my bike tyre"
+
+    @patch("app.routers.goals.get_all_goals")
+    def test_get_goals_all_goals_have_empty_tasks(
+        self, mock_get_all_goals, mock_user_id
+    ):
+        """
+        Line 255: when every goal has an empty task list (none accepted yet),
+        accepted_goals will be empty → return the 'No goals' message.
+        """
+        mock_get_all_goals.return_value = [
+            {
+                "id": "goal-1",
+                "user_id": mock_user_id,
+                "title": "Draft goal not yet accepted",
+                "goal_data": {"tasks": []}   # empty — not accepted
+            },
+            {
+                "id": "goal-2",
+                "user_id": mock_user_id,
+                "title": "Another draft",
+                "goal_data": {"tasks": []}
+            }
+        ]
+
+        response = client.get(f"/api/goals/{mock_user_id}")
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["goals"] == []
+        assert "No goals associated with the user" in data["message"]
+
+
+# =============================================================================
+# GET /api/goal-details/{goal_id} — Full coverage of untested endpoint
+# =============================================================================
+
+class TestGetGoalDetails:
+    """Tests for GET /api/goal-details/{goal_id} endpoint (lines 278-320)."""
+
+    @patch("app.routers.goals.get_goal")
+    @patch("app.routers.goals.get_tasks_for_goal")
+    def test_get_goal_details_success(
+        self, mock_get_tasks, mock_get_goal, mock_goal_id
+    ):
+        """Lines 278-324: happy path — returns goal, tasks, and has_tasks flag."""
+        mock_get_goal.return_value = {
+            "id": mock_goal_id,
+            "title": "Fix my bike tyre",
+            "goal_data": {
+                "description": "A guide",
+                "tasks": [
+                    {"id": "uuid-task-1", "ai_id": "task_1",
+                     "description": "Remove wheel", "status": "not_started", "subtasks": []}
+                ]
+            }
+        }
+        mock_get_tasks.return_value = [
+            {"id": "uuid-task-1", "status": "completed"}
+        ]
+
+        response = client.get(f"/api/goal-details/{mock_goal_id}")
+
+        assert response.status_code == 200
+        data = response.json()
+        assert "goal" in data
+        assert "tasks" in data
+        assert data["has_tasks"] is True
+        assert data["goal"]["id"] == mock_goal_id
+
+    @patch("app.routers.goals.get_goal")
+    @patch("app.routers.goals.get_tasks_for_goal")
+    def test_get_goal_details_syncs_status_from_db(
+        self, mock_get_tasks, mock_get_goal, mock_goal_id
+    ):
+        """
+        Lines 302-313: status in the returned tasks must come from the tasks
+        table (status_map), not from the stale goal_data JSON.
+        """
+        mock_get_goal.return_value = {
+            "id": mock_goal_id,
+            "title": "Fix my bike tyre",
+            "goal_data": {
+                "tasks": [
+                    {"id": "uuid-task-1", "ai_id": "task_1",
+                     "description": "Remove wheel", "status": "not_started",
+                     "subtasks": [
+                         {"id": "uuid-sub-1a", "status": "not_started"}
+                     ]}
+                ]
+            }
+        }
+        # DB says both are completed — this should override the JSON
+        mock_get_tasks.return_value = [
+            {"id": "uuid-task-1", "status": "completed"},
+            {"id": "uuid-sub-1a",  "status": "completed"},
+        ]
+
+        response = client.get(f"/api/goal-details/{mock_goal_id}")
+
+        assert response.status_code == 200
+        data = response.json()
+        tasks = data["tasks"]
+        assert tasks[0]["status"] == "completed"
+        assert tasks[0]["subtasks"][0]["status"] == "completed"
+
+    @patch("app.routers.goals.get_goal")
+    @patch("app.routers.goals.get_tasks_for_goal")
+    def test_get_goal_details_goal_data_as_json_string(
+        self, mock_get_tasks, mock_get_goal, mock_goal_id
+    ):
+        """
+        Lines 285-289: goal_data stored as a JSON string must be parsed.
+        The parsed dict should be returned to the frontend.
+        """
+        import json
+        tasks = [{"id": "uuid-task-1", "ai_id": "task_1",
+                  "description": "Remove wheel", "status": "not_started", "subtasks": []}]
+        mock_get_goal.return_value = {
+            "id": mock_goal_id,
+            "title": "Fix my bike tyre",
+            "goal_data": json.dumps({"description": "A guide", "tasks": tasks})
+        }
+        mock_get_tasks.return_value = [{"id": "uuid-task-1", "status": "not_started"}]
+
+        response = client.get(f"/api/goal-details/{mock_goal_id}")
+
+        assert response.status_code == 200
+        data = response.json()
+        # goal_data must be a dict (parsed), not a raw JSON string
+        assert isinstance(data["goal"]["goal_data"], dict)
+        assert data["goal"]["goal_data"]["description"] == "A guide"
+
+    @patch("app.routers.goals.get_goal")
+    @patch("app.routers.goals.get_tasks_for_goal")
+    def test_get_goal_details_malformed_json_falls_back(
+        self, mock_get_tasks, mock_get_goal, mock_goal_id
+    ):
+        """
+        Lines 288-289: a malformed JSON string in goal_data must not crash
+        the endpoint — it falls back to an empty dict.
+        """
+        mock_get_goal.return_value = {
+            "id": mock_goal_id,
+            "title": "Fix my bike tyre",
+            "goal_data": "this is not valid json {{{"
+        }
+        mock_get_tasks.return_value = []
+
+        response = client.get(f"/api/goal-details/{mock_goal_id}")
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["has_tasks"] is False
+        assert data["tasks"] == []
+
+    @patch("app.routers.goals.get_goal")
+    def test_get_goal_details_not_found(self, mock_get_goal):
+        """Lines 278-281: should return 404 when goal does not exist."""
+        mock_get_goal.side_effect = Exception("Goal not found")
+
+        response = client.get("/api/goal-details/nonexistent-goal-id")
+
+        assert response.status_code == 404
+        assert "Goal not found" in response.json()["detail"]
+
+    @patch("app.routers.goals.get_goal")
+    @patch("app.routers.goals.get_tasks_for_goal")
+    def test_get_goal_details_db_sync_failure_falls_back_gracefully(
+        self, mock_get_tasks, mock_get_goal, mock_goal_id
+    ):
+        """
+        Lines 315-318: if get_tasks_for_goal raises an exception, the endpoint
+        must not crash — it falls back to the statuses in the JSON blob.
+        """
+        mock_get_goal.return_value = {
+            "id": mock_goal_id,
+            "title": "Fix my bike tyre",
+            "goal_data": {
+                "tasks": [
+                    {"id": "uuid-task-1", "ai_id": "task_1",
+                     "description": "Remove wheel", "status": "in_progress", "subtasks": []}
+                ]
+            }
+        }
+        mock_get_tasks.side_effect = Exception("DB connection lost")
+
+        response = client.get(f"/api/goal-details/{mock_goal_id}")
+
+        assert response.status_code == 200
+        data = response.json()
+        # Falls back to the JSON blob status
+        assert data["tasks"][0]["status"] == "in_progress"
+
+    @patch("app.routers.goals.get_goal")
+    @patch("app.routers.goals.get_tasks_for_goal")
+    def test_get_goal_details_no_tasks(
+        self, mock_get_tasks, mock_get_goal, mock_goal_id
+    ):
+        """has_tasks should be False when goal_data has no tasks."""
+        mock_get_goal.return_value = {
+            "id": mock_goal_id,
+            "title": "Draft goal",
+            "goal_data": {"tasks": []}
+        }
+        mock_get_tasks.return_value = []
+
+        response = client.get(f"/api/goal-details/{mock_goal_id}")
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["has_tasks"] is False
+        assert data["tasks"] == []
+
+    @patch("app.routers.goals.get_goal")
+    @patch("app.routers.goals.get_tasks_for_goal")
+    def test_get_goal_details_db_tasks_none(
+        self, mock_get_tasks, mock_get_goal, mock_goal_id
+    ):
+        """
+        Line 300: if get_tasks_for_goal returns None, the status sync block
+        is skipped and goal_data statuses are used as-is.
+        """
+        mock_get_goal.return_value = {
+            "id": mock_goal_id,
+            "title": "Fix my bike tyre",
+            "goal_data": {
+                "tasks": [
+                    {"id": "uuid-task-1", "ai_id": "task_1",
+                     "description": "Remove wheel", "status": "not_started", "subtasks": []}
+                ]
+            }
+        }
+        mock_get_tasks.return_value = None
+
+        response = client.get(f"/api/goal-details/{mock_goal_id}")
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["tasks"][0]["status"] == "not_started"
