@@ -13,12 +13,13 @@ const MOCK_GOAL_RANGES = [
     { startDay: 26, endDay: 28, colorScheme: 'blue' },
 ];
 
-// mock upcoming goals (timeline view) — still mocked for now
-const MOCK_GOALS = [
-    { id: 'g1', title: 'Create a bank account', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, se....', dueDate: '2026-02-27' },
-    { id: 'g2', title: 'Create a bank account', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, se....', dueDate: '2026-02-28', locked: true },
-    { id: 'g3', title: 'Create a bank account', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, se....', dueDate: '2026-03-01' },
-];
+// maps backend goal data → shape expected by UpcomingTimeline
+const mapGoalToTimeline = (g) => ({
+    id: g.goal_id,
+    title: g.title,
+    description: g.description || `${g.task_count} task${g.task_count === 1 ? '' : 's'}`,
+    dueDate: g.goal_due_date,
+});
 
 // maps backend task data → shape expected by UpcomingTimeline
 const mapTaskToTimeline = (t) => ({
@@ -51,12 +52,14 @@ function ScheduledTasks() {
     const [activeIndex, setActiveIndex] = useState(0);
     const [selectedDate, setSelectedDate] = useState(null);
     const [upcomingTasks, setUpcomingTasks] = useState([]);
+    const [upcomingGoals, setUpcomingGoals] = useState([]);
     const [dailyTasks, setDailyTasks] = useState([]);
+    const [scheduleLoaded, setScheduleLoaded] = useState(false);
     const touchStartX = useRef(0);
     const calTouchStartX = useRef(0);
     const calendarRef = useRef(null);
 
-    // fetch upcoming tasks from backend
+    // fetch upcoming tasks and goals from backend
     useEffect(() => {
         let cancelled = false;
         (async () => {
@@ -64,14 +67,22 @@ function ScheduledTasks() {
                 const { data } = await supabase.auth.getUser();
                 const user = data?.user;
                 if (!user) return;
-                const res = await fetch(
-                    `${import.meta.env.VITE_API_URL}/schedule/${user.id}/upcoming-tasks`
-                );
-                if (!res.ok) return;
-                const json = await res.json();
-                if (!cancelled) setUpcomingTasks(json.tasks.map(mapTaskToTimeline));
+                const [tasksRes, goalsRes] = await Promise.all([
+                    fetch(`${import.meta.env.VITE_API_URL}/schedule/${user.id}/upcoming-tasks`),
+                    fetch(`${import.meta.env.VITE_API_URL}/schedule/${user.id}/upcoming-goals`),
+                ]);
+                if (!cancelled && tasksRes.ok) {
+                    const json = await tasksRes.json();
+                    setUpcomingTasks(json.tasks.map(mapTaskToTimeline));
+                }
+                if (!cancelled && goalsRes.ok) {
+                    const json = await goalsRes.json();
+                    setUpcomingGoals(json.goals.map(mapGoalToTimeline));
+                }
             } catch (err) {
-                console.error('failed to fetch upcoming tasks:', err);
+                console.error('failed to fetch schedule data:', err);
+            } finally {
+                if (!cancelled) setScheduleLoaded(true);
             }
         })();
         return () => { cancelled = true; };
@@ -203,6 +214,7 @@ function ScheduledTasks() {
                                 key={activeIndex === 0 ? `tasks-${activeIndex}` : 'tasks'}
                                 variant="tasks"
                                 items={upcomingTasks}
+                                loaded={scheduleLoaded}
                                 headerExtra={
                                     <div className="ut-swipe-dots">
                                         {PANELS.map((v, i) => (
@@ -218,7 +230,8 @@ function ScheduledTasks() {
                             <UpcomingTimeline
                                 key={activeIndex === 1 ? `goals-${activeIndex}` : 'goals'}
                                 variant="goals"
-                                items={MOCK_GOALS}
+                                items={upcomingGoals}
+                                loaded={scheduleLoaded}
                                 headerExtra={
                                     <div className="ut-swipe-dots">
                                         {PANELS.map((v, i) => (

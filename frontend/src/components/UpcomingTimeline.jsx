@@ -1,6 +1,24 @@
-import { useRef, useState, useCallback, useEffect } from 'react';
+import { useRef, useState, useCallback, useEffect, useMemo } from 'react';
 import { ArrowUpLeft } from 'lucide-react';
 import '../styles/components/UpcomingTimeline.css';
+
+// encouraging messages when there are no items
+const EMPTY_MESSAGES = {
+    tasks: [
+        "You're all caught up — no tasks due soon!",
+        "Nothing on the horizon. Time to set a new goal?",
+        "Clear schedule ahead. Enjoy the breathing room!",
+        "No upcoming tasks — you're crushing it!",
+        "All clear! A perfect time to plan something new.",
+    ],
+    goals: [
+        "No goals coming up — dream something big!",
+        "Your slate is clean. What will you aim for next?",
+        "No deadlines in sight. Set a new goal to stay on track!",
+        "Nothing upcoming — the perfect time to plan ahead.",
+        "All goals complete or far away. Keep up the momentum!",
+    ],
+};
 
 // variant config — controls title and subtitle per section type
 const VARIANT_CONFIG = {
@@ -70,9 +88,17 @@ const UpcomingTimelineShell = ({ variant = 'goals', title, subtitle, className, 
     );
 };
 
-const UpcomingTimeline = ({ variant = 'goals', items = [], onClick, headerExtra }) => {
+const UpcomingTimeline = ({ variant = 'goals', items = [], loaded = true, onClick, headerExtra }) => {
+    const emptyMessage = useMemo(() => {
+        const msgs = EMPTY_MESSAGES[variant] || EMPTY_MESSAGES.tasks;
+        return msgs[Math.floor(Math.random() * msgs.length)];
+    }, [variant]);
+
     return (
         <UpcomingTimelineShell variant={variant} headerExtra={headerExtra}>
+            {loaded && items.length === 0 && (
+                <p className="ut-empty-message">{emptyMessage}</p>
+            )}
             {items.map((item) => {
                 const dateObj = new Date(item.dueDate);
                 const dayNum = dateObj.getDate();
