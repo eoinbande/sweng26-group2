@@ -1,26 +1,50 @@
+import os
+import pytest
+
+# Skip all tests in this file if API key is not set (e.g. in CI)
+pytestmark = pytest.mark.skipif(
+    not os.environ.get("OPENAI_API_KEY"),
+    reason="OPENAI_API_KEY not set — skipping live AI tests"
+)
+
 from app.services.ai_service import AIService
 
-ai = AIService() 
+ai = AIService()
+
 
 # Test AI generation
-plan = ai.generate_plan("help me learn python in 30 days")
-print("AI plan:", plan)
+def test_ai_generate_plan():
+    plan = ai.generate_plan("help me learn python in 30 days")
+    print("AI plan:", plan)
+    assert "tasks" in plan
+
 
 # Test AI feedback
-feedback_plan = ai.revise_plan(
-    user_input="Make the tasks shorter and more daily",
-    current_goals =plan.get("tasks", [])
-)
-print("Updated plan:", feedback_plan)
+def test_ai_feedback():
+    plan = ai.generate_plan("help me learn python in 30 days")
+    feedback_plan = ai.revise_plan(
+        user_input="Make the tasks shorter and more daily",
+        current_goals=plan.get("tasks", [])
+    )
+    print("Updated plan:", feedback_plan)
+    assert "tasks" in feedback_plan
 
-#Test task expansion
+
+# Test task expansion
 # Let's expand the first task for demonstration
-task_to_expand = feedback_plan["tasks"][0]  # pick the first task
-expanded_task = ai.expand_task(
-     user_input="Expand this task into smaller daily subtasks with guidance",
-    current_goals=task_to_expand
-)
-print("Expanded task:", expanded_task)
+def test_ai_expand_task():
+    plan = ai.generate_plan("help me learn python in 30 days")
+    feedback_plan = ai.revise_plan(
+        user_input="Make the tasks shorter and more daily",
+        current_goals=plan.get("tasks", [])
+    )
+    task_to_expand = feedback_plan["tasks"][0]  # pick the first task
+    expanded_task = ai.expand_task(
+        user_input="Expand this task into smaller daily subtasks with guidance",
+        current_goals=task_to_expand
+    )
+    print("Expanded task:", expanded_task)
+    assert "subtasks" in expanded_task
 
 
 """ Output i am getting in my local machine!
