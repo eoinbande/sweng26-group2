@@ -4,6 +4,7 @@ import MonthCalendar from '../components/MonthCalendar';
 import UpcomingTimeline from '../components/UpcomingTimeline';
 import UpcomingTimelineTasks from '../components/UpcomingTimelineTasks';
 import BottomNav from '../components/BottomNav';
+import { supabase } from '../supabase_client';
 import '../styles/ScheduledTasks.css';
 import '../index.css';
 
@@ -12,29 +13,30 @@ const MOCK_GOAL_RANGES = [
     { startDay: 26, endDay: 28, colorScheme: 'blue' },
 ];
 
-
-// mock upcoming tasks (timeline view)
-const MOCK_TASKS = [
-    { id: 't1', title: 'Set overall budget', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, se....', dueDate: '2026-02-27' },
-    { id: 't2', title: 'Create a bank account', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, se....', dueDate: '2026-02-27', locked: true },
-    { id: 't3', title: 'Create a bank account', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, se....', dueDate: '2026-02-27' },
-    { id: 't4', title: 'Create a bank account', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, se....', dueDate: '2026-02-27' },
-];
-
-// mock daily tasks (card view)
-const MOCK_DAILY_TASKS = [
-    { id: 'dt1', title: 'Set overall budget', goalTitle: 'Plan a wedding', dueDate: '2026-02-27', locked: true },
-    { id: 'dt2', title: 'Set overall budget', goalTitle: 'Plan a wedding', dueDate: '2026-02-27' },
-    { id: 'dt3', title: 'Set overall budget', goalTitle: 'Plan a wedding', dueDate: '2026-02-27' },
-    { id: 'dt4', title: 'Set overall budget', goalTitle: 'Plan a wedding', dueDate: '2026-02-27', locked: true },
-];
-
-// mock upcoming goals (timeline view)
+// mock upcoming goals (timeline view) — still mocked for now
 const MOCK_GOALS = [
     { id: 'g1', title: 'Create a bank account', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, se....', dueDate: '2026-02-27' },
     { id: 'g2', title: 'Create a bank account', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, se....', dueDate: '2026-02-28', locked: true },
     { id: 'g3', title: 'Create a bank account', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, se....', dueDate: '2026-03-01' },
 ];
+
+// maps backend task data → shape expected by UpcomingTimeline
+const mapTaskToTimeline = (t) => ({
+    id: t.task_id || t.ai_id,
+    title: t.description,
+    description: t.goal_title,
+    dueDate: t.due_date,
+    locked: t.status === 'not_started' && t.order > 1,
+});
+
+// maps backend task data → shape expected by UpcomingTimelineTasks
+const mapTaskToDaily = (t) => ({
+    id: t.task_id || t.ai_id,
+    title: t.description,
+    goalTitle: t.goal_title,
+    dueDate: t.due_date,
+    locked: t.status === 'not_started' && t.order > 1,
+});
 
 const PANELS = ['tasks', 'goals'];
 const SWIPE_THRESHOLD = 50;
@@ -48,9 +50,55 @@ function ScheduledTasks() {
     const [calMonth, setCalMonth] = useState(now.getMonth());
     const [activeIndex, setActiveIndex] = useState(0);
     const [selectedDate, setSelectedDate] = useState(null);
+    const [upcomingTasks, setUpcomingTasks] = useState([]);
+    const [dailyTasks, setDailyTasks] = useState([]);
     const touchStartX = useRef(0);
     const calTouchStartX = useRef(0);
     const calendarRef = useRef(null);
+
+    // fetch upcoming tasks from backend
+    useEffect(() => {
+        let cancelled = false;
+        (async () => {
+            try {
+                const { data } = await supabase.auth.getUser();
+                const user = data?.user;
+                if (!user) return;
+                const res = await fetch(
+                    `${import.meta.env.VITE_API_URL}/schedule/${user.id}/upcoming-tasks`
+                );
+                if (!res.ok) return;
+                const json = await res.json();
+                if (!cancelled) setUpcomingTasks(json.tasks.map(mapTaskToTimeline));
+            } catch (err) {
+                console.error('failed to fetch upcoming tasks:', err);
+            }
+        })();
+        return () => { cancelled = true; };
+    }, []);
+
+    // fetch tasks for selected date
+    useEffect(() => {
+        if (!selectedDate) { setDailyTasks([]); return; }
+        let cancelled = false;
+        (async () => {
+            try {
+                const { data } = await supabase.auth.getUser();
+                const user = data?.user;
+                if (!user) return;
+                const dateStr = selectedDate.format('YYYY-MM-DD');
+                const res = await fetch(
+                    `${import.meta.env.VITE_API_URL}/schedule/${user.id}/date?date=${dateStr}`
+                );
+                if (!res.ok) return;
+                const json = await res.json();
+                if (!cancelled) setDailyTasks(json.tasks.map(mapTaskToDaily));
+            } catch (err) {
+                console.error('failed to fetch daily tasks:', err);
+            }
+        })();
+        return () => { cancelled = true; };
+    }, [selectedDate]);
 
     // sync header when MUI changes month (swipe, outside-month click, etc.)
     const onMonthChange = useCallback((date) => {
@@ -137,7 +185,7 @@ function ScheduledTasks() {
                         <UpcomingTimelineTasks
                             key={`daily-${selectedDate.format('YYYY-MM-DD')}`}
                             date={dateLabel}
-                            items={MOCK_DAILY_TASKS}
+                            items={dailyTasks}
                             onBack={() => setSelectedDate(null)}
                         />
                     </div>
@@ -154,7 +202,7 @@ function ScheduledTasks() {
                             <UpcomingTimeline
                                 key={activeIndex === 0 ? `tasks-${activeIndex}` : 'tasks'}
                                 variant="tasks"
-                                items={MOCK_TASKS}
+                                items={upcomingTasks}
                                 headerExtra={
                                     <div className="ut-swipe-dots">
                                         {PANELS.map((v, i) => (
