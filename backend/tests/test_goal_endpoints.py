@@ -890,103 +890,6 @@ class TestGoalsWorkflow:
         assert accept_response.status_code == 200
         assert accept_response.json()["saved_to_db"] is True
 
-class TestGoalsWorkflow:
-    """Tests that verify the complete workflow across multiple endpoints."""
-
-    @patch("app.routers.goals.create_goal")
-    @patch("app.routers.goals.get_mock_plan")
-    @patch("app.routers.goals.update_goal_data")
-    @patch("app.routers.goals.get_goal")
-    @patch("app.routers.goals.save_tasks_to_db")
-    def test_complete_workflow_create_to_accept(
-        self, mock_save, mock_get_goal, mock_update,
-        mock_get_plan, mock_create,
-        mock_user_id, mock_goal_id, sample_bike_tyre_plan,
-        sample_tasks_with_uuids
-    ):
-        """Should handle complete flow: create → review → accept."""
-        mock_create.return_value = MagicMock(data=[{"id": mock_goal_id}])
-        mock_get_plan.return_value = sample_bike_tyre_plan
-        
-        create_response = client.post(
-            "/api/goals",
-            json={
-                "user_id": mock_user_id,
-                "title": "Fix my bike tyre"
-            }
-        )
-        
-        assert create_response.status_code == 200
-        assert create_response.json()["saved_to_db"] is False
-        
-        mock_get_goal.return_value = {
-            "id": mock_goal_id,
-            "goal_data": {"tasks": []}
-        }
-        mock_save.return_value = sample_tasks_with_uuids
-        
-        accept_response = client.post(
-            f"/api/goals/{mock_goal_id}/accept",
-            json={"tasks": sample_bike_tyre_plan["tasks"]}
-        )
-        
-        assert accept_response.status_code == 200
-        assert accept_response.json()["saved_to_db"] is True
-        
-        accepted_tasks = accept_response.json()["tasks"]
-        assert all("id" in task for task in accepted_tasks)
-
-    @patch("app.routers.goals.create_goal")
-    @patch("app.routers.goals.get_mock_plan")
-    @patch("app.routers.goals.update_goal_data")
-    @patch("app.routers.goals.get_goal")
-    @patch("app.routers.goals.get_mock_feedback_response")
-    @patch("app.routers.goals.save_tasks_to_db")
-    def test_complete_workflow_with_feedback(
-        self, mock_save, mock_feedback, mock_get_goal,
-        mock_update, mock_get_plan, mock_create,
-        mock_user_id, mock_goal_id, sample_bike_tyre_plan,
-        sample_feedback_response, sample_tasks_with_uuids
-    ):
-        """Should handle flow: create → feedback → accept."""
-        mock_create.return_value = MagicMock(data=[{"id": mock_goal_id}])
-        mock_get_plan.return_value = sample_bike_tyre_plan
-        
-        create_response = client.post(
-            "/api/goals",
-            json={
-                "user_id": mock_user_id,
-                "title": "Fix my bike tyre"
-            }
-        )
-        assert create_response.status_code == 200
-        
-        mock_get_goal.return_value = {
-            "id": mock_goal_id,
-            "title": "Fix my bike tyre"
-        }
-        mock_feedback.return_value = sample_feedback_response
-        
-        feedback_response = client.post(
-            f"/api/goals/{mock_goal_id}/feedback",
-            json={"feedback": "Make it easier"}
-        )
-        assert feedback_response.status_code == 200
-        assert feedback_response.json()["saved_to_db"] is False
-        
-        mock_get_goal.return_value = {
-            "id": mock_goal_id,
-            "goal_data": {"tasks": []}
-        }
-        mock_save.return_value = sample_tasks_with_uuids
-        
-        accept_response = client.post(
-            f"/api/goals/{mock_goal_id}/accept",
-            json={"tasks": sample_feedback_response["tasks"]}
-        )
-        assert accept_response.status_code == 200
-        assert accept_response.json()["saved_to_db"] is True
-
 # =============================================================================
 # POST /api/goals/{goal_id}/accept — Additional coverage
 # =============================================================================
@@ -1098,7 +1001,8 @@ class TestAcceptPlanAdditional:
         assert response.status_code == 200
         assert response.json()["due_date"] == "2026-12-31"
 
-        # =============================================================================
+
+# =============================================================================
 # GET /api/goals/{user_id} — Additional coverage
 # =============================================================================
 
@@ -1162,6 +1066,7 @@ class TestGetGoalsAdditional:
         data = response.json()
         assert data["goals"] == []
         assert "No goals associated with the user" in data["message"]
+
 
 # =============================================================================
 # GET /api/goal-details/{goal_id} — Full coverage of untested endpoint
