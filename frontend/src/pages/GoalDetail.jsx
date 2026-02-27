@@ -26,6 +26,7 @@ const GoalDetail = () => {
     // Feedback popup state
     const [showFeedback, setShowFeedback] = useState(false);
     const [closingFeedback, setClosingFeedback] = useState(false);
+const [closingDelete, setClosingDelete] = useState(false);
 
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
@@ -36,6 +37,14 @@ const GoalDetail = () => {
             setShowFeedback(false);
             setClosingFeedback(false);
         }, 150);
+    };
+
+    const closeDeleteConfirm = () => {
+        setClosingDelete(true);
+        setTimeout(() => {
+            setShowDeleteConfirm(false);
+            setClosingDelete(false);
+        }, 150); 
     };
 
     const triggerToast = (message, type = 'success') => {
@@ -424,43 +433,53 @@ const GoalDetail = () => {
 
             {/* delete confirmation popup */}
             {showDeleteConfirm && (
-                <div className="feedback-overlay" onClick={() => setShowDeleteConfirm(false)}>
-                    <div className="feedback-bottom-sheet confirm-sheet" onClick={(e) => e.stopPropagation()}>
-                        
-                        {/* X close Button to match feedback pop up component */}
-                        <button
-                            onClick={() => setShowDeleteConfirm(false)}
-                            style={{
-                                position: 'absolute',
-                                top: '25px',
-                                right: '25px',
-                                backgroundColor: 'transparent',
-                                border: 'none',
-                                cursor: 'pointer',
-                                padding: '4px',
-                                zIndex: 10
-                            }}
-                        >
-                            <X size={24} color="var(--text-main)" strokeWidth={2.5} />
-                        </button>
+            <div 
+                className={`feedback-overlay ${closingDelete ? 'closing' : ''}`} 
+                onClick={closeDeleteConfirm}
+            >
+                <div 
+                    className={`feedback-bottom-sheet confirm-sheet ${closingDelete ? 'closing' : ''}`} 
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    
+                    {/* X close Button */}
+                    <button
+                        onClick={closeDeleteConfirm}
+                        style={{
+                            position: 'absolute',
+                            top: '8%',
+                            right: '8%',
+                            backgroundColor: 'transparent',
+                            border: 'none',
+                            cursor: 'pointer',
+                            padding: '4px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            zIndex: 10
+                        }}
+                    >
+                        <X size={24} color="var(--text-main)" strokeWidth={2.5} />
+                    </button>
 
-                        <div className="confirm-content">
-                            <div className="confirm-icon" style={{ textAlign: 'left', fontSize: '32px' }}>🗑️</div>
-                            <h3>Delete this goal?</h3>
-                            <p>This will permanently remove <strong>{goalTitle}</strong>. This action cannot be undone.</p>
-                            
-                            <div className="confirm-actions">
-                                <button className="btn-confirm-delete" onClick={handleConfirmDelete}>
-                                    Delete Permanently
-                                </button>
-                                <button className="btn-cancel" onClick={() => setShowDeleteConfirm(false)}>
-                                    Keep Goal
-                                </button>
-                            </div>
+                    <div className="confirm-content">
+                        <h3>Delete this goal?</h3>
+                        <p>This will permanently remove <strong>{goalTitle}</strong>. This action cannot be undone.</p>
+                        
+                        <div className="confirm-actions">
+                            {/* Primary Button */}
+                            <button className="btn-confirm-delete" onClick={handleConfirmDelete}>
+                                Delete Permanently
+                            </button>
+                            {/* Secondary Button */}
+                            <button className="btn-cancel" onClick={closeDeleteConfirm}>
+                                Keep Goal
+                            </button>
                         </div>
                     </div>
                 </div>
-            )}
+            </div>
+        )}
         </div>
     );
 };
