@@ -112,7 +112,7 @@ def create_goal_endpoint(goal: CreateGoalRequest):
 
     #----------------------Real AI integration(the following block of code calls the AI to generate the goal!)--------------
     try:
-        ai_plan = ai_service.aiGenerate(goal.title)
+        ai_plan = ai_service.generate_plan(goal.title)
     except Exception as e:
         raise HTTPException(status_code = 500, detail = f"AI generation failed: {str(e)}")
 
@@ -181,7 +181,7 @@ def feedback_on_plan(goal_id: str, request: FeedbackRequest):
 
     #call real AI service to update plan based on the feedback
     try:
-        updated_plan = ai_service.aiFeedback(
+        updated_plan = ai_service.revise_plan(
             userInput = request.feedback,
             currentGoals = current_tasks
         )

@@ -154,7 +154,7 @@ def expand_task(task_id: str, request: ExpandTaskRequest):
     # subtask_data = mock_expansions.get(ai_id) <- used for mock
     goal_tasks = get_tasks_for_goal(goal_id)
     try:
-        ai_response = ai_service.aiExpand(
+        ai_response = ai_service.expand_task(
             userInput = request.stuck_reason or task["description"], #if not given stuck reason
             currentGoals = goal_tasks
         )
