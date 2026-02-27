@@ -10,8 +10,6 @@ import '../index.css';
 // mock goal ranges for calendar highlights
 const MOCK_GOAL_RANGES = [
     { startDay: 26, endDay: 28, colorScheme: 'blue' },
-    { startDay: 29, endDay: 30, colorScheme: 'green' },
-    { startDay: 28, endDay: 28, colorScheme: 'pink' },
 ];
 
 
@@ -40,13 +38,44 @@ const MOCK_GOALS = [
 
 const PANELS = ['tasks', 'goals'];
 const SWIPE_THRESHOLD = 50;
+const MONTH_NAMES = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December',
+];
 
 function ScheduledTasks() {
     const now = new Date();
+    const [calMonth, setCalMonth] = useState(now.getMonth());
     const [activeIndex, setActiveIndex] = useState(0);
     const [selectedDate, setSelectedDate] = useState(null);
     const touchStartX = useRef(0);
+    const calTouchStartX = useRef(0);
     const calendarRef = useRef(null);
+
+    // sync header when MUI changes month (swipe, outside-month click, etc.)
+    const onMonthChange = useCallback((date) => {
+        setCalMonth(date.month());
+        setSelectedDate(null);
+    }, []);
+
+    // swipe between calendar months — click MUI's hidden nav arrows
+    const onCalTouchStart = useCallback((e) => {
+        calTouchStartX.current = e.touches[0].clientX;
+    }, []);
+
+    const onCalTouchEnd = useCallback((e) => {
+        const delta = calTouchStartX.current - e.changedTouches[0].clientX;
+        if (Math.abs(delta) < SWIPE_THRESHOLD) return;
+        if (!calendarRef.current) return;
+        // MUI renders two arrow buttons inside the hidden header
+        const arrows = calendarRef.current.querySelectorAll(
+            '.MuiPickersArrowSwitcher-root button'
+        );
+        if (!arrows.length) return;
+        // swipe left → next (second arrow), swipe right → prev (first arrow)
+        const btn = delta > 0 ? arrows[1] : arrows[0];
+        if (btn) btn.click();
+    }, []);
 
     // click outside calendar → deselect
     useEffect(() => {
@@ -87,13 +116,18 @@ function ScheduledTasks() {
         <div className="scheduled-tasks-page">
             <div className="scheduled-tasks-container">
                 <div className="scheduled-tasks-padded">
-                    <PageHeader title="February" />
-                    <div ref={calendarRef}>
+                    <PageHeader title={MONTH_NAMES[calMonth]} />
+                    <div
+                        ref={calendarRef}
+                        onTouchStart={onCalTouchStart}
+                        onTouchEnd={onCalTouchEnd}
+                    >
                         <MonthCalendar
                             year={now.getFullYear()}
                             month={now.getMonth()}
                             goalRanges={MOCK_GOAL_RANGES}
                             onDayClick={onDayClick}
+                            onMonthChange={onMonthChange}
                         />
                     </div>
                 </div>

@@ -60,18 +60,19 @@ const StyledDay = styled(PickersDay, {
     return {
         // use nested selector for higher specificity over MUI defaults
         '&.MuiPickersDay-root': {
-            // all range days: flat rectangle, colored background
+            // all range days: flat rectangle, colored background, no transform
             ...(inRange && {
                 borderRadius: 0,
                 backgroundColor: highlightBg,
                 color: highlightText,
                 fontWeight: 600,
-                '&:hover, &:focus': {
+                '&:hover, &:focus, &:active': {
                     backgroundColor: highlightBg,
+                    transform: 'none',
                 },
             }),
 
-            // single day — perfect circle
+            // single day — perfect circle, no transform
             ...(isSingle && {
                 backgroundColor: highlightBg,
                 color: highlightText,
@@ -80,8 +81,9 @@ const StyledDay = styled(PickersDay, {
                 width: 'clamp(28px, 4.5dvh, 40px)',
                 aspectRatio: '1',
                 justifySelf: 'center',
-                '&:hover, &:focus': {
+                '&:hover, &:focus, &:active': {
                     backgroundColor: highlightBg,
+                    transform: 'none',
                 },
             }),
 
@@ -161,7 +163,7 @@ function Day(props) {
  * @param {number} month — 0-indexed (0 = january)
  * @param {Array} goalRanges — [{ startDay, endDay, colorScheme }]
  */
-const MonthCalendar = ({ year, month, goalRanges = [], onDayClick }) => {
+const MonthCalendar = ({ year, month, goalRanges = [], onDayClick, onMonthChange }) => {
     const displayDate = useMemo(() => dayjs(new Date(year, month, 1)), [year, month]);
 
     return (
@@ -175,15 +177,18 @@ const MonthCalendar = ({ year, month, goalRanges = [], onDayClick }) => {
                     slotProps={{
                         day: { goalRanges, onDayClick },
                     }}
+                    onMonthChange={onMonthChange}
                     showDaysOutsideCurrentMonth
-                    fixedWeekNumber={5}
                     sx={{
                         width: '100%',
                         maxHeight: 'none',
                         height: 'auto',
-                        // hide the header (month/year + navigation arrows)
+                        // keep header in DOM for programmatic arrow clicks, but hide visually
                         '& .MuiPickersCalendarHeader-root': {
-                            display: 'none',
+                            position: 'absolute',
+                            width: 0,
+                            height: 0,
+                            overflow: 'hidden',
                         },
                     }}
                 />

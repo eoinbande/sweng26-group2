@@ -2,7 +2,8 @@
 
 .month-calendar {
     width: 100%;
-    padding: clamp(8px, 1.5dvh, 16px) 0;
+    padding: 0;
+    margin-bottom: clamp(8px, 1.5dvh, 16px);
 }
 
 
@@ -10,8 +11,9 @@
 
 .month-calendar .MuiDateCalendar-root {
     width: 100%;
-    max-height: none;
-    overflow: visible;
+    max-height: none !important;
+    height: auto !important;
+    overflow: visible !important;
 }
 
 .month-calendar .MuiDayCalendar-root {
@@ -41,12 +43,10 @@
 }
 
 
-/* slide transition container — remove fixed height */
+/* slide transition container */
 
 .month-calendar .MuiDayCalendar-slideTransition {
-    /* 5 rows of days + gaps; must not be auto or absolute children collapse */
-    min-height: calc(5 * clamp(28px, 4.5dvh, 40px) + 4 * clamp(4px, 0.8dvh, 8px));
-    overflow: visible;
+    overflow: visible !important;
 }
 
 
