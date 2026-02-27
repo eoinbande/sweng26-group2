@@ -217,7 +217,7 @@ function ScheduledTasks() {
         <div className="scheduled-tasks-page">
             <div className="scheduled-tasks-container">
                 <div className="scheduled-tasks-padded">
-                    <PageHeader title={MONTH_NAMES[calMonth]} />
+                    <PageHeader key={calMonth} title={MONTH_NAMES[calMonth]} />
                     <div
                         ref={calendarRef}
                         onTouchStart={onCalTouchStart}
