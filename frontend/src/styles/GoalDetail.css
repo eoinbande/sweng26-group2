@@ -153,8 +153,8 @@
 
 .confirm-sheet {
     background: var(--blue);
-    border-radius: 40px 40px 0 0; 
-    padding: 12% 10% 8% 10%; 
+    border-radius: 60px 60px 0 0; 
+    padding: 100px 80px 80px 80px; 
     display: flex;
     flex-direction: column;
     min-height: 400px;
