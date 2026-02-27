@@ -12,6 +12,7 @@ from unittest.mock import MagicMock, patch, call
 
 from app.Tables import(
     create_goal,
+    create_user,
     save_tasks_to_db,
     merge_and_save_tasks,
     update_task_status,
@@ -19,7 +20,10 @@ from app.Tables import(
     get_completed_task_count,
     get_total_task_count,
     get_goal,
-    get_tasks_for_goal 
+    get_all_goals,
+    get_task,
+    get_tasks_for_goal,
+    delete_goal,
 )
 
 #shared fixtures
@@ -28,6 +32,7 @@ GOAL_ID = "goal-uuid-1234"
 TASK_1_ID = "task-uuid-0001"
 TASK_2_ID = "task-uuid-0002"
 SUB_1A_ID = "sub-uuid-001a"
+USER_ID = "user_uuid_5678"
 
 def _create_mock_supabase():
     """Returns a new MagicMock that mimics a supabase client"""
@@ -43,8 +48,44 @@ def _chain(return_value):
     m.execute.return_value == return_value
     return m
 
-# create_goal - return correct structure
 
+#create user (lines 22-30)
+class TestCreateUser:
+    def test_returns_existing_account_when_email_already_registered(self):
+        """
+        If the email already exists in profiles, create_user must return
+        the existing account dict without inserting a new row (line 27).
+        """
+        existing = {"id": USER_ID, "name": "Alice", "email": "alice@example.com"}
+
+        with patch("app.Tables.supabase") as mock_sb:
+            mock_sb.table.return_value.select.return_value.eq.return_value.execute.return_value.data = [existing]
+
+            result = create_user(USER_ID, "Alice", "alice@example.com")
+
+        mock_sb.table.return_value.insert.assert_not_called()
+        assert result == existing
+
+    def test_inserts_new_user_when_email_not_registered(self):
+        """
+        If the email is not registered, create_user must call INSERT
+        and return the Supabase response (lines 30-34).
+        """
+        fake_insert_result = MagicMock()
+
+        with patch("app.Tables.supabase") as mock_sb:
+            mock_sb.table.return_value.select.return_value.eq.return_value.execute.return_value.data = []
+            mock_sb.table.return_value.insert.return_value.execute.return_value = fake_insert_result
+
+            result = create_user(USER_ID, "Bob", "bob@example.com")
+
+        inserted = mock_sb.table.return_value.insert.call_args[0][0]
+        assert inserted["id"]    == USER_ID
+        assert inserted["name"]  == "Bob"
+        assert inserted["email"] == "bob@example.com"
+        assert result is fake_insert_result
+
+# create_goal - return correct structure
 class TestCreateGoal:
 
     def test_create_goal_returns_supabase_response(self):
@@ -76,8 +117,71 @@ class TestCreateGoal:
         goal_data = json.loads(inserted_data["goal_data"])
         assert goal_data["tasks"] == []
 
-# save_tasks_to_db , gives UUIDs to th=asks and subtasks
+#get all goals test (lines 61)
+class TestGetAllGoals:
+    def test_returns_list_of_goals_for_user(self):
+        fake_goals = [
+            {"id": GOAL_ID, "user_id": USER_ID, "title": "Fix my bike tyre"},
+            {"id": "goal-uuid-9999", "user_id": USER_ID, "title": "Learn guitar"},
+        ]
 
+        with patch("app.Tables.supabase") as mock_sb:
+            mock_sb.table.return_value.select.return_value.eq.return_value.execute.return_value.data = fake_goals
+
+            result = get_all_goals(USER_ID)
+
+        assert result == fake_goals
+
+    def test_returns_empty_list_when_user_has_no_goals(self):
+        """get_all_goals returns [] when there are no goals for the user."""
+        with patch("app.Tables.supabase") as mock_sb:
+            mock_sb.table.return_value.select.return_value.eq.return_value.execute.return_value.data = []
+
+            result = get_all_goals(USER_ID)
+
+        assert result == []
+
+#get goals lines 65-66
+class testGetGoal:
+    def test_returns_goal_data_dict(self):
+        """get_goal should return result.data from a .single() query (lines 65-66)."""
+        fake_goal = {"id": GOAL_ID, "title": "Fix my bike tyre", "goal_data": "{}"}
+
+        with patch("app.Tables.supabase") as mock_sb:
+            mock_sb.table.return_value.select.return_value.eq.return_value.single.return_value.execute.return_value.data = fake_goal
+
+            result = get_goal(GOAL_ID)
+
+        assert result == fake_goal
+
+    def test_returns_none_when_goal_not_found(self):
+        """get_goal returns None when Supabase finds no matching row."""
+        with patch("app.Tables.supabase") as mock_sb:
+            mock_sb.table.return_value.select.return_value.eq.return_value.single.return_value.execute.return_value.data = None
+
+            result = get_goal("nonexistent-id")
+
+        assert result is None
+
+#test delete goal
+class TestDeleteGoal:
+
+    def test_calls_delete_on_goals_table(self):
+        """delete_goal should issue a DELETE … WHERE id = goal_id (line 88)."""
+        fake_result = MagicMock()
+
+        with patch("app.Tables.supabase") as mock_sb:
+            mock_sb.table.return_value.delete.return_value.eq.return_value.execute.return_value = fake_result
+
+            result = delete_goal(GOAL_ID)
+
+        mock_sb.table.assert_called_with("goals")
+        mock_sb.table.return_value.delete.assert_called_once()
+        eq_call = mock_sb.table.return_value.delete.return_value.eq.call_args
+        assert eq_call[0] == ("id", GOAL_ID)
+        assert result is fake_result
+
+# save_tasks_to_db , gives UUIDs to tasks and subtasks
 class TestSaveTasksToDb:
 
     def _fake_goal_with_data(self, tasks=None):
@@ -227,9 +331,7 @@ class TestSaveTasksToDb:
         assert "id" in result[0] and result[0]["id"]
         assert "id" in result[0]["subtasks"][0] and result[0]["subtasks"][0]["id"]
 
-
 # merge and save tasks - preserves status(completed) and UUID
-
 class TestMergeAndSaveTasks:
 
     def _existing_goal_data(self, tasks):
@@ -319,6 +421,7 @@ class TestMergeAndSaveTasks:
         assert sub["id"] == SUB_1A_ID
         assert sub["status"] == "completed"
 
+#update task status
 class TestUpdateTaskStatus:
 
     def _fake_task(self, task_id, goal_id, parent_id = None):
@@ -429,7 +532,6 @@ class TestUpdateTaskStatus:
         assert result == fake_task
 
 # add_subtasks_to_task  assign UUID's and sets correct parent_id
-
 class TestAddSubTasksToTask:
 
     def test_assigns_uuid_to_subtract(self):
@@ -525,8 +627,57 @@ class TestAddSubTasksToTask:
         for sub in result:
             assert sub.get("id") is not None
 
-# get_completed_task_count / get_total_task_count — return correct numbers
+#get_tasks_for_goal (line 276)
+class TestGetTasksForGoal:
 
+    def test_returns_task_rows_for_goal(self):
+        """get_tasks_for_goal should return the .data list (line 276)."""
+        fake_rows = [
+            {"id": TASK_1_ID, "goal_id": GOAL_ID, "description": "Step 1"},
+            {"id": TASK_2_ID, "goal_id": GOAL_ID, "description": "Step 2"},
+        ]
+
+        with patch("app.Tables.supabase") as mock_sb:
+            mock_sb.table.return_value.select.return_value.eq.return_value.execute.return_value.data = fake_rows
+
+            result = get_tasks_for_goal(GOAL_ID)
+
+        assert result == fake_rows
+
+    def test_returns_empty_list_when_no_tasks(self):
+        """get_tasks_for_goal returns [] when the goal has no tasks yet."""
+        with patch("app.Tables.supabase") as mock_sb:
+            mock_sb.table.return_value.select.return_value.eq.return_value.execute.return_value.data = []
+
+            result = get_tasks_for_goal(GOAL_ID)
+
+        assert result == []
+
+#get_task (lines 280-281)
+class TestGetTask:
+
+    def test_returns_task_dict(self):
+        """get_task should return result.data from a .single() query (lines 280-281)."""
+        fake_task = {"id": TASK_1_ID, "goal_id": GOAL_ID, "description": "Step 1",
+                     "status": "not_started", "parent_id": None}
+
+        with patch("app.Tables.supabase") as mock_sb:
+            mock_sb.table.return_value.select.return_value.eq.return_value.single.return_value.execute.return_value.data = fake_task
+
+            result = get_task(TASK_1_ID)
+
+        assert result == fake_task
+
+    def test_returns_none_when_task_not_found(self):
+        """get_task returns None when Supabase finds no matching task."""
+        with patch("app.Tables.supabase") as mock_sb:
+            mock_sb.table.return_value.select.return_value.eq.return_value.single.return_value.execute.return_value.data = None
+
+            result = get_task("nonexistent-task-id")
+
+        assert result is None
+
+# get_completed_task_count / get_total_task_count — return correct numbers
 class TestTaskCountFunctions:
 
     def test_get_completed_task_count_returns_correct_number(self):
