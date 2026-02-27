@@ -116,6 +116,11 @@ def create_goal_endpoint(goal: CreateGoalRequest):
     except Exception as e:
         raise HTTPException(status_code = 500, detail = f"AI generation failed: {str(e)}")
 
+    #exception related to AI service returns a malformed output
+    if "tasks" not in ai_plan:
+        raise HTTPException(status_code = 500, detail = "AI response error")
+
+
     # Save description and due date from AI plan to goal_data
     update_goal_data(goal_id, {
         "tasks": [],
