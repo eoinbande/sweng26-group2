@@ -28,7 +28,8 @@
 
 /* swipe between timeline variants */
 
-.ut-swipe-viewport {
+.ut-swipe-viewport,
+.ut-daily-viewport {
     flex: 1;
     min-height: 0;
     overflow: hidden;

@@ -133,12 +133,14 @@ function ScheduledTasks() {
                 </div>
 
                 {selectedDate ? (
-                    <UpcomingTimelineTasks
-                        key={`daily-${selectedDate.format('YYYY-MM-DD')}`}
-                        date={dateLabel}
-                        items={MOCK_DAILY_TASKS}
-                        onBack={() => setSelectedDate(null)}
-                    />
+                    <div className="ut-daily-viewport">
+                        <UpcomingTimelineTasks
+                            key={`daily-${selectedDate.format('YYYY-MM-DD')}`}
+                            date={dateLabel}
+                            items={MOCK_DAILY_TASKS}
+                            onBack={() => setSelectedDate(null)}
+                        />
+                    </div>
                 ) : (
                     <div
                         className="ut-swipe-viewport"
