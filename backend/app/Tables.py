@@ -79,9 +79,13 @@ def update_goal_data(goal_id: str, goal_data: dict):
         goal_id: The goal's UUID
         goal_data: Dict like {"tasks": [...]} to store as JSON
     """
-    return supabase.table("goals").update(
-        {"goal_data": json.dumps(goal_data)}
-    ).eq("id", goal_id).execute()
+
+    final_date = goal_data.get("goal_due_date")
+
+    return supabase.table("goals").update({
+        "goal_data": json.dumps(goal_data),
+        "due_date": final_date
+    }).eq("id", goal_id).execute()
 
 
 def delete_goal(goal_id: str):
