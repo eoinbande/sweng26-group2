@@ -1,9 +1,12 @@
 /* responsive month calendar — styling MUI DateCalendar */
 
 .month-calendar {
-    width: 100%;
+    width: 90%;
+    margin: 0 auto;
+    margin-bottom: clamp(1px, 0.3dvh, 4px);
     padding: 0;
-    margin-bottom: clamp(8px, 1.5dvh, 16px);
+    overflow: hidden;
+    transition: height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 
@@ -11,9 +14,6 @@
 
 .month-calendar .MuiDateCalendar-root {
     width: 100%;
-    max-height: none !important;
-    height: auto !important;
-    overflow: visible !important;
 }
 
 .month-calendar .MuiDayCalendar-root {
@@ -27,8 +27,8 @@
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     justify-items: center;
-    padding-bottom: clamp(4px, 0.8dvh, 8px);
-    margin-bottom: clamp(4px, 0.8dvh, 8px);
+    padding-bottom: clamp(2px, 0.5dvh, 6px);
+    margin-bottom: clamp(2px, 0.5dvh, 6px);
     border-bottom: 2px solid var(--accent-red-soft);
 }
 
@@ -55,7 +55,7 @@
 .month-calendar .MuiDayCalendar-monthContainer {
     display: flex;
     flex-direction: column;
-    gap: clamp(4px, 0.8dvh, 8px);
+    gap: clamp(2px, 0.5dvh, 6px);
 }
 
 .month-calendar .MuiDayCalendar-weekContainer {
@@ -67,6 +67,8 @@
 
 
 /* ── individual day button ── */
+
+
 /* border-radius handled entirely by styled component — do NOT set it here */
 
 .month-calendar .MuiPickersDay-root {
@@ -75,7 +77,7 @@
     font-weight: 500;
     color: var(--text-main);
     width: 100%;
-    height: clamp(28px, 4.5dvh, 40px);
+    height: clamp(26px, 4dvh, 36px);
     margin: 0;
 }
 
@@ -88,13 +90,15 @@
     background-color: transparent !important;
     color: var(--text-main) !important;
     border-radius: 999px !important;
-    width: clamp(28px, 4.5dvh, 40px);
-    height: clamp(28px, 4.5dvh, 40px);
+    width: clamp(26px, 4dvh, 36px);
+    height: clamp(26px, 4dvh, 36px);
     aspect-ratio: 1;
     justify-self: center;
 }
 
+
 /* keep range highlight colors when MUI adds selected class */
+
 .month-calendar .MuiPickersDay-root.day-highlighted.Mui-selected,
 .month-calendar .MuiPickersDay-root.day-highlighted.Mui-selected:hover,
 .month-calendar .MuiPickersDay-root.day-highlighted.Mui-selected:focus {
@@ -106,6 +110,7 @@
     justify-self: stretch !important;
 }
 
+
 /* focused / active / hover day — perfect circle */
 
 .month-calendar .MuiPickersDay-root:not(.day-highlighted).Mui-focusVisible,
@@ -113,18 +118,19 @@
 .month-calendar .MuiPickersDay-root:not(.day-highlighted):active,
 .month-calendar .MuiPickersDay-root:not(.day-highlighted):hover {
     border-radius: 999px !important;
-    width: clamp(28px, 4.5dvh, 40px);
-    height: clamp(28px, 4.5dvh, 40px);
+    width: clamp(26px, 4dvh, 36px);
+    height: clamp(26px, 4dvh, 36px);
     aspect-ratio: 1;
     justify-self: center;
 }
+
 
 /* today — perfect circle, but not when part of a highlighted range */
 
 .month-calendar .MuiPickersDay-root.MuiPickersDay-today:not(.day-highlighted) {
     border-radius: 999px;
-    width: clamp(28px, 4.5dvh, 40px);
-    height: clamp(28px, 4.5dvh, 40px);
+    width: clamp(26px, 4dvh, 36px);
+    height: clamp(26px, 4dvh, 36px);
     aspect-ratio: 1;
     justify-self: center;
 }
@@ -139,4 +145,5 @@
 .month-calendar .MuiPickersDay-root.MuiPickersDay-dayOutsideMonth {
     color: var(--text-secondary);
     opacity: 0.4;
+    pointer-events: none;
 }

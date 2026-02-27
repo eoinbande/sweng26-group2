@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef, useEffect } from 'react';
 import dayjs from 'dayjs';
 import weekday from 'dayjs/plugin/weekday';
 import updateLocale from 'dayjs/plugin/updateLocale';
@@ -78,7 +78,7 @@ const StyledDay = styled(PickersDay, {
                 color: highlightText,
                 fontWeight: 600,
                 borderRadius: '999px',
-                width: 'clamp(28px, 4.5dvh, 40px)',
+                width: 'clamp(26px, 4dvh, 36px)',
                 aspectRatio: '1',
                 justifySelf: 'center',
                 '&:hover, &:focus, &:active': {
@@ -118,7 +118,7 @@ function Day(props) {
             day={day}
             outsideCurrentMonth={outsideCurrentMonth}
             // intercept MUI's selection — call our handler instead
-            onDaySelect={(d) => onDayClick && onDayClick(d)}
+            onDaySelect={(d) => { if (!outsideCurrentMonth && onDayClick) onDayClick(d); }}
             disableMargin
             selected={false}
             className={highlight ? 'day-highlighted' : undefined}
@@ -137,7 +137,7 @@ function Day(props) {
                         color: 'white',
                         fontWeight: 600,
                         borderRadius: '999px',
-                        width: 'clamp(28px, 4.5dvh, 40px)',
+                        width: 'clamp(26px, 4dvh, 36px)',
                         aspectRatio: '1',
                         justifySelf: 'center',
                         '&:hover, &:focus': {
@@ -165,9 +165,55 @@ function Day(props) {
  */
 const MonthCalendar = ({ year, month, goalRanges = [], onDayClick, onMonthChange }) => {
     const displayDate = useMemo(() => dayjs(new Date(year, month, 1)), [year, month]);
+    const wrapperRef = useRef(null);
+    const timerRef = useRef(null);
+
+    // measure the current month's last row and set wrapper height;
+    // uses the last monthContainer to avoid stale rows during transitions
+    const calcHeight = () => {
+        const el = wrapperRef.current;
+        if (!el) return;
+        const containers = el.querySelectorAll('.MuiDayCalendar-monthContainer');
+        if (!containers.length) return;
+        const current = containers[0];
+        const rows = current.querySelectorAll('.MuiDayCalendar-weekContainer');
+        if (rows.length) {
+            const wrapperTop = el.getBoundingClientRect().top;
+            const lastRow = rows[rows.length - 1];
+            const h = lastRow.getBoundingClientRect().bottom - wrapperTop;
+            if (h > 0) el.style.height = h + 'px';
+        }
+    };
+
+    // initial height calc + window resize only
+    useEffect(() => {
+        requestAnimationFrame(calcHeight);
+        const onResize = () => requestAnimationFrame(calcHeight);
+        window.addEventListener('resize', onResize);
+        return () => window.removeEventListener('resize', onResize);
+    }, []);
+
+    // on month change: let MUI slide freely, then animate to new height
+    const handleMonthChange = (date) => {
+        const el = wrapperRef.current;
+        if (el) {
+            // freeze current height so the upcoming component doesn't jump
+            const current = el.getBoundingClientRect().height;
+            el.style.transition = 'none';
+            el.style.height = current + 'px';
+
+            clearTimeout(timerRef.current);
+            timerRef.current = setTimeout(() => {
+                // after MUI's slide finishes, animate to the new height
+                el.style.transition = '';
+                calcHeight();
+            }, 400);
+        }
+        if (onMonthChange) onMonthChange(date);
+    };
 
     return (
-        <div className="month-calendar">
+        <div className="month-calendar" ref={wrapperRef}>
             <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
                 <DateCalendar
                     value={null}
@@ -177,12 +223,10 @@ const MonthCalendar = ({ year, month, goalRanges = [], onDayClick, onMonthChange
                     slotProps={{
                         day: { goalRanges, onDayClick },
                     }}
-                    onMonthChange={onMonthChange}
+                    onMonthChange={handleMonthChange}
                     showDaysOutsideCurrentMonth
                     sx={{
                         width: '100%',
-                        maxHeight: 'none',
-                        height: 'auto',
                         // keep header in DOM for programmatic arrow clicks, but hide visually
                         '& .MuiPickersCalendarHeader-root': {
                             position: 'absolute',
