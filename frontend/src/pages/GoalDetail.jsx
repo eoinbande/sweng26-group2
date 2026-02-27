@@ -373,7 +373,13 @@ const [closingDelete, setClosingDelete] = useState(false);
                     endDate={endDate}
                     onBack={() => {
                         if (location.state?.from === 'schedule') {
-                            navigate('/schedule');
+                            navigate('/schedule', {
+                                state: {
+                                    calMonth: location.state.calMonth,
+                                    activeIndex: location.state.activeIndex,
+                                    selectedDate: location.state.selectedDate,
+                                },
+                            });
                         } else {
                             navigate('/goals', {
                                 state: {

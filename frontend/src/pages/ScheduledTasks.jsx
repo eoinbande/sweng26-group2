@@ -1,5 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import dayjs from 'dayjs';
 import PageHeader from '../components/PageHeader';
 import MonthCalendar from '../components/MonthCalendar';
 import UpcomingTimeline from '../components/UpcomingTimeline';
@@ -77,10 +78,14 @@ const MONTH_NAMES = [
 
 function ScheduledTasks() {
     const navigate = useNavigate();
+    const location = useLocation();
+    const restored = location.state;
     const now = new Date();
-    const [calMonth, setCalMonth] = useState(now.getMonth());
-    const [activeIndex, setActiveIndex] = useState(0);
-    const [selectedDate, setSelectedDate] = useState(null);
+    const [calMonth, setCalMonth] = useState(restored?.calMonth ?? now.getMonth());
+    const [activeIndex, setActiveIndex] = useState(restored?.activeIndex ?? 0);
+    const [selectedDate, setSelectedDate] = useState(
+        restored?.selectedDate ? dayjs(restored.selectedDate) : null,
+    );
     const [upcomingTasks, setUpcomingTasks] = useState([]);
     const [upcomingGoals, setUpcomingGoals] = useState([]);
     const [dailyTasks, setDailyTasks] = useState([]);
@@ -174,9 +179,17 @@ function ScheduledTasks() {
     // navigate to goal detail when a task/goal card is tapped
     const onItemClick = useCallback((item) => {
         if (item.goalId) {
-            navigate(`/goal/${item.goalId}`, { state: { goalId: item.goalId, from: 'schedule' } });
+            navigate(`/goal/${item.goalId}`, {
+                state: {
+                    goalId: item.goalId,
+                    from: 'schedule',
+                    calMonth,
+                    activeIndex,
+                    selectedDate: selectedDate ? selectedDate.format('YYYY-MM-DD') : null,
+                },
+            });
         }
-    }, [navigate]);
+    }, [navigate, calMonth, activeIndex, selectedDate]);
 
     // click outside calendar → deselect
     useEffect(() => {
@@ -224,8 +237,8 @@ function ScheduledTasks() {
                         onTouchEnd={onCalTouchEnd}
                     >
                         <MonthCalendar
-                            year={now.getFullYear()}
-                            month={now.getMonth()}
+                            year={calYear}
+                            month={calMonth}
                             goalRanges={taskRanges}
                             onDayClick={onDayClick}
                             onMonthChange={onMonthChange}
