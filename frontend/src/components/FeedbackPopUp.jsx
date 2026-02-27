@@ -1,10 +1,8 @@
-
 import React, { useState } from 'react';
 import '../index.css';
 import { InputBar } from './InputBar';
 import { X, Mic } from 'lucide-react';
 
-// variant content configuration
 const variantConfig = {
     help: {
         background: 'var(--accent-blue)',
@@ -20,40 +18,37 @@ const variantConfig = {
 
 export default function FeedbackPopUp({ variant = 'help', onClose, onSubmit }) {
     const config = variantConfig[variant] || variantConfig.help;
-    const [inputValue, setInputValue] = useState(''); // Local state for the input
+    const [inputValue, setInputValue] = useState('');
 
     return (
         <div style={{
             background: config.background,
-            padding: '12%',
+            padding: '100px 80px 80px 80px', 
             borderRadius: '60px 60px 0 0',
             position: 'relative',
             width: '100%',
-            aspectRatio: '1 / 1',
+            maxWidth: '480px',
             display: 'flex',
             flexDirection: 'column',
-            justifyContent: 'flex-start',
-            alignItems: 'flex-start',
             boxSizing: 'border-box',
+            boxShadow: '0 -10px 25px rgba(0,0,0,0.1)',
         }}>
-            {/* close button */}
+            {/* close button - pinned to top right */}
             <button
                 onClick={onClose}
                 style={{
                     position: 'absolute',
-                    top: '8%',
-                    right: '8%',
+                    top: '1.5rem',
+                    right: '1.5rem',
                     backgroundColor: 'transparent',
                     border: 'none',
                     cursor: 'pointer',
-                    padding: '4px',
+                    padding: '8px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    transition: 'transform 0.2s',
+                    zIndex: 10
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
-                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1.0)'}
             >
                 <X size={24} color="var(--text-main)" strokeWidth={2.5} />
             </button>
@@ -61,13 +56,14 @@ export default function FeedbackPopUp({ variant = 'help', onClose, onSubmit }) {
             {/* title */}
             <h2 style={{
                 fontFamily: 'var(--font-serif)',
-                fontSize: 'clamp(32px, 8vw, 44px)',
+                fontSize: 'clamp(28px, 7vw, 36px)',
                 fontWeight: '600',
                 color: 'var(--text-main)',
                 textAlign: 'left',
                 margin: 0,
-                marginTop: '18%',
-                marginBottom: '3%',
+                marginTop: '1rem', 
+                marginBottom: '0.75rem',
+                lineHeight: 1.2,
             }}>
                 {config.title}
             </h2>
@@ -75,24 +71,25 @@ export default function FeedbackPopUp({ variant = 'help', onClose, onSubmit }) {
             {/* subtitle */}
             <p style={{
                 fontFamily: 'var(--font-sans)',
-                fontSize: 'clamp(12px, 3.5vw, 16px)',
+                fontSize: '15px',
                 color: 'var(--text-main)',
                 textAlign: 'left',
                 margin: 0,
                 lineHeight: 1.5,
-                maxWidth: '75%',
+                maxWidth: '90%',
+                marginBottom: '2.5rem', 
             }}>
                 {config.subtitle}
             </p>
 
-            {/* input bar */}
-            <div style={{ width: '100%', marginTop: 'auto', paddingBottom: '5%' }}>
+            {/* input bar container */}
+            <div style={{ width: '100%' }}>
                 <InputBar
                     variant="auth"
                     placeholder="Feedback to AI..."
-                    value={inputValue} // Bind the value
-                    onChange={(e) => setInputValue(e.target.value)} // Update on change
-                    onSubmit={() => onSubmit(inputValue)} // Pass the local state
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    onSubmit={() => onSubmit(inputValue)}
                     icon={<Mic size={18} color="white" />}
                     buttonStyle="dark"
                     padding="18px 20px"
