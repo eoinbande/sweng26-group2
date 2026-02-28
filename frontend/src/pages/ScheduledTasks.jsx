@@ -89,6 +89,7 @@ function ScheduledTasks() {
     const [upcomingTasks, setUpcomingTasks] = useState([]);
     const [upcomingGoals, setUpcomingGoals] = useState([]);
     const [dailyTasks, setDailyTasks] = useState([]);
+    const [dailyLoaded, setDailyLoaded] = useState(false);
     const [scheduleLoaded, setScheduleLoaded] = useState(false);
     const calYear = now.getFullYear();
     const taskRanges = useMemo(
@@ -130,7 +131,9 @@ function ScheduledTasks() {
 
     // fetch tasks for selected date
     useEffect(() => {
-        if (!selectedDate) { setDailyTasks([]); return; }
+        if (!selectedDate) { setDailyTasks([]); setDailyLoaded(false); return; }
+        setDailyTasks([]);
+        setDailyLoaded(false);
         let cancelled = false;
         (async () => {
             try {
@@ -146,6 +149,8 @@ function ScheduledTasks() {
                 if (!cancelled) setDailyTasks(json.tasks.map(mapTaskToDaily));
             } catch (err) {
                 console.error('failed to fetch daily tasks:', err);
+            } finally {
+                if (!cancelled) setDailyLoaded(true);
             }
         })();
         return () => { cancelled = true; };
@@ -252,6 +257,7 @@ function ScheduledTasks() {
                             key={`daily-${selectedDate.format('YYYY-MM-DD')}`}
                             date={dateLabel}
                             items={dailyTasks}
+                            loaded={dailyLoaded}
                             onClick={onItemClick}
                             onBack={() => setSelectedDate(null)}
                         />

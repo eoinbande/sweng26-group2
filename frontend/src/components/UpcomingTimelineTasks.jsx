@@ -1,7 +1,11 @@
 import { useMemo } from 'react';
 import { ArrowUpLeft, ChevronLeft } from 'lucide-react';
+import { ring } from 'ldrs';
+import 'ldrs/react/Ring.css';
 import { UpcomingTimelineShell } from './UpcomingTimeline';
 import '../styles/components/UpcomingTimelineTasks.css';
+
+ring.register();
 
 const EMPTY_DAILY_MESSAGES = [
     "No tasks due today — enjoy the free time!",
@@ -18,7 +22,7 @@ const EMPTY_DAILY_MESSAGES = [
  * @param {Array}    items    — [{ id, title, goalTitle, dueDate, locked? }]
  * @param {function} onClick  — optional callback when a card is tapped
  */
-const UpcomingTimelineTasks = ({ date, items = [], onClick, onBack }) => {
+const UpcomingTimelineTasks = ({ date, items = [], loaded = true, onClick, onBack }) => {
     const emptyMessage = useMemo(() =>
         EMPTY_DAILY_MESSAGES[Math.floor(Math.random() * EMPTY_DAILY_MESSAGES.length)],
     []);
@@ -35,7 +39,12 @@ const UpcomingTimelineTasks = ({ date, items = [], onClick, onBack }) => {
                 </button>
             )}
         >
-            {items.length === 0 && (
+            {!loaded && (
+                <div className="ut-loading">
+                    <l-ring size="50" speed="1.75" color="#1C1C1E" />
+                </div>
+            )}
+            {loaded && items.length === 0 && (
                 <p className="ut-empty-message">{emptyMessage}</p>
             )}
             {items.map((item, i) => {

@@ -1,6 +1,10 @@
 import { useRef, useState, useCallback, useEffect, useMemo } from 'react';
 import { ArrowUpLeft } from 'lucide-react';
+import { ring } from 'ldrs';
+import 'ldrs/react/Ring.css';
 import '../styles/components/UpcomingTimeline.css';
+
+ring.register();
 
 // encouraging messages when there are no items
 const EMPTY_MESSAGES = {
@@ -96,6 +100,15 @@ const UpcomingTimeline = ({ variant = 'goals', items = [], loaded = true, onClic
 
     return (
         <UpcomingTimelineShell variant={variant} headerExtra={headerExtra}>
+            {!loaded && (
+                <div className="ut-loading">
+                    <l-ring
+                        size="50"
+                        speed="1.75"
+                        color={variant === 'tasks' ? '#1C1C1E' : 'white'}
+                    />
+                </div>
+            )}
             {loaded && items.length === 0 && (
                 <p className="ut-empty-message">{emptyMessage}</p>
             )}
