@@ -12,7 +12,7 @@ const Loading = ({ onLoadingComplete }) => {
 
     return (
         <div style={{
-            height: '100vh',
+            height: '100dvh',
             width: '100%',
             backgroundColor: 'var(--bg-color)',
             display: 'flex',

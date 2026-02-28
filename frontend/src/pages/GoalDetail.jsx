@@ -354,7 +354,7 @@ const [closingDelete, setClosingDelete] = useState(false);
     if (isLoading) {
         return (
             <div className="goal-detail-page">
-                <div className="loading-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                <div className="loading-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100dvh' }}>
                     {/* Use Loading component if available, else text */}
                     <Loading />
                 </div>
