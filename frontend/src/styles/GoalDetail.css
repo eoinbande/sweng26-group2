@@ -261,35 +261,3 @@
         transform: translateY(100%);
     }
 }
-
-/* ---- Responsive ---- */
-
-@media (max-width: 480px) {
-    .goal-detail-container {
-        padding: 0 var(--space-sm);
-        padding-top: 6px;
-        padding-bottom: 160px;
-    }
-    .btn-update-plan {
-        width: 160px;
-        padding: 12px;
-        font-size: 14px;
-    }
-}
-
-@media (max-width: 380px) {
-    .goal-detail-container {
-        padding: 0 8px;
-        padding-top: 4px;
-        padding-bottom: 140px;
-    }
-    .btn-update-plan {
-        width: 150px;
-        padding: 10px;
-        font-size: 13px;
-        border-radius: 20px;
-    }
-    .fab-container {
-        bottom: 80px;
-    }
-}

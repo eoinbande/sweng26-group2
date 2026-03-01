@@ -12,20 +12,16 @@ import { supabase } from '../supabase_client';
 const GoalDetail = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const closeDeleteConfirm = () => {
-        setClosingDelete(true);
-        setTimeout(() => {
-            setShowDeleteConfirm(false);
-            setClosingDelete(false);
-        }, 150); 
-    };
 
-    const triggerToast = (message, type = 'success') => {
-        setToast({ show: true, message, type });
-        setTimeout(() => setToast({ show: false, message: '', type: 'success' }), 3000);
-    };
+    // Safely access location state
+    // Use "Loading..." as default if we are loading, unless we want to show stale title
+    const [goalTitle, setGoalTitle] = useState(location.state?.goal?.title || location.state?.goalTitle || "Loading...");
+    const goalId = location.state?.goal?.id || location.state?.goalId || null;
 
-    /* helper to calculate progress locally to fix sync issues */
+    /* rstore tasks from location.state if returning from feedback page */
+    const [tasks, setTasks] = useState(location.state?.tasks || []);
+    const [endDate, setEndDate] = useState("");
+    const [progress, setProgress] = useState(0);
 
     // Feedback popup state
     const [showFeedback, setShowFeedback] = useState(false);
@@ -43,15 +39,6 @@ const [closingDelete, setClosingDelete] = useState(false);
         }, 150);
     };
 
-<<<<<<< HEAD
-    /* helper to calculate progress locally — matches backend logic
-       (counts every row in the tasks table: parent tasks + subtasks)
-       
-       IMPORTANT: A parent task is considered completed when ALL its subtasks
-       are completed (matches the backend auto-complete behaviour). This ensures
-       the progress bar here matches the Goals list page, even during the 1200ms
-       delay before the parent's `completed` boolean is flipped locally. */
-=======
     const closeDeleteConfirm = () => {
         setClosingDelete(true);
         setTimeout(() => {
@@ -66,32 +53,27 @@ const [closingDelete, setClosingDelete] = useState(false);
     };
 
     /* helper to calculate progress locally to fix sync issues */
->>>>>>> 8e77b5caa36f8b6234561844ffea2f371b6f0a28
     const calculateLocalProgress = (currentTasks) => {
-        if (!currentTasks || currentTasks.length === 0) return 0;
+    if (!currentTasks || currentTasks.length === 0) return 0;
 
-        let totalNodes = 0;
-        let completedNodes = 0;
+    let totalNodes = 0;
+    let completedNodes = 0;
 
-        currentTasks.forEach(task => {
-            totalNodes += 1;
+    currentTasks.forEach(task => {
+        // Count the parent task
+        totalNodes += 1;
+        if (task.completed) completedNodes += 1;
 
-            if (task.subtasks && task.subtasks.length > 0) {
-                // Parent is "completed" if every subtask is completed
-                const allSubsDone = task.subtasks.every(s => s.completed);
-                if (allSubsDone) completedNodes += 1;
+        // Count every subtask
+        if (task.subtasks && task.subtasks.length > 0) {
+            task.subtasks.forEach(sub => {
+                totalNodes += 1;
+                if (sub.completed) completedNodes += 1;
+            });
+        }
+    });
 
-                task.subtasks.forEach(sub => {
-                    totalNodes += 1;
-                    if (sub.completed) completedNodes += 1;
-                });
-            } else {
-                // No subtasks — use the task's own completed flag
-                if (task.completed) completedNodes += 1;
-            }
-        });
-
-        return totalNodes > 0 ? Math.round((completedNodes / totalNodes) * 100) : 0;
+    return totalNodes > 0 ? Math.round((completedNodes / totalNodes) * 100) : 0;
     };
 
     // Add loading state
@@ -123,20 +105,21 @@ const [closingDelete, setClosingDelete] = useState(false);
                     setGoalTitle(data.goal.title);
                 }
 
-                // Set End Date if available — check multiple possible locations
-                let rawEndDate = '';
-                if (data.goal) {
-                    const gd = data.goal.goal_data;
-                    if (gd && gd.goal_due_date) {
-                        rawEndDate = gd.goal_due_date;
-                    } else if (data.goal.due_date) {
-                        rawEndDate = data.goal.due_date;
+                // Set End Date if available
+                if (data.goal && data.goal.goal_data && data.goal.goal_data.goal_due_date) {
+                    const rawDate = data.goal.goal_data.goal_due_date;
+                    // Format date nicely (e.g. 14 Feb 2026)
+                    const dateObj = new Date(rawDate);
+                    if (!isNaN(dateObj)) {
+                        setEndDate(dateObj.toLocaleDateString('en-GB', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric'
+                        }));
+                    } else {
+                        setEndDate(rawDate);
                     }
                 }
-                if (rawEndDate) {
-                    setEndDate(rawEndDate);
-                }
-                console.log("End date extracted:", rawEndDate, "goal_data:", data.goal?.goal_data);
 
                 // Transform backend tasks to frontend format
                 const processTasks = (backendTasks) => {
@@ -158,13 +141,13 @@ const [closingDelete, setClosingDelete] = useState(false);
                 };
 
                 if (data.tasks) {
-                    const processed = processTasks(data.tasks);
-                    setTasks(processed);
-                    // Calculate progress locally — this is the single source of truth
-                    // for the GoalDetail session. It matches backend counting because
-                    // get_goal_details already patches statuses from the tasks table.
-                    setProgress(calculateLocalProgress(processed));
+                    setTasks(processTasks(data.tasks));
                 }
+
+                // Fetch progress from backend
+                const progRes = await fetch(`${import.meta.env.VITE_API_URL}/tasks/${goalId}/progress`, { cache: 'no-store' });
+                const progData = await progRes.json();
+                if (progData) setProgress(progData.percentage);
             } catch (err) {
                 console.error("Error loading goal details:", err);
             } finally {
@@ -212,61 +195,37 @@ const [closingDelete, setClosingDelete] = useState(false);
 
     /* toggle a subtask */
     const toggleSubtask = (taskId, subtaskId) => {
-        // Prevent unticking completed subtasks
-        const parentTask = tasks.find(t => t.id === taskId);
-        if (parentTask) {
-            const sub = parentTask.subtasks.find(s => s.id === subtaskId);
-            if (sub && sub.completed) return;
-        }
+    let newStatus = 'not_started';
 
-        let newStatus = 'not_started';
+    setTasks(prev => {
+        const newTasks = prev.map(task => {
+            if (task.id !== taskId) return task;
 
-        setTasks(prev => {
-            const newTasks = prev.map(task => {
-                if (task.id !== taskId) return task;
-
-                // 1. Update the specific subtask
-                const updatedSubtasks = task.subtasks.map(s => {
-                    if (s.id === subtaskId) {
-                        const nextCompleted = !s.completed;
-                        newStatus = nextCompleted ? 'completed' : 'not_started';
-                        return { ...s, completed: nextCompleted };
-                    }
-                    return s;
-                });
-
-                // 2. DON'T auto-complete parent yet — let the user see
-                //    the last subtask checked before the task collapses
-                return {
-                    ...task,
-                    subtasks: updatedSubtasks,
-                    // Keep parent uncompleted for now
-                    completed: false
-                };
+            // 1. Update the specific subtask
+            const updatedSubtasks = task.subtasks.map(s => {
+                if (s.id === subtaskId) {
+                    const nextCompleted = !s.completed;
+                    newStatus = nextCompleted ? 'completed' : 'not_started';
+                    return { ...s, completed: nextCompleted };
+                }
+                return s;
             });
 
-            setProgress(calculateLocalProgress(newTasks));
-            return newTasks;
+            // 2. Check if ALL subtasks are now complete to auto-update parent
+            const allDone = updatedSubtasks.every(s => s.completed);
+            
+            return {
+                ...task,
+                subtasks: updatedSubtasks,
+                completed: allDone // Auto-complete parent if all subs are done
+            };
         });
+        
+        setProgress(calculateLocalProgress(newTasks));
+        return newTasks;
+    });
 
-        updateTaskStatus(subtaskId, newStatus);
-
-        // After a longer delay, auto-complete parent if all subtasks done
-        setTimeout(() => {
-            setTasks(prev => {
-                const newTasks = prev.map(task => {
-                    if (task.id !== taskId) return task;
-                    const allDone = task.subtasks.every(s => s.completed);
-                    if (allDone && !task.completed) {
-                        updateTaskStatus(taskId, 'completed');
-                        return { ...task, completed: true };
-                    }
-                    return task;
-                });
-                setProgress(calculateLocalProgress(newTasks));
-                return newTasks;
-            });
-        }, 1200);
+    updateTaskStatus(subtaskId, newStatus);
     };
 
     /* toggle a whole task (complete all subtasks or un-complete) */
@@ -276,12 +235,8 @@ const [closingDelete, setClosingDelete] = useState(false);
 
     const task = tasks[taskIndex];
     const isComplete = isTaskComplete(task);
-
-    // Once completed, tasks cannot be unticked
-    if (isComplete) return;
-
-    let targetStatus = 'completed';
-    let targetBool = true;
+    let targetStatus = isComplete ? 'not_started' : 'completed';
+    let targetBool = !isComplete;
 
     setTasks(prev => {
         const newTasks = prev.map((t, i) => {
@@ -399,7 +354,10 @@ const [closingDelete, setClosingDelete] = useState(false);
     if (isLoading) {
         return (
             <div className="goal-detail-page">
-                <Loading />
+                <div className="loading-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                    {/* Use Loading component if available, else text */}
+                    <Loading />
+                </div>
                 <BottomNav />
             </div>
         );

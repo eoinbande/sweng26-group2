@@ -67,33 +67,13 @@ const Goals = () => {
                         console.error("Failed to fetch progress for goal " + goal.id);
                     }
 
-                    // Extract due date — check multiple possible locations
-                    let rawDate = '';
-                    if (goal.due_date) {
-                        rawDate = goal.due_date;
-                    } else if (goalData.goal_due_date) {
-                        rawDate = goalData.goal_due_date;
-                    } else if (goal.goal_data && typeof goal.goal_data === 'object' && goal.goal_data.goal_due_date) {
-                        rawDate = goal.goal_data.goal_due_date;
-                    }
-
-                    let formattedDate = '';
-                    if (rawDate && rawDate.length > 0) {
-                        try {
-                            const d = new Date(rawDate);
-                            if (!isNaN(d.getTime())) {
-                                formattedDate = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-                            }
-                        } catch (e) { /* keep empty */ }
-                    }
-
-                    console.log(`Goal "${goal.title}" date: rawDate="${rawDate}", formatted="${formattedDate}", goalData keys:`, Object.keys(goalData));
-
                     return {
                         id: goal.id,
                         title: goal.title,
                         description: goal.description || goalData.description || '',
-                        date: formattedDate,
+                        date: (goal.due_date || goalData.goal_due_date)
+                            ? new Date(goal.due_date || goalData.goal_due_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
+                            : '',
                         progress: progress,
                         colorScheme: COLOR_SCHEMES_LIST[index % COLOR_SCHEMES_LIST.length],
                     };
@@ -119,18 +99,6 @@ const Goals = () => {
             setGoals(prev => prev.map(g =>
                 g.id === updatedId ? { ...g, progress: updatedProgress } : g
             ));
-
-            // Also re-fetch from backend to ensure accuracy
-            fetch(`${import.meta.env.VITE_API_URL}/tasks/${updatedId}/progress`, { cache: 'no-store' })
-                .then(r => r.json())
-                .then(data => {
-                    if (data && data.percentage != null) {
-                        setGoals(prev => prev.map(g =>
-                            g.id === updatedId ? { ...g, progress: data.percentage } : g
-                        ));
-                    }
-                })
-                .catch(err => console.error('Failed to re-fetch progress:', err));
         }
     }, [location.state]);
 
