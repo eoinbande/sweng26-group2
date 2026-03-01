@@ -27,7 +27,7 @@ function Feedback() {
         <div style={{
             maxWidth: '480px',
             margin: '0 auto',
-            minHeight: '100vh',
+            minHeight: '100dvh',
             backgroundColor: 'var(--bg-color)',
             padding: 'var(--space-md)',
             paddingTop: '24px',

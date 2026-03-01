@@ -354,7 +354,7 @@ const [closingDelete, setClosingDelete] = useState(false);
     if (isLoading) {
         return (
             <div className="goal-detail-page">
-                <div className="loading-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                <div className="loading-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100dvh' }}>
                     {/* Use Loading component if available, else text */}
                     <Loading />
                 </div>
@@ -371,12 +371,24 @@ const [closingDelete, setClosingDelete] = useState(false);
                     progress={progress}
                     category="Event"
                     endDate={endDate}
-                    onBack={() => navigate('/goals', {
-                        state: {
-                            updatedGoalId: goalId,
-                            updatedProgress: progress,
+                    onBack={() => {
+                        if (location.state?.from === 'schedule') {
+                            navigate('/schedule', {
+                                state: {
+                                    calMonth: location.state.calMonth,
+                                    activeIndex: location.state.activeIndex,
+                                    selectedDate: location.state.selectedDate,
+                                },
+                            });
+                        } else {
+                            navigate('/goals', {
+                                state: {
+                                    updatedGoalId: goalId,
+                                    updatedProgress: progress,
+                                },
+                            });
                         }
-                    })}
+                    }}
                 />
 
                 <TaskTimeline
