@@ -5,14 +5,14 @@ const Loading = ({ onLoadingComplete }) => {
     useEffect(() => {
         const timer = setTimeout(() => {
             onLoadingComplete && onLoadingComplete();
-        }, 2000); // 2 seconds loading time
+        }, 1500); // 1.5 seconds loading time
 
         return () => clearTimeout(timer);
     }, [onLoadingComplete]);
 
     return (
         <div style={{
-            height: '100vh',
+            height: '100dvh',
             width: '100%',
             backgroundColor: 'var(--bg-color)',
             display: 'flex',

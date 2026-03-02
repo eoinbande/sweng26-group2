@@ -10,6 +10,7 @@ from app.database import supabase
 from app.routers.goals import goal_router
 from app.routers.tasks import task_router
 from app.routers.auth import account_router
+from app.routers.schedule import schedule_router
 
 app = FastAPI(
     title="Procrastination Solver API",
@@ -35,6 +36,7 @@ app.add_middleware(
 app.include_router(goal_router, prefix="/api", tags=["Goals"])
 app.include_router(task_router, prefix="/api", tags=["Tasks"])
 app.include_router(account_router, prefix="/api", tags=["Profiles"])
+app.include_router(schedule_router, prefix="/api", tags=["Schedule"])
 
 @app.get("/")
 async def root():

@@ -74,8 +74,8 @@
 /* top/bottom padding = 2x the side padding to keep proportional height */
 
 .home-page .home-create-goal {
-    padding: clamp(32px, 5dvh, 5dvh) clamp(16px, 5dvh, 40px);
-    padding-right: clamp(24px, 6dvh, 60px);
+    padding: clamp(32px, 5dvh, 5dvh) clamp(16px, 5dvh, 30px);
+    padding-right: clamp(24px, 6dvh, 8%);
     flex-shrink: 0;
 }
 
