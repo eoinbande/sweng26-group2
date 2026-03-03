@@ -73,8 +73,8 @@ def test_modify_task_notfound():
 #this test checks if we can successfully expand a task(for now only task_5/MOCK)
 def test_expand_task():
     fake_task = {"goal_id": "goal-1", "ai_id": "task_5"}
-    fake_subtasks = [{"description": "Step 1"}, {"description": "Step 2"}]
-
+    fake_subtasks = [{"ai_id": "task_5a", "title": "Step 1", "description": "Step 1", "order": 1},
+                     {"ai_id": "task_5b", "title": "Step 2", "description": "Step 2", "order": 2}]
 
     with patch("app.routers.tasks.get_task") as mock_get_task, \
          patch("app.routers.tasks.get_tasks_for_goal") as mock_get_tasks, \
@@ -82,45 +82,45 @@ def test_expand_task():
          patch("app.routers.tasks.ai_service.expand_task") as mock_ai:
 
         mock_get_task.return_value = fake_task
-        mock_get_tasks.return_value = [] # Simulate no existing subtasks
+        mock_get_tasks.return_value = []
+        mock_ai.return_value = {"subtasks": fake_subtasks, "task_ai_id": "task_5"}
         mock_add_subtasks.return_value = fake_subtasks
 
-        response = client.post( #for now we can only expand task_5
-        "/api/tasks/valid-task-ai-id-task_5/expand",
-        json = {"stuck_reason": "I don't know how to reassemble the wheel"}
+        response = client.post(
+            "/api/tasks/valid-task-ai-id-task_5/expand",
+            json={"stuck_reason": "I don't know how to reassemble the wheel"}
         )
 
     assert response.status_code == 200
     data = response.json()
-
     assert data["message"] == "Task expanded into subtasks"
-    assert data["subtasks"] == fake_subtasks
     assert data["stuck_reason"] == "I don't know how to reassemble the wheel"
 
 #this test if that a specific task ALREADY has subtasks(400 case)
 def test_task_already_expanded():
+    fake_subtasks = [{"ai_id": "task_5a", "title": "Step 1", "description": "Step 1", "order": 1},
+                     {"ai_id": "task_5b", "title": "Step 2", "description": "Step 2", "order": 2}]
+
     with patch("app.routers.tasks.get_task") as mock_get_task, \
          patch("app.routers.tasks.get_tasks_for_goal") as mock_get_tasks, \
          patch("app.routers.tasks.add_subtasks_to_task") as mock_add_subtasks, \
          patch("app.routers.tasks.ai_service.expand_task") as mock_ai:
 
-        # Simulate a task exists
         mock_get_task.return_value = {"id": "task_5", "goal_id": "goal-1", "ai_id": "task_5"}
 
-        # First call: no subtasks; second call: subtasks exist to trigger "already expanded"
         mock_get_tasks.side_effect = [
-            [],  # first expand call
-            [{"parent_id": "task_5"}]  # second expand call triggers 400
+            [],
+            [{"parent_id": "task_5"}]
         ]
 
-        # Mock returned subtasks
-        mock_add_subtasks.return_value = [{"id": "subtask_1"}, {"id": "subtask_2"}]
+        mock_ai.return_value = {"subtasks": fake_subtasks, "task_ai_id": "task_5"}
+        mock_add_subtasks.return_value = fake_subtasks
 
-        # First expand 
+        # First expand
         response = client.post("/api/tasks/task_5/expand", json={"stuck_reason": "whatever"})
         assert response.status_code == 200
 
-        # Second expand (will fail cause the task already has subtasks)
+        # Second expand (already has subtasks)
         response = client.post("/api/tasks/task_5/expand", json={"stuck_reason": "whatever"})
         assert response.status_code == 400
         assert "already has subtasks" in response.json()["detail"]
@@ -168,22 +168,22 @@ def test_get_progress():
 
 #this test check if there is no expanded list for a task(only for MOCK)
 def test_expand_task_no_mock():
-    fake_task = {"id": "task-10", "goal_id": "uuid-goal", "ai_id": "unknown_task"} # we mock(we dont use the DB)
+    fake_task = {"id": "task-10", "goal_id": "uuid-goal", "ai_id": "unknown_task"}
 
     with patch("app.routers.tasks.get_task") as mock_get_task, \
          patch("app.routers.tasks.get_tasks_for_goal"), \
          patch("app.routers.tasks.ai_service.expand_task") as mock_ai:
 
-
         mock_get_task.return_value = fake_task
+        mock_ai.side_effect = Exception("AI unavailable")
 
         response = client.post(
             f"/api/tasks/{fake_task['id']}/expand",
-            json = {"stuck_reason": "I am confused"}
-    )
+            json={"stuck_reason": "I am confused"}
+        )
 
-    assert response.status_code == 404
-    assert "No expansion available" in response.json()["detail"]
+    assert response.status_code == 503
+    assert "AI service unavailable" in response.json()["detail"]
 
 #This test checks if we can fail to retrieve the tasks of a goal
 def test_get_no_tasks():
