@@ -78,7 +78,8 @@ def test_expand_task():
 
     with patch("app.routers.tasks.get_task") as mock_get_task, \
          patch("app.routers.tasks.get_tasks_for_goal") as mock_get_tasks, \
-         patch("app.routers.tasks.add_subtasks_to_task") as mock_add_subtasks:
+         patch("app.routers.tasks.add_subtasks_to_task") as mock_add_subtasks, \
+         patch("app.routers.tasks.ai_service.expand_task") as mock_ai:
 
         mock_get_task.return_value = fake_task
         mock_get_tasks.return_value = [] # Simulate no existing subtasks
@@ -100,7 +101,8 @@ def test_expand_task():
 def test_task_already_expanded():
     with patch("app.routers.tasks.get_task") as mock_get_task, \
          patch("app.routers.tasks.get_tasks_for_goal") as mock_get_tasks, \
-         patch("app.routers.tasks.add_subtasks_to_task") as mock_add_subtasks:
+         patch("app.routers.tasks.add_subtasks_to_task") as mock_add_subtasks, \
+         patch("app.routers.tasks.ai_service.expand_task") as mock_ai:
 
         # Simulate a task exists
         mock_get_task.return_value = {"id": "task_5", "goal_id": "goal-1", "ai_id": "task_5"}
@@ -169,7 +171,8 @@ def test_expand_task_no_mock():
     fake_task = {"id": "task-10", "goal_id": "uuid-goal", "ai_id": "unknown_task"} # we mock(we dont use the DB)
 
     with patch("app.routers.tasks.get_task") as mock_get_task, \
-         patch("app.routers.tasks.get_tasks_for_goal"):
+         patch("app.routers.tasks.get_tasks_for_goal"), \
+         patch("app.routers.tasks.ai_service.expand_task") as mock_ai:
 
 
         mock_get_task.return_value = fake_task
