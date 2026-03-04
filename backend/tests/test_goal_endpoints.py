@@ -160,7 +160,7 @@ class TestCreateGoal:
     """Tests for POST /api/goals endpoint."""
 
     @patch("app.routers.goals.create_goal")
-    @patch("app.routers.goals.get_mock_plan")
+    @patch("app.routers.goals.ai_service.generate_plan")
     @patch("app.routers.goals.update_goal_data")
     def test_create_goal_success(
         self, mock_update, mock_get_plan, mock_create, 
@@ -200,7 +200,7 @@ class TestCreateGoal:
         mock_update.assert_called_once()
 
     @patch("app.routers.goals.create_goal")
-    @patch("app.routers.goals.get_mock_plan")
+    @patch("app.routers.goals.ai_service.generate_plan")
     @patch("app.routers.goals.update_goal_data")
     def test_create_goal_returns_task_structure(
         self, mock_update, mock_get_plan, mock_create,
@@ -279,7 +279,7 @@ class TestCreateGoal:
         assert response.status_code == 422
 
     @patch("app.routers.goals.create_goal")
-    @patch("app.routers.goals.get_mock_plan")
+    @patch("app.routers.goals.ai_service.generate_plan")
     @patch("app.routers.goals.update_goal_data")
     def test_create_goal_with_wedding_plan(
         self, mock_update, mock_get_plan, mock_create,
@@ -325,7 +325,7 @@ class TestFeedbackOnPlan:
     """Tests for POST /api/goals/{goal_id}/feedback endpoint."""
 
     @patch("app.routers.goals.get_goal")
-    @patch("app.routers.goals.get_mock_feedback_response")
+    @patch("app.routers.goals.ai_service.revise_plan")
     def test_feedback_success(
         self, mock_get_feedback, mock_get_goal,
         mock_goal_id, sample_feedback_response
@@ -353,7 +353,7 @@ class TestFeedbackOnPlan:
         assert len(data["tasks"]) == 2
 
     @patch("app.routers.goals.get_goal")
-    @patch("app.routers.goals.get_mock_feedback_response")
+    @patch("app.routers.goals.ai_service.revise_plan")
     def test_feedback_preserves_task_structure(
         self, mock_get_feedback, mock_get_goal, mock_goal_id
     ):
@@ -408,7 +408,7 @@ class TestFeedbackOnPlan:
         assert response.status_code == 422
 
     @patch("app.routers.goals.get_goal")
-    @patch("app.routers.goals.get_mock_feedback_response")
+    @patch("app.routers.goals.ai_service.revise_plan")
     def test_feedback_empty_string_accepted(
         self, mock_get_feedback, mock_get_goal, 
         mock_goal_id, sample_feedback_response
@@ -427,7 +427,7 @@ class TestFeedbackOnPlan:
         assert data["feedback_received"] == ""
 
     @patch("app.routers.goals.get_goal")
-    @patch("app.routers.goals.get_mock_feedback_response")
+    @patch("app.routers.goals.ai_service.revise_plan")
     def test_feedback_can_be_called_multiple_times(
         self, mock_get_feedback, mock_get_goal,
         mock_goal_id, sample_feedback_response
@@ -797,7 +797,7 @@ class TestGoalsWorkflow:
     """Tests that verify the complete workflow across multiple endpoints."""
 
     @patch("app.routers.goals.create_goal")
-    @patch("app.routers.goals.get_mock_plan")
+    @patch("app.routers.goals.ai_service.generate_plan")
     @patch("app.routers.goals.update_goal_data")
     @patch("app.routers.goals.get_goal")
     @patch("app.routers.goals.save_tasks_to_db")
@@ -840,10 +840,10 @@ class TestGoalsWorkflow:
         assert all("id" in task for task in accepted_tasks)
 
     @patch("app.routers.goals.create_goal")
-    @patch("app.routers.goals.get_mock_plan")
+    @patch("app.routers.goals.ai_service.generate_plan")
     @patch("app.routers.goals.update_goal_data")
     @patch("app.routers.goals.get_goal")
-    @patch("app.routers.goals.get_mock_feedback_response")
+    @patch("app.routers.goals.ai_service.revise_plan")
     @patch("app.routers.goals.save_tasks_to_db")
     def test_complete_workflow_with_feedback(
         self, mock_save, mock_feedback, mock_get_goal,

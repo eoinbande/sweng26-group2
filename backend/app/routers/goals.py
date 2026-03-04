@@ -2,6 +2,8 @@ from fastapi import APIRouter, HTTPException
 from enum import Enum
 from pydantic import BaseModel, Field
 from typing import Optional
+import json
+from app.services.ai_service import AIService
 # Database functions (Tables.py)
 from ..Tables import (
     create_goal, get_all_goals, get_goal, delete_goal,
@@ -21,6 +23,7 @@ from ..mock_ai_responses import get_mock_plan, get_mock_feedback_response
 
 
 goal_router = APIRouter()
+ai_service = AIService()
 
 # =============================================================================
 # REQUEST MODELS
@@ -113,7 +116,18 @@ def create_goal_endpoint(goal: CreateGoalRequest):
 
     # Get AI-generated plan from mock templates
     # TODO: Replace with real AI call when AI integration is ready
-    ai_plan = get_mock_plan(goal.title)
+    #ai_plan = get_mock_plan(goal.title) <- we used this for mocking
+
+    #----------------------Real AI integration(the following block of code calls the AI to generate the goal!)--------------
+    try:
+        ai_plan = ai_service.generate_plan(goal.title)
+    except Exception as e:
+        raise HTTPException(status_code = 500, detail = f"AI generation failed: {str(e)}")
+
+    #exception related to AI service returns a malformed output
+    if "tasks" not in ai_plan:
+        raise HTTPException(status_code = 500, detail = "AI response error")
+
 
     # Save description and due date from AI plan to goal_data
     update_goal_data(goal_id, {
@@ -162,7 +176,29 @@ def feedback_on_plan(goal_id: str, request: FeedbackRequest):
     # Get AI feedback response from mock
     # TODO: Replace with real AI call that takes current plan + feedback text
     # For now, we just return a pre-made feedback response based on the title
-    updated_plan = get_mock_feedback_response(goal["title"], request.feedback)
+    #updated_plan = get_mock_feedback_response(goal["title"], request.feedback) <- we use this for mocking
+
+    #------------------------Real AI integration-----------------
+
+    #we want to ONLY modify the task been asked for feedback, leave other task as they are
+    current_data = goal.get("goal_data", {}) #not sure if this gonna work, needs testing!
+    if isinstance(current_data, str): 
+        current_data = json.loads(current_data)
+
+    current_tasks = current_data.get("tasks", [])
+
+    #call real AI service to update plan based on the feedback
+    try:
+        updated_plan = ai_service.revise_plan(
+            user_input = request.feedback,
+            current_goals = current_tasks
+        )
+    except Exception as e:
+        raise HTTPException(status_code = 500, detail = f"AI feedback failed: {str(e)}")
+
+    #exception related to the AI service outputting an error
+    if "tasks" not in updated_plan:
+        raise HTTPException(status_code = 500, detail = "AI response error")
 
     return {
         "message": "Plan updated based on your feedback",
@@ -195,7 +231,6 @@ def accept_plan(goal_id: str, request: AcceptPlanRequest):
         raise HTTPException(status_code=404, detail="Goal not found")
 
     # Check if goal already has saved tasks (i.e., this is a re-accept after feedback)
-    import json
     current_data = goal.get("goal_data", {})
     if isinstance(current_data, str):
         current_data = json.loads(current_data)
