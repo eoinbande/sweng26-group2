@@ -109,8 +109,10 @@ def test_task_already_expanded():
         mock_get_task.return_value = {"id": "task_5", "goal_id": "goal-1", "ai_id": "task_5"}
 
         mock_get_tasks.side_effect = [
-            [],
-            [{"parent_id": "task_5"}]
+            [],   # first expand: check existing subtasks
+            [],   # first expand: get goal tasks for AI
+            [],   # first expand: duplicate ai_id check
+            [{"parent_id": "task_5"}]  # second expand: check existing subtasks → triggers 400
         ]
 
         mock_ai.return_value = {"subtasks": fake_subtasks, "task_ai_id": "task_5"}
