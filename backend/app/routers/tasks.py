@@ -155,8 +155,8 @@ def expand_task(task_id: str, request: ExpandTaskRequest):
     goal_tasks = get_tasks_for_goal(goal_id)
     try:
         ai_response = ai_service.expand_task(
-            userInput = request.stuck_reason or task["description"], #if not given stuck reason
-            currentGoals = goal_tasks
+            user_input = request.stuck_reason or task["description"], #if not given stuck reason
+            current_goals = goal_tasks
         )
     
     #exception related to the AI service being unavailable
@@ -177,7 +177,7 @@ def expand_task(task_id: str, request: ExpandTaskRequest):
 
     #exception related to the AI service returning an invalid structure
     for subtask in subtask_data:
-        if "title" not in subtask or "ai_id" not in subtask:
+        if "description" not in subtask or "ai_id" not in subtask:
             raise HTTPException(
                 status_code = 500,
                 detail = "AI returned invalid subtask structure"
