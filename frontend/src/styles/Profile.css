@@ -93,14 +93,14 @@
 }
 
 /* ── Avatar: semicircle on top of rectangle, flush on card ── */
-.profile-avatar-wrap {
+/*.profile-avatar-wrap {
     display: flex;
     flex-direction: column;
     align-items: center;
-}
+}*/
 
 /* Original width was clamp(70px,18vw,100px) — widened by 4px total (2px each side) */
-.profile-avatar-top {
+/*.profile-avatar-top {
     width: calc(clamp(70px, 18vw, 100px) + 4px);
     height: clamp(35px, 9vw, 50px);
     background: #C4C4C4;
@@ -112,7 +112,7 @@
     height: clamp(48px, 12vw, 68px);
     background: #C4C4C4;
     border-radius: 0;
-}
+}*/
 
 /* ── Info card ── */
 .profile-card {
