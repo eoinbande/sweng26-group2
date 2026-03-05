@@ -84,7 +84,7 @@
     left: 50%;
     /* shift up by 50% of group height, then shift back down by avatar height
        so the card midpoint lands on the boundary */
-    transform: translate(-50%, calc(-50% + -20px));
+    transform: translate(-50%, calc(-50% + 10px));
     display: flex;
     flex-direction: column;
     align-items: center;
