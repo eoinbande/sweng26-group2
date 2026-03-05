@@ -134,7 +134,7 @@
     right: 0;
     background: #C95C5C;
     color: #fff;
-    border-radius: 22px 6px 22px 22px;
+    border-radius: 0px 22px 22px 22px;
     padding: 7px 16px 7px 12px;
     font-size: clamp(0.78rem, 1.8dvh, 0.92rem);
     font-weight: 600;
