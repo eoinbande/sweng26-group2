@@ -35,11 +35,71 @@ function ReviewPlan() {
     }, []);
 
     // Data from CreateGoal (preview only, not saved yet)
-    const previewData = location.state?.previewData;
+    // We use a state for previewData so we can fetch it if it wasn't passed (e.g. from GoalAddDate)
+    const [previewData, setPreviewData] = useState(location.state?.previewData || null);
     const userId = location.state?.userId;
     const goalTitle = location.state?.goal || '';
     const originalPrompt = location.state?.originalPrompt || goalTitle;
     const goalId = previewData?.goal_id;
+
+    // If we don't have previewData but we have a goalTitle, fetch it now
+    useEffect(() => {
+        // If we already have data, just ensure loading is off after a moment
+        if (previewData) {
+            if (showLoading) {
+                // If we came with loading=true but data exists (shouldn't happen with new flow, but mostly for safety)
+                const t = setTimeout(() => setShowLoading(false), 500);
+                return () => clearTimeout(t);
+            }
+            return;
+        }
+
+        // If no data and no goal info, we can't do anything
+        if (!goalTitle || !userId) return;
+
+        // Fetch from backend
+        const fetchPlan = async () => {
+            try {
+                // In demo mode we might want mock data
+                if (isDemoMode) {
+                    console.log("Demo mode: generating mock plan...");
+                    // Simulate delay
+                    await new Promise(r => setTimeout(r, 2000));
+                    
+                    setPreviewData({
+                        goal_id: "mock-goal-id",
+                        tasks: [
+                            { ai_id: "t1", description: "Mock Task 1", order: 1, status: "not_started" },
+                            { ai_id: "t2", description: "Mock Task 2", order: 2, status: "not_started" }
+                        ]
+                    });
+                    setShowLoading(false);
+                    return;
+                }
+
+                const res = await fetch(`${import.meta.env.VITE_API_URL}/goals`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: userId,
+                        title: goalTitle,
+                    }),
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.detail || 'Failed to fetch plan');
+
+                setPreviewData(data);
+                setShowLoading(false);
+            } catch (err) {
+                console.error(err);
+                alert("Failed to generate plan. Please try again.");
+                navigate('/create-goal');
+                setShowLoading(false);
+            }
+        };
+
+        fetchPlan();
+    }, [goalTitle, userId, previewData]); 
 
     // parse tasks from the preview response (includes subtasks for later use)
     const tasks = React.useMemo(() => {
@@ -443,7 +503,10 @@ function ReviewPlan() {
 
             {/* loading overlay - shown when navigating from CreateGoal */}
             {showLoading && (
-                <LoadingOverlay onComplete={() => setShowLoading(false)} />
+                <LoadingOverlay 
+                    onComplete={() => setShowLoading(false)} 
+                    isLoading={!previewData}
+                />
             )}
         </div>
     );

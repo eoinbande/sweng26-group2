@@ -105,44 +105,20 @@ function GoalAddDate() {
             return;
         }
 
-        // call backend for ai-generated plan
-        try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/goals`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    user_id: user.id,
-                    title: goalText,
-                }),
+        // Navigate immediately to ReviewPlan, letting it handle the loading state
+        setTimeout(() => {
+            navigate('/review-plan', {
+                state: {
+                    goal: goalText,
+                    showLoading: true, // Tell ReviewPlan to show the loading screen
+                    previewData: null, // No data yet, ReviewPlan will fetch it
+                    userId: user.id,
+                    originalPrompt: goalText,
+                    dueDate: dateValueRef.current || null, // null if skipped
+                    from: 'create',
+                },
             });
-            const data = await res.json();
-            if (!res.ok) {
-                alert('Failed to get AI plan. Check console.');
-                navigatingRef.current = false;
-                setIsFading(false);
-                setIsExpanding(false);
-                return;
-            }
-            setTimeout(() => {
-                    navigate('/review-plan', {
-                        state: {
-                            goal: goalText,
-                            showLoading: true,
-                            previewData: data,
-                            userId: user.id,
-                            originalPrompt: goalText,
-                            dueDate: dateValueRef.current,
-                            from: 'create',
-                        },
-                    });
-            }, 1400);
-        } catch (err) {
-            console.error('Network error:', err);
-            alert('Network error. Is the backend running?');
-            navigatingRef.current = false;
-            setIsFading(false);
-            setIsExpanding(false);
-        }
+        }, 1400); // Keep visual transition timing
     };
 
     // close picker when clicking outside
