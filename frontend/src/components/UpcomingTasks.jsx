@@ -1,5 +1,6 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
 import { ArrowUpRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabase_client';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -8,11 +9,13 @@ import '../index.css';
 dayjs.extend(relativeTime);
 
 const UpcomingTasks = () => {
+    const navigate = useNavigate();
     const scrollRef = useRef(null);
     const [showTopFade, setShowTopFade] = useState(false);
     const [showBottomFade, setShowBottomFade] = useState(false);
     const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [hoveredIndex, setHoveredIndex] = useState(null);
 
     const updateFades = useCallback(() => {
         const el = scrollRef.current;
@@ -44,35 +47,39 @@ const UpcomingTasks = () => {
                     const mappedTasks = json.tasks.map(t => {
                         const dueDate = t.due_date ? dayjs(t.due_date) : null;
                         let dueText = null;
-                        let isUrgent = false;
+                        let urgencyLevel = 'normal'; // normal, urgent (red), warning (orange)
 
                         if (dueDate) {
                             const now = dayjs().startOf('day');
                             const target = dueDate.startOf('day');
                             const diffDays = target.diff(now, 'day');
 
-                            if (diffDays === 0) {
+                            if (diffDays < 0) {
+                                // Overdue
+                                dueText = target.format('D MMM');
+                                urgencyLevel = 'urgent';
+                            } else if (diffDays === 0) {
                                 dueText = 'Today';
-                                isUrgent = true;
+                                urgencyLevel = 'urgent';
                             } else if (diffDays === 1) {
                                 dueText = 'Tomorrow';
-                                isUrgent = true;
-                            } else if (diffDays < 7 && diffDays > 1) {
+                                urgencyLevel = 'urgent';
+                            } else if (diffDays < 7) {
                                 dueText = target.format('dddd'); // Day name
-                            } else if (diffDays >= 0) {
-                                dueText = target.format('D MMM');
+                                urgencyLevel = 'warning';
                             } else {
-                                // Overdue?
                                 dueText = target.format('D MMM');
-                                isUrgent = true;
+                                urgencyLevel = 'normal';
                             }
                         }
 
                         return {
                             title: t.description,
                             due: dueText,
-                            urgent: isUrgent,
-                            id: t.task_id || t.ai_id
+                            urgencyLevel,
+                            id: t.task_id || t.ai_id,
+                            goalId: t.goal_id,
+                            goalTitle: t.goal_title
                         };
                     });
                     
@@ -87,6 +94,14 @@ const UpcomingTasks = () => {
 
         fetchTasks();
     }, []);
+
+    const getBadgeColor = (level) => {
+        switch(level) {
+            case 'urgent': return 'var(--accent-red-soft)';
+            case 'warning': return 'var(--red)';
+            default: return 'var(--accent-blue, #6B8DB0)';
+        }
+    };
 
     return (
         <div className="home-upcoming-tasks">
@@ -167,27 +182,53 @@ const UpcomingTasks = () => {
                                                 justifyContent: 'space-between',
                                             }}>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                {/* simple arrow icon */}
-                                                <div style={{
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    color: '#1A1A1A'
-                                                }}>
+                                                {/* arrow icon with hover effect */}
+                                                <div 
+                                                    style={{
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        color: hoveredIndex === index ? 'var(--red)' : '#1A1A1A',
+                                                        cursor: 'pointer',
+                                                        transition: 'color 0.2s',
+                                                    }}
+                                                    onMouseEnter={() => setHoveredIndex(index)}
+                                                    onMouseLeave={() => setHoveredIndex(null)}
+                                                    onClick={() => task.goalId && navigate(`/goal/${task.goalId}`, {
+                                                        state: {
+                                                            goalId: task.goalId,
+                                                            goalTitle: task.goalTitle || "Loading...",
+                                                            from: 'home'
+                                                        }
+                                                    })}
+                                                >
                                                     <ArrowUpRight size={20} strokeWidth={2.5} />
                                                 </div>
 
-                                                <span className="task-title" style={{
-                                                    color: task.urgent ? 'var(--accent-red-soft)' : 'var(--text-main)',
-                                                    fontWeight: '400'
-                                                }}>
+                                                <span className="task-title" 
+                                                    style={{
+                                                        color: (hoveredIndex === index || task.urgencyLevel === 'urgent') ? 'var(--red)' : 'var(--text-main)',
+                                                        fontWeight: '400',
+                                                        cursor: 'pointer',
+                                                        transition: 'color 0.2s',
+                                                    }}
+                                                    onMouseEnter={() => setHoveredIndex(index)}
+                                                    onMouseLeave={() => setHoveredIndex(null)}
+                                                    onClick={() => task.goalId && navigate(`/goal/${task.goalId}`, {
+                                                        state: {
+                                                            goalId: task.goalId,
+                                                            goalTitle: task.goalTitle || "Loading...",
+                                                            from: 'home'
+                                                        }
+                                                    })}
+                                                >
                                                     {task.title}
                                                 </span>
                                             </div>
 
                                             {task.due && (
                                                 <span className="task-due-badge" style={{
-                                                    backgroundColor: task.urgent ? 'var(--accent-red-soft)' : '#E0E0E0',
+                                                    backgroundColor: getBadgeColor(task.urgencyLevel),
                                                     color: 'white',
                                                     boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
                                                 }}>
