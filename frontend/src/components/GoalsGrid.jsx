@@ -17,7 +17,7 @@ const GoalsGrid = () => {
     const navigate = useNavigate();
     const [goals, setGoals] = useState([]);
     const [loading, setLoading] = useState(true);
-    const currentMonth = new Date().toLocaleString('default', { month: 'long' });
+    const currentMonth = new Date().toLocaleString('en-US', { month: 'long' });
 
     useEffect(() => {
         const fetchGoals = async () => {
