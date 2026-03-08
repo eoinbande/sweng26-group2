@@ -5,26 +5,21 @@ const Loading = ({ onLoadingComplete }) => {
     useEffect(() => {
         const timer = setTimeout(() => {
             onLoadingComplete && onLoadingComplete();
-        }, 2000); // 2 seconds loading time
+        }, 1500); // 1.5 seconds loading time
 
         return () => clearTimeout(timer);
     }, [onLoadingComplete]);
 
     return (
         <div style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            height: '100vh',
-            width: '100vw',
+            height: '100dvh',
+            width: '100%',
             backgroundColor: 'var(--bg-color)',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: 'var(--space-lg)',
-            zIndex: 1000,
-            overflow: 'hidden'
+            gap: 'var(--space-lg)'
         }}>
             {/*circle*/}
             <div style={{

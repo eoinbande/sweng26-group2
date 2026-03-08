@@ -80,7 +80,7 @@ function LoadingOverlay({ onComplete }) {
                 transform: 'translateX(-50%)',
                 width: '100%',
                 maxWidth: '480px',
-                height: isShrinking ? '75vh' : '100vh',
+                height: isShrinking ? '75dvh' : '100dvh',
                 background: 'var(--accent-blue)',
                 padding: 'var(--space-xxl)',
                 paddingTop: 'var(--space-xl)',

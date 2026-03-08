@@ -11,7 +11,7 @@
     max-width: 480px;
     margin: 0 auto;
     background-color: var(--bg-color);
-    height: 100vh;
+    height: 100dvh;
     overflow-y: auto;
     scrollbar-width: none;
 }
@@ -27,6 +27,32 @@
     /* room for FAB + BottomNav */
 }
 
+/*toast styling*/
+.custom-toast {
+    position: fixed;
+    top: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--text-main);
+    color: white;
+    padding: 12px 24px;
+    border-radius: var(--radius-pill);
+    font-weight: 500;
+    box-shadow: var(--shadow-lg);
+    z-index: 1000;
+    animation: slideDown 0.3s ease-out;
+    white-space: nowrap;
+}
+
+.custom-toast.error {
+    background-color: var(--red);
+}
+
+
+@keyframes slideDown {
+    from { transform: translate(-50%, -20px); opacity: 0; }
+    to { transform: translate(-50%, 0); opacity: 1; }
+}
 
 /* floating action button */
 
@@ -38,13 +64,31 @@
     width: 100%;
     max-width: 480px;
     padding: 0 var(--space-lg);
-    display: flex;
+    display: flex; /* Ensure flex is active */
     justify-content: center;
+    align-items: center;
+    gap: 16px; /* This creates the space between the two buttons */
     z-index: 90;
 }
 
+.btn-update-plan, .btn-delete-goal {
+    flex: 1; /* Allow them to grow equally */
+    max-width: 170px; /* Limits how wide they get on larger screens */
+    background-color: var(--yellow);
+    color: var(--text-main);
+    font-weight: 600;
+    border: none;
+    border-radius: 24px;
+    padding: 14px;
+    font-size: 15px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(255, 185, 46, 0.25);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    white-space: nowrap;
+}
+
 .btn-update-plan {
-    width: 180px;
+    width: 160px;
     background-color: var(--yellow);
     color: var(--text-main);
     font-weight: 600;
@@ -57,10 +101,97 @@
     transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
+.btn-delete-goal {
+    width: 160px;
+    background-color: var(--red);
+    color: var(--card-bg);
+    font-weight: 600;
+    border: none;
+    border-radius: 24px;
+    padding: 14px;
+    font-size: 15px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(221, 100, 95, 0.35);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
 .btn-update-plan:active {
     transform: scale(0.97);
 }
 
+.btn-delete-goal:active {
+    transform: scale(0.97);
+}
+
+/*confirmation for deletion of goal*/
+.btn-confirm-delete, .btn-cancel {
+    width: 100%;
+    font-weight: 600;
+    border: none;
+    border-radius: 24px; 
+    padding: 14px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+}
+
+.btn-confirm-delete {
+    background-color: var(--red);
+    color: white;
+    box-shadow: 0 4px 12px rgba(221, 100, 95, 0.2);
+}
+
+.btn-cancel {
+    background-color: #F0F0EC;
+    color: var(--text-main);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.btn-confirm-delete:active, .btn-cancel:active {
+    transform: scale(0.96);
+}
+
+.confirm-sheet {
+    background: var(--blue);
+    border-radius: 60px 60px 0 0; 
+    padding: 100px 80px 80px 80px; 
+    display: flex;
+    flex-direction: column;
+    min-height: 400px;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.confirm-content {
+    text-align: left; 
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.confirm-content h3 {
+    font-family: var(--font-serif);
+    font-size: clamp(28px, 7vw, 36px);
+    font-weight: '600';
+    color: var(--text-main);
+    margin-bottom: 20px;
+}
+
+.confirm-content p {
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    margin-bottom: 10px; 
+}
+
+.confirm-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    margin-top: 20px;
+}
 
 /* feedback popup overlay */
 
@@ -128,37 +259,5 @@
     }
     to {
         transform: translateY(100%);
-    }
-}
-
-/* ---- Responsive ---- */
-
-@media (max-width: 480px) {
-    .goal-detail-container {
-        padding: 0 var(--space-sm);
-        padding-top: 6px;
-        padding-bottom: 160px;
-    }
-    .btn-update-plan {
-        width: 160px;
-        padding: 12px;
-        font-size: 14px;
-    }
-}
-
-@media (max-width: 380px) {
-    .goal-detail-container {
-        padding: 0 8px;
-        padding-top: 4px;
-        padding-bottom: 140px;
-    }
-    .btn-update-plan {
-        width: 150px;
-        padding: 10px;
-        font-size: 13px;
-        border-radius: 20px;
-    }
-    .fab-container {
-        bottom: 80px;
     }
 }

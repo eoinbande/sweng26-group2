@@ -58,8 +58,10 @@ const StatusIcon = ({ status, allSubsDone, onClick }) => {
     if (status === 'completed') {
         return (
             <div
-                className="tl-status-icon tl-status-icon--completed"
-                aria-label="Task completed"
+                className="tl-status-icon tl-status-icon--completed tl-status-icon--clickable"
+                onClick={onClick}
+                role="button" tabIndex={0}
+                aria-label="Mark as incomplete"
             >
                 <Check size={20} strokeWidth={3} />
             </div>
