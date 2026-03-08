@@ -1,15 +1,24 @@
 import '../index.css';
+import dayjs from 'dayjs';
+import weekday from 'dayjs/plugin/weekday';
+import 'dayjs/locale/en-gb';
+
+dayjs.extend(weekday);
+dayjs.locale('en-gb'); // Start week on Monday
 
 const CalendarStrip = () => {
-    const days = [
-        { day: 'Mon', date: 16 },
-        { day: 'Tue', date: 17 },
-        { day: 'Wed', date: 18 },
-        { day: 'Thu', date: 19 },
-        { day: 'Fri', date: 20, active: true  },
-        { day: 'Sat', date: 21},
-        { day: 'Sun', date: 22 },
-    ];
+    // Generate current week (Mon-Sun)
+    const startOfWeek = dayjs().startOf('week');
+    const today = dayjs();
+    
+    const days = Array.from({ length: 7 }).map((_, i) => {
+        const d = startOfWeek.add(i, 'day');
+        return {
+            date: d.date(),
+            day: d.format('ddd'), // Mon, Tue...
+            active: d.isSame(today, 'day')
+        };
+    });
 
     return (
         <div className="home-calendar">
