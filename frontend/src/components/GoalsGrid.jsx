@@ -5,13 +5,20 @@ import dayjs from 'dayjs';
 import '../index.css';
 
 const CATEGORY_STYLES = {
-    'Health': { color: 'var(--accent-green)', categoryColor: '#3D6B33' },
-    'Personal': { color: 'var(--accent-pink)', categoryColor: '#C0504D' },
-    'Work': { color: 'var(--accent-blue)', categoryColor: '#4A6D8C' },
-    'Education': { color: 'var(--accent-pink)', categoryColor: '#C0504D' },
-    'Finance': { color: 'var(--accent-blue)', categoryColor: '#4A6D8C' },
-    'default': { color: 'var(--primary)', categoryColor: '#A07518' }
+    'Health': { categoryColor: '#3D6B33' },
+    'Personal': { categoryColor: '#C0504D' },
+    'Work': { categoryColor: '#4A6D8C' },
+    'Education': { categoryColor: '#ffdbee' },
+    'Finance': { categoryColor: '#4A6D8C' },
+    'default': { categoryColor: '#A07518' }
 };
+const CARD_COLORS = [
+    'var(--pink)',
+    'var(--blue)',
+    'var(--green-soft)',
+    'var(--blue-soft)'
+];
+
 
 const GoalsGrid = () => {
     const navigate = useNavigate();
@@ -36,13 +43,14 @@ const GoalsGrid = () => {
                     
                     const mappedGoals = json.goals.map((g, index) => {
                         const style = CATEGORY_STYLES[g.category] || CATEGORY_STYLES.default;
-                        
+                        const bgColor = CARD_COLORS[index % CARD_COLORS.length];
+
                         return {
                             id: g.goal_id,
                             title: g.title,
                             date: dayjs(g.goal_due_date).format('D MMM'),
                             category: g.category,
-                            color: style.color,
+                            color: bgColor,
                             categoryColor: style.categoryColor
                         };
                     });
