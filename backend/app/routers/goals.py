@@ -53,10 +53,15 @@ class AcceptPlanRequest(BaseModel):
 class FeedbackRequest(BaseModel):
     """
     What frontend sends when user gives feedback on a plan.
-    
+
+    current_tasks: The tasks currently visible to the user. If provided, used as
+    AI context instead of fetching from DB — critical for multi-round feedback
+    on the preview page where intermediate revisions aren't saved yet.
+
     Example: {"feedback": "I don't like task_3, use soapy water instead"}
     """
     feedback: str
+    current_tasks: Optional[list] = None
 
 
 class UpdateCategoryRequest(BaseModel):
@@ -180,12 +185,15 @@ def feedback_on_plan(goal_id: str, request: FeedbackRequest):
 
     #------------------------Real AI integration-----------------
 
-    #we want to ONLY modify the task been asked for feedback, leave other task as they are
-    current_data = goal.get("goal_data", {}) #not sure if this gonna work, needs testing!
-    if isinstance(current_data, str): 
-        current_data = json.loads(current_data)
-
-    current_tasks = current_data.get("tasks", [])
+    # Use tasks sent by the frontend if provided (covers multi-round feedback on preview,
+    # where intermediate revisions are not yet saved to DB). Fall back to DB state otherwise.
+    if request.current_tasks is not None:
+        current_tasks = request.current_tasks
+    else:
+        current_data = goal.get("goal_data", {})
+        if isinstance(current_data, str):
+            current_data = json.loads(current_data)
+        current_tasks = current_data.get("tasks", [])
 
     #call real AI service to update plan based on the feedback
     try:

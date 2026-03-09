@@ -222,7 +222,7 @@ function ReviewPlan() {
         const res = await fetch(`${import.meta.env.VITE_API_URL}/goals/${goalId}/feedback`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ feedback: feedbackText })
+            body: JSON.stringify({ feedback: val, current_tasks: previewData?.tasks })
         });
 
         const data = await res.json();
