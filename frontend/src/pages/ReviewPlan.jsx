@@ -177,8 +177,21 @@ function ReviewPlan() {
                 setSaving(false);
                 return;
             }
+            
+            const from = location.state?.originalFrom || location.state?.from;  // Get where we came from
+    
 
-            navigate('/goals');
+            if (from === 'detail') {
+                // Came from GoalDetail or Review (aka iterative feedback) → go back to GoalDetail;
+                navigate(`/goal/${goalId}`, {
+                    state: { goalId }
+                });
+            } else {
+                // Came from CreateGoal or default → go to CreateGoal
+                navigate('/create-goal', { 
+                    state: { originalPrompt } 
+                });
+            }
         } catch (err) {
             console.error('Network error saving goal:', err);
             alert('Network error. Is the backend running?');
