@@ -38,7 +38,7 @@ const Profile = () => {
                 padding: '0 var(--space-lg)',
                 paddingBottom: '120px' // Space for bottom nav
             }}>
-                <PageHeader title="Your Account" accentColor="var(--accent-red)" />
+                <PageHeader title="Your Account" accentColor="var(--accent-red-soft)" />
                 
                 <div style={{
                     flex: 1,
@@ -65,11 +65,11 @@ const Profile = () => {
                         }}
                         onMouseEnter={(e) => {
                             e.currentTarget.style.transform = 'translateY(-2px)';
-                            e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
+                            e.currentTarget.style.boxShadow = 'var(--shadow-md)';
                         }}
                         onMouseLeave={(e) => {
                             e.currentTarget.style.transform = 'translateY(0)';
-                            e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+                            e.currentTarget.style.boxShadow = 'none';
                         }}
                     >
                         <LogOut size={20} />
