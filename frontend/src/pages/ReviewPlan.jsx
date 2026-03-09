@@ -371,7 +371,8 @@ function ReviewPlan() {
                             flexDirection: 'column',
                             alignItems: 'center',
                             gap: 'var(--space-md)',
-                            paddingLeft: '40px',
+                            // paddingLeft: '40px', /* Restore when tick/cross needed */
+                            paddingLeft: 'var(--space-md)', 
                             paddingRight: 'var(--space-md)',
                             width: '100%',
                             boxSizing: 'border-box',
