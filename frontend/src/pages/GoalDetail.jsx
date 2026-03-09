@@ -5,6 +5,7 @@ import BottomNav from '../components/BottomNav';
 import GoalDetailHeader from '../components/GoalDetailHeader';
 import TaskTimeline from '../components/TaskTimeline';
 import Loading from '../components/Loading'; // Import Loading component if it exists
+import LoadingOverlay from '../components/LoadingOverlay'; // Import LoadingOverlay for feedback
 import FeedbackPopUp from '../components/FeedbackPopUp';
 import '../styles/GoalDetail.css';
 import { supabase } from '../supabase_client';
@@ -30,6 +31,7 @@ const [closingDelete, setClosingDelete] = useState(false);
 
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
+    const [updating, setUpdating] = useState(false); // New state for feedback loading overlay
 
     const closeFeedback = () => {
         setClosingFeedback(true);
@@ -263,8 +265,8 @@ const [closingDelete, setClosingDelete] = useState(false);
     const handleSubmitFeedback = async (text) => {
     const val = text; // handle value from InputBar or state
     if (!val.trim()) return;
-    
-        //setSubmittingFeedback(true);
+    setUpdating(true); // Start loading overlay
+        closeFeedback(); // Close the popup
         //setShowLoading(true); // Show loading overlay while processing feedback
     
         try {
@@ -315,13 +317,12 @@ const [closingDelete, setClosingDelete] = useState(false);
             },
         });
 
-        //setSubmittingFeedback(false);
+        // setUpdating(false); // Don't turn off here, let navigation handle it (unmount) or let ReviewPlan take over
 
     } catch (err) {
         console.error('Network error:', err);
         alert('Network error. Is the backend running?');
-        //setSubmittingFeedback(false);
-        //setShowLoading(false);
+        setUpdating(false);
     }
     };
 
@@ -423,6 +424,14 @@ const [closingDelete, setClosingDelete] = useState(false);
             )}
 
             {/* floating buttons */}
+            {/* loading overlay for feedback */}
+            {updating && (
+                <LoadingOverlay 
+                    isLoading={true} 
+                    onComplete={() => {}} 
+                />
+            )}
+
             {/* Update Button */}
             <div className="fab-container">
                 <button className="btn-update-plan" onClick={() => setShowFeedback(true)}>
