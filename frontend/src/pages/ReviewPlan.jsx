@@ -44,13 +44,9 @@ function ReviewPlan() {
 
     // If we don't have previewData but we have a goalTitle, fetch it now
     useEffect(() => {
-        // If we already have data, just ensure loading is off after a moment
+        // If we already have data, let LoadingOverlay handle the transition
+        // by passing a short minDisplayTime.
         if (previewData) {
-            if (showLoading) {
-                // If we came with loading=true but data exists (shouldn't happen with new flow, but mostly for safety)
-                const t = setTimeout(() => setShowLoading(false), 500);
-                return () => clearTimeout(t);
-            }
             return;
         }
 
@@ -522,6 +518,7 @@ function ReviewPlan() {
                 <LoadingOverlay 
                     onComplete={() => setShowLoading(false)} 
                     isLoading={!previewData || submittingFeedback}
+                    minDisplayTime={previewData ? 100 : 2000}
                 />
             )}
         </div>

@@ -6,7 +6,7 @@ import 'ldrs/react/Hourglass.css'
 import '../index.css';
 
 // loading overlay component for transitioning between pages
-function LoadingOverlay({ onComplete, isLoading = false }) {
+function LoadingOverlay({ onComplete, isLoading = false, minDisplayTime = 2000 }) {
     const navigate = useNavigate();
 
     const phrases = [
@@ -40,7 +40,7 @@ function LoadingOverlay({ onComplete, isLoading = false }) {
         // set minimum time elapsed
         const minTimeTimer = setTimeout(() => {
             setMinTimeElapsed(true);
-        }, 2000);
+        }, minDisplayTime);
 
         // cycle through phrases with fade transition
         const cycleInterval = setInterval(() => {
@@ -58,7 +58,7 @@ function LoadingOverlay({ onComplete, isLoading = false }) {
             clearTimeout(minTimeTimer);
             clearInterval(cycleInterval);
         };
-    }, [phrases.length]);
+    }, [phrases.length, minDisplayTime]);
 
     // Handle completion logic: wait for isLoading to be false AND minTimeElapsed
     useEffect(() => {
