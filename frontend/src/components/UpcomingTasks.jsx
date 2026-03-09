@@ -207,7 +207,7 @@ const UpcomingTasks = () => {
 
                                                 <span className="task-title" 
                                                     style={{
-                                                        color: (hoveredIndex === index || task.urgencyLevel === 'urgent') ? 'var(--red)' : 'var(--text-main)',
+                                                        color: hoveredIndex === index ? 'var(--red)' : 'var(--text-main)',
                                                         fontWeight: '400',
                                                         cursor: 'pointer',
                                                         transition: 'color 0.2s',
