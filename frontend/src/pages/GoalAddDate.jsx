@@ -58,14 +58,17 @@ function GoalAddDate() {
         }, 500);
     };
 
-    // format date from picker as MM/DD/YYYY
+    // format date from picker
     const handleDateChange = (date) => {
         const dd = String(date.getDate()).padStart(2, '0');
         const mm = String(date.getMonth() + 1).padStart(2, '0');
         const yyyy = date.getFullYear();
-        const formatted = `${mm}/${dd}/${yyyy}`;
-        setDateValue(formatted);
-        dateValueRef.current = formatted;
+        
+        // internal value for backend: YYYY-MM-DD (ISO format)
+        dateValueRef.current = `${yyyy}-${mm}-${dd}`;
+
+        // display value: DD/MM/YYYY
+        setDateValue(`${dd}/${mm}/${yyyy}`);
     };
 
     // "Let AI decide" - skip date input and proceed with goal submission
