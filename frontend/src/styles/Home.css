@@ -49,7 +49,7 @@
 
 .home-page .home-calendar {
     margin-bottom: clamp(4px, 2dvh, 4dvh);
-    flex-shrink: 0;
+    flex-shrink: 1;
 }
 
 .home-page .home-calendar .calendar-day-label {
@@ -74,9 +74,9 @@
 /* top/bottom padding = 2x the side padding to keep proportional height */
 
 .home-page .home-create-goal {
-    padding: clamp(32px, 5dvh, 5dvh) clamp(16px, 5dvh, 30px);
+    padding: clamp(24px, 4dvh, 5dvh) clamp(16px, 5dvh, 30px);
     padding-right: clamp(24px, 6dvh, 8%);
-    flex-shrink: 0;
+    flex-shrink: 1;
 }
 
 .home-page .home-create-goal h3 {
@@ -112,7 +112,7 @@
     display: flex;
     flex-direction: column;
     flex: 1; /* Grow to fill space */
-    min-height: 25dvh; /* Force it to be taller */
+    min-height: 20dvh; 
 }
 
 .home-page .home-upcoming-tasks>h4 {
@@ -169,8 +169,8 @@
 }
 
 .home-page .home-goals-grid .goal-card {
-    min-width: clamp(100px, 28vw, 140px); /* Smaller width */
-    max-width: clamp(100px, 28vw, 140px); /* Smaller width */
+    min-width: clamp(110px, 30vw, 150px); /* Slightly wider */
+    max-width: clamp(110px, 30vw, 150px);
     padding: clamp(10px, 1.8dvh, 16px);   /* Reduced padding */
     border-radius: clamp(20px, 2.5dvh, 32px);
 }
