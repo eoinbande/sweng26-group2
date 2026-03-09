@@ -4,21 +4,12 @@ import { supabase } from '../supabase_client';
 import dayjs from 'dayjs';
 import '../index.css';
 
-const CATEGORY_STYLES = {
-    'Health': { categoryColor: '#3D6B33' },
-    'Personal': { categoryColor: '#C0504D' },
-    'Work': { categoryColor: '#4A6D8C' },
-    'Education': { categoryColor: '#ffdbee' },
-    'Finance': { categoryColor: '#4A6D8C' },
-    'default': { categoryColor: '#A07518' }
-};
 const CARD_COLORS = [
     'var(--pink)',
     'var(--blue)',
-    'var(--green-soft)',
-    'var(--blue-soft)'
+    'var(--accent-green)',
+    'var(--yellow-soft)'
 ];
-
 
 const GoalsGrid = () => {
     const navigate = useNavigate();
@@ -42,7 +33,6 @@ const GoalsGrid = () => {
                     const json = await res.json();
                     
                     const mappedGoals = json.goals.map((g, index) => {
-                        const style = CATEGORY_STYLES[g.category] || CATEGORY_STYLES.default;
                         const bgColor = CARD_COLORS[index % CARD_COLORS.length];
 
                         return {
@@ -50,8 +40,7 @@ const GoalsGrid = () => {
                             title: g.title,
                             date: dayjs(g.goal_due_date).format('D MMM'),
                             category: g.category,
-                            color: bgColor,
-                            categoryColor: style.categoryColor
+                            color: bgColor
                         };
                     });
                     
