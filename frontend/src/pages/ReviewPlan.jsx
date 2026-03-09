@@ -279,6 +279,9 @@ function ReviewPlan() {
 
     useEffect(() => {
         if (location.state?.previewData) {
+            // Update previewData from location state (for feedback loop)
+            setPreviewData(location.state.previewData);
+
             // If the tasks in state change, ensure we show the loading if requested
             if (location.state.showLoading) {
                 setShowLoading(true);
@@ -505,7 +508,7 @@ function ReviewPlan() {
             {showLoading && (
                 <LoadingOverlay 
                     onComplete={() => setShowLoading(false)} 
-                    isLoading={!previewData}
+                    isLoading={!previewData || submittingFeedback}
                 />
             )}
         </div>
