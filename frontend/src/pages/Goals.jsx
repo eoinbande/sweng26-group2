@@ -6,6 +6,7 @@ import BottomNav from '../components/BottomNav';
 import Loading from '../components/Loading';
 import { supabase, isDemoMode } from '../supabase_client';
 import '../styles/Goals.css';
+import CategoryIcon from '../components/CategoryIcon';
 
 const COLOR_SCHEMES_LIST = ['blue', 'yellow', 'green', 'pink'];
 
