@@ -1,5 +1,5 @@
 import React, {useState} from "react"
-
+import '.../styles/components/CategoryIcon.css'
 const CategoryIcon = ({
     categories,
     selectedCategories,
@@ -9,12 +9,12 @@ const CategoryIcon = ({
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isAddingNew, setIsAddingNew] = useState(false);
     const [newCategoryInput, setNewCategoryInput] = useState('');
-    return <div className = "category">
+    return <div className = "category-bar">
         <div> 
-            <button onClick={() => setIsDropdownOpen (!isDropdownOpen)}>
+            <button className="category-btn" onClick={() => setIsDropdownOpen (!isDropdownOpen)}>
                  Category {isDropdownOpen ? '▲' : '▼'}
             </button>
-            { isDropdownOpen && <div> 
+            { isDropdownOpen && <div className="category-dropdown"> 
                 <p onClick={() => { onSelectionChange([]); setIsDropdownOpen(false); }}>
                     {selectedCategories.length === 0 ? '✓ ' : ''}All
                     </p>
