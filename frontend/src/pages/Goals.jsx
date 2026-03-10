@@ -9,8 +9,6 @@ import '../styles/Goals.css';
 import CategoryIcon from '../components/CategoryIcon';
 
 const COLOR_SCHEMES_LIST = ['blue', 'yellow', 'green', 'pink'];
-const [categories, setCategories] = useState(['Creative', 'School', 'Health']);
-const [selectedCategories, setSelectedCategories] = useState([]);
 
 const MOCK_GOALS = [
     { id: 1, title: 'Learn Piano', description: 'Master basic chords and scales', date: '15 Mar', progress: 40, colorScheme: 'blue' },
@@ -25,6 +23,9 @@ const Goals = () => {
     const [goals, setGoals] = useState([]);
     const [loading, setLoading] = useState(true);
     const scrollRef = useRef(null);
+    const [categories, setCategories] = useState(['Creative', 'School', 'Health']);
+    const [selectedCategories, setSelectedCategories] = useState([]);
+
 
     const handleScroll = useCallback(() => {
         const el = scrollRef.current;
@@ -137,6 +138,14 @@ const Goals = () => {
         }
     }, [location.state]);
 
+     const handleSelectionChange = (updated) => {
+    setSelectedCategories(updated);
+    };
+
+    const handleNewCategory = (name) => {
+        if (name.trim()) setCategories(prev => [...prev, name.trim()]);
+    };
+
     if (loading) {
         return (
             <div className="goals-page">
@@ -146,13 +155,9 @@ const Goals = () => {
         );
     }
 
-    const handleSelectionChange = (updated) => {
-    setSelectedCategories(updated);
-    };
-
-    const handleNewCategory = (name) => {
-        if (name.trim()) setCategories(prev => [...prev, name.trim()]);
-    };
+    const filteredGoals = selectedCategories.length === 0
+    ? goals
+    : goals.filter(g => selectedCategories.includes(g.category));
 
 
     return (
