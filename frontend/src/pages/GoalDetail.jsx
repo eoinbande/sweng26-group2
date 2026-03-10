@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react'; 
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
 import GoalDetailHeader from '../components/GoalDetailHeader';
 import TaskTimeline from '../components/TaskTimeline';
@@ -13,11 +13,12 @@ import { supabase } from '../supabase_client';
 const GoalDetail = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const { id: paramId } = useParams();
 
     // Safely access location state
     // Use "Loading..." as default if we are loading, unless we want to show stale title
     const [goalTitle, setGoalTitle] = useState(location.state?.goal?.title || location.state?.goalTitle || "Loading...");
-    const goalId = location.state?.goal?.id || location.state?.goalId || null;
+    const goalId = location.state?.goal?.id || location.state?.goalId || paramId || null;
 
     /* rstore tasks from location.state if returning from feedback page */
     const [tasks, setTasks] = useState(location.state?.tasks || []);

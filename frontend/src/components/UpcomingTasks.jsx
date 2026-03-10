@@ -176,10 +176,20 @@ const UpcomingTasks = () => {
                                 <ul style={{ listStyle: 'none' }}>
                                     {tasks.map((task, index) => (
                                         <li key={index} className="task-item"
+                                            onClick={() => task.goalId && navigate(`/goal/${task.goalId}`, {
+                                                state: {
+                                                    goalId: task.goalId,
+                                                    goalTitle: task.goalTitle || "Loading...",
+                                                    from: 'home'
+                                                }
+                                            })}
+                                            onMouseEnter={() => setHoveredIndex(index)}
+                                            onMouseLeave={() => setHoveredIndex(null)}
                                             style={{
                                                 display: 'flex',
                                                 alignItems: 'center',
                                                 justifyContent: 'space-between',
+                                                cursor: 'pointer'
                                             }}>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                                 {/* arrow icon with hover effect */}
@@ -189,18 +199,8 @@ const UpcomingTasks = () => {
                                                         alignItems: 'center',
                                                         justifyContent: 'center',
                                                         color: hoveredIndex === index ? 'var(--red)' : '#1A1A1A',
-                                                        cursor: 'pointer',
                                                         transition: 'color 0.2s',
                                                     }}
-                                                    onMouseEnter={() => setHoveredIndex(index)}
-                                                    onMouseLeave={() => setHoveredIndex(null)}
-                                                    onClick={() => task.goalId && navigate(`/goal/${task.goalId}`, {
-                                                        state: {
-                                                            goalId: task.goalId,
-                                                            goalTitle: task.goalTitle || "Loading...",
-                                                            from: 'home'
-                                                        }
-                                                    })}
                                                 >
                                                     <ArrowUpRight size={20} strokeWidth={2.5} />
                                                 </div>
@@ -209,18 +209,8 @@ const UpcomingTasks = () => {
                                                     style={{
                                                         color: hoveredIndex === index ? 'var(--red)' : 'var(--text-main)',
                                                         fontWeight: '400',
-                                                        cursor: 'pointer',
                                                         transition: 'color 0.2s',
                                                     }}
-                                                    onMouseEnter={() => setHoveredIndex(index)}
-                                                    onMouseLeave={() => setHoveredIndex(null)}
-                                                    onClick={() => task.goalId && navigate(`/goal/${task.goalId}`, {
-                                                        state: {
-                                                            goalId: task.goalId,
-                                                            goalTitle: task.goalTitle || "Loading...",
-                                                            from: 'home'
-                                                        }
-                                                    })}
                                                 >
                                                     {task.title}
                                                 </span>

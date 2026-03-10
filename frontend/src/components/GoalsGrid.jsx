@@ -75,13 +75,14 @@ const GoalsGrid = () => {
                     </div>
                 ) : (
                     goals.map((goal, index) => (
-                        <div key={index} className="goal-grid-card goal-card" onClick={() => navigate(`/goal/${goal.id}`)} style={{
+                        <div key={index} className="goal-grid-card goal-card" onClick={() => navigate(`/goal/${goal.id}`, { state: { goalTitle: goal.title } })} style={{
                             backgroundColor: goal.color,
                             display: 'flex',
                             flexDirection: 'column',
                             justifyContent: 'space-between',
                             boxShadow: 'var(--shadow-sm)',
-                            flexShrink: 0
+                            flexShrink: 0,
+                            cursor: 'pointer'
                         }}>
                             <h5 style={{
                                 fontFamily: 'var(--font-sans)',
