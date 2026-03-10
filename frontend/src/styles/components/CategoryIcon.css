@@ -1,0 +1,82 @@
+/* Outer wrapper - flex row, space between */
+.category-bar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    position: relative;
+}
+
+/* Both buttons share base style */
+.category-btn, .new-category-btn {
+    border-radius: 999px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+}
+
+/* "Category ▼" — filled red */
+.category-btn {
+    background-color: #E8505B;
+    color: white;
+}
+
+/* "+ New category" — outlined red */
+.new-category-btn {
+    background-color: transparent;
+    border: 2px solid #E8505B;
+    color: #E8505B;
+}
+
+/* Dropdown panel */
+.category-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    z-index: 100;
+    min-width: 160px;
+    padding: 8px 0;
+}
+
+.category-dropdown p {
+    padding: 10px 20px;
+    margin: 0;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.category-dropdown p:hover {
+    background-color: #f5f5f5;
+}
+
+/* New category input row */
+.new-category-input {
+    display: flex;
+    gap: 6px;
+}
+
+.new-category-input input {
+    border-radius: 999px;
+    border: 2px solid #E8505B;
+    padding: 6px 12px;
+    font-size: 13px;
+    outline: none;
+    width: 130px;
+}
+
+.new-category-input button {
+    border-radius: 999px;
+    background-color: #E8505B;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    font-size: 13px;
+    cursor: pointer;
+}
