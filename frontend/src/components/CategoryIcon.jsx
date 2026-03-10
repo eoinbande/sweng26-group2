@@ -38,6 +38,13 @@ const CategoryIcon = ({
                 <input 
                 value = {newCategoryInput}
                 onChange={(e) => setNewCategoryInput(e.currentTarget.value)}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                        onNewCategory(newCategoryInput);
+                        setNewCategoryInput('');
+                        setIsAddingNew(false);
+                    }
+                }}      
                 placeholder="Category name"/>
                 
                 <button onClick={() => { 
