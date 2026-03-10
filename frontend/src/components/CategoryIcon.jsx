@@ -1,8 +1,15 @@
 import React, {useState} from "react"
 
-export function CategoryIcon = ({
+const CategoryIcon = ({
     categories,
     selectedCategories,
     onSelectionChange,
-    onNewCaategory
-})
+    onNewCategory
+}) => {
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [isAddingNew, setIsAddingNew] = useState(false);
+    const [newCategoryInput, setCategoryInput] = useState('');
+
+    return <div></div>
+};
+export default CategoryIcon;
