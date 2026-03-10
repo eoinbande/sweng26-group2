@@ -168,9 +168,9 @@ const TaskTimeline = ({ tasks, getTaskStatus, isTaskComplete, toggleTask, toggle
                                 {daysLeft}
                             </p> */}
 
-                            {lockMessage && (
+                            {/* {lockMessage && (
                                 <p className="tl-lock-msg">{lockMessage}</p>
-                            )}
+                            )} */}
 
                             {/* subtasks;only shown for ACTIVE tasks */}
                             {status === 'active' && task.subtasks.length > 0 && (
