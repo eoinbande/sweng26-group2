@@ -7,8 +7,6 @@ const CategoryIcon = ({
     onNewCategory
 }) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const [isAddingNew, setIsAddingNew] = useState(false);
-    const [newCategoryInput, setNewCategoryInput] = useState('');
     return <div className = "category-bar">
         <div> 
             <button className="category-btn" onClick={() => setIsDropdownOpen (!isDropdownOpen)}>
