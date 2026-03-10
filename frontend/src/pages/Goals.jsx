@@ -188,7 +188,7 @@ const Goals = () => {
             />
             <BottomNav />
         </div>
-        </div>
+    </div>
     );
 };
 
