@@ -8,8 +8,18 @@ const CategoryIcon = ({
 }) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isAddingNew, setIsAddingNew] = useState(false);
-    const [newCategoryInput, setCategoryInput] = useState('');
+    const [newCategoryInput, setNewCategoryInput] = useState('');
+    return <div className = "category">
+        <h4> Category </h4>
+        <div> 
+            <button> Category ▼ </button>
+            { isDropdownOpen && <div> </div>}
+        </div>
 
-    return <div></div>
+        <div>
+            { isAddingNew ? <input + confirm> : <button> + New category</button>}
+        </div>
+
+    </div>
 };
 export default CategoryIcon;
