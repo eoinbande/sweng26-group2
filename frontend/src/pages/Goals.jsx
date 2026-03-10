@@ -179,6 +179,7 @@ const Goals = () => {
                             <GoalListCard key={goal.id} 
                             goal={goal}
                             categories={categories}
+                            onNewCategory={handleNewCategory}
                             onAssignCategory={(goalId, cat)=> {
                                 setGoals(prev => prev.map(g => g.id === goalId ? {...g, category: cat} : g))
                             }} />
