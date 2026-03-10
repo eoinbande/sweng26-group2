@@ -1,4 +1,5 @@
 import React from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProgressBar from './ProgressBar';
 import '../styles/components/GoalListCard.css';
@@ -30,10 +31,10 @@ const COLOR_SCHEMES = {
     }
 };
 
-const GoalListCard = ({ goal, onClick }) => {
+const GoalListCard = ({ goal, onClick, categories, onAssignCategory }) => {
     const navigate = useNavigate();
     const scheme = COLOR_SCHEMES[goal.colorScheme] || COLOR_SCHEMES.blue;
-
+    const [isAssignOpen, setIsAssignOpen] = useState(false);
     const handleClick = () => {
         if (onClick) {
             onClick();
