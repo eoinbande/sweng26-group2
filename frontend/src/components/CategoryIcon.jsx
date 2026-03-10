@@ -10,14 +10,28 @@ const CategoryIcon = ({
     const [isAddingNew, setIsAddingNew] = useState(false);
     const [newCategoryInput, setNewCategoryInput] = useState('');
     return <div className = "category">
-        <h4> Category </h4>
         <div> 
-            <button> Category ▼ </button>
+            <button onClick={() => setIsDropdownOpen (!isDropdownOpen)}>
+                 Category {isDropdownOpen ? '▲' : '▼'}
+            </button>
             { isDropdownOpen && <div> </div>}
         </div>
 
         <div>
-            { isAddingNew ? <input + confirm> : <button> + New category</button>}
+            { isAddingNew 
+            ? <div> 
+                <input 
+                value = {newCategoryInput}
+                onChange={(e) => setNewCategoryInput(e.currentTarget.value)}
+                placeholder="Category name"/>
+                
+                <button onClick={() => { 
+                    onNewCategory(newCategoryInput);
+                    setNewCategoryInput('');
+                    setIsAddingNew(false);
+                }}> Add</button> 
+                </div>:
+                 <button onClick = {() => setIsAddingNew(true)}> + New category</button>}
         </div>
 
     </div>
