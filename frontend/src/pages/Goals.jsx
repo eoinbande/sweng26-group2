@@ -167,26 +167,27 @@ const Goals = () => {
                 <CategoryIcon
                     categories={categories}
                     selectedCategories={selectedCategories}
-                    onSelectionChange={onSelectionChange}
-                    onNewCategory={onNewCategory}
+                    onSelectionChange={handleSelectionChange}
+                    onNewCategory={handleNewCategory}
                 />
                 {/* Goals List */}
                 <div className="goals-list">
-                    {goals.length === 0 ? (
+                    {filteredGoals.length === 0 ? (
                         <p style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>No goals yet. Create one!</p>
                     ) : (
-                        goals.map((goal) => (
+                        filteredGoals.map((goal) => (
                             <GoalListCard key={goal.id} goal={goal} />
                         ))
                     )}
                 </div>
-            </div>
+
 
             <div
                 className="goals-fade-overlay"
                 style={{ opacity: showBottomFade ? 1 : 0 }}
             />
             <BottomNav />
+        </div>
         </div>
     );
 };
