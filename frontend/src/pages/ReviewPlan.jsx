@@ -174,20 +174,11 @@ function ReviewPlan() {
                 return;
             }
             
-            const from = location.state?.originalFrom || location.state?.from;  // Get where we came from
-    
-
-            if (from === 'detail') {
                 // Came from GoalDetail or Review (aka iterative feedback) → go back to GoalDetail;
                 navigate(`/goal/${goalId}`, {
                     state: { goalId }
                 });
-            } else {
-                // Came from CreateGoal or default → go to CreateGoal
-                navigate('/create-goal', { 
-                    state: { originalPrompt } 
-                });
-            }
+
         } catch (err) {
             console.error('Network error saving goal:', err);
             alert('Network error. Is the backend running?');
@@ -371,8 +362,7 @@ function ReviewPlan() {
                             flexDirection: 'column',
                             alignItems: 'center',
                             gap: 'var(--space-md)',
-                            // paddingLeft: '40px', /* Restore when tick/cross needed */
-                            paddingLeft: 'var(--space-md)', 
+                            paddingLeft: '40px',
                             paddingRight: 'var(--space-md)',
                             width: '100%',
                             boxSizing: 'border-box',
