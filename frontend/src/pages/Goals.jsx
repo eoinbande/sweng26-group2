@@ -176,7 +176,12 @@ const Goals = () => {
                         <p style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>No goals yet. Create one!</p>
                     ) : (
                         filteredGoals.map((goal) => (
-                            <GoalListCard key={goal.id} goal={goal} />
+                            <GoalListCard key={goal.id} 
+                            goal={goal}
+                            categories={categories}
+                            onAssignCategory={(goalId, cat)=> {
+                                setGoals(prev => prev.map(g => g.id === goalId ? {...g, category: cat} : g))
+                            }} />
                         ))
                     )}
                 </div>
