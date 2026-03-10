@@ -187,14 +187,13 @@
 }
 
 .assign-category-btn {
-    width: 28px;
-    height: 28px;
+    padding: 4px 12px;
     border-radius: 999px;
     border: none;
     background-color: white;
     color: #E8505B;
     font-size: 22px;
-    font-weight: 300;
+    font-weight: 400;
     cursor: pointer;
     display: flex;
     align-items: center;
