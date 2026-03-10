@@ -9,6 +9,8 @@ import '../styles/Goals.css';
 import CategoryIcon from '../components/CategoryIcon';
 
 const COLOR_SCHEMES_LIST = ['blue', 'yellow', 'green', 'pink'];
+const [categories, setCategories] = useState(['Creative', 'School', 'Health']);
+const [selectedCategories, setSelectedCategories] = useState([]);
 
 const MOCK_GOALS = [
     { id: 1, title: 'Learn Piano', description: 'Master basic chords and scales', date: '15 Mar', progress: 40, colorScheme: 'blue' },
@@ -143,6 +145,15 @@ const Goals = () => {
             </div>
         );
     }
+
+    const handleSelectionChange = (updated) => {
+    setSelectedCategories(updated);
+    };
+
+    const handleNewCategory = (name) => {
+        if (name.trim()) setCategories(prev => [...prev, name.trim()]);
+    };
+
 
     return (
         <div className="goals-page">
