@@ -71,7 +71,7 @@ const GoalListCard = ({ goal, onClick, categories, onAssignCategory }) => {
                         : <button className = "assign-category-btn" onClick={(e) => { e.stopPropagation(); setIsAssignOpen(!isAssignOpen); }}>+</button>
                     }
                     {isAssignOpen && (
-                        <div classNmae= "assign-dropdown">
+                        <div className= "assign-dropdown">
                             {categories.map(cat => (
                                 <p key={cat} onClick={(e) => { 
                                     e.stopPropagation(); 
