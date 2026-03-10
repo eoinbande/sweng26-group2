@@ -34,7 +34,7 @@ const CategoryIcon = ({
 
         <div>
             { isAddingNew 
-            ? <div> 
+            ? <div className = "new-category-input"> 
                 <input 
                 value = {newCategoryInput}
                 onChange={(e) => setNewCategoryInput(e.currentTarget.value)}
@@ -46,7 +46,7 @@ const CategoryIcon = ({
                     setIsAddingNew(false);
                 }}> Add</button> 
                 </div>:
-                 <button onClick = {() => setIsAddingNew(true)}> + New category</button>}
+                 <button className= "new-category-btn" onClick = {() => setIsAddingNew(true)}> + New category</button>}
         </div>
 
     </div>
