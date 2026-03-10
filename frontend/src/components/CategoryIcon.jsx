@@ -14,7 +14,22 @@ const CategoryIcon = ({
             <button onClick={() => setIsDropdownOpen (!isDropdownOpen)}>
                  Category {isDropdownOpen ? '▲' : '▼'}
             </button>
-            { isDropdownOpen && <div> </div>}
+            { isDropdownOpen && <div> 
+                <p onClick={() => { onSelectionChange([]); setIsDropdownOpen(false); }}>
+                    {selectedCategories.length === 0 ? '✓ ' : ''}All
+                    </p>
+                    {categories.map(cat => (
+                        <p key={cat} onClick={() => {
+                            const updated = selectedCategories.includes(cat)
+                                ? selectedCategories.filter(c => c !== cat)
+                                : [...selectedCategories, cat];
+                            onSelectionChange(updated);
+                        }}>
+                            {selectedCategories.includes(cat) ? '✓ ' : ''}{cat}
+                        </p>
+                    ))}
+                </div>
+            }
         </div>
 
         <div>
