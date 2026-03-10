@@ -69,7 +69,7 @@ function ReviewPlan() {
                             { ai_id: "t2", description: "Mock Task 2", order: 2, status: "not_started" }
                         ]
                     });
-                    setShowLoading(false);
+                    // let LoadingOverlay handle the transition via onComplete
                     return;
                 }
 
@@ -85,7 +85,7 @@ function ReviewPlan() {
                 if (!res.ok) throw new Error(data.detail || 'Failed to fetch plan');
 
                 setPreviewData(data);
-                setShowLoading(false);
+                // setShowLoading(false);
             } catch (err) {
                 console.error(err);
                 alert("Failed to generate plan. Please try again.");
