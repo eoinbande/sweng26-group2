@@ -205,7 +205,7 @@
     position: absolute;
     top: 40px;
     right: 40px;
-    background: white;
+    background: #E8505B;
     border-radius: 16px;
     box-shadow: 0 4px 16px rgba(0,0,0,0.12);
     z-index: 100;
@@ -219,8 +219,9 @@
     cursor: pointer;
     font-size: 14px;
     font-weight: 600;
+    color: white;
 }
 
 .assign-dropdown p:hover {
-    background-color: #f5f5f5;
+    background-color: rgba(255,255,255,0.15);
 }
