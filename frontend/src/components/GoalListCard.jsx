@@ -31,10 +31,13 @@ const COLOR_SCHEMES = {
     }
 };
 
-const GoalListCard = ({ goal, onClick, categories, onAssignCategory }) => {
+const GoalListCard = ({ goal, onClick, categories, onAssignCategory, onNewCategory }) => {
     const navigate = useNavigate();
     const scheme = COLOR_SCHEMES[goal.colorScheme] || COLOR_SCHEMES.blue;
     const [isAssignOpen, setIsAssignOpen] = useState(false);
+    const [isCustomInput, setIsCustomInput] = useState(false);
+    const [customInput, setCustomInput] = useState('');
+
     const handleClick = () => {
         if (onClick) {
             onClick();
@@ -79,8 +82,28 @@ const GoalListCard = ({ goal, onClick, categories, onAssignCategory }) => {
                                     setIsAssignOpen(false); 
                                 }}>{cat}</p>
                             ))}
-                        </div>
-                    )}
+                            {isCustomInput 
+                                ? <div onClick={e=>e.stopPropagation()}>
+                                    <input 
+                                        value={customInput}
+                                        onChange={e => setCustomInput(e.target.value)}
+                                        onKeyDown={e => {
+                                            if (e.key === 'Enter' && customInput.trim()) {
+                                                onNewCategory(customInput.trim());
+                                                onAssignCategory(goal.id, customInput.trim());
+                                                setCustomInput('');
+                                                setIsAssignOpen(false);
+                                                setIsCustomInput(false);
+                                            }
+                                        }}
+                                        placeholder="Category name"
+                                    />
+                                </div>
+                            : <p onClick={e => { e.stopPropagation(); setIsCustomInput(true); }}>Custom...</p>
+                        }
+
+                    </div>
+                )}
 
                 </div>
 
