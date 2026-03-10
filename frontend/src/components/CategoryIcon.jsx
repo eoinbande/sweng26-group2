@@ -32,30 +32,6 @@ const CategoryIcon = ({
             }
         </div>
 
-        <div>
-            { isAddingNew 
-            ? <div className = "new-category-input"> 
-                <input 
-                value = {newCategoryInput}
-                onChange={(e) => setNewCategoryInput(e.currentTarget.value)}
-                onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                        onNewCategory(newCategoryInput);
-                        setNewCategoryInput('');
-                        setIsAddingNew(false);
-                    }
-                }}      
-                placeholder="Category name"/>
-                
-                <button onClick={() => { 
-                    onNewCategory(newCategoryInput);
-                    setNewCategoryInput('');
-                    setIsAddingNew(false);
-                }}> Add</button> 
-                </div>:
-                 <button className= "new-category-btn" onClick = {() => setIsAddingNew(true)}> + New category</button>}
-        </div>
-
     </div>
 };
 export default CategoryIcon;
