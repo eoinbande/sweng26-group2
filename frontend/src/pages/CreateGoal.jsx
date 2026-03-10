@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Mic } from 'lucide-react';
+import { ArrowLeft, Mic, ArrowUp } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
 import { InputBar } from '../components/InputBar';
@@ -189,7 +189,7 @@ function CreateGoal() {
                                 setMessage('');
                             }
                         }}
-                        icon={<Mic size={18} color="white" />}
+                        icon={<ArrowUp size={20} color="white" strokeWidth={2.5} />} // icon={<Mic size={18} color="white" />}
                         buttonStyle="dark"
                         variant="auth"
                     />
