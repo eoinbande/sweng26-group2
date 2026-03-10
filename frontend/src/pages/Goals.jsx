@@ -164,7 +164,12 @@ const Goals = () => {
         <div className="goals-page">
             <div className="goals-container" ref={scrollRef} onScroll={handleScroll}>
                 <PageHeader title="Goals" />
-
+                <CategoryIcon
+                    categories={categories}
+                    selectedCategories={selectedCategories}
+                    onSelectionChange={onSelectionChange}
+                    onNewCategory={onNewCategory}
+                />
                 {/* Goals List */}
                 <div className="goals-list">
                     {goals.length === 0 ? (
