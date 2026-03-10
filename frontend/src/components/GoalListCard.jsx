@@ -66,6 +66,22 @@ const GoalListCard = ({ goal, onClick, categories, onAssignCategory }) => {
                     style={{ backgroundColor: scheme.header }}
                 >
                     <h2 className="goal-card-title">{goal.title}</h2>
+                    {goal.category 
+                        ? <span>{goal.category}</span>
+                        : <button onClick={(e) => { e.stopPropagation(); setIsAssignOpen(!isAssignOpen); }}>+</button>
+                    }
+                    {isAssignOpen && (
+                        <div>
+                            {categories.map(cat => (
+                                <p key={cat} onClick={(e) => { 
+                                    e.stopPropagation(); 
+                                    onAssignCategory(goal.id, cat); 
+                                    setIsAssignOpen(false); 
+                                }}>{cat}</p>
+                            ))}
+                        </div>
+                    )}
+
                 </div>
 
                 {/* Body Section */}
