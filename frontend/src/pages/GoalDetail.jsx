@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { X } from 'lucide-react'; 
 import { useNavigate, useLocation } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
 import GoalDetailHeader from '../components/GoalDetailHeader';
@@ -25,6 +26,10 @@ const GoalDetail = () => {
     // Feedback popup state
     const [showFeedback, setShowFeedback] = useState(false);
     const [closingFeedback, setClosingFeedback] = useState(false);
+const [closingDelete, setClosingDelete] = useState(false);
+
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
 
     const closeFeedback = () => {
         setClosingFeedback(true);
@@ -32,6 +37,43 @@ const GoalDetail = () => {
             setShowFeedback(false);
             setClosingFeedback(false);
         }, 150);
+    };
+
+    const closeDeleteConfirm = () => {
+        setClosingDelete(true);
+        setTimeout(() => {
+            setShowDeleteConfirm(false);
+            setClosingDelete(false);
+        }, 150); 
+    };
+
+    const triggerToast = (message, type = 'success') => {
+        setToast({ show: true, message, type });
+        setTimeout(() => setToast({ show: false, message: '', type: 'success' }), 3000);
+    };
+
+    /* helper to calculate progress locally to fix sync issues */
+    const calculateLocalProgress = (currentTasks) => {
+    if (!currentTasks || currentTasks.length === 0) return 0;
+
+    let totalNodes = 0;
+    let completedNodes = 0;
+
+    currentTasks.forEach(task => {
+        // Count the parent task
+        totalNodes += 1;
+        if (task.completed) completedNodes += 1;
+
+        // Count every subtask
+        if (task.subtasks && task.subtasks.length > 0) {
+            task.subtasks.forEach(sub => {
+                totalNodes += 1;
+                if (sub.completed) completedNodes += 1;
+            });
+        }
+    });
+
+    return totalNodes > 0 ? Math.round((completedNodes / totalNodes) * 100) : 0;
     };
 
     // Add loading state
@@ -162,25 +204,37 @@ const GoalDetail = () => {
 
     /* toggle a subtask */
     const toggleSubtask = (taskId, subtaskId) => {
-        let newStatus = 'not_started';
+    let newStatus = 'not_started';
 
-        setTasks(prev => prev.map(task => {
+    setTasks(prev => {
+        const newTasks = prev.map(task => {
             if (task.id !== taskId) return task;
+
+            // 1. Update the specific subtask
+            const updatedSubtasks = task.subtasks.map(s => {
+                if (s.id === subtaskId) {
+                    const nextCompleted = !s.completed;
+                    newStatus = nextCompleted ? 'completed' : 'not_started';
+                    return { ...s, completed: nextCompleted };
+                }
+                return s;
+            });
+
+            // 2. Check if ALL subtasks are now complete to auto-update parent
+            const allDone = updatedSubtasks.every(s => s.completed);
+            
             return {
                 ...task,
-                subtasks: task.subtasks.map(s => {
-                    if (s.id === subtaskId) {
-                        const nextCompleted = !s.completed;
-                        newStatus = nextCompleted ? 'completed' : 'not_started';
-                        return { ...s, completed: nextCompleted };
-                    }
-                    return s;
-                })
+                subtasks: updatedSubtasks,
+                completed: allDone // Auto-complete parent if all subs are done
             };
-        }));
+        });
+        
+        setProgress(calculateLocalProgress(newTasks));
+        return newTasks;
+    });
 
-        // Trigger API call
-        updateTaskStatus(subtaskId, newStatus);
+    updateTaskStatus(subtaskId, newStatus);
     };
 
     /* toggle a whole task (complete all subtasks or un-complete) */
@@ -188,54 +242,30 @@ const GoalDetail = () => {
         const status = getTaskStatus(taskIndex);
         if (status === 'locked') return;
 
-        const task = tasks[taskIndex];
-        const isComplete = isTaskComplete(task); /* currently complete? */
+    const task = tasks[taskIndex];
+    const isComplete = isTaskComplete(task);
+    let targetStatus = isComplete ? 'not_started' : 'completed';
+    let targetBool = !isComplete;
 
-        if (isComplete) { // uncheck a completed task -> uncheck ALL subtasks
-            setTasks(prev => prev.map((t, i) => {
-                if (i !== taskIndex) return t;
-                return {
-                    ...t,
-                    completed: false,
-                    status: 'not_started',
-                    subtasks: t.subtasks.map(s => ({ ...s, completed: false, status: 'not_started' }))
-                };
-            }));
+    setTasks(prev => {
+        const newTasks = prev.map((t, i) => {
+            if (i !== taskIndex) return t;
+            return {
+                ...t,
+                completed: targetBool,
+                subtasks: t.subtasks.map(s => ({ ...s, completed: targetBool }))
+            };
+        });
 
-            if (task.subtasks.length > 0) {
-                // Call API for ALL subtasks
-                task.subtasks.forEach(s => {
-                    updateTaskStatus(s.id, 'not_started');
-                });
-                // Also update parent task
-                updateTaskStatus(task.id, 'not_started');
-            } else {
-                // No subtasks case: uncheck the task itself
-                updateTaskStatus(task.id, 'not_started');
-            }
-        } else { // mark task as complete -> mark ALL subtasks as done
-            setTasks(prev => prev.map((t, i) => {
-                if (i !== taskIndex) return t;
-                return {
-                    ...t,
-                    completed: true,
-                    status: 'completed',
-                    subtasks: t.subtasks.map(s => ({ ...s, completed: true }))
-                };
-            }));
+        setProgress(calculateLocalProgress(newTasks));
+        return newTasks;
+    });
 
-            if (task.subtasks.length > 0) {
-                // Call API for ALL subtasks
-                task.subtasks.forEach(s => {
-                    if (!s.completed) {
-                        updateTaskStatus(s.id, 'completed');
-                    }
-                });
-            } else {
-                // Call API for task
-                updateTaskStatus(task.id, 'completed');
-            }
-        }
+    // API Sync
+    if (task.subtasks.length > 0) {
+        task.subtasks.forEach(s => updateTaskStatus(s.id, targetStatus));
+    }
+    updateTaskStatus(task.id, targetStatus);
     };
 
     // Feedback submisison
@@ -302,6 +332,24 @@ const GoalDetail = () => {
         //setShowLoading(false);
     }
     };
+
+    const handleConfirmDelete = async () => {
+        setShowDeleteConfirm(false); // Close the sheet
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/goals/${goalId}`, {
+                method: 'DELETE',
+            });
+
+            if (response.ok) {
+                triggerToast("Goal deleted successfully");
+                setTimeout(() => navigate('/goals'), 1500);
+            } else {
+                triggerToast("Error deleting goal", "error");
+            }
+        } catch (err) {
+            triggerToast("Network error", "error");
+        }
+    };
             
 
 
@@ -314,7 +362,7 @@ const GoalDetail = () => {
     if (isLoading) {
         return (
             <div className="goal-detail-page">
-                <div className="loading-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                <div className="loading-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100dvh' }}>
                     {/* Use Loading component if available, else text */}
                     <Loading />
                 </div>
@@ -331,12 +379,24 @@ const GoalDetail = () => {
                     progress={progress}
                     category="Event"
                     endDate={endDate}
-                    onBack={() => navigate('/goals', {
-                        state: {
-                            updatedGoalId: goalId,
-                            updatedProgress: progress,
+                    onBack={() => {
+                        if (location.state?.from === 'schedule') {
+                            navigate('/schedule', {
+                                state: {
+                                    calMonth: location.state.calMonth,
+                                    activeIndex: location.state.activeIndex,
+                                    selectedDate: location.state.selectedDate,
+                                },
+                            });
+                        } else {
+                            navigate('/goals', {
+                                state: {
+                                    updatedGoalId: goalId,
+                                    updatedProgress: progress,
+                                },
+                            });
                         }
-                    })}
+                    }}
                 />
 
                 <TaskTimeline
@@ -370,14 +430,76 @@ const GoalDetail = () => {
                 </div>
             )}
 
-            {/* floating action button */}
+            {/* floating buttons */}
+            {/* Update Button */}
             <div className="fab-container">
                 <button className="btn-update-plan" onClick={() => setShowFeedback(true)}>
                     Update Plan
                 </button>
+                
+                {/* Delete Button */}
+                <button className="btn-delete-goal" onClick={() => setShowDeleteConfirm(true)}>
+                    Delete Goal
+                </button>
             </div>
 
             <BottomNav />
+
+            {toast.show && (
+                <div className={`custom-toast ${toast.type}`}>
+                    {toast.message}
+                </div>
+            )}
+
+            {/* delete confirmation popup */}
+            {showDeleteConfirm && (
+            <div 
+                className={`feedback-overlay ${closingDelete ? 'closing' : ''}`} 
+                onClick={closeDeleteConfirm}
+            >
+                <div 
+                    className={`feedback-bottom-sheet confirm-sheet ${closingDelete ? 'closing' : ''}`} 
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    
+                    {/* X close Button */}
+                    <button
+                        onClick={closeDeleteConfirm}
+                        style={{
+                            position: 'absolute',
+                            top: '8%',
+                            right: '8%',
+                            backgroundColor: 'transparent',
+                            border: 'none',
+                            cursor: 'pointer',
+                            padding: '4px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            zIndex: 10
+                        }}
+                    >
+                        <X size={24} color="var(--text-main)" strokeWidth={2.5} />
+                    </button>
+
+                    <div className="confirm-content">
+                        <h3>Delete this goal?</h3>
+                        <p>This will permanently remove <strong>{goalTitle}</strong>. This action cannot be undone.</p>
+                        
+                        <div className="confirm-actions">
+                            {/* Primary Button */}
+                            <button className="btn-confirm-delete" onClick={handleConfirmDelete}>
+                                Delete Permanently
+                            </button>
+                            {/* Secondary Button */}
+                            <button className="btn-cancel" onClick={closeDeleteConfirm}>
+                                Keep Goal
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )}
         </div>
     );
 };

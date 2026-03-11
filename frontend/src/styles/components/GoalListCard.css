@@ -28,12 +28,12 @@
 
 /* Card Header */
 .goal-card-header {
-    padding: 14px 20px;
+    padding: 20px 24px;
 }
 
 .goal-card-title {
     font-family: var(--font-sans);
-    font-size: 16px;
+    font-size: 20px;
     font-weight: var(--font-weight-bold);
     color: var(--text-main);
     margin: 0;
@@ -42,15 +42,15 @@
 
 /* Card Body */
 .goal-card-body {
-    padding: 12px 20px 16px;
+    padding: 16px 24px 22px;
 }
 
 .goal-card-description {
     font-family: var(--font-sans);
-    font-size: 13px;
+    font-size: 15px;
     color: var(--text-secondary);
-    line-height: 1.5;
-    margin: 0 0 12px 0;
+    line-height: 1.6;
+    margin: 0 0 16px 0;
 }
 
 /* ---- Progress-bar base styles ---- */
@@ -79,8 +79,8 @@
     position: absolute;
     top: 0;
     right: 0;
-    width: 28px;
-    height: 56px; /* Compact bookmark height */
+    width: 30px;
+    height: 80px; /* Fixed height for bookmark appearance */
     background-color: #E8505B;
     border-radius: 0 14px 14px 0px;
     display: flex;
@@ -93,80 +93,37 @@
 
 .goal-date-text {
     font-family: var(--font-serif);
-    font-size: 11px;
+    font-size: 15px;
     font-weight: 700;
     color: white;
-    letter-spacing: 0.3px;
+    letter-spacing: 0.5px;
     white-space: nowrap;
 }
 
 /* Responsive adjustments */
-@media (max-width: 480px) {
+@media (max-width: 380px) {
     .goal-list-card {
         padding-right: 26px;
     }
     .goal-card-title {
-        font-size: 15px;
+        font-size: 18px;
     }
-    .goal-card-description {
-        font-size: 12px;
-    }
-    .goal-card-header {
-        padding: 12px 18px;
-    }
-    .goal-card-body {
-        padding: 10px 18px 14px;
-    }
-    .goal-date-tab {
-        width: 26px;
-        height: 50px;
-    }
-    .goal-date-text {
-        font-size: 10px;
-    }
-}
 
-@media (max-width: 380px) {
-    .goal-list-card {
-        padding-right: 22px;
-    }
-    .goal-card-title {
-        font-size: 14px;
-    }
     .goal-card-description {
-        font-size: 11px;
-    }
-    .goal-card-header {
-        padding: 10px 14px;
-    }
-    .goal-card-body {
-        padding: 8px 14px 12px;
-    }
-    .goal-date-tab {
-        width: 22px;
-        height: 44px;
-    }
-    .goal-date-text {
-        font-size: 9px;
-    }
-}
-
-@media (max-width: 320px) {
-    .goal-card-inner {
-        border-radius: 20px;
-        border-top-right-radius: 0px;
-    }
-    .goal-card-title {
         font-size: 13px;
     }
-    .goal-card-description {
-        font-size: 10px;
-    }
+
     .goal-card-header {
-        padding: 8px 12px;
+        padding: 16px 18px;
     }
+
     .goal-card-body {
-        padding: 6px 12px 10px;
+        padding: 14px 18px 18px;
+    }
+
+    .goal-date-tab {
+        width: 26px;
+        height: 70px;
     }
 }
 

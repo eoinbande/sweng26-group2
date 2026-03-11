@@ -16,21 +16,13 @@ const Schedule = ({ size = 30 }) => (
     <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className="icon icon-tabler icons-tabler-filled icon-tabler-clipboard-text"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M17.997 4.17a3 3 0 0 1 2.003 2.83v12a3 3 0 0 1 -3 3h-10a3 3 0 0 1 -3 -3v-12a3 3 0 0 1 2.003 -2.83a4 4 0 0 0 3.997 3.83h4a4 4 0 0 0 3.98 -3.597zm-2.997 10.83h-6a1 1 0 0 0 0 2h6a1 1 0 0 0 0 -2m0 -4h-6a1 1 0 0 0 0 2h6a1 1 0 0 0 0 -2m-1 -9a2 2 0 1 1 0 4h-4a2 2 0 1 1 0 -4z" /></svg>
 )
 
-const BarChart = ({ size = 30 }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="currentColor" stroke="none">
-        <rect x="2" y="13" width="6" height="8" rx="1.5" />
-        <rect x="9" y="5" width="6" height="16" rx="1.5" />
-        <rect x="16" y="9" width="6" height="12" rx="1.5" />
-    </svg>
-)
-
 const User = ({ size = 30 }) => (
 <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className="icon icon-tabler icons-tabler-filled icon-tabler-user"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 2a5 5 0 1 1 -5 5l.005 -.217a5 5 0 0 1 4.995 -4.783z" /><path d="M14 14a5 5 0 0 1 5 5v1a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-1a5 5 0 0 1 5 -5h4z" /></svg>
 )
 
 
 
-const BottomNav = () => {
+const BottomNav = ({ transparent = false }) => {
     const navigate = useNavigate();
     const location = useLocation();
     const currentPath = location.pathname;
@@ -43,18 +35,15 @@ const BottomNav = () => {
             transform: 'translateX(-50%)',
             width: '100%',
             maxWidth: '480px',
-            backgroundColor: 'rgba(248, 248, 244, 0.97)',
-            backdropFilter: 'blur(12px)',
+            backgroundColor: transparent ? 'transparent' : 'var(--bg-color)',
             display: 'flex',
             alignItems: 'flex-end',
             justifyContent: 'space-around',
             borderTop: 'none',
             zIndex: 100,
+            paddingBottom: '10px' 
         }}>
-            <NavIcon icon={<Target />} label="Goals" active={currentPath === '/goals'} onClick={() => navigate('/goals')} />
-            <NavIcon icon={<Schedule />} label="Schedule" active={currentPath === '/schedule'} onClick={() => navigate('/schedule')} />
-
-            {/* floating home button */}
+            
             <div style={{
                 display: 'flex',
                 flexDirection: 'column',
@@ -74,7 +63,8 @@ const BottomNav = () => {
                 </div>
             </div>
 
-            <NavIcon icon={<BarChart/>} label="Progress" active={currentPath === '/progress'} onClick={() => navigate('/progress')} />
+            <NavIcon icon={<Target />} label="Goals" active={currentPath === '/goals'} onClick={() => navigate('/goals')} />
+            <NavIcon icon={<Schedule />} label="Schedule" active={currentPath === '/schedule'} onClick={() => navigate('/schedule')} />
             <NavIcon icon={<User/>} label="Profile" active={currentPath === '/profile'} onClick={() => navigate('/profile')} />
         </div>
     );

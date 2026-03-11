@@ -13,7 +13,6 @@ const getProgressColor = (pct) => {
 const formatEndDate = (dateStr) => {
     if (!dateStr) return '';
     const date = new Date(dateStr);
-    if (isNaN(date)) return dateStr;
     const day = date.getDate();
     const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const month = monthNames[date.getMonth()];
@@ -35,7 +34,7 @@ const GoalDetailHeader = ({ title, progress = 0, category, endDate, onBack }) =>
                     onClick={onBack}
                     aria-label="Back to goals"
                 >
-                    <ArrowUpLeft size={32} strokeWidth={2.5} />
+                    <ArrowUpLeft size={40} strokeWidth={2.5} />
                 </button>
                 <h1 className="goal-detail-header__title">{title}</h1>
             </div>

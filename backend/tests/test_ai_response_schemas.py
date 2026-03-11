@@ -7,7 +7,8 @@ from app.mock_ai_responses import (
     get_mock_plan, get_mock_feedback_response,
     BIKE_TYRE_INITIAL, BIKE_TYRE_AFTER_FEEDBACK,
     BIKE_TYRE_FEEDBACK_AFTER_PROGRESS, BIKE_EXPAND_TASK_5,
-    WEDDING_INITIAL, PIANO_INITIAL, DEFAULT_MOCK
+    WEDDING_INITIAL, WEDDING_AFTER_FEEDBACK, WEDDING_FEEDBACK_BABY,
+    PIANO_INITIAL, DEFAULT_MOCK
 )
 
 
@@ -244,3 +245,35 @@ class TestMockTemplates:
                 assert "order" in task, f"Task missing order: {task}"
                 for sub in task.get("subtasks", []):
                     assert "order" in sub, f"Subtask missing order: {sub}"
+
+    def test_get_mock_feedback_bike_tyre(self):
+        """Feedback for bike tyre goal should return bike tyre feedback mock."""
+        result = get_mock_feedback_response("Fix my bike tyre", "I don't like step 3")
+        assert result == BIKE_TYRE_AFTER_FEEDBACK
+
+    def test_get_mock_feedback_bike_tire_american(self):
+        """Should handle American spelling of tire."""
+        result = get_mock_feedback_response("Fix my bike tire", "Change step 2")
+        assert result == BIKE_TYRE_AFTER_FEEDBACK
+
+    def test_get_mock_feedback_wedding(self):
+        """Feedback for wedding goal should return wedding feedback mock."""
+        result = get_mock_feedback_response("Plan a wedding", "Task 2 is too vague")
+        assert result == WEDDING_AFTER_FEEDBACK
+
+    def test_get_mock_feedback_wedding_baby(self):
+        """Wedding feedback mentioning baby should return baby scenario."""
+        from app.mock_ai_responses import WEDDING_FEEDBACK_BABY
+        result = get_mock_feedback_response("Plan a wedding", "The couple are expecting a baby")
+        assert result == WEDDING_FEEDBACK_BABY
+
+    def test_get_mock_feedback_wedding_pregnant(self):
+        """Wedding feedback mentioning pregnant should return baby scenario."""
+        from app.mock_ai_responses import WEDDING_FEEDBACK_BABY
+        result = get_mock_feedback_response("Plan a wedding", "She is pregnant")
+        assert result == WEDDING_FEEDBACK_BABY
+
+    def test_get_mock_feedback_unknown_goal(self):
+        """Feedback for unknown goal should fall back to default mock."""
+        result = get_mock_feedback_response("Build a spaceship", "Make it faster")
+        assert result == DEFAULT_MOCK
