@@ -35,11 +35,67 @@ function ReviewPlan() {
     }, []);
 
     // Data from CreateGoal (preview only, not saved yet)
-    const previewData = location.state?.previewData;
+    // We use a state for previewData so we can fetch it if it wasn't passed (e.g. from GoalAddDate)
+    const [previewData, setPreviewData] = useState(location.state?.previewData || null);
     const userId = location.state?.userId;
     const goalTitle = location.state?.goal || '';
     const originalPrompt = location.state?.originalPrompt || goalTitle;
     const goalId = previewData?.goal_id;
+
+    // If we don't have previewData but we have a goalTitle, fetch it now
+    useEffect(() => {
+        // If we already have data, let LoadingOverlay handle the transition
+        // by passing a short minDisplayTime.
+        if (previewData) {
+            return;
+        }
+
+        // If no data and no goal info, we can't do anything
+        if (!goalTitle || !userId) return;
+
+        // Fetch from backend
+        const fetchPlan = async () => {
+            try {
+                // In demo mode we might want mock data
+                if (isDemoMode) {
+                    console.log("Demo mode: generating mock plan...");
+                    // Simulate delay
+                    await new Promise(r => setTimeout(r, 2000));
+                    
+                    setPreviewData({
+                        goal_id: "mock-goal-id",
+                        tasks: [
+                            { ai_id: "t1", description: "Mock Task 1", order: 1, status: "not_started" },
+                            { ai_id: "t2", description: "Mock Task 2", order: 2, status: "not_started" }
+                        ]
+                    });
+                    // let LoadingOverlay handle the transition via onComplete
+                    return;
+                }
+
+                const res = await fetch(`${import.meta.env.VITE_API_URL}/goals`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: userId,
+                        title: goalTitle,
+                    }),
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.detail || 'Failed to fetch plan');
+
+                setPreviewData(data);
+                // setShowLoading(false);
+            } catch (err) {
+                console.error(err);
+                alert("Failed to generate plan. Please try again.");
+                navigate('/create-goal');
+                setShowLoading(false);
+            }
+        };
+
+        fetchPlan();
+    }, [goalTitle, userId, previewData]); 
 
     // parse tasks from the preview response (includes subtasks for later use)
     const tasks = React.useMemo(() => {
@@ -117,8 +173,12 @@ function ReviewPlan() {
                 setSaving(false);
                 return;
             }
+            
+                // Came from GoalDetail or Review (aka iterative feedback) → go back to GoalDetail;
+                navigate(`/goal/${goalId}`, {
+                    state: { goalId }
+                });
 
-            navigate('/goals');
         } catch (err) {
             console.error('Network error saving goal:', err);
             alert('Network error. Is the backend running?');
@@ -162,7 +222,7 @@ function ReviewPlan() {
         const res = await fetch(`${import.meta.env.VITE_API_URL}/goals/${goalId}/feedback`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ feedback: feedbackText })
+            body: JSON.stringify({ feedback: val, current_tasks: previewData?.tasks })
         });
 
         const data = await res.json();
@@ -219,6 +279,9 @@ function ReviewPlan() {
 
     useEffect(() => {
         if (location.state?.previewData) {
+            // Update previewData from location state (for feedback loop)
+            setPreviewData(location.state.previewData);
+
             // If the tasks in state change, ensure we show the loading if requested
             if (location.state.showLoading) {
                 setShowLoading(true);
@@ -443,7 +506,11 @@ function ReviewPlan() {
 
             {/* loading overlay - shown when navigating from CreateGoal */}
             {showLoading && (
-                <LoadingOverlay onComplete={() => setShowLoading(false)} />
+                <LoadingOverlay 
+                    onComplete={() => setShowLoading(false)} 
+                    isLoading={!previewData || submittingFeedback}
+                    minDisplayTime={previewData ? 100 : 2000}
+                />
             )}
         </div>
     );

@@ -1,11 +1,21 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
 import { ArrowUpRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '../supabase_client';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 import '../index.css';
 
+dayjs.extend(relativeTime);
+
 const UpcomingTasks = () => {
+    const navigate = useNavigate();
     const scrollRef = useRef(null);
     const [showTopFade, setShowTopFade] = useState(false);
     const [showBottomFade, setShowBottomFade] = useState(false);
+    const [tasks, setTasks] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [hoveredIndex, setHoveredIndex] = useState(null);
 
     const updateFades = useCallback(() => {
         const el = scrollRef.current;
@@ -17,18 +27,81 @@ const UpcomingTasks = () => {
 
     useEffect(() => {
         updateFades();
-    }, [updateFades]);
+    }, [updateFades, tasks]);
 
-    const tasks = [
-        { title: 'Learn basic piano chords', due: '3 days', urgent: true },
-        { title: 'Call bank', due: null },
-        { title: 'Start personal journal', due: '2 days', urgent: true },
-        { title: 'Networks revision topic 2', due: null },
-        { title: 'Brainstorm erasmus', due: null },
-        { title: 'Create homepage mockup', due: null },
-        { title: 'Buy groceries', due: null },
-        { title: 'Call Mom', due: 'Tonight', urgent: false },
-    ];
+    useEffect(() => {
+        const fetchTasks = async () => {
+            try {
+                const { data } = await supabase.auth.getUser();
+                const user = data?.user;
+                if (!user) {
+                    setLoading(false);
+                    return;
+                }
+
+                const res = await fetch(`${import.meta.env.VITE_API_URL}/schedule/${user.id}/upcoming-tasks?days=15`);
+                if (res.ok) {
+                    const json = await res.json();
+                    
+                    // Map backend tasks to frontend structure
+                    const mappedTasks = json.tasks.map(t => {
+                        const dueDate = t.due_date ? dayjs(t.due_date) : null;
+                        let dueText = null;
+                        let urgencyLevel = 'normal'; // normal, urgent (red), warning (orange)
+
+                        if (dueDate) {
+                            const now = dayjs().startOf('day');
+                            const target = dueDate.startOf('day');
+                            const diffDays = target.diff(now, 'day');
+
+                            if (diffDays < 0) {
+                                // Overdue
+                                dueText = target.format('D MMM');
+                                urgencyLevel = 'urgent';
+                            } else if (diffDays === 0) {
+                                dueText = 'Today';
+                                urgencyLevel = 'urgent';
+                            } else if (diffDays === 1) {
+                                dueText = 'Tomorrow';
+                                urgencyLevel = 'urgent';
+                            } else if (diffDays < 7) {
+                                dueText = target.format('dddd'); // Day name
+                                urgencyLevel = 'warning';
+                            } else {
+                                dueText = target.format('D MMM');
+                                urgencyLevel = 'normal';
+                            }
+                        }
+
+                        return {
+                            title: t.description,
+                            due: dueText,
+                            urgencyLevel,
+                            id: t.task_id || t.ai_id,
+                            goalId: t.goal_id,
+                            goalTitle: t.goal_title
+                        };
+                    });
+                    
+                    setTasks(mappedTasks);
+                }
+            } catch (err) {
+                console.error("Error fetching upcoming tasks:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchTasks();
+    }, []);
+
+    const getBadgeColor = (level) => {
+        switch(level) {
+            case 'urgent': return 'var(--accent-red-soft)';
+            case 'warning': return 'var(--red)';
+            default: return 'var(--accent-blue, #6B8DB0)';
+        }
+    };
 
     return (
         <div className="home-upcoming-tasks">
@@ -86,45 +159,76 @@ const UpcomingTasks = () => {
                                 overflowY: 'auto',
                             }}
                         >
-                            <ul style={{ listStyle: 'none' }}>
-                                {tasks.map((task, index) => (
-                                    <li key={index} className="task-item"
-                                        style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'space-between',
-                                        }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                            {/* simple arrow icon */}
-                                            <div style={{
+                            {!loading && tasks.length === 0 ? (
+                                <div style={{ 
+                                    height: '100%', 
+                                    display: 'flex', 
+                                    alignItems: 'center', 
+                                    justifyContent: 'center',
+                                    color: 'var(--text-secondary)',
+                                    fontFamily: 'var(--font-sans)',
+                                    textAlign: 'center',
+                                    padding: '0 var(--space-md)'
+                                }}>
+                                    No upcoming tasks!
+                                </div>
+                            ) : (
+                                <ul style={{ listStyle: 'none' }}>
+                                    {tasks.map((task, index) => (
+                                        <li key={index} className="task-item"
+                                            onClick={() => task.goalId && navigate(`/goal/${task.goalId}`, {
+                                                state: {
+                                                    goalId: task.goalId,
+                                                    goalTitle: task.goalTitle || "Loading...",
+                                                    from: 'home'
+                                                }
+                                            })}
+                                            onMouseEnter={() => setHoveredIndex(index)}
+                                            onMouseLeave={() => setHoveredIndex(null)}
+                                            style={{
                                                 display: 'flex',
                                                 alignItems: 'center',
-                                                justifyContent: 'center',
-                                                color: '#1A1A1A'
+                                                justifyContent: 'space-between',
+                                                cursor: 'pointer'
                                             }}>
-                                                <ArrowUpRight size={20} strokeWidth={2.5} />
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                {/* arrow icon with hover effect */}
+                                                <div 
+                                                    style={{
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        color: hoveredIndex === index ? 'var(--red)' : '#1A1A1A',
+                                                        transition: 'color 0.2s',
+                                                    }}
+                                                >
+                                                    <ArrowUpRight size={20} strokeWidth={2.5} />
+                                                </div>
+
+                                                <span className="task-title" 
+                                                    style={{
+                                                        color: hoveredIndex === index ? 'var(--red)' : 'var(--text-main)',
+                                                        fontWeight: '400',
+                                                        transition: 'color 0.2s',
+                                                    }}
+                                                >
+                                                    {task.title}
+                                                </span>
                                             </div>
 
-                                            <span className="task-title" style={{
-                                                color: task.urgent ? 'var(--accent-red-soft)' : 'var(--text-main)',
-                                                fontWeight: '400'
-                                            }}>
-                                                {task.title}
-                                            </span>
-                                        </div>
-
-                                        {task.due && (
-                                            <span className="task-due-badge" style={{
-                                                backgroundColor: task.urgent ? 'var(--accent-red-soft)' : '#E0E0E0',
-                                                color: 'white',
-                                                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                                            }}>
-                                                {task.due}
-                                            </span>
-                                        )}
-                                    </li>
-                                ))}
-                            </ul>
+                                            {task.due && (
+                                                <span className="task-due-badge" style={{
+                                                    backgroundColor: getBadgeColor(task.urgencyLevel),
+                                                    color: 'white',
+                                                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                                                }}>
+                                                    {task.due}
+                                                </span>
+                                            )}
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
                         </div>
 
                         {/* top fade overlay */}

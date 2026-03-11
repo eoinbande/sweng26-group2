@@ -28,12 +28,12 @@
 
 /* Card Header */
 .goal-card-header {
-    padding: 20px 24px;
+    padding: 16px 20px 18px; /* Slightly compacted padding */
 }
 
 .goal-card-title {
     font-family: var(--font-sans);
-    font-size: 20px;
+    font-size: 17px; /* Reduced from 20px */
     font-weight: var(--font-weight-bold);
     color: var(--text-main);
     margin: 0;
@@ -42,15 +42,15 @@
 
 /* Card Body */
 .goal-card-body {
-    padding: 16px 24px 22px;
+    padding: 12px 20px 18px; /* Slightly compacted padding */
 }
 
 .goal-card-description {
     font-family: var(--font-sans);
-    font-size: 15px;
+    font-size: 13px; /* Reduced from 15px */
     color: var(--text-secondary);
-    line-height: 1.6;
-    margin: 0 0 16px 0;
+    line-height: 1.5;
+    margin: 0 0 14px 0;
 }
 
 /* ---- Progress-bar base styles ---- */
@@ -93,7 +93,7 @@
 
 .goal-date-text {
     font-family: var(--font-serif);
-    font-size: 15px;
+    font-size: 13px; /* Reduced from 15px */
     font-weight: 700;
     color: white;
     letter-spacing: 0.5px;

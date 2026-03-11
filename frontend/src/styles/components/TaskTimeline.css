@@ -137,14 +137,14 @@
 
 .tl-card h4 {
     font-family: var(--font-sans);
-    font-size: 15px;
+    font-size: 14px; /* Reduced from 15px */
     font-weight: 500;
     margin-bottom: 2px;
     color: var(--text-main);
 }
 
 .tl-meta {
-    font-size: 12px;
+    font-size: 11px; /* Reduced from 12px */
     color: #8E8E93;
     display: flex;
     align-items: center;
@@ -185,7 +185,7 @@
     top: 8px;
     color: white;
     font-weight: 700;
-    font-size: 13px;
+    font-size: 11px; /* Reduced from 13px */
 }
 
 /* subtask list */

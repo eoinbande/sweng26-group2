@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import '../index.css';
 import { InputBar } from './InputBar';
-import { X, Mic } from 'lucide-react';
+import { X, Mic, ArrowUp } from 'lucide-react';
 
 const variantConfig = {
     help: {
@@ -90,7 +90,7 @@ export default function FeedbackPopUp({ variant = 'help', onClose, onSubmit }) {
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
                     onSubmit={() => onSubmit(inputValue)}
-                    icon={<Mic size={18} color="white" />}
+                    icon={<ArrowUp size={20} color="white" strokeWidth={2.5} />} // icon={<Mic size={18} color="white" />}
                     buttonStyle="dark"
                     padding="18px 20px"
                     borderRadius="var(--radius-xl)"
