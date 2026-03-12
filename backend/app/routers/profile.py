@@ -79,3 +79,48 @@ def get_goals_completed(user_id: str):
     goals = get_all_goals(user_id) or []
     count = sum(1 for g in goals if _is_goal_completed(g["id"]))
     return {"user_id": user_id, "goals_completed": count}
+
+@profile_router.get("/profile/{user_id}/tasks-completed")
+def get_tasks_completed(user_id: str):
+    """
+    Total number of tasks and subtasks ever marked completed.
+    """
+    all_tasks = _get_all_tasks_for_user(user_id)
+    count = sum(1 for t in all_tasks if t.get("status") == "completed")
+    return {"user_id": user_id, "tasks_completed": count}
+
+@profile_router.get("/profile/{user_id}/goals-completed-on-time")
+def get_goals_completed_on_time(user_id: str):
+    """
+    Total goals completed on or before their goal_due_date.
+    Completion date is the latest tasks.updated_at across the goal.
+    """
+    goals = get_all_goals(user_id) or []
+    all_tasks = _get_all_tasks_for_user(user_id)
+ 
+    count = 0
+    for g in goals:
+        if not _is_goal_completed(g["id"]):
+            continue
+ 
+        goal_data = g.get("goal_data", {})
+        if isinstance(goal_data, str):
+            try:
+                goal_data = json.loads(goal_data)
+            except (json.JSONDecodeError, TypeError):
+                goal_data = {}
+ 
+        due_dt = _parse_date(goal_data.get("goal_due_date"))
+        if not due_dt:
+            continue
+ 
+        goal_tasks = [t for t in all_tasks if t.get("goal_id") == g["id"] and t.get("updated_at")]
+        completion_dates = [d for d in (_parse_date(t["updated_at"]) for t in goal_tasks) if d]
+        if not completion_dates:
+            continue
+ 
+        if max(completion_dates).date() <= due_dt.date():
+            count += 1
+ 
+    return {"user_id": user_id, "goals_completed_on_time": count}
+
