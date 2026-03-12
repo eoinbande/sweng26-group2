@@ -93,3 +93,35 @@ class TestParseDate:
         dt = _parse_date("2025-06-15T10:30:00.123456+00:00")
         assert dt is not None
         assert dt.microsecond == 123456
+
+# =============================================================================
+# Helper: _is_goal_completed
+# =============================================================================
+ 
+class TestIsGoalCompleted:
+ 
+    @patch("app.routers.profile.supabase")
+    def test_returns_false_when_no_tasks(self, mock_supabase):
+        mock_supabase.table.return_value.select.return_value.eq.return_value.execute.return_value.data = []
+        assert _is_goal_completed("goal-1") is False
+ 
+    @patch("app.routers.profile.supabase")
+    def test_returns_true_when_all_completed(self, mock_supabase):
+        mock_supabase.table.return_value.select.return_value.eq.return_value.execute.return_value.data = [
+            {"status": "completed"}, {"status": "completed"}
+        ]
+        assert _is_goal_completed("goal-1") is True
+ 
+    @patch("app.routers.profile.supabase")
+    def test_returns_false_when_one_not_started(self, mock_supabase):
+        mock_supabase.table.return_value.select.return_value.eq.return_value.execute.return_value.data = [
+            {"status": "completed"}, {"status": "not_started"}
+        ]
+        assert _is_goal_completed("goal-1") is False
+ 
+    @patch("app.routers.profile.supabase")
+    def test_returns_false_when_one_in_progress(self, mock_supabase):
+        mock_supabase.table.return_value.select.return_value.eq.return_value.execute.return_value.data = [
+            {"status": "completed"}, {"status": "in_progress"}
+        ]
+        assert _is_goal_completed("goal-1") is False
