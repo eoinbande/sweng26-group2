@@ -124,3 +124,21 @@ def get_goals_completed_on_time(user_id: str):
  
     return {"user_id": user_id, "goals_completed_on_time": count}
 
+@profile_router.get("/profile/{user_id}/tasks-completed-on-time")
+def get_tasks_completed_on_time(user_id: str):
+    """
+    Total tasks completed on or before their due_date.
+    Only tasks with both a due_date and status == 'completed' are counted.
+    """
+    all_tasks = _get_all_tasks_for_user(user_id)
+ 
+    count = 0
+    for t in all_tasks:
+        if t.get("status") != "completed":
+            continue
+        due_dt = _parse_date(t.get("due_date"))
+        completed_dt = _parse_date(t.get("updated_at"))
+        if due_dt and completed_dt and completed_dt.date() <= due_dt.date():
+            count += 1
+ 
+    return {"user_id": user_id, "tasks_completed_on_time": count}
