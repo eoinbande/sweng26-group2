@@ -46,7 +46,6 @@ def get_streak(user_id:str):
     Current streak: consecutive days (UTC) with at least one task completed.
     Derived from tasks.updated_at where status == 'completed'.
     """
-
     all_tasks = _get_all_tasks_for_user(user_id)
     completed = [t for t in all_tasks if t.get("status") == "completed" and t.get("updated_at")]
 
@@ -72,3 +71,11 @@ def get_streak(user_id:str):
  
     return {"user_id": user_id, "current_streak": current_streak}
     
+@profile_router.get("/profile/{user_id}/goals-completed")
+def get_goals_completed(user_id: str):
+    """
+    Total number of goals where every task is marked completed.
+    """
+    goals = get_all_goals(user_id) or []
+    count = sum(1 for g in goals if _is_goal_completed(g["id"]))
+    return {"user_id": user_id, "goals_completed": count}
