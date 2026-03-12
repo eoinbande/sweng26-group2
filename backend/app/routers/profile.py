@@ -18,4 +18,10 @@ def _get_all_tasks_for_user(user_id: str) -> list[dict]:
         rows = supabase.table("tasks").select("*").eq("goal_id", goal["id"]).execute().data
         all_tasks.extend(rows or [])
     return all_tasks
+
+def _is_goal_completed(goal_id: str) -> bool:
+    rows = supabase.table("tasks").select("status").eq("goal_id", goal_id).execute().data
+    if not rows:
+        return False
+    return all(r["status"] == "completed" for r in rows)
         
