@@ -157,3 +157,67 @@ class TestGetAllTasksForUser:
  
         result = _get_all_tasks_for_user("user-1")
         assert len(result) == 3
+
+# =============================================================================
+# GET /api/profile/{user_id}/streak
+# =============================================================================
+ 
+class TestGetStreak:
+ 
+    @patch("app.routers.profile._get_all_tasks_for_user")
+    def test_streak_zero_no_tasks(self, mock_tasks, mock_user_id):
+        mock_tasks.return_value = []
+        response = client.get(f"/api/profile/{mock_user_id}/streak")
+        assert response.status_code == 200
+        assert response.json()["current_streak"] == 0
+        assert response.json()["user_id"] == mock_user_id
+ 
+    @patch("app.routers.profile._get_all_tasks_for_user")
+    def test_streak_zero_no_completed_tasks(self, mock_tasks, mock_user_id, today_str):
+        mock_tasks.return_value = [{"status": "not_started", "updated_at": today_str}]
+        response = client.get(f"/api/profile/{mock_user_id}/streak")
+        assert response.json()["current_streak"] == 0
+ 
+    @patch("app.routers.profile._get_all_tasks_for_user")
+    def test_streak_one_completed_today(self, mock_tasks, mock_user_id, today_str):
+        mock_tasks.return_value = [{"status": "completed", "updated_at": today_str}]
+        response = client.get(f"/api/profile/{mock_user_id}/streak")
+        assert response.json()["current_streak"] == 1
+ 
+    @patch("app.routers.profile._get_all_tasks_for_user")
+    def test_streak_one_completed_yesterday(self, mock_tasks, mock_user_id, yesterday_str):
+        mock_tasks.return_value = [{"status": "completed", "updated_at": yesterday_str}]
+        response = client.get(f"/api/profile/{mock_user_id}/streak")
+        assert response.json()["current_streak"] == 1
+ 
+    @patch("app.routers.profile._get_all_tasks_for_user")
+    def test_streak_zero_last_completion_two_days_ago(self, mock_tasks, mock_user_id, two_days_ago_str):
+        mock_tasks.return_value = [{"status": "completed", "updated_at": two_days_ago_str}]
+        response = client.get(f"/api/profile/{mock_user_id}/streak")
+        assert response.json()["current_streak"] == 0
+ 
+    @patch("app.routers.profile._get_all_tasks_for_user")
+    def test_streak_three_consecutive_days(self, mock_tasks, mock_user_id, sample_completed_tasks):
+        mock_tasks.return_value = sample_completed_tasks
+        response = client.get(f"/api/profile/{mock_user_id}/streak")
+        assert response.json()["current_streak"] == 3
+ 
+    @patch("app.routers.profile._get_all_tasks_for_user")
+    def test_streak_breaks_on_gap(self, mock_tasks, mock_user_id, today_str, two_days_ago_str):
+        mock_tasks.return_value = [
+            {"status": "completed", "updated_at": today_str},
+            {"status": "completed", "updated_at": two_days_ago_str},  # yesterday missing
+        ]
+        response = client.get(f"/api/profile/{mock_user_id}/streak")
+        assert response.json()["current_streak"] == 1
+ 
+    @patch("app.routers.profile._get_all_tasks_for_user")
+    def test_streak_multiple_completions_same_day_count_once(self, mock_tasks, mock_user_id, today_str):
+        mock_tasks.return_value = [
+            {"status": "completed", "updated_at": today_str},
+            {"status": "completed", "updated_at": today_str},
+            {"status": "completed", "updated_at": today_str},
+        ]
+        response = client.get(f"/api/profile/{mock_user_id}/streak")
+        assert response.json()["current_streak"] == 1
+ 
