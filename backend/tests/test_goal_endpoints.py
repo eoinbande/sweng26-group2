@@ -221,3 +221,46 @@ class TestGetStreak:
         response = client.get(f"/api/profile/{mock_user_id}/streak")
         assert response.json()["current_streak"] == 1
  
+
+ # =============================================================================
+# GET /api/profile/{user_id}/goals-completed
+# =============================================================================
+ 
+class TestGetGoalsCompleted:
+ 
+    @patch("app.routers.profile.get_all_goals")
+    def test_zero_when_no_goals(self, mock_get_goals, mock_user_id):
+        mock_get_goals.return_value = []
+        response = client.get(f"/api/profile/{mock_user_id}/goals-completed")
+        assert response.status_code == 200
+        assert response.json()["goals_completed"] == 0
+ 
+    @patch("app.routers.profile.get_all_goals")
+    def test_zero_when_goals_none(self, mock_get_goals, mock_user_id):
+        mock_get_goals.return_value = None
+        response = client.get(f"/api/profile/{mock_user_id}/goals-completed")
+        assert response.json()["goals_completed"] == 0
+ 
+    @patch("app.routers.profile.get_all_goals")
+    @patch("app.routers.profile._is_goal_completed")
+    def test_counts_only_fully_completed_goals(self, mock_completed, mock_get_goals, mock_user_id):
+        mock_get_goals.return_value = [{"id": "goal-1"}, {"id": "goal-2"}, {"id": "goal-3"}]
+        mock_completed.side_effect = lambda gid: gid in ("goal-1", "goal-3")
+        response = client.get(f"/api/profile/{mock_user_id}/goals-completed")
+        assert response.json()["goals_completed"] == 2
+ 
+    @patch("app.routers.profile.get_all_goals")
+    @patch("app.routers.profile._is_goal_completed")
+    def test_all_goals_completed(self, mock_completed, mock_get_goals, mock_user_id):
+        mock_get_goals.return_value = [{"id": "goal-1"}, {"id": "goal-2"}]
+        mock_completed.return_value = True
+        response = client.get(f"/api/profile/{mock_user_id}/goals-completed")
+        assert response.json()["goals_completed"] == 2
+ 
+    @patch("app.routers.profile.get_all_goals")
+    @patch("app.routers.profile._is_goal_completed")
+    def test_no_goals_completed(self, mock_completed, mock_get_goals, mock_user_id):
+        mock_get_goals.return_value = [{"id": "goal-1"}, {"id": "goal-2"}]
+        mock_completed.return_value = False
+        response = client.get(f"/api/profile/{mock_user_id}/goals-completed")
+        assert response.json()["goals_completed"] == 0
