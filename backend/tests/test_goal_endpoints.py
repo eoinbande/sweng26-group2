@@ -264,3 +264,44 @@ class TestGetGoalsCompleted:
         mock_completed.return_value = False
         response = client.get(f"/api/profile/{mock_user_id}/goals-completed")
         assert response.json()["goals_completed"] == 0
+
+# =============================================================================
+# GET /api/profile/{user_id}/tasks-completed
+# =============================================================================
+ 
+class TestGetTasksCompleted:
+ 
+    @patch("app.routers.profile._get_all_tasks_for_user")
+    def test_zero_when_no_tasks(self, mock_tasks, mock_user_id):
+        mock_tasks.return_value = []
+        response = client.get(f"/api/profile/{mock_user_id}/tasks-completed")
+        assert response.status_code == 200
+        assert response.json()["tasks_completed"] == 0
+ 
+    @patch("app.routers.profile._get_all_tasks_for_user")
+    def test_counts_only_completed_status(self, mock_tasks, mock_user_id):
+        mock_tasks.return_value = [
+            {"status": "completed"},
+            {"status": "completed"},
+            {"status": "not_started"},
+            {"status": "in_progress"},
+        ]
+        response = client.get(f"/api/profile/{mock_user_id}/tasks-completed")
+        assert response.json()["tasks_completed"] == 2
+ 
+    @patch("app.routers.profile._get_all_tasks_for_user")
+    def test_includes_subtask_rows(self, mock_tasks, mock_user_id):
+        # subtasks are plain rows in the tasks table, so they count the same
+        mock_tasks.return_value = [
+            {"status": "completed"},
+            {"status": "completed"},
+            {"status": "completed"},
+        ]
+        response = client.get(f"/api/profile/{mock_user_id}/tasks-completed")
+        assert response.json()["tasks_completed"] == 3
+ 
+    @patch("app.routers.profile._get_all_tasks_for_user")
+    def test_returns_correct_user_id(self, mock_tasks, mock_user_id):
+        mock_tasks.return_value = []
+        response = client.get(f"/api/profile/{mock_user_id}/tasks-completed")
+        assert response.json()["user_id"] == mock_user_id
