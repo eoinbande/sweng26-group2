@@ -125,3 +125,35 @@ class TestIsGoalCompleted:
             {"status": "completed"}, {"status": "in_progress"}
         ]
         assert _is_goal_completed("goal-1") is False
+
+# =============================================================================
+# Helper: _get_all_tasks_for_user
+# =============================================================================
+ 
+class TestGetAllTasksForUser:
+ 
+    @patch("app.routers.profile.get_all_goals")
+    def test_returns_empty_when_no_goals(self, mock_get_goals):
+        mock_get_goals.return_value = []
+        assert _get_all_tasks_for_user("user-1") == []
+ 
+    @patch("app.routers.profile.get_all_goals")
+    def test_returns_empty_when_goals_none(self, mock_get_goals):
+        mock_get_goals.return_value = None
+        assert _get_all_tasks_for_user("user-1") == []
+ 
+    @patch("app.routers.profile.get_all_goals")
+    @patch("app.routers.profile.supabase")
+    def test_aggregates_tasks_across_goals(self, mock_supabase, mock_get_goals):
+        mock_get_goals.return_value = [{"id": "goal-1"}, {"id": "goal-2"}]
+ 
+        tasks_g1 = [{"id": "t1", "goal_id": "goal-1"}]
+        tasks_g2 = [{"id": "t2", "goal_id": "goal-2"}, {"id": "t3", "goal_id": "goal-2"}]
+ 
+        mock_supabase.table.return_value.select.return_value.eq.return_value.execute.side_effect = [
+            type("R", (), {"data": tasks_g1})(),
+            type("R", (), {"data": tasks_g2})(),
+        ]
+ 
+        result = _get_all_tasks_for_user("user-1")
+        assert len(result) == 3
