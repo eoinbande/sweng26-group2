@@ -24,7 +24,7 @@ const AccountCard = ({ username, email, streakDays, onEdit, onSignOut }) => {
                 </div>
 
                 <button className="account-card-edit" onClick={onEdit} aria-label="Edit profile">
-                    <Pencil />
+                    <Pencil strokeWidth={4} />
                 </button>
             </div>
 
