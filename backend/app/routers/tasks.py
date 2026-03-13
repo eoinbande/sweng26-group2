@@ -162,7 +162,7 @@ def expand_task(task_id: str, request: ExpandTaskRequest):
        #LOG AI usage for green metrics
         log_ai_usage(
             user_id = task.user_id,
-            endpoint_type = "generate_plan",
+            endpoint_type = "expand_plan",
             tokens_used = ai_response.get("tokens_used", 0),
             carbon_footprint = ai_response.get("carbon_footprint", 0)
         )

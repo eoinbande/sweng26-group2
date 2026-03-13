@@ -5,6 +5,7 @@ from typing import Optional
 import json
 from app.services.ai_service import AIService
 from app.services.ai_service import log_ai_usage
+from app.aicalls import estimate_carbon_usage
 # Database functions (Tables.py)
 from ..Tables import (
     create_goal, get_all_goals, get_goal, delete_goal,
@@ -128,12 +129,17 @@ def create_goal_endpoint(goal: CreateGoalRequest):
     try:
         ai_plan = ai_service.generate_plan(goal.title)
 
+        tokens_used = ai_plan.get("tokens_used", 0)
+        carbon_footprint = ai_plan.get("carbon_footprint")
+        if carbon_footprint is None:
+            carbon_footprint = estimate_carbon_usage(tokens_used)
+
         #LOG AI usage for green metrics
         log_ai_usage(
             user_id = goal.user_id,
             endpoint_type = "generate_plan",
-            tokens_used = ai_plan.get("tokens_used", 0),
-            carbon_footprint = ai_plan.get("carbon_footprint", 0)
+            tokens_used = tokens_used,
+            carbon_footprint = carbon_footprint
         )
     except Exception as e:
         raise HTTPException(status_code = 500, detail = f"AI generation failed: {str(e)}")
@@ -210,13 +216,17 @@ def feedback_on_plan(goal_id: str, request: FeedbackRequest):
             user_input = request.feedback,
             current_goals = current_tasks
         )
+        tokens_used = updated_plan.get("tokens_used", 0)
+        carbon_footprint = updated_plan.get("carbon_footprint")
+        if carbon_footprint is None:
+            carbon_footprint = estimate_carbon_usage(tokens_used)
 
         #LOG AI usage for green metrics
         log_ai_usage(
             user_id = goal.user_id,
-            endpoint_type = "generate_plan",
-            tokens_used = updated_plan.get("tokens_used", 0),
-            carbon_footprint = updated_plan.get("carbon_footprint", 0)
+            endpoint_type = "revise_plan",
+            tokens_used = tokens_used,
+            carbon_footprint = carbon_footprint
         )
     except Exception as e:
         raise HTTPException(status_code = 500, detail = f"AI feedback failed: {str(e)}")
