@@ -31,7 +31,7 @@ const COLOR_SCHEMES = {
     }
 };
 
-const GoalListCard = ({ goal, onClick, categories, onAssignCategory, onNewCategory }) => {
+const GoalListCard = ({ goal, onClick, categories, onAssignCategory, onNewCategory, completed }) => {
     const navigate = useNavigate();
     const scheme = COLOR_SCHEMES[goal.colorScheme] || COLOR_SCHEMES.blue;
     const [isAssignOpen, setIsAssignOpen] = useState(false);
