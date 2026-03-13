@@ -74,6 +74,7 @@ const Goals = () => {
                     return {
                         id: goal.id,
                         title: goal.title,
+                        category: goal.category|| null, 
                         description: goal.description || goalData.description || '',
                         date: (goal.due_date || goalData.goal_due_date)
                             ? new Date(goal.due_date || goalData.goal_due_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
@@ -162,13 +163,13 @@ const Goals = () => {
                             categories={categories}
                             onNewCategory={handleNewCategory}
                             onAssignCategory={async (goalId, cat) => {
-    await fetch(`${import.meta.env.VITE_API_URL}/goals/${goalId}/category`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ category: cat })
-    });
-    setGoals(prev => prev.map(g => g.id === goalId ? {...g, category: cat} : g));
-}}
+                                await fetch(`${import.meta.env.VITE_API_URL}/goals/${goalId}/category`, {
+                                method: 'PATCH',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ category: cat })
+                            });
+                            setGoals(prev => prev.map(g => g.id === goalId ? {...g, category: cat} : g));
+                        }}
  />
                         ))
                     )}
