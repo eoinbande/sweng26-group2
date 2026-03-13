@@ -192,8 +192,18 @@
 }
 
 .goal-card-header--completed {
+    min-height: 80px; /* Match the date tab height */
     flex-direction: column;
     align-items: flex-start;
-    gap: 12px;
+    justify-content: center;
+    gap: 8px;
 }
 
+.goal-card-inner--completed {
+    flex: 1;
+    border-radius: 28px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+    overflow: hidden;
+    min-width: 0;
+}

@@ -61,7 +61,7 @@ const GoalListCard = ({ goal, onClick, categories, onAssignCategory, onNewCatego
             onKeyDown={handleKeyDown}
             aria-label={`Open ${goal.title}`}
         >
-            <div className="goal-card-inner">
+            <div className={`goal-card-inner${completed ? ' goal-card-inner--completed' : ''}`}>
             <div className={`goal-card-header${completed ? ' goal-card-header--completed' : ''}`} style={{ backgroundColor: scheme.header }}>        <h2 className="goal-card-title">{goal.title}</h2>
         {goal.category
             ? <span className="category-badge">{goal.category}</span>
