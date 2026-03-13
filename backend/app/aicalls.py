@@ -131,4 +131,4 @@ def estimate_carbon_usage(tokens):
     energy = tokens * energy_per_token #energy used per call
     total_carbon_per_call = energy * carbon_average #formula required to calculate total carbon
 
-    return total_carbon_per_call
+    return round(total_carbon_per_call, 6)
