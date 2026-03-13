@@ -19,8 +19,13 @@
     animation: fadeIn 0.5s ease-out forwards;
 }
 
-.fade-in-delay-1 { animation-delay: 0.15s; }
-.fade-in-delay-2 { animation-delay: 0.35s; }
+.fade-in-delay-1 {
+    animation-delay: 0.15s;
+}
+
+.fade-in-delay-2 {
+    animation-delay: 0.35s;
+}
 
 
 /* fluid scaling — iphone 14 (390px) as reference, all values scale with vw via clamp() */
@@ -239,7 +244,7 @@
 /* analytics card — single unified card with red, white, blue zones */
 
 .analytics-card {
-    border-radius: clamp(24px, 8.2vw, 36px);
+    border-radius: clamp(30px, 10vw, 40px);
     overflow: hidden;
     box-shadow: 0 3px 3px rgba(0, 0, 0, 0.25);
     background-color: var(--red);
