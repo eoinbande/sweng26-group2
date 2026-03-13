@@ -165,6 +165,14 @@ const [closingDelete, setClosingDelete] = useState(false);
         fetchGoalDetails();
     }, [goalId]);
 
+    // detect when progress transitions to 100%
+    useEffect(() => {
+        if (prevProgressRef.current !== null && prevProgressRef.current < 100 && progress === 100) {
+            setShowCongrats(true);
+        }
+        prevProgressRef.current = progress;
+    }, [progress]);
+
     /* API Helper to update status */
     const updateTaskStatus = async (taskId, newStatus) => {
         try {
