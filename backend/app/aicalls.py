@@ -123,6 +123,8 @@ print(json.dumps(response3) + "\n")
 
 #this function calculates the average carbon usage per call
 def estimate_carbon_usage(tokens):
+    #**Estimates based on average AI compute energy usage**
+    #Source -> ML CO2 Impact
     energy_per_token = 0.000002
     carbon_average = 0.4
 

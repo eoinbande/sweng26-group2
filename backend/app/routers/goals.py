@@ -121,6 +121,8 @@ def create_goal_endpoint(goal: CreateGoalRequest):
         "category": goal.category,
         "description": ai_plan.get("description", ""),
         "goal_due_date": ai_plan.get("goal_due_date", ""),
+        "tokens_used": ai_plan.get("tokens_used"), #returns tokens to show in green computing tab
+        "carbon_footprint": ai_plan.get("carbon_footprint"), #returns carbon to show in green computing tab
         "tasks": ai_plan["tasks"],   # Tasks for frontend to display on review screen
         "saved_to_db": False          # Frontend knows this isn't saved yet
     }
