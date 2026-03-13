@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from typing import Optional
 from app.services.ai_service import AIService
 from app.services.ai_service import log_ai_usage
+from app.aicalls import estimate_carbon_usage
 # Database functions (Tables.py)
 from ..Tables import (
     get_tasks_for_goal, get_task, update_task_status,
@@ -158,13 +159,18 @@ def expand_task(task_id: str, request: ExpandTaskRequest):
             user_input = request.stuck_reason or task["description"], #if not given stuck reason
             current_goals = goal_tasks
         )
+    
+        tokens_used = ai_response.get("tokens_used", 0)
+        carbon_footprint = ai_response.get("carbon_footprint")
+        if carbon_footprint is None:
+            carbon_footprint = estimate_carbon_usage(tokens_used)
 
        #LOG AI usage for green metrics
         log_ai_usage(
             user_id = task.user_id,
             endpoint_type = "expand_plan",
-            tokens_used = ai_response.get("tokens_used", 0),
-            carbon_footprint = ai_response.get("carbon_footprint", 0)
+            tokens_used = tokens_used,
+            carbon_footprint = carbon_footprint
         )
     
     #exception related to the AI service being unavailable
