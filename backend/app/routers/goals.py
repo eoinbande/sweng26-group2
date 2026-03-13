@@ -221,7 +221,6 @@ def feedback_on_plan(goal_id: str, request: FeedbackRequest):
     }
 
 
-
 # ---- Step 3: User accepts the plan → save to database ----
 
 @goal_router.post("/goals/{goal_id}/accept")
