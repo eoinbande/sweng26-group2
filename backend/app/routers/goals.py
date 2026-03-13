@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field
 from typing import Optional
 import json
 from app.services.ai_service import AIService
-# Database functions (Tables.py)
+# Database functions (Tables.py)  
 from ..Tables import (
     create_goal, get_all_goals, get_goal, delete_goal,
     update_goal_data, save_tasks_to_db, merge_and_save_tasks,
