@@ -94,7 +94,7 @@ export function TaskCard({
         flex: 1,
         minWidth: 0,
         justifyContent: 'center',
-        padding: '12px',
+        padding: '8px',
       }}>
         <div style={{ marginRight: subtasks.length > 0 ? 'clamp(30px, 4.5dvh, 36px)' : '0' }}>
             <div className="cg-task-title" style={{
