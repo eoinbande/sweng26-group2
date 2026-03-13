@@ -60,11 +60,18 @@ const GoalListCard = ({ goal, onClick, categories, onAssignCategory, onNewCatego
             tabIndex={0}
             onKeyDown={handleKeyDown}
             aria-label={`Open ${goal.title}`}
+            style={{ zIndex: isAssignOpen ? 100 : 'auto' }}
         >
             <div className={`goal-card-inner${completed ? ' goal-card-inner--completed' : ''}`}>
             <div className={`goal-card-header${completed ? ' goal-card-header--completed' : ''}`} style={{ backgroundColor: scheme.header }}>        <h2 className="goal-card-title">{goal.title}</h2>
         {goal.category
-            ? <span className="category-badge">{goal.category}</span>
+            ? <span 
+                className="category-badge" 
+                onClick={!completed ? (e) => { e.stopPropagation(); setIsAssignOpen(!isAssignOpen); } : undefined}
+                style={!completed ? { cursor: 'pointer' } : {}}
+              >
+                {goal.category}
+              </span>
             : !completed && (
                 <button className="assign-category-btn" onClick={(e) => { e.stopPropagation(); setIsAssignOpen(!isAssignOpen); }}>+</button>
             )
@@ -79,7 +86,9 @@ const GoalListCard = ({ goal, onClick, categories, onAssignCategory, onNewCatego
                             e.stopPropagation();
                             onAssignCategory(goal.id, cat);
                             setIsAssignOpen(false);
-                        }}>{cat}</p>
+                        }}>
+                             {cat}
+                        </p>
                     </React.Fragment>
                 ))}
             </div>
