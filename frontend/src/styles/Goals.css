@@ -56,3 +56,25 @@
         gap: 24px;
     }
 }
+
+/* Section headers — matches schedule page ut-title / ut-subtitle style */
+.goals-section-header {
+    margin-top: 8px;
+    margin-bottom: 0px;
+}
+
+.goals-section-title {
+    font-family: var(--font-serif);
+    font-size: clamp(20px, 3dvh, 26px);
+    font-weight: 550;
+    color: var(--text-main);
+    margin: 0 0 4px;
+}
+
+.goals-section-subtitle {
+    font-family: var(--font-sans);
+    font-size: clamp(11px, 1.4dvh, 13px);
+    color: var(--text-secondary);
+    margin: 0 0 24px;
+}
+

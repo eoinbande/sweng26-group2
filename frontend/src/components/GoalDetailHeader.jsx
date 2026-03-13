@@ -52,9 +52,9 @@ const GoalDetailHeader = ({ title, progress = 0, category, endDate, onBack }) =>
                     <span className="goal-detail-header__percentage">
                         {progress}% complete
                     </span>
-                    {/* {category && (
+                    {category && (
                         <span className="goal-detail-header__category">{category}</span>
-                    )} */}
+                    )}
                 </div>
             </div>
 

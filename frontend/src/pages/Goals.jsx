@@ -6,6 +6,7 @@ import BottomNav from '../components/BottomNav';
 import Loading from '../components/Loading';
 import { supabase, isDemoMode } from '../supabase_client';
 import '../styles/Goals.css';
+import CategoryIcon from '../components/CategoryIcon';
 
 const COLOR_SCHEMES_LIST = ['blue', 'yellow', 'green', 'pink'];
 
@@ -22,6 +23,9 @@ const Goals = () => {
     const [goals, setGoals] = useState([]);
     const [loading, setLoading] = useState(true);
     const scrollRef = useRef(null);
+    const [categories, setCategories] = useState([]);
+    const [selectedCategories, setSelectedCategories] = useState([]);
+
 
     const handleScroll = useCallback(() => {
         const el = scrollRef.current;
@@ -70,6 +74,7 @@ const Goals = () => {
                     return {
                         id: goal.id,
                         title: goal.title,
+                        category: goal.category|| null, 
                         description: goal.description || goalData.description || '',
                         date: (goal.due_date || goalData.goal_due_date)
                             ? new Date(goal.due_date || goalData.goal_due_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
@@ -80,6 +85,11 @@ const Goals = () => {
                 }));
 
                 setGoals(mapped);
+                // Fetch categories
+                const catRes = await fetch(`${import.meta.env.VITE_API_URL}/categories/${user.id}`);
+                const catData = await catRes.json();
+                setCategories(catData.categories.map(c => c.name)); // backend returns objects with a .name field
+
             } catch (err) {
                 console.error('Failed to fetch goals, using mock data:', err);
                 setGoals(MOCK_GOALS);
@@ -102,6 +112,22 @@ const Goals = () => {
         }
     }, [location.state]);
 
+     const handleSelectionChange = (updated) => {
+    setSelectedCategories(updated);
+    };
+
+    const handleNewCategory = async (name) => {
+    if (!name.trim()) return;
+    const { data: { user } } = await supabase.auth.getUser();
+    await fetch(`${import.meta.env.VITE_API_URL}/categories`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: user.id, name: name.trim() })
+    });
+    setCategories(prev => [...prev, name.trim()]); // still update state so UI reacts instantly
+    };
+
+
     if (loading) {
         return (
             <div className="goals-page">
@@ -111,22 +137,86 @@ const Goals = () => {
         );
     }
 
+    const filteredGoals = selectedCategories.length === 0
+    ? goals
+    : goals.filter(g => selectedCategories.includes(g.category));
+
+    const activeGoals = filteredGoals.filter(g => g.progress < 100);
+    const completedGoals = filteredGoals.filter(g => g.progress === 100);
+
+
     return (
         <div className="goals-page">
             <div className="goals-container" ref={scrollRef} onScroll={handleScroll}>
                 <PageHeader title="Goals" />
-
+                <CategoryIcon
+                    categories={categories}
+                    selectedCategories={selectedCategories}
+                    onSelectionChange={handleSelectionChange}
+                    onNewCategory={handleNewCategory}
+                />
                 {/* Goals List */}
-                <div className="goals-list">
-                    {goals.length === 0 ? (
-                        <p style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>No goals yet. Create one!</p>
-                    ) : (
-                        goals.map((goal) => (
-                            <GoalListCard key={goal.id} goal={goal} />
-                        ))
-                    )}
+                {activeGoals.length === 0 && completedGoals.length === 0 ? (
+    <p style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>No goals yet. Create one!</p>
+) : (
+    <>
+        {activeGoals.length > 0 && (
+            <>
+                <div className="goals-section-header">
+                    <h2 className="goals-section-title">Active Goals</h2>
+                    <p className="goals-section-subtitle">See your current goals here</p>
                 </div>
+                <div className="goals-list">
+                    {activeGoals.map((goal) => (
+                        <GoalListCard key={goal.id}
+                            goal={goal}
+                            categories={categories}
+                            onNewCategory={handleNewCategory}
+                            onAssignCategory={async (goalId, cat) => {
+                                await fetch(`${import.meta.env.VITE_API_URL}/goals/${goalId}/category`, {
+                                    method: 'PATCH',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ category: cat })
+                                });
+                                setGoals(prev => prev.map(g => g.id === goalId ? {...g, category: cat} : g));
+                            }}
+                        />
+                    ))}
+                </div>
+            </>
+        )}
+
+        <div style={{ marginTop: '30px' }}>
+            <div className="goals-section-header">
+                <h2 className="goals-section-title">Completed Goals</h2>
+                <p className="goals-section-subtitle">See your goal history here</p>
             </div>
+            {completedGoals.length > 0 ? (
+                <div className="goals-list">
+                    {completedGoals.map((goal) => (
+                        <GoalListCard key={goal.id}
+                            goal={goal}
+                            completed
+                            categories={categories}
+                            onNewCategory={handleNewCategory}
+                            onAssignCategory={async (goalId, cat) => {
+                                await fetch(`${import.meta.env.VITE_API_URL}/goals/${goalId}/category`, {
+                                    method: 'PATCH',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ category: cat })
+                                });
+                                setGoals(prev => prev.map(g => g.id === goalId ? {...g, category: cat} : g));
+                            }}
+                        />
+                    ))}
+                </div>
+            ) : (
+                <p style={{ textAlign: 'center', padding: '1rem', color: '#888' }}>No completed goals yet!</p>
+            )}
+        </div>
+    </>
+)}
+
 
             <div
                 className="goals-fade-overlay"
@@ -134,6 +224,7 @@ const Goals = () => {
             />
             <BottomNav />
         </div>
+    </div>
     );
 };
 

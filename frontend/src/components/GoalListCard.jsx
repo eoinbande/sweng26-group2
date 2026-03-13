@@ -1,4 +1,5 @@
 import React from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProgressBar from './ProgressBar';
 import '../styles/components/GoalListCard.css';
@@ -30,9 +31,11 @@ const COLOR_SCHEMES = {
     }
 };
 
-const GoalListCard = ({ goal, onClick }) => {
+const GoalListCard = ({ goal, onClick, categories, onAssignCategory, onNewCategory, completed }) => {
     const navigate = useNavigate();
     const scheme = COLOR_SCHEMES[goal.colorScheme] || COLOR_SCHEMES.blue;
+    const [isAssignOpen, setIsAssignOpen] = useState(false);
+
 
     const handleClick = () => {
         if (onClick) {
@@ -51,31 +54,54 @@ const GoalListCard = ({ goal, onClick }) => {
 
     return (
         <article 
-            className="goal-list-card"
+            className={`goal-list-card${completed ? ' goal-list-card--completed-root' : ''}`}
             onClick={handleClick}
             role="button"
             tabIndex={0}
             onKeyDown={handleKeyDown}
             aria-label={`Open ${goal.title}`}
+            style={{ zIndex: isAssignOpen ? 100 : 'auto' }}
         >
-            <div className="goal-card-inner">
-                {/* Header Section */}
-                <div 
-                    className="goal-card-header"
-                    style={{ backgroundColor: scheme.header }}
-                >
-                    <h2 className="goal-card-title">{goal.title}</h2>
-                </div>
+            <div className={`goal-card-inner${completed ? ' goal-card-inner--completed' : ''}`}>
+            <div className={`goal-card-header${completed ? ' goal-card-header--completed' : ''}`} style={{ backgroundColor: scheme.header }}>        <h2 className="goal-card-title">{goal.title}</h2>
+        {goal.category
+            ? <span 
+                className="category-badge" 
+                onClick={!completed ? (e) => { e.stopPropagation(); setIsAssignOpen(!isAssignOpen); } : undefined}
+                style={!completed ? { cursor: 'pointer' } : {}}
+              >
+                {goal.category}
+              </span>
+            : !completed && (
+                <button className="assign-category-btn" onClick={(e) => { e.stopPropagation(); setIsAssignOpen(!isAssignOpen); }}>+</button>
+            )
+        }
 
-                {/* Body Section */}
-                <div 
-                    className="goal-card-body"
-                    style={{ backgroundColor: scheme.body }}
-                >
-                    <p className="goal-card-description">{goal.description}</p>
-                    <ProgressBar progress={goal.progress} />
-                </div>
+        {!completed && isAssignOpen && (
+            <div className="assign-dropdown" onClick={e => e.stopPropagation()}>
+                {categories.map((cat, i) => (
+                    <React.Fragment key={cat}>
+                        {i > 0 && <div className="assign-dropdown-divider" />}
+                        <p onClick={(e) => {
+                            e.stopPropagation();
+                            onAssignCategory(goal.id, cat);
+                            setIsAssignOpen(false);
+                        }}>
+                             {cat}
+                        </p>
+                    </React.Fragment>
+                ))}
             </div>
+        )}
+    </div>
+
+    {!completed && (
+        <div className="goal-card-body" style={{ backgroundColor: scheme.body }}>
+            <p className="goal-card-description">{goal.description}</p>
+            <ProgressBar progress={goal.progress} />
+        </div>
+    )}
+</div>
 
             {/* date tab - vertical strip on the right side */}
             <div className="goal-date-tab">

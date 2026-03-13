@@ -75,20 +75,24 @@
 
 /* date Tab – vertical strip on the right side of the card  */
 .goal-date-tab {
-
     position: absolute;
     top: 0;
     right: 0;
     width: 30px;
     height: 80px; /* Fixed height for bookmark appearance */
     background-color: #E8505B;
-    border-radius: 0 14px 14px 0px;
+    border-radius: 0 14px 14px 0;
     display: flex;
     align-items: center;
     justify-content: center;
     writing-mode: vertical-rl;
     z-index: 2;
     box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.goal-list-card--completed-root .goal-date-tab {
+    top: 50%;
+    transform: translateY(-50%);
 }
 
 .goal-date-text {
@@ -125,4 +129,85 @@
         width: 26px;
         height: 70px;
     }
+}
+
+.goal-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    
+}
+
+.category-badge {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background-color: rgba(255,255,255,0.5);
+    color: var(--text-main);
+    white-space: nowrap;
+}
+
+.assign-category-btn {
+    padding: 4px 14px;
+    border-radius: 999px;
+    border: none;
+    background-color: white;
+    color: #E8505B;
+    font-size: 22px;
+    font-weight: 400;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+/* White divider in assign dropdown */
+.assign-dropdown-divider {
+    height: 1px;
+    background-color: rgba(255, 255, 255, 0.35);
+    margin: 0 12px;
+}
+
+.assign-dropdown {
+    position: absolute;
+    top: 45px;
+    right: 40px;
+    background: #E8505B;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    z-index: 100;
+    min-width: 140px;
+    padding: 8px 0;
+}
+
+.assign-dropdown p {
+    padding: 10px 20px;
+    margin: 0;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    color: white;
+}
+
+.assign-dropdown p:hover {
+    background-color: rgba(255,255,255,0.15);
+}
+
+.goal-card-header--completed {
+    min-height: 80px; /* Match the date tab height */
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 8px;
+}
+
+.goal-card-inner--completed {
+    flex: 1;
+    border-radius: 28px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+    overflow: hidden;
+    min-width: 0;
 }

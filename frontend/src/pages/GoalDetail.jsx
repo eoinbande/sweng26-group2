@@ -21,6 +21,7 @@ const GoalDetail = () => {
     const [goalTitle, setGoalTitle] = useState(location.state?.goal?.title || location.state?.goalTitle || "Loading...");
     const goalId = location.state?.goal?.id || location.state?.goalId || paramId || null;
     const goalColorScheme = location.state?.goal?.colorScheme || 'yellow';
+    const [goalCategory, setGoalCategory] = useState(location.state?.goal?.category || null);
 
     /* rstore tasks from location.state if returning from feedback page */
     const [tasks, setTasks] = useState(location.state?.tasks || []);
@@ -119,6 +120,10 @@ const [closingDelete, setClosingDelete] = useState(false);
                     setGoalTitle(data.goal.title);
                 }
 
+                if (data.goal?.category) {
+                    setGoalCategory(data.goal.category);
+                }
+
                 // Set End Date if available
                 if (data.goal && data.goal.goal_data && data.goal.goal_data.goal_due_date) {
                     const rawDate = data.goal.goal_data.goal_due_date;
@@ -194,6 +199,15 @@ const [closingDelete, setClosingDelete] = useState(false);
                 // Optionally revert local state here
                 return;
             }
+
+            // Fetch progress after successful update
+            if (goalId) {
+                try {
+                    const progRes = await fetch(`${import.meta.env.VITE_API_URL}/tasks/${goalId}/progress`, { cache: 'no-store' });
+                    const progData = await progRes.json();
+                    if (progData) setProgress(progData.percentage);
+                } catch (e) { console.error("Failed to fetch progress:", e); }
+            }
         } catch (e) {
             console.error("Failed to update task status:", e);
         }
@@ -252,8 +266,8 @@ const [closingDelete, setClosingDelete] = useState(false);
 
     /* toggle a whole task (complete all subtasks or un-complete) */
     const toggleTask = (taskIndex) => {
-    const status = getTaskStatus(taskIndex);
-    if (status === 'locked') return;
+        const status = getTaskStatus(taskIndex);
+        if (status === 'locked') return;
 
     const task = tasks[taskIndex];
     const isComplete = isTaskComplete(task);
@@ -332,7 +346,6 @@ const [closingDelete, setClosingDelete] = useState(false);
                 },
                 userId: userId,
                 originalPrompt: goalTitle,
-                from: 'detail',
                 dueDate: endDate,
             },
         });
@@ -390,7 +403,7 @@ const [closingDelete, setClosingDelete] = useState(false);
                 <GoalDetailHeader
                     title={goalTitle}
                     progress={progress}
-                    category="Event"
+                    category={goalCategory}
                     endDate={endDate}
                     onBack={() => {
                         if (location.state?.from === 'schedule') {
