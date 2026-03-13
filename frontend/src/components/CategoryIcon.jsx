@@ -8,6 +8,31 @@ const CategoryIcon = ({
     onNewCategory
 }) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [isAddingNew, setIsAddingNew] = useState(false);
+    const [newCatInput, setNewCatInput] = useState('');
+    const inputRef = useRef(null);
+    const containerRef = useRef(null);
+
+    useEffect(() => {
+        if (isAddingNew && inputRef.current) inputRef.current.focus();
+    }, [isAddingNew]);
+
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (containerRef.current && !containerRef.current.contains(e.target))
+                setIsDropdownOpen(false);
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    const handleAddCategory = () => {
+        const trimmed = newCatInput.trim();
+        if (trimmed && !categories.includes(trimmed)) onNewCategory(trimmed);
+        setNewCatInput('');
+        setIsAddingNew(false);
+    };
     return <div className = "category-bar">
         <div> 
             <button className="category-btn" onClick={() => setIsDropdownOpen (!isDropdownOpen)}>
