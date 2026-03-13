@@ -187,7 +187,7 @@ const Goals = () => {
         )}
 
         {completedGoals.length > 0 && (
-            <>
+            <div style={{ marginTop: '30px' }}>
                 <div className="goals-section-header">
                     <h2 className="goals-section-title">Completed Goals</h2>
                     <p className="goals-section-subtitle">See your goal history here</p>
@@ -210,7 +210,7 @@ const Goals = () => {
                         />
                     ))}
                 </div>
-            </>
+            </div>
         )}
     </>
 )}
