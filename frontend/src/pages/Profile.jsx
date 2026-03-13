@@ -1,7 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiEdit2 } from 'react-icons/fi';
+import ProfileHeader from '../components/ProfileHeader';
+import AccountCard from '../components/AccountCard';
+import AnalyticsSection from '../components/AnalyticsSection';
 import BottomNav from '../components/BottomNav';
+import Loading from '../components/Loading';
 import { supabase } from '../supabase_client';
 import '../styles/Profile.css';
 
@@ -9,140 +12,68 @@ const Profile = () => {
     const navigate = useNavigate();
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
-    const [isLoading, setIsLoading] = useState(true);
-    const [visible, setVisible] = useState(false);
-    const streak = 217;
+    const [profileLoaded, setProfileLoaded] = useState(false);
 
     useEffect(() => {
-        const fetchUser = async () => {
+        const fetchProfile = async () => {
             try {
                 const { data } = await supabase.auth.getUser();
                 const user = data?.user;
+
                 if (user) {
-                    setEmail(user.email || '');
-                    setUsername(
-                        user.user_metadata?.username ||
-                        user.email?.split('@')[0] ||
-                        ''
-                    );
+                    setEmail(user.email);
+
+                    const { data: profile } = await supabase
+                        .from('profiles')
+                        .select('name')
+                        .eq('id', user.id)
+                        .single();
+
+                    setUsername(profile?.name || user.email.split('@')[0]);
                 }
-            } catch (err) {
-                console.error('Error fetching user:', err);
+            } catch (e) {
+                console.error('Error loading profile', e);
+            } finally {
+                setProfileLoaded(true);
             }
         };
 
-        fetchUser();
-
-        const t = setTimeout(() => {
-            setIsLoading(false);
-            setTimeout(() => setVisible(true), 60);
-        }, 1500);
-
-        return () => clearTimeout(t);
+        fetchProfile();
     }, []);
 
     const handleSignOut = async () => {
-        await supabase.auth.signOut();
-        navigate('/login');
+        try {
+            const { error } = await supabase.auth.signOut();
+            if (error) throw error;
+            navigate('/login');
+        } catch (error) {
+            console.error('Error signing out:', error.message);
+            navigate('/login');
+        }
     };
 
-    /* ── Loading spinner ── */
-    if (isLoading) {
-        return (
-            <>
-                <style>{`
-                    @keyframes profile-spin {
-                        from { transform: rotate(0deg); }
-                        to   { transform: rotate(360deg); }
-                    }
-                `}</style>
-                <div style={{
-                    position: 'fixed',
-                    inset: 0,
-                    backgroundColor: 'var(--bg-color)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    zIndex: 1000,
-                }}>
-                    <div style={{
-                        width: '52px',
-                        height: '52px',
-                        border: '4px solid rgba(255,185,46,0.2)',
-                        borderTop: '4px solid var(--primary)',
-                        borderRadius: '50%',
-                        animation: 'profile-spin 1s linear infinite',
-                    }} />
-                </div>
-            </>
-        );
+    if (!profileLoaded) {
+        return <Loading />;
     }
 
-    /* ── Profile page ── */
     return (
-        <div
-            className="profile-page"
-            style={{
-                opacity: visible ? 1 : 0,
-                transform: visible ? 'translateY(0)' : 'translateY(14px)',
-                transition: 'opacity 0.4s ease, transform 0.4s ease',
-            }}
-        >
-            {/* Pink top half */}
-            <div className="profile-header-bg">
-                <h1 className="profile-title">Your Account</h1>
-            </div>
+        <div className="profile-page">
+            <ProfileHeader />
 
-            {/* Grey lower half */}
-            <div className="profile-lower">
-                {/*
-                  * Content group:
-                  *   top: 0  →  sits at the 50dvh boundary
-                  *   transform: translate(-50%, calc(-50% + 54px))
-                  *     → centres horizontally
-                  *     → lifts group so card midpoint = boundary
-                  *       (54px ≈ half of avatar total height ~107px)
-                  * Result: top half of card in pink, bottom half in grey.
-                  * Avatar sits above card (in pink zone).
-                  * Sign-out sits below card (in grey zone).
-                  */}
-                <div className="profile-content-group">
+            <AccountCard
+                username={username}
+                email={email}
+                streakDays={217}
+                onEdit={() => {}}
+                onSignOut={handleSignOut}
+            />
 
-                    {/* Avatar: semicircle + rectangle, zero gap to card */}
-                    <div className="profile-avatar-wrap">
-                        <div className="profile-avatar-top" />
-                        <div className="profile-avatar-body" />
-                    </div>
-
-                    {/* Info card — top half in pink, bottom half in grey */}
-                    <div className="profile-card">
-                        <div className="profile-streak">
-                            <span className="profile-streak-icon">🔥</span>
-                            <span className="profile-streak-days">{streak} days</span>
-                        </div>
-
-                        <div className="profile-info">
-                            <div className="profile-info-row">
-                                <span className="profile-info-label">Username</span>
-                                <span className="profile-info-value">{username}</span>
-                            </div>
-                            <div className="profile-info-row">
-                                <span className="profile-info-label">Email</span>
-                                <span className="profile-info-value">{email}</span>
-                            </div>
-                        </div>
-
-                        <button className="profile-edit-btn" aria-label="Edit profile">
-                            <FiEdit2 size={17} color="#000000" />
-                        </button>
-                    </div>
-
-                    {/* Sign out — directly below card */}
-                    <button className="profile-signout-btn" onClick={handleSignOut}>
-                        Sign Out
-                    </button>
-                </div>
-            </div>
+            <AnalyticsSection
+                tasksCompleted={28}
+                goalsCompleted={28}
+                onTimeTasks={13}
+                onTimeGoals={13}
+            />
 
             <BottomNav />
         </div>

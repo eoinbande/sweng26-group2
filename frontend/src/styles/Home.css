@@ -49,7 +49,7 @@
 
 .home-page .home-calendar {
     margin-bottom: clamp(4px, 2dvh, 4dvh);
-    flex-shrink: 0;
+    flex-shrink: 1;
 }
 
 .home-page .home-calendar .calendar-day-label {
@@ -57,14 +57,14 @@
 }
 
 .home-page .home-calendar .calendar-day-circle {
-    width: clamp(36px, 7dvh, 50px);
-    height: clamp(36px, 7dvh, 50px);
+    width: clamp(30px, 5dvh, 44px);
+    height: clamp(30px, 5dvh, 44px);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 600;
-    font-size: clamp(11px, 2dvh, 14px);
+    font-size: clamp(10px, 1.8dvh, 13px);
 }
 
 
@@ -74,14 +74,14 @@
 /* top/bottom padding = 2x the side padding to keep proportional height */
 
 .home-page .home-create-goal {
-    padding: clamp(32px, 5dvh, 5dvh) clamp(16px, 5dvh, 30px);
+    padding: clamp(20px, 3.5dvh, 4dvh) clamp(16px, 5dvh, 30px);
     padding-right: clamp(24px, 6dvh, 8%);
-    flex-shrink: 0;
+    flex-shrink: 1;
 }
 
 .home-page .home-create-goal h3 {
-    font-size: clamp(16px, 2.5dvh, 22px);
-    margin-bottom: clamp(4px, 1dvh, 14px);
+    font-size: clamp(15px, 2.2dvh, 20px);
+    margin-bottom: clamp(2px, 0.8dvh, 10px);
     font-family: var(--font-sans);
 }
 
@@ -111,16 +111,15 @@
     margin-top: clamp(8px, 2.2dvh, 24px);
     display: flex;
     flex-direction: column;
-    flex: 0.9;
-    min-height: 0px;
-    max-height: 270px;
+    flex: 1; /* Grow to fill space */
+    min-height: 20dvh; 
 }
 
 .home-page .home-upcoming-tasks>h4 {
     font-family: var(--font-serif);
     font-size: clamp(16px, 2.7dvh, 20px);
     font-weight: 600;
-    margin-bottom: clamp(8px, 2dvh, 24px);
+    margin-bottom: clamp(6px, 1.5dvh, 12px);
     flex-shrink: 0;
 }
 
@@ -146,43 +145,48 @@
 /* goals grid */
 
 .home-page .home-goals-grid {
-    flex-shrink: 0;
-    margin-top: auto;
+    flex-shrink: 1; /* Allow to shrink if needed */
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    margin-top: clamp(8px, 1.5dvh, 16px);
 }
 
 .home-page .home-goals-grid>h4 {
     font-family: var(--font-serif);
-    font-size: clamp(16px, 2.7dvh, 20px);
+    font-size: clamp(16px, 2.7dvh, 20px); /* Revert to match upcoming tasks */
     font-weight: 600;
-    margin-bottom: clamp(8px, 1dvh, 24px);
+    margin-bottom: clamp(6px, 1dvh, 12px);
 }
 
 .home-page .home-goals-grid .goals-scroll {
     display: flex;
     gap: var(--space-md);
     overflow-x: auto;
-    padding: var(--space-md) 24px;
+    padding: clamp(6px, 1dvh, 12px) 24px; /* Reduced padding */
     margin: 0 -24px;
+    min-height: 80px; /* Force height to prevent layout shift */
 }
 
 .home-page .home-goals-grid .goal-card {
-    min-width: clamp(120px, 32vw, 160px);
-    max-width: clamp(120px, 32vw, 160px);
-    padding: clamp(12px, 2dvh, 18px);
-    border-radius: clamp(24px, 3dvh, 36px);
+    min-width: clamp(130px, 35vw, 170px); /* Wider */
+    max-width: clamp(130px, 35vw, 170px);
+    padding: clamp(8px, 1.5dvh, 14px);   /* Reduced padding */
+    border-radius: clamp(20px, 2.5dvh, 32px);
 }
 
 .home-page .home-goals-grid .goal-card h5 {
-    font-size: clamp(13px, 1.6dvh, 16px);
+    font-size: clamp(12px, 1.4dvh, 15px);
 }
 
 .home-page .home-goals-grid .goal-card .goal-date {
-    font-size: clamp(11px, 1.3dvh, 13px);
+    font-size: clamp(10px, 1.1dvh, 12px);
 }
 
 .home-page .home-goals-grid .goal-card .goal-category {
-    font-size: clamp(9px, 1.1dvh, 11px);
-    padding: clamp(2px, 0.4dvh, 4px) clamp(6px, 0.8dvh, 10px);
+    font-size: clamp(8px, 1dvh, 10px);
+    padding: clamp(2px, 0.4dvh, 3px) clamp(5px, 0.8dvh, 8px);
 }
 
 

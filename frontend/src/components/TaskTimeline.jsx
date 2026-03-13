@@ -163,14 +163,14 @@ const TaskTimeline = ({ tasks, getTaskStatus, isTaskComplete, toggleTask, toggle
                                 {task.title}
                             </h4>
 
-                            <p className={`tl-meta ${status === 'completed' ? 'tl-strikethrough' : ''}`}>
+                            {/* <p className={`tl-meta ${status === 'completed' ? 'tl-strikethrough' : ''}`}>
                                 <Clock size={12} />
                                 {daysLeft}
-                            </p>
+                            </p> */}
 
-                            {lockMessage && (
+                            {/* {lockMessage && (
                                 <p className="tl-lock-msg">{lockMessage}</p>
-                            )}
+                            )} */}
 
                             {/* subtasks;only shown for ACTIVE tasks */}
                             {status === 'active' && task.subtasks.length > 0 && (
@@ -193,10 +193,10 @@ const TaskTimeline = ({ tasks, getTaskStatus, isTaskComplete, toggleTask, toggle
                                                 <span className={sub.completed ? 'tl-strikethrough' : ''}>
                                                     {sub.title}
                                                 </span>
-                                                <span className="tl-subtask__date">
+                                                {/* <span className="tl-subtask__date">
                                                     <Clock size={10} />
                                                     {getDaysLeftText(sub.dueDate)}
-                                                </span>
+                                                </span> */}
                                             </div>
                                             <span className="tl-subtask__number">
                                                 {index + 1}.{subIndex + 1}

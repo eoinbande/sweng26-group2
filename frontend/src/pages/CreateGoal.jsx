@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Mic } from 'lucide-react';
+import { ArrowLeft, Mic, ArrowUp } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
 import { InputBar } from '../components/InputBar';
+import { supabase } from '../supabase_client';
 import '../styles/CreateGoal.css';
 import '../index.css';
 
@@ -16,7 +17,20 @@ function CreateGoal() {
     const [message, setMessage] = useState(restoredPrompt);
     const [manualGoal, setManualGoal] = useState('');
     const [isFading, setIsFading] = useState(false);
+    const [showOverlay, setShowOverlay] = useState(false);
     const [contentVisible, setContentVisible] = useState(false);
+    const [userId, setUserId] = useState(null);
+
+    // fetch user id on mount
+    useEffect(() => {
+        const getUser = async () => {
+            const { data } = await supabase.auth.getUser();
+            if (data?.user) {
+                setUserId(data.user.id);
+            }
+        };
+        getUser();
+    }, []);
 
     // fade in content on mount
     useEffect(() => {
@@ -24,22 +38,34 @@ function CreateGoal() {
         return () => clearTimeout(timer);
     }, []);
 
-    // handle goal submission - fades out content then navigates to date selection
+    // handle goal submission - fades out content then navigates to review plan
     const handleGoalSubmit = (goalText) => {
+        if (!userId) {
+            console.error("No user ID found, cannot submit goal");
+            // Optionally redirect to login or show error
+            return;
+        }
+
         console.log('Goal submitted:', goalText);
 
         // fade out all content
         setIsFading(true);
+        setShowOverlay(true);
 
         // navigate after fade completes
         setTimeout(() => {
-            navigate('/goal-add-date', {
+            navigate('/review-plan', {
                 state: {
-                    goalText,
+                    goal: goalText,
+                    showLoading: true, // Tell ReviewPlan to show the loading screen
+                    previewData: null, // No data yet, ReviewPlan will fetch it
+                    userId: userId,
                     originalPrompt: goalText,
+                    dueDate: null, // skipped since we removed the date page
+                    from: 'create',
                 },
             });
-        }, 500);
+        }, 600);
     };
 
     return (
@@ -189,7 +215,7 @@ function CreateGoal() {
                                 setMessage('');
                             }
                         }}
-                        icon={<Mic size={18} color="white" />}
+                        icon={<ArrowUp size={20} color="white" strokeWidth={2.5} />} // icon={<Mic size={18} color="white" />}
                         buttonStyle="dark"
                         variant="auth"
                     />
@@ -198,6 +224,20 @@ function CreateGoal() {
 
             {/* bottom nav */}
             <BottomNav />
+
+            {/* blue overlay for smooth transition to loading screen */}
+            <div style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                backgroundColor: 'var(--accent-blue)',
+                zIndex: 1000,
+                opacity: showOverlay ? 1 : 0,
+                pointerEvents: 'none',
+                transition: 'opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
+            }} />
         </div>
     );
 }

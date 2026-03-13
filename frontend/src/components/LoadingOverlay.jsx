@@ -6,7 +6,7 @@ import 'ldrs/react/Hourglass.css'
 import '../index.css';
 
 // loading overlay component for transitioning between pages
-function LoadingOverlay({ onComplete }) {
+function LoadingOverlay({ onComplete, isLoading = false, minDisplayTime = 2000 }) {
     const navigate = useNavigate();
 
     const phrases = [
@@ -24,6 +24,9 @@ function LoadingOverlay({ onComplete }) {
     const [isTextVisible, setIsTextVisible] = useState(false);
     const [isShrinking, setIsShrinking] = useState(false);
     const [isPhraseVisible, setIsPhraseVisible] = useState(true);
+    
+    // minimum display time (e.g., 2 seconds) to avoid flicker
+    const [minTimeElapsed, setMinTimeElapsed] = useState(false);
 
     useEffect(() => {
         // register hourglass spinner
@@ -33,6 +36,11 @@ function LoadingOverlay({ onComplete }) {
         const fadeInTimer = setTimeout(() => {
             setIsTextVisible(true);
         }, 100);
+
+        // set minimum time elapsed
+        const minTimeTimer = setTimeout(() => {
+            setMinTimeElapsed(true);
+        }, minDisplayTime);
 
         // cycle through phrases with fade transition
         const cycleInterval = setInterval(() => {
@@ -45,29 +53,35 @@ function LoadingOverlay({ onComplete }) {
             }, 400);
         }, 2500);
 
-        // start shrinking animation after showing phrases
-        const shrinkTimer = setTimeout(() => {
-            setIsTextVisible(false);
-        }, 5000);
-
-        // begin card shrink
-        const transitionTimer = setTimeout(() => {
-            setIsShrinking(true);
-        }, 5500);
-
-        // notify parent that loading is complete
-        const completeTimer = setTimeout(() => {
-            onComplete?.();
-        }, 7000);
-
         return () => {
             clearTimeout(fadeInTimer);
+            clearTimeout(minTimeTimer);
             clearInterval(cycleInterval);
-            clearTimeout(shrinkTimer);
-            clearTimeout(transitionTimer);
-            clearTimeout(completeTimer);
         };
-    }, [phrases.length, onComplete]);
+    }, [phrases.length, minDisplayTime]);
+
+    // Handle completion logic: wait for isLoading to be false AND minTimeElapsed
+    useEffect(() => {
+        if (!isLoading && minTimeElapsed) {
+            // fade out text
+            setIsTextVisible(false);
+
+            // start shrinking animation
+            const shrinkTimer = setTimeout(() => {
+                setIsShrinking(true);
+            }, 500); // Wait for text fade out
+
+            // notify parent that loading is complete
+            const completeTimer = setTimeout(() => {
+                onComplete?.();
+            }, 1700); // 500ms + 1200ms transition
+
+            return () => {
+                clearTimeout(shrinkTimer);
+                clearTimeout(completeTimer);
+            };
+        }
+    }, [isLoading, minTimeElapsed, onComplete]);
     
 
     return (

@@ -27,7 +27,7 @@ export function TaskCard({
       maxWidth: '400px',
       boxSizing: 'border-box',
     }}>
-      {/* review variant: confirm/deny buttons floating on left */}
+      {/* review variant: confirm/deny buttons floating on left
       {isReviewVariant && (
         <div className="cg-task-action-group" style={{
           position: 'absolute',
@@ -85,7 +85,7 @@ export function TaskCard({
             <X size={20} color="white" strokeWidth={3} />
           </button>
         </div>
-      )}
+      )} */}
 
       {/* text content */}
       <div style={{
@@ -93,7 +93,7 @@ export function TaskCard({
         flexDirection: 'column',
         flex: 1,
         minWidth: 0,
-        marginLeft: 'var(--space-sm)',
+        // marginLeft: 'var(--space-sm)',
         marginRight: subtasks.length > 0 ? 'clamp(30px, 4.5dvh, 36px)' : '0',
         justifyContent: 'center',
       }}>
@@ -108,7 +108,7 @@ export function TaskCard({
           )}
           <span>{title}</span>
         </div>
-        <div className="cg-task-due" style={{
+        {/* <div className="cg-task-due" style={{
           display: 'flex',
           alignItems: 'center',
           gap: 'var(--space-xs)',
@@ -118,7 +118,7 @@ export function TaskCard({
         }}>
           <Clock size={12} strokeWidth={2} />
           <span>{dueDate}</span>
-        </div>
+        </div> */}
 
         {/* subtasks dropdown */}
         {subtasks.length > 0 && (

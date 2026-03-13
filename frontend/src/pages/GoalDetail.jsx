@@ -1,23 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import { X } from 'lucide-react'; 
-import { useNavigate, useLocation } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { X } from 'lucide-react';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
 import GoalDetailHeader from '../components/GoalDetailHeader';
 import TaskTimeline from '../components/TaskTimeline';
 import Loading from '../components/Loading'; // Import Loading component if it exists
+import LoadingOverlay from '../components/LoadingOverlay'; // Import LoadingOverlay for feedback
 import FeedbackPopUp from '../components/FeedbackPopUp';
+import Congratulations from '../components/Congratulations';
 import '../styles/GoalDetail.css';
 import { supabase } from '../supabase_client';
 
 const GoalDetail = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const { id: paramId } = useParams();
 
     // Safely access location state
     // Use "Loading..." as default if we are loading, unless we want to show stale title
     const [goalTitle, setGoalTitle] = useState(location.state?.goal?.title || location.state?.goalTitle || "Loading...");
-    const goalId = location.state?.goal?.id || location.state?.goalId || null;
-    const [goalCategory, setGoalCategory] = useState(location.state?.goal?.category || null);
+    const goalId = location.state?.goal?.id || location.state?.goalId || paramId || null;
+    const goalColorScheme = location.state?.goal?.colorScheme || 'yellow';
 
     /* rstore tasks from location.state if returning from feedback page */
     const [tasks, setTasks] = useState(location.state?.tasks || []);
@@ -31,6 +34,9 @@ const [closingDelete, setClosingDelete] = useState(false);
 
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
+    const [updating, setUpdating] = useState(false); // New state for feedback loading overlay
+    const [showCongrats, setShowCongrats] = useState(false);
+    const prevProgressRef = useRef(null);
 
     const closeFeedback = () => {
         setClosingFeedback(true);
@@ -91,13 +97,20 @@ const [closingDelete, setClosingDelete] = useState(false);
         const fetchGoalDetails = async () => {
             setIsLoading(true);
             try {
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/goal-details/${goalId}`, { cache: 'no-store' });
+                // fetch goal details and progress in parallel
+                const [response, progRes] = await Promise.all([
+                    fetch(`${import.meta.env.VITE_API_URL}/goal-details/${goalId}`, { cache: 'no-store' }),
+                    fetch(`${import.meta.env.VITE_API_URL}/tasks/${goalId}/progress`, { cache: 'no-store' }),
+                ]);
 
                 if (!response.ok) {
                     throw new Error('Failed to fetch details');
                 }
 
-                const data = await response.json();
+                const [data, progData] = await Promise.all([
+                    response.json(),
+                    progRes.json(),
+                ]);
 
                 // Debug log to check data structure
                 console.log("Goal details fetched:", data);
@@ -149,10 +162,10 @@ const [closingDelete, setClosingDelete] = useState(false);
                     setTasks(processTasks(data.tasks));
                 }
 
-                // Fetch progress from backend
-                const progRes = await fetch(`${import.meta.env.VITE_API_URL}/tasks/${goalId}/progress`, { cache: 'no-store' });
-                const progData = await progRes.json();
-                if (progData) setProgress(progData.percentage);
+                if (progData) {
+                    setProgress(progData.percentage);
+                    prevProgressRef.current = progData.percentage;
+                }
             } catch (err) {
                 console.error("Error loading goal details:", err);
             } finally {
@@ -162,6 +175,14 @@ const [closingDelete, setClosingDelete] = useState(false);
 
         fetchGoalDetails();
     }, [goalId]);
+
+    // detect when progress transitions to 100%
+    useEffect(() => {
+        if (prevProgressRef.current !== null && prevProgressRef.current < 100 && progress === 100) {
+            setShowCongrats(true);
+        }
+        prevProgressRef.current = progress;
+    }, [progress]);
 
     /* API Helper to update status */
     const updateTaskStatus = async (taskId, newStatus) => {
@@ -277,8 +298,8 @@ const [closingDelete, setClosingDelete] = useState(false);
     const handleSubmitFeedback = async (text) => {
     const val = text; // handle value from InputBar or state
     if (!val.trim()) return;
-    
-        //setSubmittingFeedback(true);
+    setUpdating(true); // Start loading overlay
+        closeFeedback(); // Close the popup
         //setShowLoading(true); // Show loading overlay while processing feedback
     
         try {
@@ -294,7 +315,7 @@ const [closingDelete, setClosingDelete] = useState(false);
         const res = await fetch(`${import.meta.env.VITE_API_URL}/goals/${goalId}/feedback`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ feedback: val })
+            body: JSON.stringify({ feedback: val, current_tasks: tasks })
         });
 
         const data = await res.json();
@@ -328,13 +349,12 @@ const [closingDelete, setClosingDelete] = useState(false);
             },
         });
 
-        //setSubmittingFeedback(false);
+        // setUpdating(false); // Don't turn off here, let navigation handle it (unmount) or let ReviewPlan take over
 
     } catch (err) {
         console.error('Network error:', err);
         alert('Network error. Is the backend running?');
-        //setSubmittingFeedback(false);
-        //setShowLoading(false);
+        setUpdating(false);
     }
     };
 
@@ -413,6 +433,14 @@ const [closingDelete, setClosingDelete] = useState(false);
                 />
             </div>
 
+            {/* congratulations popup */}
+            <Congratulations
+                isOpen={showCongrats}
+                onClose={() => setShowCongrats(false)}
+                goalTitle={goalTitle}
+                colorScheme={goalColorScheme}
+            />
+
             {/* feedback popup */}
             {showFeedback && (
                 <div
@@ -436,6 +464,14 @@ const [closingDelete, setClosingDelete] = useState(false);
             )}
 
             {/* floating buttons */}
+            {/* loading overlay for feedback */}
+            {updating && (
+                <LoadingOverlay 
+                    isLoading={true} 
+                    onComplete={() => {}} 
+                />
+            )}
+
             {/* Update Button */}
             <div className="fab-container">
                 <button className="btn-update-plan" onClick={() => setShowFeedback(true)}>

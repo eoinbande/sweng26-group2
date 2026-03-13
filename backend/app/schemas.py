@@ -342,15 +342,24 @@ class CreateGoalRequest(BaseModel):
 class FeedbackRequest(BaseModel):
     """
     Request body for POST /goals/{goal_id}/feedback
-    
+
     User's free-text feedback about the plan. Can be used both
     on the review screen (before save) and after the goal is active.
-    
+
     Example: {"feedback": "I don't like task_3, use soapy water instead"}
+
+    current_tasks: If provided, the backend uses these tasks as the context
+    for AI revision instead of fetching from DB. This is critical for
+    multi-round feedback on the preview page, where intermediate revisions
+    are not yet saved to DB.
     """
     feedback: str = Field(
         ...,
         description="User's feedback on the plan"
+    )
+    current_tasks: Optional[list] = Field(
+        default=None,
+        description="Current tasks visible to the user. If provided, used as AI context instead of DB state."
     )
 
 

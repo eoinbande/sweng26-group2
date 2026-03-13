@@ -169,7 +169,7 @@
 
 .create-goal-page .cg-task-card {
     padding: clamp(10px, 1.6dvh, 16px);
-    border-radius: clamp(12px, 2dvh, 20px);
+    border-radius: clamp(12px, 2.5dvh, 20px);
     min-height: clamp(70px, 11dvh, 100px);
 }
 
