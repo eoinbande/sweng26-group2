@@ -128,14 +128,11 @@ function ReviewPlan() {
         // Get the due date from location state (passed from GoalAddDate), might be null
         const dueDate = location.state?.dueDate;
         
-        // - If dueDate is empty string, send null (skip deadline)
-        // - If dueDate is 'AI_DECIDE' => don't send anything (use AI's date from mock)
+        // - If dueDate is 'AI_DECIDE' or empty/null => send 'AI_DECIDE' so backend knows to keep AI's suggestion
         // - Otherwise => send the actual date
         let dateToSend;
-        if (dueDate === 'AI_DECIDE') {
-            dateToSend = undefined; // Don't include in request (will use the existant one that AI gave)
-        } else if (!dueDate || dueDate === '') {
-            dateToSend = null; // Explicitly null
+        if (!dueDate || dueDate === '' || dueDate === 'AI_DECIDE') {
+            dateToSend = 'AI_DECIDE'; // Tell backend to keep AI suggestion (never null)
         } else {
             dateToSend = dueDate; // User-selected date
         }

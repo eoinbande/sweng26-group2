@@ -78,12 +78,6 @@ function GoalAddDate() {
         await handleGoalSubmit();
     };
 
-    // "Skip deadline" - explicitly set date to null and proceed with goal submission
-    const handleSkipDeadline = async () => {
-        dateValueRef.current = null;
-        await handleGoalSubmit();
-    };
-
     // goal submission - fade out, expand, then navigate to review
     const handleGoalSubmit = async () => {
         if (navigatingRef.current) return;
@@ -227,7 +221,7 @@ function GoalAddDate() {
                                 if (dateValueRef.current) {
                                     handleGoalSubmit();
                                 } else {
-                                    alert('Please select a date first, or use "Skip deadline" or "Let AI decide"');
+                                    alert('Please select a date first or use "Let AI decide"');
                                 }
                             }}
                             variant="auth"
@@ -273,31 +267,6 @@ function GoalAddDate() {
                     transform: (isFadingOut || isFading) ? 'translateY(-20px)' : (contentVisible ? 'translateY(0)' : 'translateY(20px)'),
                     transition: 'all 0.4s ease-out 0.3s',
                 }}>
-                    <button
-                        className="cg-action-btn"
-                        onClick={handleSkipDeadline}
-                        style={{
-                            backgroundColor: 'var(--bg-color)',
-                            color: 'var(--text-main)',
-                            border: 'none',
-                            fontFamily: 'var(--font-sans)',
-                            fontWeight: '500',
-                            cursor: 'pointer',
-                            transition: 'all 0.3s ease',
-                            boxShadow: 'var(--shadow-sm)',
-                            whiteSpace: 'nowrap',
-                        }}
-                        onMouseEnter={(e) => {
-                            e.currentTarget.style.transform = 'translateY(-3px)';
-                            e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
-                        }}
-                        onMouseLeave={(e) => {
-                            e.currentTarget.style.transform = 'translateY(0)';
-                            e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
-                        }}
-                    >
-                        Skip deadline
-                    </button>
                     <button
                         className="cg-action-btn"
                         onClick={handleLetAIDecide}

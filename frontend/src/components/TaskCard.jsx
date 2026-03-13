@@ -93,32 +93,35 @@ export function TaskCard({
         flexDirection: 'column',
         flex: 1,
         minWidth: 0,
-        // marginLeft: 'var(--space-sm)',
-        marginRight: subtasks.length > 0 ? 'clamp(30px, 4.5dvh, 36px)' : '0',
         justifyContent: 'center',
+        padding: '8px',
       }}>
-        <div className="cg-task-title" style={{
-          display: 'flex',
-          fontWeight: 600,
-          color: 'var(--text-main)',
-          lineHeight: '1.3',
-        }}>
-          {order != null && (
-            <span style={{ color: 'var(--accent-red-soft)', marginRight: '4px', flexShrink: 0 }}>{order}.</span>
-          )}
-          <span>{title}</span>
+        <div style={{ marginRight: subtasks.length > 0 ? 'clamp(30px, 4.5dvh, 36px)' : '0' }}>
+            <div className="cg-task-title" style={{
+              fontWeight: 600,
+              color: 'var(--text-main)',
+              lineHeight: '1.3',
+              wordBreak: 'break-word', // Ensure long words break
+            }}>
+              {order != null && (
+                <span style={{ color: 'var(--accent-red-soft)', marginRight: '4px' }}>{order}.</span>
+              )}
+              <span>{title}</span>
+            </div>
+            {dueDate && (
+             <div className="cg-task-due" style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--space-xs)',
+              color: 'var(--text-secondary)',
+              marginTop: '4px',
+              flexShrink: 0,
+            }}>
+              <Clock size={12} strokeWidth={2} />
+              <span>{dueDate}</span>
+            </div>
+            )}
         </div>
-        {/* <div className="cg-task-due" style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 'var(--space-xs)',
-          color: 'var(--text-secondary)',
-          whiteSpace: 'nowrap',
-          flexShrink: 0,
-        }}>
-          <Clock size={12} strokeWidth={2} />
-          <span>{dueDate}</span>
-        </div> */}
 
         {/* subtasks dropdown */}
         {subtasks.length > 0 && (
@@ -129,19 +132,21 @@ export function TaskCard({
             gap: showSubtasks ? '6px' : '0px',
             borderTop: showSubtasks ? '1px solid #F0F0EC' : '1px solid transparent',
             paddingTop: showSubtasks ? '8px' : '0px',
-            maxHeight: showSubtasks ? `${subtasks.length * 60}px` : '0px',
+            maxHeight: showSubtasks ? `${subtasks.length * 300}px` : '0px', // Allow enough space for wrapping text
             overflow: 'hidden',
             transition: 'max-height 0.4s ease-out, margin-top 0.3s ease-out, padding-top 0.3s ease-out, gap 0.3s ease-out, border-color 0.3s ease-out',
           }}>
             {subtasks.map((sub, index) => (
               <div key={sub.id} className="cg-task-subtask" style={{
                 display: 'flex',
-                alignItems: 'center',
+                alignItems: 'flex-start',
                 backgroundColor: '#F9F9F7',
                 position: 'relative',
                 opacity: showSubtasks ? 1 : 0,
                 transform: showSubtasks ? 'translateY(0)' : 'translateY(20px)',
                 transition: `all 0.5s ease-out ${index * 0.1}s`,
+                padding: '12px',
+                borderRadius: '10px',
               }}>
                 <div style={{
                   flex: 1,
@@ -153,26 +158,28 @@ export function TaskCard({
                   <span className="cg-task-subtask-title" style={{
                     color: 'var(--text-main)',
                     fontWeight: 400,
+                    wordBreak: 'break-word',
                   }}>{sub.title}</span>
                   {sub.dueDate && (
                     <span className="cg-task-subtask-due" style={{
                       color: '#8E8E93',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '2px',
+                      gap: '4px',
+                      marginTop: '4px', // Add slight spacing from title
                     }}>
-                      <Clock size={10} strokeWidth={2} />
-                      {sub.dueDate}
+                      <Clock size={10} strokeWidth={2} style={{ flexShrink: 0 }} />
+                      <span style={{ wordBreak: 'break-word' }}>{sub.dueDate}</span>
                     </span>
                   )}
                 </div>
                 {order != null && sub.order != null && (
                   <span className="cg-task-subtask-order" style={{
-                    position: 'absolute',
-                    bottom: '6px',
-                    right: '10px',
+                    marginLeft: '8px',
                     fontWeight: 500,
                     color: '#8E8E93',
+                    alignSelf: 'center', // Center vertically relative to the block
+                    flexShrink: 0,
                   }}>
                     {order}.{sub.order}
                   </span>
