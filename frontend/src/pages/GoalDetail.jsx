@@ -154,7 +154,10 @@ const [closingDelete, setClosingDelete] = useState(false);
                 // Fetch progress from backend
                 const progRes = await fetch(`${import.meta.env.VITE_API_URL}/tasks/${goalId}/progress`, { cache: 'no-store' });
                 const progData = await progRes.json();
-                if (progData) setProgress(progData.percentage);
+                if (progData) {
+                    setProgress(progData.percentage);
+                    prevProgressRef.current = progData.percentage;
+                }
             } catch (err) {
                 console.error("Error loading goal details:", err);
             } finally {
