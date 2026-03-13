@@ -35,8 +35,7 @@ const GoalListCard = ({ goal, onClick, categories, onAssignCategory, onNewCatego
     const navigate = useNavigate();
     const scheme = COLOR_SCHEMES[goal.colorScheme] || COLOR_SCHEMES.blue;
     const [isAssignOpen, setIsAssignOpen] = useState(false);
-    const [isCustomInput, setIsCustomInput] = useState(false);
-    const [customInput, setCustomInput] = useState('');
+
 
     const handleClick = () => {
         if (onClick) {
