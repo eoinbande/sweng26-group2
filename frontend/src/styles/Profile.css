@@ -115,3 +115,46 @@
     color: #ffffff;
     white-space: nowrap;
 }
+
+.account-card-field {
+    display: flex;
+    flex-direction: column;
+}
+
+.account-card-label {
+    font-family: var(--font-sans);
+    font-size: clamp(13px, 3.59vw, 15px);
+    font-weight: 700;
+    color: #000000;
+    line-height: 1.5;
+}
+
+.account-card-value {
+    font-family: var(--font-sans);
+    font-size: clamp(13px, 3.59vw, 15px);
+    font-weight: 400;
+    color: #000000;
+    line-height: 1.5;
+}
+
+.account-card-edit {
+    position: absolute;
+    bottom: 16px;
+    right: 18px;
+    width: clamp(36px, 10.26vw, 44px);
+    height: clamp(36px, 10.26vw, 44px);
+    border-radius: 50%;
+    background-color: var(--yellow);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.25);
+    cursor: pointer;
+}
+
+.account-card-edit svg {
+    width: 14px;
+    height: 14px;
+    color: #000000;
+}
