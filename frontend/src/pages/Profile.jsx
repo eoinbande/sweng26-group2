@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProfileHeader from '../components/ProfileHeader';
 import AccountCard from '../components/AccountCard';
@@ -9,6 +9,33 @@ import '../styles/Profile.css';
 
 const Profile = () => {
     const navigate = useNavigate();
+    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
+
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const { data } = await supabase.auth.getUser();
+                const user = data?.user;
+
+                if (user) {
+                    setEmail(user.email);
+
+                    const { data: profile } = await supabase
+                        .from('profiles')
+                        .select('name')
+                        .eq('id', user.id)
+                        .single();
+
+                    setUsername(profile?.name || user.email.split('@')[0]);
+                }
+            } catch (e) {
+                console.error('Error loading profile', e);
+            }
+        };
+
+        fetchProfile();
+    }, []);
 
     const handleSignOut = async () => {
         try {
@@ -26,8 +53,8 @@ const Profile = () => {
             <ProfileHeader />
 
             <AccountCard
-                username="Marissa"
-                email="marissa@email.com"
+                username={username}
+                email={email}
                 streakDays={217}
                 onEdit={() => {}}
                 onSignOut={handleSignOut}
