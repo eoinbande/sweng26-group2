@@ -73,36 +73,19 @@ const GoalListCard = ({ goal, onClick, categories, onAssignCategory, onNewCatego
                         : <button className = "assign-category-btn" onClick={(e) => { e.stopPropagation(); setIsAssignOpen(!isAssignOpen); }}>+</button>
                     }
                     {isAssignOpen && (
-                        <div className= "assign-dropdown">
-                            {categories.map(cat => (
-                                <p key={cat} onClick={(e) => { 
-                                    e.stopPropagation(); 
-                                    onAssignCategory(goal.id, cat); 
-                                    setIsAssignOpen(false); 
-                                }}>{cat}</p>
-                            ))}
-                            {isCustomInput 
-                                ? <div onClick={e=>e.stopPropagation()}>
-                                    <input 
-                                        value={customInput}
-                                        onChange={e => setCustomInput(e.target.value)}
-                                        onKeyDown={e => {
-                                            if (e.key === 'Enter' && customInput.trim()) {
-                                                onNewCategory(customInput.trim());
-                                                onAssignCategory(goal.id, customInput.trim());
-                                                setCustomInput('');
-                                                setIsAssignOpen(false);
-                                                setIsCustomInput(false);
-                                            }
-                                        }}
-                                        placeholder="Category name"
-                                    />
-                                </div>
-                            : <p onClick={e => { e.stopPropagation(); setIsCustomInput(true); }}>Custom...</p>
-                        }
-
-                    </div>
-                )}
+    <div className="assign-dropdown" onClick={e => e.stopPropagation()}>
+        {categories.map((cat, i) => (
+            <React.Fragment key={cat}>
+                {i > 0 && <div className="assign-dropdown-divider" />}
+                <p onClick={(e) => {
+                    e.stopPropagation();
+                    onAssignCategory(goal.id, cat);
+                    setIsAssignOpen(false);
+                }}>{cat}</p>
+            </React.Fragment>
+        ))}
+    </div>
+)}
 
                 </div>
 
