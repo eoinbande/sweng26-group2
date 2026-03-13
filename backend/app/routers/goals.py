@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field
 from typing import Optional
 import json
 from app.services.ai_service import AIService
+from app.services.ai_service import log_ai_usage
 # Database functions (Tables.py)
 from ..Tables import (
     create_goal, get_all_goals, get_goal, delete_goal,
@@ -126,6 +127,14 @@ def create_goal_endpoint(goal: CreateGoalRequest):
     #----------------------Real AI integration(the following block of code calls the AI to generate the goal!)--------------
     try:
         ai_plan = ai_service.generate_plan(goal.title)
+
+        #LOG AI usage for green metrics
+        log_ai_usage(
+            user_id = goal.user_id,
+            endpoint_type = "generate_plan",
+            tokens_used = ai_plan.get("tokens_used", 0),
+            carbon_footprint = ai_plan.get("carbon_footprint", 0)
+        )
     except Exception as e:
         raise HTTPException(status_code = 500, detail = f"AI generation failed: {str(e)}")
 
