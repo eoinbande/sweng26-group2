@@ -93,34 +93,35 @@ export function TaskCard({
         flexDirection: 'column',
         flex: 1,
         minWidth: 0,
-        marginRight: subtasks.length > 0 ? 'clamp(30px, 4.5dvh, 36px)' : '0',
         justifyContent: 'center',
-        padding: '12px',  // Add some padding to main content
+        padding: '12px',
       }}>
-        <div className="cg-task-title" style={{
-          fontWeight: 600,
-          color: 'var(--text-main)',
-          lineHeight: '1.3',
-          wordBreak: 'break-word', // Ensure long words break
-        }}>
-          {order != null && (
-            <span style={{ color: 'var(--accent-red-soft)', marginRight: '4px' }}>{order}.</span>
-          )}
-          <span>{title}</span>
+        <div style={{ marginRight: subtasks.length > 0 ? 'clamp(30px, 4.5dvh, 36px)' : '0' }}>
+            <div className="cg-task-title" style={{
+              fontWeight: 600,
+              color: 'var(--text-main)',
+              lineHeight: '1.3',
+              wordBreak: 'break-word', // Ensure long words break
+            }}>
+              {order != null && (
+                <span style={{ color: 'var(--accent-red-soft)', marginRight: '4px' }}>{order}.</span>
+              )}
+              <span>{title}</span>
+            </div>
+            {dueDate && (
+             <div className="cg-task-due" style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--space-xs)',
+              color: 'var(--text-secondary)',
+              marginTop: '4px',
+              flexShrink: 0,
+            }}>
+              <Clock size={12} strokeWidth={2} />
+              <span>{dueDate}</span>
+            </div>
+            )}
         </div>
-        {dueDate && (
-         <div className="cg-task-due" style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 'var(--space-xs)',
-          color: 'var(--text-secondary)',
-          marginTop: '4px',
-          flexShrink: 0,
-        }}>
-          <Clock size={12} strokeWidth={2} />
-          <span>{dueDate}</span>
-        </div>
-        )}
 
         {/* subtasks dropdown */}
         {subtasks.length > 0 && (
@@ -144,8 +145,8 @@ export function TaskCard({
                 opacity: showSubtasks ? 1 : 0,
                 transform: showSubtasks ? 'translateY(0)' : 'translateY(20px)',
                 transition: `all 0.5s ease-out ${index * 0.1}s`,
-                padding: '8px 12px',
-                borderRadius: '8px',
+                padding: '12px',
+                borderRadius: '10px',
               }}>
                 <div style={{
                   flex: 1,
