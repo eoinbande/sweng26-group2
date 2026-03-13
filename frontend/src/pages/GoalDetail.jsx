@@ -382,7 +382,7 @@ const [closingDelete, setClosingDelete] = useState(false);
                 <GoalDetailHeader
                     title={goalTitle}
                     progress={progress}
-                    category="Event"
+                    category={goalCategory}
                     endDate={endDate}
                     onBack={() => {
                         if (location.state?.from === 'schedule') {
