@@ -177,3 +177,38 @@
     cursor: pointer;
     box-shadow: 0 3px 3px rgba(0, 0, 0, 0.25);
 }
+
+
+/* analytics section */
+
+.analytics-section {
+    padding: 0 8%;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 20px;
+    padding-bottom: 100px;
+}
+
+.analytics-section-title {
+    font-family: var(--font-serif);
+    font-size: clamp(18px, 5.13vw, 22px);
+    font-weight: 600;
+    color: #000000;
+    line-height: 1.5;
+}
+
+.analytics-section-subtitle {
+    font-family: var(--font-sans);
+    font-size: clamp(13px, 3.59vw, 15px);
+    font-weight: 400;
+    color: #000000;
+    line-height: 1.5;
+    margin-bottom: 12px;
+}
+
+.analytics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(10px, 4.1vw, 20px);
+}
