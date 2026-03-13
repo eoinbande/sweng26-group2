@@ -211,7 +211,7 @@ const Goals = () => {
                     ))}
                 </div>
             ) : (
-                <p style={{ textAlign: 'center', padding: '1rem', color: '#AAA', fontStyle: 'italic' }}>No completed goals yet</p>
+                <p style={{ textAlign: 'center', padding: '1rem', color: '#888' }}>No completed goals yet!</p>
             )}
         </div>
     </>
