@@ -121,7 +121,7 @@
     right: -10px;
     padding: clamp(8px, 2.3vw, 10px) clamp(14px, 3.85vw, 16px);
     background-color: var(--red);
-    border-radius: clamp(20px, 5.64vw, 24px);
+    border-radius: 0 clamp(20px, 5.64vw, 24px) clamp(20px, 5.64vw, 24px) clamp(20px, 5.64vw, 24px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -130,8 +130,8 @@
 }
 
 .account-card-streak-icon {
-    width: clamp(18px, 5.13vw, 22px);
-    height: clamp(18px, 5.13vw, 22px);
+    width: clamp(21px, 6.15vw, 27px);
+    height: clamp(21px, 6.15vw, 27px);
     color: #ee9300;
 }
 
