@@ -186,12 +186,12 @@ const Goals = () => {
             </>
         )}
 
-        {completedGoals.length > 0 && (
-            <div style={{ marginTop: '30px' }}>
-                <div className="goals-section-header">
-                    <h2 className="goals-section-title">Completed Goals</h2>
-                    <p className="goals-section-subtitle">See your goal history here</p>
-                </div>
+        <div style={{ marginTop: '30px' }}>
+            <div className="goals-section-header">
+                <h2 className="goals-section-title">Completed Goals</h2>
+                <p className="goals-section-subtitle">See your goal history here</p>
+            </div>
+            {completedGoals.length > 0 ? (
                 <div className="goals-list">
                     {completedGoals.map((goal) => (
                         <GoalListCard key={goal.id}
@@ -210,8 +210,10 @@ const Goals = () => {
                         />
                     ))}
                 </div>
-            </div>
-        )}
+            ) : (
+                <p style={{ textAlign: 'center', padding: '1rem', color: '#AAA', fontStyle: 'italic' }}>No completed goals yet</p>
+            )}
+        </div>
     </>
 )}
 
