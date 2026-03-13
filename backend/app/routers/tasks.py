@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Optional
 from app.services.ai_service import AIService
-
+from app.services.ai_service import log_ai_usage
 # Database functions (Tables.py)
 from ..Tables import (
     get_tasks_for_goal, get_task, update_task_status,
@@ -157,6 +157,14 @@ def expand_task(task_id: str, request: ExpandTaskRequest):
         ai_response = ai_service.expand_task(
             user_input = request.stuck_reason or task["description"], #if not given stuck reason
             current_goals = goal_tasks
+        )
+
+       #LOG AI usage for green metrics
+        log_ai_usage(
+            user_id = task.user_id,
+            endpoint_type = "generate_plan",
+            tokens_used = ai_response.get("tokens_used", 0),
+            carbon_footprint = ai_response.get("carbon_footprint", 0)
         )
     
     #exception related to the AI service being unavailable
