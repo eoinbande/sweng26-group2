@@ -417,6 +417,14 @@ const [closingDelete, setClosingDelete] = useState(false);
                 />
             </div>
 
+            {/* congratulations popup */}
+            <Congratulations
+                isOpen={showCongrats}
+                onClose={() => setShowCongrats(false)}
+                goalTitle={goalTitle}
+                colorScheme={goalColorScheme}
+            />
+
             {/* feedback popup */}
             {showFeedback && (
                 <div
