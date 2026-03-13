@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { X } from 'lucide-react'; 
+import React, { useState, useEffect, useRef } from 'react';
+import { X } from 'lucide-react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
 import GoalDetailHeader from '../components/GoalDetailHeader';
@@ -7,6 +7,7 @@ import TaskTimeline from '../components/TaskTimeline';
 import Loading from '../components/Loading'; // Import Loading component if it exists
 import LoadingOverlay from '../components/LoadingOverlay'; // Import LoadingOverlay for feedback
 import FeedbackPopUp from '../components/FeedbackPopUp';
+import Congratulations from '../components/Congratulations';
 import '../styles/GoalDetail.css';
 import { supabase } from '../supabase_client';
 
@@ -19,6 +20,7 @@ const GoalDetail = () => {
     // Use "Loading..." as default if we are loading, unless we want to show stale title
     const [goalTitle, setGoalTitle] = useState(location.state?.goal?.title || location.state?.goalTitle || "Loading...");
     const goalId = location.state?.goal?.id || location.state?.goalId || paramId || null;
+    const goalColorScheme = location.state?.goal?.colorScheme || 'yellow';
 
     /* rstore tasks from location.state if returning from feedback page */
     const [tasks, setTasks] = useState(location.state?.tasks || []);
@@ -33,6 +35,8 @@ const [closingDelete, setClosingDelete] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
     const [updating, setUpdating] = useState(false); // New state for feedback loading overlay
+    const [showCongrats, setShowCongrats] = useState(false);
+    const prevProgressRef = useRef(null);
 
     const closeFeedback = () => {
         setClosingFeedback(true);
