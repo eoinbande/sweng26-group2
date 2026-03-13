@@ -2,12 +2,15 @@ from fastapi import APIRouter, HTTPException
 from enum import Enum
 from pydantic import BaseModel, Field
 from typing import Optional
+import json
+from app.services.ai_service import AIService
 # Database functions (Tables.py)
 from ..Tables import (
     create_goal, get_all_goals, get_goal, delete_goal,
     update_goal_data, save_tasks_to_db, merge_and_save_tasks,
-    get_tasks_for_goal
+    get_tasks_for_goal, get_categories, create_category
 )
+from ..database import supabase
 
 # Mock AI responses (replace with real AI later)
 from ..mock_ai_responses import get_mock_plan, get_mock_feedback_response
@@ -20,20 +23,11 @@ from ..mock_ai_responses import get_mock_plan, get_mock_feedback_response
 
 
 goal_router = APIRouter()
+ai_service = AIService()
 
 # =============================================================================
 # REQUEST MODELS
 # =============================================================================
-
-#Enums of predefined categories(for now 5)
-#IF WE NEED TO ADD MORE PREFEFINED CATEGORIES, JUST ADDED IT IN THE ENUM!
-class CategoryEnum(str, Enum):
-    Health = "Health"
-    Personal = "Personal"
-    Work = "Work"
-    Education = "Education"
-    Finance = "Finance"
-
 
 class CreateGoalRequest(BaseModel):
     """
@@ -43,7 +37,7 @@ class CreateGoalRequest(BaseModel):
     """
     user_id: str
     title: str = Field(min_length=1) # won't allow goals to be created with empty titles
-    category: Optional[CategoryEnum] = None #each goal will be of one category
+    category: Optional[str] = None  # accepts predefined or custom categories
 
 class AcceptPlanRequest(BaseModel):
     """
@@ -59,12 +53,34 @@ class AcceptPlanRequest(BaseModel):
 class FeedbackRequest(BaseModel):
     """
     What frontend sends when user gives feedback on a plan.
-    
+
+    current_tasks: The tasks currently visible to the user. If provided, used as
+    AI context instead of fetching from DB — critical for multi-round feedback
+    on the preview page where intermediate revisions aren't saved yet.
+
     Example: {"feedback": "I don't like task_3, use soapy water instead"}
     """
     feedback: str
+    current_tasks: Optional[list] = None
 
 
+class UpdateCategoryRequest(BaseModel):
+    """
+    What frontend sends when updating a goal's category.
+    
+    Example: {"category": "Health"}
+    """
+    category: str
+
+
+class CreateCategoryRequest(BaseModel):
+    """
+    What frontend sends when creating a new custom category.
+    
+    Example: {"user_id": "uuid-123", "name": "Fitness"}
+    """
+    user_id: str
+    name: str = Field(min_length=1)
 
 
 # =============================================================================
@@ -92,7 +108,7 @@ def create_goal_endpoint(goal: CreateGoalRequest):
     result = create_goal(
         user_id=goal.user_id,
         title=goal.title,
-        category = goal.category
+        category=goal.category
     )
 
     # Extract the goal ID from the database response
@@ -105,7 +121,18 @@ def create_goal_endpoint(goal: CreateGoalRequest):
 
     # Get AI-generated plan from mock templates
     # TODO: Replace with real AI call when AI integration is ready
-    ai_plan = get_mock_plan(goal.title)
+    #ai_plan = get_mock_plan(goal.title) <- we used this for mocking
+
+    #----------------------Real AI integration(the following block of code calls the AI to generate the goal!)--------------
+    try:
+        ai_plan = ai_service.generate_plan(goal.title)
+    except Exception as e:
+        raise HTTPException(status_code = 500, detail = f"AI generation failed: {str(e)}")
+
+    #exception related to AI service returns a malformed output
+    if "tasks" not in ai_plan:
+        raise HTTPException(status_code = 500, detail = "AI response error")
+
 
     # Save description and due date from AI plan to goal_data
     update_goal_data(goal_id, {
@@ -121,8 +148,8 @@ def create_goal_endpoint(goal: CreateGoalRequest):
         "category": goal.category,
         "description": ai_plan.get("description", ""),
         "goal_due_date": ai_plan.get("goal_due_date", ""),
-        "tokens_used": ai_plan.get("tokens_used"), #returns tokens to show in green computing tab
-        "carbon_footprint": ai_plan.get("carbon_footprint"), #returns carbon to show in green computing tab
+        "tokens_used": ai_plan.get("tokens_used"),
+        "carbon_footprint": ai_plan.get("carbon_footprint"),
         "tasks": ai_plan["tasks"],   # Tasks for frontend to display on review screen
         "saved_to_db": False          # Frontend knows this isn't saved yet
     }
@@ -156,16 +183,43 @@ def feedback_on_plan(goal_id: str, request: FeedbackRequest):
     # Get AI feedback response from mock
     # TODO: Replace with real AI call that takes current plan + feedback text
     # For now, we just return a pre-made feedback response based on the title
-    updated_plan = get_mock_feedback_response(goal["title"], request.feedback)
+    #updated_plan = get_mock_feedback_response(goal["title"], request.feedback) <- we use this for mocking
 
+    #------------------------Real AI integration-----------------
+
+    # Use tasks sent by the frontend if provided (covers multi-round feedback on preview,
+    # where intermediate revisions are not yet saved to DB). Fall back to DB state otherwise.
+    if request.current_tasks is not None:
+        current_tasks = request.current_tasks
+    else:
+        current_data = goal.get("goal_data", {})
+        if isinstance(current_data, str):
+            current_data = json.loads(current_data)
+        current_tasks = current_data.get("tasks", [])
+
+    #call real AI service to update plan based on the feedback
+    try:
+        updated_plan = ai_service.revise_plan(
+            user_input = request.feedback,
+            current_goals = current_tasks
+        )
+    except Exception as e:
+        raise HTTPException(status_code = 500, detail = f"AI feedback failed: {str(e)}")
+
+    #exception related to the AI service outputting an error
+    if "tasks" not in updated_plan:
+        raise HTTPException(status_code = 500, detail = "AI response error")
 
     return {
         "message": "Plan updated based on your feedback",
         "goal_id": goal_id,
         "tasks": updated_plan["tasks"],
+        "tokens_used": updated_plan.get("tokens_used"),
+        "carbon_footprint": updated_plan.get("carbon_footprint"),
         "feedback_received": request.feedback,
         "saved_to_db": False
     }
+
 
 
 # ---- Step 3: User accepts the plan → save to database ----
