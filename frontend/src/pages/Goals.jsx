@@ -141,6 +141,9 @@ const Goals = () => {
     ? goals
     : goals.filter(g => selectedCategories.includes(g.category));
 
+    const activeGoals = filteredGoals.filter(g => g.progress < 100);
+    const completedGoals = filteredGoals.filter(g => g.progress === 100);
+
 
     return (
         <div className="goals-page">
