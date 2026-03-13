@@ -33,8 +33,8 @@ const CategoryIcon = ({
         setNewCatInput('');
         setIsAddingNew(false);
     };
-    return <div className = "category-bar">
-        <div> 
+    return <div className = "category-bar" ref={containerRef}> 
+        <div className="category-bar-row"> 
             <button className="category-btn" onClick={() => setIsDropdownOpen (!isDropdownOpen)}>
                  Category {isDropdownOpen ? '▲' : '▼'}
             </button>
