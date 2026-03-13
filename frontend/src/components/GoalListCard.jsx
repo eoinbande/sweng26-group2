@@ -64,11 +64,13 @@ const GoalListCard = ({ goal, onClick, categories, onAssignCategory, onNewCatego
             <div className="goal-card-inner">
     <div className="goal-card-header" style={{ backgroundColor: scheme.header }}>
         <h2 className="goal-card-title">{goal.title}</h2>
-        {!completed && (
-            goal.category
-                ? <span className="category-badge">{goal.category}</span>
-                : <button className="assign-category-btn" onClick={(e) => { e.stopPropagation(); setIsAssignOpen(!isAssignOpen); }}>+</button>
-        )}
+        {goal.category
+            ? <span className="category-badge">{goal.category}</span>
+            : !completed && (
+                <button className="assign-category-btn" onClick={(e) => { e.stopPropagation(); setIsAssignOpen(!isAssignOpen); }}>+</button>
+            )
+        }
+
         {!completed && isAssignOpen && (
             <div className="assign-dropdown" onClick={e => e.stopPropagation()}>
                 {categories.map((cat, i) => (
