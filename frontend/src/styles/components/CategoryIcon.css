@@ -52,6 +52,39 @@ category-bar-row{
     overflow: hidden;
 }
 
+.dropdown-item{
+    display:flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 20px;
+    margin: 0;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    color: white;
+}
+
+.dropdown-item:hover {
+    background-color: rgba(255,255,255,0.15);
+}
+
+.checkmark {
+    width: 16px;
+    font-size: 13px;
+}
+.checkmark-placeholder {
+    display: inline-block;
+    width: 16px;
+}
+
+/* White divider between items */
+.dropdown-divider {
+    height: 1px;
+    background-color: rgba(255, 255, 255, 0.35);
+    margin: 0 12px;
+}
+
+
 .category-dropdown p {
     padding: 10px 20px;
     margin: 0;
