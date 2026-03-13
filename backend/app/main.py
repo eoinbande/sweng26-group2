@@ -26,6 +26,7 @@ app.add_middleware(
         "http://localhost:5173",
         "http://localhost:8080",
         "http://localhost:4200",
+        "https://sweng26-group2.vercel.app",
     ],
     allow_credentials=True,
     allow_methods=["*"],
