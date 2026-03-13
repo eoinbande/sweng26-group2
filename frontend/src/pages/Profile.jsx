@@ -4,6 +4,7 @@ import ProfileHeader from '../components/ProfileHeader';
 import AccountCard from '../components/AccountCard';
 import AnalyticsSection from '../components/AnalyticsSection';
 import BottomNav from '../components/BottomNav';
+import Loading from '../components/Loading';
 import { supabase } from '../supabase_client';
 import '../styles/Profile.css';
 
@@ -11,6 +12,7 @@ const Profile = () => {
     const navigate = useNavigate();
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
+    const [profileLoaded, setProfileLoaded] = useState(false);
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -31,6 +33,8 @@ const Profile = () => {
                 }
             } catch (e) {
                 console.error('Error loading profile', e);
+            } finally {
+                setProfileLoaded(true);
             }
         };
 
@@ -47,6 +51,10 @@ const Profile = () => {
             navigate('/login');
         }
     };
+
+    if (!profileLoaded) {
+        return <Loading />;
+    }
 
     return (
         <div className="profile-page">
