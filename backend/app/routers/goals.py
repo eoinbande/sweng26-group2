@@ -148,8 +148,6 @@ def create_goal_endpoint(goal: CreateGoalRequest):
         "category": goal.category,
         "description": ai_plan.get("description", ""),
         "goal_due_date": ai_plan.get("goal_due_date", ""),
-        "tokens_used": ai_plan.get("tokens_used"),
-        "carbon_footprint": ai_plan.get("carbon_footprint"),
         "tasks": ai_plan["tasks"],   # Tasks for frontend to display on review screen
         "saved_to_db": False          # Frontend knows this isn't saved yet
     }
@@ -214,8 +212,6 @@ def feedback_on_plan(goal_id: str, request: FeedbackRequest):
         "message": "Plan updated based on your feedback",
         "goal_id": goal_id,
         "tasks": updated_plan["tasks"],
-        "tokens_used": updated_plan.get("tokens_used"),
-        "carbon_footprint": updated_plan.get("carbon_footprint"),
         "feedback_received": request.feedback,
         "saved_to_db": False
     }

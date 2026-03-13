@@ -222,8 +222,6 @@ def expand_task(task_id: str, request: ExpandTaskRequest):
         "task_id": task_id,
         "task_ai_id": ai_id,
         "subtasks": saved_subtasks,
-        "tokens_used": ai_response.get("tokens_used"),
-        "carbon_footprint": ai_response.get("carbon_footprint"),
         "stuck_reason": request.stuck_reason
     }
 
