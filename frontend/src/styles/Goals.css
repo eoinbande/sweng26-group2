@@ -60,7 +60,7 @@
 /* Section headers — matches schedule page ut-title / ut-subtitle style */
 .goals-section-header {
     margin-top: 8px;
-    margin-bottom: 4px;
+    margin-bottom: 0px;
 }
 
 .goals-section-title {
@@ -75,6 +75,6 @@
     font-family: var(--font-sans);
     font-size: clamp(11px, 1.4dvh, 13px);
     color: var(--text-secondary);
-    margin: 0 0 16px;
+    margin: 0 0 24px;
 }
 

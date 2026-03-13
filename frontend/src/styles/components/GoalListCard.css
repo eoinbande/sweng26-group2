@@ -75,20 +75,24 @@
 
 /* date Tab – vertical strip on the right side of the card  */
 .goal-date-tab {
-
     position: absolute;
     top: 0;
     right: 0;
     width: 30px;
     height: 80px; /* Fixed height for bookmark appearance */
     background-color: #E8505B;
-    border-radius: 0 14px 14px 0px;
+    border-radius: 0 14px 14px 0;
     display: flex;
     align-items: center;
     justify-content: center;
     writing-mode: vertical-rl;
     z-index: 2;
     box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.goal-list-card--completed-root .goal-date-tab {
+    top: 50%;
+    transform: translateY(-50%);
 }
 
 .goal-date-text {

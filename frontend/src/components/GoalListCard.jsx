@@ -54,7 +54,7 @@ const GoalListCard = ({ goal, onClick, categories, onAssignCategory, onNewCatego
 
     return (
         <article 
-            className="goal-list-card"
+            className={`goal-list-card${completed ? ' goal-list-card--completed-root' : ''}`}
             onClick={handleClick}
             role="button"
             tabIndex={0}
