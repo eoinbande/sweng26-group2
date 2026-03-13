@@ -210,6 +210,14 @@ def feedback_on_plan(goal_id: str, request: FeedbackRequest):
             user_input = request.feedback,
             current_goals = current_tasks
         )
+
+        #LOG AI usage for green metrics
+        log_ai_usage(
+            user_id = goal.user_id,
+            endpoint_type = "generate_plan",
+            tokens_used = updated_plan.get("tokens_used", 0),
+            carbon_footprint = updated_plan.get("carbon_footprint", 0)
+        )
     except Exception as e:
         raise HTTPException(status_code = 500, detail = f"AI feedback failed: {str(e)}")
 
