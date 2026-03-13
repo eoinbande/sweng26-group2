@@ -76,7 +76,15 @@ def aiFeedback(userInput, currentGoals):
     input = userInput,
     text_format = schemas.AIFeedbackResponse
     )
-    return json.loads(response.output_text)
+    data = json.loads(response.output_text)
+
+    tokens = response.usage.total_tokens if response.usage else 0
+    carbon = estimate_carbon_usage(tokens)
+
+    data["tokens_used"] = tokens
+    data["carbon_footprint"] = carbon
+
+    return data
 
 def aiExpand(userInput, currentGoals):
     response = get_client().responses.parse(
