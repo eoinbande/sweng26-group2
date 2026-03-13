@@ -1,5 +1,6 @@
-import React, {useState} from "react"
+import React, {useState, useRef, useEffect} from "react"
 import '../styles/components/CategoryIcon.css'
+
 const CategoryIcon = ({
     categories,
     selectedCategories,
