@@ -161,9 +161,15 @@ const Goals = () => {
                             goal={goal}
                             categories={categories}
                             onNewCategory={handleNewCategory}
-                            onAssignCategory={(goalId, cat)=> {
-                                setGoals(prev => prev.map(g => g.id === goalId ? {...g, category: cat} : g))
-                            }} />
+                            onAssignCategory={async (goalId, cat) => {
+    await fetch(`${import.meta.env.VITE_API_URL}/goals/${goalId}/category`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ category: cat })
+    });
+    setGoals(prev => prev.map(g => g.id === goalId ? {...g, category: cat} : g));
+}}
+ />
                         ))
                     )}
                 </div>
