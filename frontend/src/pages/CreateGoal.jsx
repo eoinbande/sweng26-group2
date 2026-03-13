@@ -50,7 +50,7 @@ function CreateGoal() {
 
         // fade out all content
         setIsFading(true);
-        setShowOverlay(true);
+        // setShowOverlay(true);
 
         // navigate after fade completes
         setTimeout(() => {
@@ -60,7 +60,7 @@ function CreateGoal() {
                     originalPrompt: restoredPrompt || goalText,
                 },
             });
-        }, 600);
+        }, 500);
     };
 
     return (
@@ -220,19 +220,8 @@ function CreateGoal() {
             {/* bottom nav */}
             <BottomNav />
 
-            {/* blue overlay for smooth transition to loading screen */}
-            <div style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                backgroundColor: 'var(--accent-blue)',
-                zIndex: 1000,
-                opacity: showOverlay ? 1 : 0,
-                pointerEvents: 'none',
-                transition: 'opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
-            }} />
+            {/* overlay removed to make card transition feel continuous */}
+            {/* <div style={{...}} /> */}
         </div>
     );
 }
