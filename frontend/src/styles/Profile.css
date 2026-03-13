@@ -1,0 +1,21 @@
+/* profile page styles */
+
+
+/* fluid scaling — iphone 14 (390px) as reference, all values scale with vw via clamp() */
+
+.profile-page {
+    max-width: 480px;
+    margin: 0 auto;
+    height: 100dvh;
+    background-color: var(--bg-color);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+}
+
+.profile-page::-webkit-scrollbar {
+    display: none;
+}
