@@ -19,3 +19,51 @@
 .profile-page::-webkit-scrollbar {
     display: none;
 }
+
+
+/* profile header — pink bg extends behind account card */
+
+.profile-header-wrapper {
+    position: relative;
+    margin-bottom: -8px;
+}
+
+.profile-header-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: calc(100% + 70px);
+    background-color: #ffdbda;
+    border-radius: 0 0 clamp(22px, 7.18vw, 32px) clamp(22px, 7.18vw, 32px);
+    z-index: 0;
+}
+
+.profile-header-content {
+    position: relative;
+    z-index: 1;
+    padding-bottom: clamp(40px, 12.8vw, 60px);
+}
+
+.profile-header-content .page-header {
+    margin-left: 0;
+}
+
+.profile-avatar-container {
+    display: flex;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+    margin-top: -16px;
+    pointer-events: none;
+}
+
+
+/* semicircular top, flat bottom — matches figma [139, 139, 0, 0] */
+
+.profile-avatar {
+    width: 33%;
+    aspect-ratio: 175 / 177;
+    background-color: #cdcdcd;
+    border-radius: 50% 50% 0 0;
+}
