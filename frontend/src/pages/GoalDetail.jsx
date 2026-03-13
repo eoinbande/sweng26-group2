@@ -21,6 +21,7 @@ const GoalDetail = () => {
     const [goalTitle, setGoalTitle] = useState(location.state?.goal?.title || location.state?.goalTitle || "Loading...");
     const goalId = location.state?.goal?.id || location.state?.goalId || paramId || null;
     const goalColorScheme = location.state?.goal?.colorScheme || 'yellow';
+    const [goalCategory, setGoalCategory] = useState(location.state?.goal?.category || null);
 
     /* rstore tasks from location.state if returning from feedback page */
     const [tasks, setTasks] = useState(location.state?.tasks || []);
