@@ -144,7 +144,11 @@ def get_upcoming_goals(user_id: str, days: int = 30):
             goal_data = json.loads(goal_data)
 
         goal_due_date = goal_data.get("goal_due_date", "")
-        if goal_due_date and today <= goal_due_date <= end_date:
+        # Only show goals that have an accepted plan (tasks list is not empty)
+        # This prevents "zombie" drafts from appearing if the user created a goal but didn't accept it.
+        has_tasks = len(goal_data.get("tasks", [])) > 0
+        
+        if has_tasks and goal_due_date and today <= goal_due_date <= end_date:
             upcoming_goals.append({
                 "goal_id": goal.get("id"),
                 "title": goal.get("title"),
