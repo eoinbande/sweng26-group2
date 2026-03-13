@@ -156,27 +156,64 @@ const Goals = () => {
                     onNewCategory={handleNewCategory}
                 />
                 {/* Goals List */}
+                {activeGoals.length === 0 && completedGoals.length === 0 ? (
+    <p style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>No goals yet. Create one!</p>
+) : (
+    <>
+        {activeGoals.length > 0 && (
+            <>
+                <div className="goals-section-header">
+                    <h2 className="goals-section-title">Active Goals</h2>
+                    <p className="goals-section-subtitle">See your current goals here</p>
+                </div>
                 <div className="goals-list">
-                    {filteredGoals.length === 0 ? (
-                        <p style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>No goals yet. Create one!</p>
-                    ) : (
-                        filteredGoals.map((goal) => (
-                            <GoalListCard key={goal.id} 
+                    {activeGoals.map((goal) => (
+                        <GoalListCard key={goal.id}
                             goal={goal}
                             categories={categories}
                             onNewCategory={handleNewCategory}
                             onAssignCategory={async (goalId, cat) => {
                                 await fetch(`${import.meta.env.VITE_API_URL}/goals/${goalId}/category`, {
-                                method: 'PATCH',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ category: cat })
-                            });
-                            setGoals(prev => prev.map(g => g.id === goalId ? {...g, category: cat} : g));
-                        }}
- />
-                        ))
-                    )}
+                                    method: 'PATCH',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ category: cat })
+                                });
+                                setGoals(prev => prev.map(g => g.id === goalId ? {...g, category: cat} : g));
+                            }}
+                        />
+                    ))}
                 </div>
+            </>
+        )}
+
+        {completedGoals.length > 0 && (
+            <>
+                <div className="goals-section-header">
+                    <h2 className="goals-section-title">Completed Goals</h2>
+                    <p className="goals-section-subtitle">See your goal history here</p>
+                </div>
+                <div className="goals-list">
+                    {completedGoals.map((goal) => (
+                        <GoalListCard key={goal.id}
+                            goal={goal}
+                            completed
+                            categories={categories}
+                            onNewCategory={handleNewCategory}
+                            onAssignCategory={async (goalId, cat) => {
+                                await fetch(`${import.meta.env.VITE_API_URL}/goals/${goalId}/category`, {
+                                    method: 'PATCH',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ category: cat })
+                                });
+                                setGoals(prev => prev.map(g => g.id === goalId ? {...g, category: cat} : g));
+                            }}
+                        />
+                    ))}
+                </div>
+            </>
+        )}
+    </>
+)}
 
 
             <div
