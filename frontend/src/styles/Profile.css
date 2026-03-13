@@ -212,3 +212,33 @@
     grid-template-columns: 1fr 1fr;
     gap: clamp(10px, 4.1vw, 20px);
 }
+
+
+/* analytics card — single unified card with red, white, blue zones */
+
+.analytics-card {
+    border-radius: clamp(24px, 8.2vw, 36px);
+    overflow: hidden;
+    box-shadow: 0 3px 3px rgba(0, 0, 0, 0.25);
+    background-color: var(--red);
+}
+
+
+/* red zone — top */
+
+.analytics-card-red {
+    background-color: var(--red);
+    padding: clamp(16px, 5vw, 24px) clamp(12px, 3.59vw, 16px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.analytics-card-top-label {
+    font-family: var(--font-sans);
+    font-size: clamp(11px, 3.33vw, 14px);
+    font-weight: 500;
+    color: #ffffff;
+    line-height: 1.4;
+}
