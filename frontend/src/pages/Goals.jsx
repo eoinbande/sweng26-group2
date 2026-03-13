@@ -23,7 +23,7 @@ const Goals = () => {
     const [goals, setGoals] = useState([]);
     const [loading, setLoading] = useState(true);
     const scrollRef = useRef(null);
-    const [categories, setCategories] = useState(['Creative', 'School', 'Health']);
+    const [categories, setCategories] = useState([]);
     const [selectedCategories, setSelectedCategories] = useState([]);
 
 
@@ -84,6 +84,11 @@ const Goals = () => {
                 }));
 
                 setGoals(mapped);
+                // Fetch categories
+                const catRes = await fetch(`${import.meta.env.VITE_API_URL}/categories/${user.id}`);
+                const catData = await catRes.json();
+                setCategories(catData.categories.map(c => c.name)); // backend returns objects with a .name field
+
             } catch (err) {
                 console.error('Failed to fetch goals, using mock data:', err);
                 setGoals(MOCK_GOALS);
