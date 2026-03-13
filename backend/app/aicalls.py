@@ -44,7 +44,7 @@ def aiGenerate(userInput):
     text_format = schemas.AIGeneratePlanResponse #the AI is supposed to follow this schema but is not guarantee, how can we make it to be more guarantee?
     )
     data = json.loads(response.output_text)
-    tokens = response.usage.total_tokens if response.usage else 0
+    tokens = response.usage.total_tokens if response.usage else 0 #get the tokens per call
     carbon = estimate_carbon_usage(tokens) #Call the function to estimate carbon usage
 
     data["tokens_used"] = tokens #show data of tokens used per cal
@@ -105,12 +105,12 @@ response3 = aiExpand("Help me break down task 3", response2)
 print(json.dumps(response3) + "\n")
 """
 
-
+#this function calculates the average carbon usage per call
 def estimate_carbon_usage(tokens):
     energy_per_token = 0.000002
     carbon_average = 0.4
 
     energy = tokens * energy_per_token
-    total_carbon_per_call = energy * carbon_intensity
+    total_carbon_per_call = energy * carbon_average
 
     return total_carbon_per_call
