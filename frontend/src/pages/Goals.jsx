@@ -115,9 +115,17 @@ const Goals = () => {
     setSelectedCategories(updated);
     };
 
-    const handleNewCategory = (name) => {
-        if (name.trim()) setCategories(prev => [...prev, name.trim()]);
+    const handleNewCategory = async (name) => {
+    if (!name.trim()) return;
+    const { data: { user } } = await supabase.auth.getUser();
+    await fetch(`${import.meta.env.VITE_API_URL}/categories`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: user.id, name: name.trim() })
+    });
+    setCategories(prev => [...prev, name.trim()]); // still update state so UI reacts instantly
     };
+
 
     if (loading) {
         return (
