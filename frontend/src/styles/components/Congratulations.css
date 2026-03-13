@@ -1,0 +1,353 @@
+/* congratulations popup styles */
+
+/* overlay */
+
+.congrats-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 24px;
+    animation: congrats-fade-in 0.3s ease-out forwards;
+}
+
+.congrats-overlay.closing {
+    animation: congrats-fade-out 0.25s ease-in forwards;
+}
+
+.congrats-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
+}
+
+/* popup card */
+
+.congrats-popup {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 360px;
+    overflow: hidden;
+    border-radius: 30px;
+    background-color: var(--bg-color);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+    animation: congrats-pop-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.congrats-overlay.closing .congrats-popup {
+    animation: congrats-pop-out 0.25s ease-in forwards;
+}
+
+/* top decorative band */
+
+.congrats-banner {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 140px;
+    overflow: hidden;
+    /* default gradient — overridden by inline style per color scheme */
+    background: linear-gradient(135deg, #facb6e, #f7d88a, #facb6e);
+}
+
+/* decorative circles */
+
+.congrats-banner-circle {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.congrats-banner-circle-1 {
+    width: 96px;
+    height: 96px;
+    top: -24px;
+    left: -24px;
+}
+
+.congrats-banner-circle-2 {
+    width: 80px;
+    height: 80px;
+    bottom: -16px;
+    right: -16px;
+}
+
+.congrats-banner-circle-3 {
+    width: 32px;
+    height: 32px;
+    top: 8px;
+    left: 25%;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* animated stars */
+
+.congrats-star {
+    position: absolute;
+    color: #ffffff;
+    opacity: 0.6;
+    animation: congrats-star-twinkle 2s ease-in-out infinite;
+}
+
+.congrats-star-1 {
+    top: 24px;
+    left: 24px;
+    animation-duration: 2s;
+    animation-delay: 0s;
+}
+
+.congrats-star-2 {
+    top: 32px;
+    right: 48px;
+    opacity: 0.5;
+    animation-duration: 2.5s;
+    animation-delay: 0.5s;
+}
+
+.congrats-star-3 {
+    bottom: 24px;
+    left: 64px;
+    opacity: 0.4;
+    animation-duration: 3s;
+    animation-delay: 0.8s;
+}
+
+/* icon circle */
+
+.congrats-icon-circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    animation: congrats-bounce 2s ease-in-out infinite;
+}
+
+.congrats-icon-circle svg {
+    width: 36px;
+    height: 36px;
+    color: #facb6e;
+}
+
+/* close button */
+
+.congrats-close-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.6);
+    color: #6c6b67;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.congrats-close-btn:hover {
+    background: #ffffff;
+}
+
+/* content area */
+
+.congrats-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 32px 32px;
+}
+
+.congrats-title {
+    font-family: var(--font-serif);
+    font-size: 28px;
+    font-weight: 600;
+    color: #000000;
+    line-height: 1.2;
+}
+
+.congrats-subtitle {
+    margin-top: 8px;
+    text-align: center;
+    font-family: var(--font-sans);
+    font-size: 15px;
+    color: #6c6b67;
+    line-height: 1.6;
+}
+
+/* goal name pill */
+
+.congrats-goal-pill {
+    margin-top: 12px;
+    padding: 12px 20px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.7);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.congrats-goal-pill p {
+    text-align: center;
+    font-family: var(--font-serif);
+    font-size: 18px;
+    color: #000000;
+    line-height: 1.4;
+}
+
+/* progress bar */
+
+.congrats-progress-row {
+    margin-top: 20px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.congrats-progress-track {
+    flex: 1;
+    height: 8px;
+    border-radius: 9999px;
+    background: #ffffff;
+    overflow: hidden;
+}
+
+.congrats-progress-fill {
+    height: 100%;
+    border-radius: 9999px;
+    background: #a7dd99;
+    width: 14%;
+    animation: congrats-progress-grow 1.2s 0.5s ease-out forwards;
+}
+
+.congrats-progress-label {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 600;
+    color: #a7dd99;
+    opacity: 0;
+    animation: congrats-fade-in 0.3s 1.5s ease-out forwards;
+}
+
+/* continue button */
+
+.congrats-continue-btn {
+    margin-top: 24px;
+    width: 100%;
+    padding: 14px 0;
+    border: none;
+    border-radius: 40px;
+    background: #facb6e;
+    font-family: var(--font-sans);
+    font-size: 18px;
+    font-weight: 600;
+    color: #000000;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(250, 203, 110, 0.4);
+    transition: box-shadow 0.2s, transform 0.1s;
+}
+
+.congrats-continue-btn:hover {
+    box-shadow: 0 6px 20px rgba(250, 203, 110, 0.5);
+}
+
+.congrats-continue-btn:active {
+    transform: scale(0.97);
+}
+
+/* confetti particles */
+
+.congrats-confetti {
+    position: fixed;
+    inset: 0;
+    z-index: 201;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.congrats-confetti-piece {
+    position: absolute;
+    top: -20px;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    animation: congrats-confetti-fall linear forwards;
+}
+
+/* keyframes */
+
+@keyframes congrats-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes congrats-fade-out {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+@keyframes congrats-pop-in {
+    from {
+        transform: scale(0.7) translateY(40px);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes congrats-pop-out {
+    from {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+    }
+    to {
+        transform: scale(0.8) translateY(20px);
+        opacity: 0;
+    }
+}
+
+@keyframes congrats-star-twinkle {
+    0%, 100% {
+        transform: rotate(0deg) scale(1);
+    }
+    25% {
+        transform: rotate(15deg) scale(1.2);
+    }
+    75% {
+        transform: rotate(-15deg) scale(1);
+    }
+}
+
+@keyframes congrats-bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+}
+
+@keyframes congrats-progress-grow {
+    from { width: 14%; }
+    to { width: 100%; }
+}
+
+@keyframes congrats-confetti-fall {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(110vh) rotate(720deg);
+        opacity: 0;
+    }
+}
