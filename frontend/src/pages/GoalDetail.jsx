@@ -17,6 +17,7 @@ const GoalDetail = () => {
     // Use "Loading..." as default if we are loading, unless we want to show stale title
     const [goalTitle, setGoalTitle] = useState(location.state?.goal?.title || location.state?.goalTitle || "Loading...");
     const goalId = location.state?.goal?.id || location.state?.goalId || null;
+    const [goalCategory, setGoalCategory] = useState(location.state?.goal?.category || null);
 
     /* rstore tasks from location.state if returning from feedback page */
     const [tasks, setTasks] = useState(location.state?.tasks || []);
@@ -103,6 +104,10 @@ const [closingDelete, setClosingDelete] = useState(false);
 
                 if (data.goal?.title) {
                     setGoalTitle(data.goal.title);
+                }
+
+                if (data.goal?.category) {
+                    setGoalCategory(data.goal.category);
                 }
 
                 // Set End Date if available
