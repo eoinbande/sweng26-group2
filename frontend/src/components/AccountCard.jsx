@@ -3,7 +3,7 @@ import '../styles/Profile.css';
 
 const AccountCard = ({ username, email, streakDays, onEdit, onSignOut }) => {
     return (
-        <div className="account-card-wrapper">
+        <div className="account-card-wrapper fade-in">
             <div className="account-card">
                 <div className="account-card-streak">
                     <Flame className="account-card-streak-icon" />

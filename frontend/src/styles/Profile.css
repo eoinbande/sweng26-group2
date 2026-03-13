@@ -1,6 +1,28 @@
 /* profile page styles */
 
 
+/* fade-in animation */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    opacity: 0;
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+.fade-in-delay-1 { animation-delay: 0.15s; }
+.fade-in-delay-2 { animation-delay: 0.35s; }
+
+
 /* fluid scaling — iphone 14 (390px) as reference, all values scale with vw via clamp() */
 
 .profile-page {

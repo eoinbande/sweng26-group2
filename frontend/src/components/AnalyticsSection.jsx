@@ -3,7 +3,7 @@ import '../styles/Profile.css';
 
 const AnalyticsSection = ({ tasksCompleted, goalsCompleted, onTimeTasks, onTimeGoals }) => {
     return (
-        <section className="analytics-section">
+        <section className="analytics-section fade-in fade-in-delay-1">
             <h2 className="analytics-section-title">Your Analytics</h2>
             <p className="analytics-section-subtitle">See how far you've come!</p>
 
