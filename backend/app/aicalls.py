@@ -100,7 +100,15 @@ def aiExpand(userInput, currentGoals):
     input = userInput,
     text_format = schemas.AIExpandTaskResponse
     )
-    return json.loads(response.output_text)
+    data = json.loads(response.output_text)
+
+    tokens = response.usage.total_tokens if response.usage else 0
+    carbon = estimate_carbon_usage(tokens)
+
+    data["tokens_used"] = tokens
+    data["carbon_footprint"] = carbon
+
+    return data
 
 
 # Little bit of test code just for prompt engineering, feel free to ignore
@@ -118,7 +126,7 @@ def estimate_carbon_usage(tokens):
     energy_per_token = 0.000002
     carbon_average = 0.4
 
-    energy = tokens * energy_per_token
-    total_carbon_per_call = energy * carbon_average
+    energy = tokens * energy_per_token #energy used per call
+    total_carbon_per_call = energy * carbon_average #formula required to calculate total carbon
 
     return total_carbon_per_call
