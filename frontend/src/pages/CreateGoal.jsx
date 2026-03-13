@@ -54,15 +54,10 @@ function CreateGoal() {
 
         // navigate after fade completes
         setTimeout(() => {
-            navigate('/review-plan', {
+            navigate('/goal-add-date', {
                 state: {
-                    goal: goalText,
-                    showLoading: true, // Tell ReviewPlan to show the loading screen
-                    previewData: null, // No data yet, ReviewPlan will fetch it
-                    userId: userId,
-                    originalPrompt: goalText,
-                    dueDate: null, // skipped since we removed the date page
-                    from: 'create',
+                    goalText: goalText,
+                    originalPrompt: restoredPrompt || goalText,
                 },
             });
         }, 600);
