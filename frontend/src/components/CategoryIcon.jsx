@@ -35,12 +35,26 @@ const CategoryIcon = ({
     };
     return <div className = "category-bar" ref={containerRef}> 
         <div className="category-bar-row"> 
-            <button className="category-btn" onClick={() => setIsDropdownOpen (!isDropdownOpen)}>
+            <button 
+                className="category-btn" 
+                onClick={() => {setIsDropdownOpen (!isDropdownOpen); setIsAddingNew(false);}}
+                >
                  Category {isDropdownOpen ? '▲' : '▼'}
             </button>
-            { isDropdownOpen && <div className="category-dropdown"> 
-                <p onClick={() => { onSelectionChange([]); setIsDropdownOpen(false); }}>
-                    {selectedCategories.length === 0 ? '✓ ' : ''}All
+            <button 
+                className = "new-category-btn"
+                onClick={() => {setIsAddingNew (true); setIsDropdownOpen(false);}}
+                >
+                    + New category 
+                </button>    
+            { isDropdownOpen && (
+                <div className="category-dropdown"> 
+                <p className ="dropdown-item"
+                    onClick={() => { onSelectionChange([]); setIsDropdownOpen(false); }}>
+                    {selectedCategories.length === 0 
+                    ? <span className="checkmark">✓</span>
+                    : <span className="checkmark-placeholder" />}
+                    All
                     </p>
                     {categories.map(cat => (
                         <p key={cat} onClick={() => {
