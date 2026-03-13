@@ -18,8 +18,10 @@ def get_client():
 userinput = The literal string the user sent
 currentGoals = The existing JSON of the goals. Please pass as a JSON object; if it's a string, pass with json.loads()
 
-output: A new goals list, as a JSON object
+output: A tuple of the new list as a json object, and the total token usage as an int
 """
+
+# TODO: Ensure AI calls from backend adhere to new tuple output format; currently commented out to keep backend functional
 
 def aiGenerate(userInput):
     response = get_client().responses.parse(
@@ -35,15 +37,20 @@ def aiGenerate(userInput):
                       info is needed. If a task is complex but does not need further info, you may instead make subtasks
                       which are each smaller tasks to take - format their id by appending letters (so task_7 will have subtasks
                       task_7a, task_7b, etc). Each information gathering task (i.e. where requires_input==true) should
-                      only require a single input, do not group questions. Subtasks / input should only be used when absolutely neccessary.
+                      only require a single input, do not group questions. There is an optional field, called due_date, for each task. Always
+                      fill this field with a reasonable estimation for when this task could be finished by, bearing in mind the complexity
+                      of the task and the time taken to complete prior tasks. Also fill the optional field goal_due_date with a reasonable timeline
+                      for all of the tasks to be complete. Subtasks / input should only be used when necessary, for complex tasks that need steps.
                       Limit the number of main tasks to a maximum of five. If KEY information is missing from the prompt, do not generate
                       every task now. Instead, generate a smaller list of tasks (some with requires_input set to true) and gather further
-                      information to later make a more accurate set of tasks. Do not assume any concrete info you have not been given.""",
+                      information to later make a more accurate set of tasks. Do not assume any concrete info you have not been given.
+                      Keep task titles to a single sentence unless absolutely necessary, do not provide examples in task titles.""",
     model = "gpt-5.2",
     input = userInput,
-    text_format = schemas.AIGeneratePlanResponse #the AI is supposed to follow this schema but is not guarantee, how can we make it to be more guarantee?
+    text_format = schemas.AIGeneratePlanResponse
     )
-    return json.loads(response.output_text)
+    return (json.loads(response.output_text))
+    # return (json.loads(response.output_text), response.usage.total_tokens) / Updated format
 
 def aiFeedback(userInput, currentGoals):
     response = get_client().responses.parse(
@@ -58,17 +65,21 @@ def aiFeedback(userInput, currentGoals):
                       info is needed. If a task is complex but does not need further info, you may instead make subtasks
                       which are each smaller tasks to take - format their id by appending letters (so task_7 will have subtasks
                       task_7a, task_7b, etc). Each information gathering task (i.e. where requires_input==true) should
-                      only require a single input, do not group questions. Subtasks should only be used when absolutely neccessary.
-                      Limit the number of new tasks to a maximum of five. You may delete tasks which are rendered redundant by new tasks.
-                      Importantly, NEVER geneerate a new task with an ai_id equal to or lower than the highest ai_id you were passeed. For
-                      example, if you were passed a task with ai_id "task_7", the LOWEST ai_id you may generate is "task_8". Consider
-                      carefully where to restructure the "order" of the tasks for this change of plans to fit in properly."""
+                      only require a single input, do not group questions. There is an optional field, called due_date, for each task. Unless already
+                      filled, always fill this field with a reasonable estimation for when this task could be finished by, bearing in mind the complexity
+                      of the task and the time taken to complete prior tasks, but do not change existing dates. Subtasks should only be 
+                      used when absolutely neccessary. Limit the number of new tasks to a maximum of five. You may delete tasks which are rendered
+                      redundant by new tasks. Importantly, NEVER geneerate a new task with an ai_id equal to or lower than the highest ai_id you were 
+                      passeed. For example, if you were passed a task with ai_id "task_7", the LOWEST ai_id you may generate is "task_8". Consider
+                      carefully where to restructure the "order" of the tasks for this change of plans to fit in properly. Keep task titles to a single
+                      sentence unless absolutely necessary"""
                       + json.dumps(currentGoals),
     model = "gpt-5.2",
     input = userInput,
     text_format = schemas.AIFeedbackResponse
     )
     return json.loads(response.output_text)
+    # return (json.loads(response.output_text), response.usage.total_tokens) / Updated format
 
 def aiExpand(userInput, currentGoals):
     response = get_client().responses.parse(
@@ -76,23 +87,16 @@ def aiExpand(userInput, currentGoals):
                      {userInput} which will include an identified task (the user may mention "task 1", "the first task", etc.) from
                      {currentGoals}. If the user does not explicitly state a task, but says something to the effect of "my current task", assume
                      the focused task is the one with the lowest order parameter with status as in_progress. With the identified task in mind,
-                     out to the schema the ai_id of the selected task (e.g. task_3), and output a list of subtasks. Keep this list to five
+                     out to the schema the ai_id of the selected task (e.g. task_3), and output a list of subtasks. There is an optional field, 
+                     called due_date, for each task. Always fill this field with a reasonable estimation for when this task could be finished by,
+                     bearing in mind the complexity of the task and the time taken to complete prior tasks.Keep this list to five
                      entries or less, and generate ai_ids according to the parent task's ai_id (for parent task_3, make the subtasks task_3a,
-                     task_3b, etc.). Do NOT populate the id field, and initialise all status to "not_started" """
+                     task_3b, etc.). Do NOT populate the id field, and initialise all status to "not_started". Keep task titles to a single sentence
+                     unless absolutely necessary"""
                      + json.dumps(currentGoals),
     model = "gpt-5.2",
     input = userInput,
     text_format = schemas.AIExpandTaskResponse
     )
     return json.loads(response.output_text)
-
-
-# Little bit of test code just for prompt engineering, feel free to ignore
-"""
-response1 = aiGenerate("I want to learn piano")
-print(json.dumps(response1) + "\n")
-response2 = aiFeedback("My fingers hurt", response1)
-print(json.dumps(response2) + "\n")
-response3 = aiExpand("Help me break down task 3", response2)
-print(json.dumps(response3) + "\n")
-"""
+    # return (json.loads(response.output_text), response.usage.total_tokens) / Updated format
