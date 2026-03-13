@@ -108,7 +108,7 @@ export function TaskCard({
           )}
           <span>{title}</span>
         </div>
-        {/* <div className="cg-task-due" style={{
+        { <div className="cg-task-due" style={{
           display: 'flex',
           alignItems: 'center',
           gap: 'var(--space-xs)',
@@ -118,7 +118,7 @@ export function TaskCard({
         }}>
           <Clock size={12} strokeWidth={2} />
           <span>{dueDate}</span>
-        </div> */}
+        </div> }
 
         {/* subtasks dropdown */}
         {subtasks.length > 0 && (
