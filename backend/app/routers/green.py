@@ -17,14 +17,14 @@ def get_green_stats(user_id: str):
         "total_carbon": round(total_carbon, 6)
     }
 
-
+#GET function to get green metrics by GOAL
 @green_router.get("/green/goals/{user_id}")
 def carbon_per_goal(user_id: str):
 
     response = supabase.table("ai_usage_logs")\
     .select("*")\
     .eq("user_id", user_id)\
-    .execture()
+    .execute()
 
     logs = response.data or []
     goals = {}
@@ -34,19 +34,24 @@ def carbon_per_goal(user_id: str):
         if goal_id not in goals:
             goals[goal_id] = {
                 "ai_calls": 0,
-                "tokens": 0,
-                "carbon": 0
+                "tokens_used": 0,
+                "carbon_footprint": 0
             }
         
         goals[goal_id]["ai_calls"] += 1
-        goals[goal_id]["tokens"] += log["tokens_used"]
-        goals[goal_id]["carbon"] += log["carbon_footprint"]
+        goals[goal_id]["tokens_used"] += log["tokens_used"]
+        goals[goal_id]["carbon_footprint"] += log["carbon_footprint"]
 
+    #when getting the sum, round the carbon values
+    for goal in goals:
+        goals[goal]["carbon_footprint"] = round(goals[goal]["carbon_footprint"], 6)
+
+        
     return goals
     
 
-
-@green_router.get("/green/stats/monthlt/{user_id}")
+#GET function to get green stats by month
+@green_router.get("/green/stats/monthly/{user_id}")
 def get_monthly_green_stats(user_id: str):
 
     response = supabase.table("ai_usage_logs")\
@@ -58,7 +63,7 @@ def get_monthly_green_stats(user_id: str):
     monthly_stats = {}
 
     for log in logs:
-        month = log["timestamp"][:7] #take the first 7 characters, supabase format YYYY-MM
+        month = str(log["timestamp"])[:7] #take the first 7 characters, supabase format YYYY-MM
         if month not in monthly_stats:
             monthly_stats[month] = {
                 "ai_calls": 0,
