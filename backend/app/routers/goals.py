@@ -137,6 +137,7 @@ def create_goal_endpoint(goal: CreateGoalRequest):
         #LOG AI usage for green metrics
         log_ai_usage(
             user_id = goal.user_id,
+            goal_id = goal_id,
             endpoint_type = "generate_plan",
             tokens_used = tokens_used,
             carbon_footprint = carbon_footprint
@@ -224,6 +225,7 @@ def feedback_on_plan(goal_id: str, request: FeedbackRequest):
         #LOG AI usage for green metrics
         log_ai_usage(
             user_id = goal.user_id,
+            goal_id = goal_id,
             endpoint_type = "revise_plan",
             tokens_used = tokens_used,
             carbon_footprint = carbon_footprint
