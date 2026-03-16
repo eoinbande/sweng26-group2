@@ -51,6 +51,11 @@ function GreenPage() {
                         <span className="co2-description">from all your activity</span>
                     </div>
                 </div>
+
+                {/* stats section */}
+                <h2 className="green-page-section-title">
+                    In total, you've made...
+                </h2>
             </div>
 
             <BottomNav />
