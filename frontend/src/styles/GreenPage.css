@@ -219,12 +219,11 @@
 .co2-gauge-fill {
     fill: none;
     stroke: #A2E070;
-    animation: gaugeDraw 1.2s ease-out 0.6s both;
+    transition: stroke-dashoffset 1.2s ease-out;
 }
 
-@keyframes gaugeDraw {
-    from { stroke-dashoffset: 251; }
-    to { stroke-dashoffset: 80; }
+.co2-gauge-fill--active {
+    stroke-dashoffset: 80;
 }
 
 .co2-info {
