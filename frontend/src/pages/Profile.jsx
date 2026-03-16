@@ -73,6 +73,7 @@ const Profile = () => {
                 goalsCompleted={28}
                 onTimeTasks={13}
                 onTimeGoals={13}
+                loaded={profileLoaded}
             />
 
             <BottomNav />
