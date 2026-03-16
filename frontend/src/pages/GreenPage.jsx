@@ -3,24 +3,26 @@ import PageHeader from '../components/PageHeader';
 import BottomNav from '../components/BottomNav';
 import '../styles/GreenPage.css';
 
-// animates a number from 0 to target over duration
+// animates a number from 0 to target over duration, returns { value, blur }
 const useCountUp = (target, duration = 800, shouldStart = false) => {
     const [value, setValue] = useState(0);
+    const [progress, setProgress] = useState(0);
     const frameRef = useRef(null);
 
     useEffect(() => {
         if (!shouldStart || target === 0) {
-            if (shouldStart) setValue(0);
+            if (shouldStart) { setValue(0); setProgress(1); }
             return;
         }
 
         const start = performance.now();
         const step = (now) => {
-            const progress = Math.min((now - start) / duration, 1);
+            const p = Math.min((now - start) / duration, 1);
             // ease-out cubic
-            const eased = 1 - Math.pow(1 - progress, 3);
+            const eased = 1 - Math.pow(1 - p, 3);
             setValue(Math.round(eased * target));
-            if (progress < 1) {
+            setProgress(p);
+            if (p < 1) {
                 frameRef.current = requestAnimationFrame(step);
             }
         };
@@ -29,7 +31,10 @@ const useCountUp = (target, duration = 800, shouldStart = false) => {
         return () => cancelAnimationFrame(frameRef.current);
     }, [target, duration, shouldStart]);
 
-    return value;
+    // vertical blur that fades out as count finishes
+    const blur = progress < 1 ? (1 - progress) * 2 : 0;
+
+    return { value, blur };
 };
 
 // semicircular gauge for co2 visualization
@@ -169,9 +174,9 @@ function GreenPage() {
     const CO2_GAUGE_MAX = 1000;
     const ARC_LENGTH = 251;
 
-    const co2 = useCountUp(data?.co2 ?? 0, 1000, loaded);
-    const aiCalls = useCountUp(data?.aiCalls ?? 0, 800, loaded);
-    const tokens = useCountUp(data?.tokens ?? 0, 1000, loaded);
+    const co2Count = useCountUp(data?.co2 ?? 0, 1000, loaded);
+    const aiCallsCount = useCountUp(data?.aiCalls ?? 0, 800, loaded);
+    const tokensCount = useCountUp(data?.tokens ?? 0, 1000, loaded);
 
     // temporary: scale gauge fill relative to 1000g max
     const co2Raw = data?.co2 ?? 0;
@@ -195,8 +200,11 @@ function GreenPage() {
                 <div className="green-page-co2-card">
                     <Co2Gauge loaded={loaded} fillOffset={gaugeOffset} />
                     <div className="co2-info">
-                        <span className="co2-value">
-                            {loaded ? `${co2}g` : '—'}
+                        <span className="co2-value" style={co2Count.blur > 0 ? {
+                            filter: `blur(${co2Count.blur}px)`,
+                            transform: `scaleY(${1 + co2Count.blur * 0.04})`
+                        } : undefined}>
+                            {loaded ? `${co2Count.value}g` : '—'}
                         </span>
                         <span className="co2-label">CO<sub>2</sub></span>
                         <span className="co2-description">from all your activity</span>
@@ -210,15 +218,21 @@ function GreenPage() {
 
                 <div className="green-page-stats-wrapper">
                     <div className="stat-card stat-card-dark">
-                        <span className="stat-value">
-                            {loaded ? aiCalls : '—'}
+                        <span className="stat-value" style={aiCallsCount.blur > 0 ? {
+                            filter: `blur(${aiCallsCount.blur}px)`,
+                            transform: `scaleY(${1 + aiCallsCount.blur * 0.04})`
+                        } : undefined}>
+                            {loaded ? aiCallsCount.value : '—'}
                         </span>
                         <span className="stat-label">AI Calls</span>
                     </div>
                     <div className="stat-card stat-card-light">
                         <span className="stat-using-label">using a total of...</span>
-                        <span className="stat-value">
-                            {loaded ? tokens : '—'}
+                        <span className="stat-value" style={tokensCount.blur > 0 ? {
+                            filter: `blur(${tokensCount.blur}px)`,
+                            transform: `scaleY(${1 + tokensCount.blur * 0.04})`
+                        } : undefined}>
+                            {loaded ? tokensCount.value : '—'}
                         </span>
                         <span className="stat-label">tokens</span>
                     </div>
