@@ -165,9 +165,17 @@ function GreenPage() {
         return () => clearTimeout(timer);
     }, []);
 
+    // temporary: 1000g max until we have a real usage-based cap
+    const CO2_GAUGE_MAX = 1000;
+    const ARC_LENGTH = 251;
+
     const co2 = useCountUp(data?.co2 ?? 0, 1000, loaded);
     const aiCalls = useCountUp(data?.aiCalls ?? 0, 800, loaded);
     const tokens = useCountUp(data?.tokens ?? 0, 1000, loaded);
+
+    // temporary: scale gauge fill relative to 1000g max
+    const co2Raw = data?.co2 ?? 0;
+    const gaugeOffset = ARC_LENGTH - (ARC_LENGTH * Math.min(co2Raw, CO2_GAUGE_MAX) / CO2_GAUGE_MAX);
 
     return (
         <div className="green-page">
@@ -185,7 +193,7 @@ function GreenPage() {
 
                 {/* co2 card */}
                 <div className="green-page-co2-card">
-                    <Co2Gauge loaded={loaded} fillOffset={80} />
+                    <Co2Gauge loaded={loaded} fillOffset={gaugeOffset} />
                     <div className="co2-info">
                         <span className="co2-value">
                             {loaded ? `${co2}g` : '—'}

@@ -222,9 +222,7 @@
     transition: stroke-dashoffset 1.2s ease-out;
 }
 
-.co2-gauge-fill--active {
-    stroke-dashoffset: 80;
-}
+/* active state handled via inline strokeDashoffset prop */
 
 .co2-info {
     display: flex;
