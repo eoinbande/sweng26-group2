@@ -6,6 +6,8 @@ import '../styles/GreenPage.css';
 function GreenPage() {
     return (
         <div className="green-page">
+            <div className="green-wave green-wave-1" />
+
             <div className="green-page-content">
                 <PageHeader title="Green Dashboard" accentColor="#DD645F" />
 
