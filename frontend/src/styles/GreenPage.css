@@ -165,4 +165,10 @@
     color: var(--text-main);
     opacity: 0.7;
     margin: 0 0 clamp(16px, 3dvh, 28px);
+    animation: greenFadeIn 0.6s ease-out 0.3s both;
+}
+
+@keyframes greenFadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 0.7; transform: translateY(0); }
 }
