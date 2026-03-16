@@ -353,6 +353,85 @@
 }
 
 
+/* carbon trend sparkline */
+
+.sparkline-card {
+    background: #67B082;
+    border-radius: clamp(24px, 5dvh, 36px);
+    padding: clamp(16px, 2.5dvh, 24px) clamp(20px, 4vw, 28px);
+    box-shadow: 0 5px 5px rgba(0, 0, 0, 0.25);
+    margin-top: clamp(14px, 2.5dvh, 24px);
+    animation: greenCardSlide 0.5s ease-out 0.8s both;
+}
+
+.sparkline-title {
+    font-family: var(--font-serif);
+    font-size: clamp(14px, 2dvh, 18px);
+    font-weight: 600;
+    color: #FFFFFF;
+    display: block;
+    margin-bottom: clamp(8px, 1.5dvh, 14px);
+}
+
+.sparkline-placeholder {
+    font-family: var(--font-serif);
+    font-size: clamp(24px, 5dvh, 36px);
+    color: #FFFFFF;
+    opacity: 0.5;
+    text-align: center;
+    padding: clamp(16px, 3dvh, 28px) 0;
+}
+
+.sparkline-svg {
+    width: 100%;
+    height: clamp(60px, 10dvh, 90px);
+    display: block;
+}
+
+.sparkline-line {
+    animation: sparklineDraw 1s ease-out 0.2s both;
+}
+
+.sparkline-area {
+    animation: sparklineFadeIn 1.2s ease-out 0.4s both;
+}
+
+@keyframes sparklineDraw {
+    from { opacity: 0; stroke-dasharray: 1000; stroke-dashoffset: 1000; }
+    to { opacity: 1; stroke-dasharray: 1000; stroke-dashoffset: 0; }
+}
+
+@keyframes sparklineFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.sparkline-dot {
+    opacity: 0;
+    animation: dotPop 0.3s ease-out forwards;
+}
+
+@keyframes dotPop {
+    from { opacity: 0; r: 0; }
+    to { opacity: 1; r: 3; }
+}
+
+.sparkline-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: clamp(6px, 1dvh, 10px);
+    padding: 0 4px;
+}
+
+.sparkline-label {
+    font-family: var(--font-sans);
+    font-size: clamp(9px, 1.1dvh, 11px);
+    font-weight: 500;
+    color: #FFFFFF;
+    opacity: 0.7;
+}
+
+
 /* responsive */
 
 @media (max-width: 380px) {
