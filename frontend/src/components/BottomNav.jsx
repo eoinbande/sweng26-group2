@@ -80,7 +80,7 @@ const BottomNav = () => {
                 </div>
             </div>
 
-            <NavIcon icon={<BarChart/>} label="Progress" active={currentPath === '/progress'} onClick={() => navigate('/greenpage')} />
+            <NavIcon icon={<BarChart/>} label="Progress" active={currentPath === '/greenpage'} onClick={() => navigate('/greenpage')} />
             <NavIcon icon={<User/>} label="Profile" active={currentPath === '/profile'} onClick={() => navigate('/profile')} />
         </div>
     );
