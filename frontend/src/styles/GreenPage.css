@@ -48,6 +48,98 @@
     83%      { border-radius: 50% 50% 0 0 / 28% 16% 0 0; }
 }
 
+/* wave 2 — slightly smaller, a bit faster, semi-transparent */
+
+.green-wave-2 {
+    height: 68%;
+    bottom: -3%;
+    left: -15%;
+    width: 135%;
+    background: rgba(248, 248, 244, 0.55);
+    border-radius: 52% 48% 0 0 / 22% 28% 0 0;
+    animation: wave2Rise 18s ease-in-out infinite, wave2Morph 13s ease-in-out infinite;
+}
+
+/* wave 3 — smaller crest, faster, more transparent */
+
+.green-wave-3 {
+    height: 64%;
+    bottom: -2%;
+    left: -25%;
+    width: 145%;
+    background: rgba(248, 248, 244, 0.35);
+    border-radius: 45% 55% 0 0 / 30% 18% 0 0;
+    animation: wave3Rise 15s ease-in-out infinite, wave3Morph 11s ease-in-out infinite;
+}
+
+/* wave 4 — smallest ripple, fastest, subtle */
+
+.green-wave-4 {
+    height: 60%;
+    bottom: -1%;
+    left: -10%;
+    width: 130%;
+    background: rgba(248, 248, 244, 0.2);
+    border-radius: 55% 45% 0 0 / 18% 32% 0 0;
+    animation: wave4Rise 12s ease-in-out infinite, wave4Morph 9s ease-in-out infinite;
+}
+
+/* wave 2 — medium swell, offset rhythm */
+
+@keyframes wave2Rise {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    20%      { transform: translateY(16px) rotate(-0.8deg); }
+    45%      { transform: translateY(-24px) rotate(0.6deg); }
+    70%      { transform: translateY(12px) rotate(-0.5deg); }
+}
+
+@keyframes wave2Morph {
+    0%, 100% { border-radius: 52% 48% 0 0 / 22% 28% 0 0; }
+    14%      { border-radius: 46% 54% 0 0 / 36% 12% 0 0; }
+    28%      { border-radius: 56% 44% 0 0 / 14% 38% 0 0; }
+    42%      { border-radius: 42% 58% 0 0 / 32% 18% 0 0; }
+    57%      { border-radius: 54% 46% 0 0 / 18% 34% 0 0; }
+    71%      { border-radius: 48% 52% 0 0 / 38% 10% 0 0; }
+    85%      { border-radius: 50% 50% 0 0 / 16% 30% 0 0; }
+}
+
+/* wave 3 — quicker, taller peaks */
+
+@keyframes wave3Rise {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    18%      { transform: translateY(-28px) rotate(1deg); }
+    40%      { transform: translateY(14px) rotate(-0.7deg); }
+    60%      { transform: translateY(-18px) rotate(0.5deg); }
+    82%      { transform: translateY(10px) rotate(-0.6deg); }
+}
+
+@keyframes wave3Morph {
+    0%, 100% { border-radius: 45% 55% 0 0 / 30% 18% 0 0; }
+    17%      { border-radius: 55% 45% 0 0 / 12% 38% 0 0; }
+    34%      { border-radius: 42% 58% 0 0 / 32% 20% 0 0; }
+    50%      { border-radius: 56% 44% 0 0 / 16% 34% 0 0; }
+    67%      { border-radius: 48% 52% 0 0 / 36% 14% 0 0; }
+    84%      { border-radius: 52% 48% 0 0 / 20% 30% 0 0; }
+}
+
+/* wave 4 — small fast ripple, highest relative peaks */
+
+@keyframes wave4Rise {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    22%      { transform: translateY(20px) rotate(-1.2deg); }
+    44%      { transform: translateY(-16px) rotate(0.8deg); }
+    66%      { transform: translateY(24px) rotate(-0.6deg); }
+    88%      { transform: translateY(-10px) rotate(0.9deg); }
+}
+
+@keyframes wave4Morph {
+    0%, 100% { border-radius: 55% 45% 0 0 / 18% 32% 0 0; }
+    20%      { border-radius: 44% 56% 0 0 / 34% 16% 0 0; }
+    40%      { border-radius: 56% 44% 0 0 / 14% 32% 0 0; }
+    60%      { border-radius: 46% 54% 0 0 / 30% 18% 0 0; }
+    80%      { border-radius: 52% 48% 0 0 / 18% 38% 0 0; }
+}
+
 .green-page-content {
     position: relative;
     z-index: 1;
