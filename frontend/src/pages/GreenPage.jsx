@@ -62,6 +62,11 @@ function GreenPage() {
                         <span className="stat-value">28</span>
                         <span className="stat-label">AI Calls</span>
                     </div>
+                    <div className="stat-card stat-card-light">
+                        <span className="stat-using-label">using a total of...</span>
+                        <span className="stat-value">234</span>
+                        <span className="stat-label">tokens</span>
+                    </div>
                 </div>
             </div>
 
