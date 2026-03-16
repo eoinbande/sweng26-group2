@@ -165,6 +165,7 @@
     color: var(--text-main);
     opacity: 0.7;
     margin: 0 0 clamp(16px, 3dvh, 28px);
+    margin-left: calc(28px - var(--space-lg) + var(--space-md));
     animation: greenFadeIn 0.6s ease-out 0.3s both;
 }
 
