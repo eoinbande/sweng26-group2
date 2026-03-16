@@ -31,7 +31,7 @@ const User = ({ size = 30 }) => (
 
 
 
-const BottomNav = () => {
+const BottomNav = ({ transparent = false }) => {
     const navigate = useNavigate();
     const location = useLocation();
     const currentPath = location.pathname;
@@ -44,7 +44,7 @@ const BottomNav = () => {
             transform: 'translateX(-50%)',
             width: '100%',
             maxWidth: '480px',
-            backgroundColor: 'rgba(248, 248, 244, 0.97)',
+            backgroundColor: transparent ? 'transparent' : 'rgba(248, 248, 244, 0.97)',
             backdropFilter: 'blur(12px)',
             padding: '10px 16px 14px',
             display: 'flex',
@@ -80,7 +80,7 @@ const BottomNav = () => {
                 </div>
             </div>
 
-            <NavIcon icon={<BarChart/>} label="Progress" active={currentPath === '/greenpage'} onClick={() => navigate('/greenpage')} />
+            <NavIcon icon={<BarChart/>} label="Green" active={currentPath === '/greenpage'} onClick={() => navigate('/greenpage')} />
             <NavIcon icon={<User/>} label="Profile" active={currentPath === '/profile'} onClick={() => navigate('/profile')} />
         </div>
     );
