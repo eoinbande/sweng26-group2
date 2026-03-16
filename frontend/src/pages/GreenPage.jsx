@@ -56,6 +56,13 @@ function GreenPage() {
                 <h2 className="green-page-section-title">
                     In total, you've made...
                 </h2>
+
+                <div className="green-page-stats-wrapper">
+                    <div className="stat-card stat-card-dark">
+                        <span className="stat-value">28</span>
+                        <span className="stat-label">AI Calls</span>
+                    </div>
+                </div>
             </div>
 
             <BottomNav />
