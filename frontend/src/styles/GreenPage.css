@@ -351,3 +351,16 @@
     color: var(--text-main);
     line-height: 1;
 }
+
+
+/* responsive */
+
+@media (max-width: 380px) {
+    .stat-card {
+        min-height: clamp(90px, 14dvh, 120px);
+        padding: clamp(14px, 2dvh, 20px) clamp(12px, 2.5vw, 20px);
+    }
+    .green-page-co2-card {
+        padding: clamp(14px, 2dvh, 22px);
+    }
+}
