@@ -12,6 +12,11 @@ const Profile = () => {
     const navigate = useNavigate();
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
+    const [streakDays, setStreakDays] = useState(0);
+    const [tasksCompleted, setTasksCompleted] = useState(0);
+    const [onTimeTasks, setOnTimeTasks] = useState(0);
+    const [goalsCompleted, setGoalsCompleted] = useState(0);
+    const [onTimeGoals, setOnTimeGoals] = useState(0);
     const [profileLoaded, setProfileLoaded] = useState(false);
 
     useEffect(() => {
@@ -30,6 +35,29 @@ const Profile = () => {
                         .single();
 
                     setUsername(profile?.name || user.email.split('@')[0]);
+
+                    const baseUrl = import.meta.env.VITE_API_URL;
+                    const [streakRes, tasksRes, tasksOnTimeRes, goalsRes, goalsOnTimeRes] = await Promise.all([
+                        fetch(`${baseUrl}/profile/${user.id}/streak`, { cache: 'no-store' }),
+                        fetch(`${baseUrl}/profile/${user.id}/tasks-completed`, { cache: 'no-store' }),
+                        fetch(`${baseUrl}/profile/${user.id}/tasks-completed-on-time`, { cache: 'no-store' }),
+                        fetch(`${baseUrl}/profile/${user.id}/goals-completed`, { cache: 'no-store' }),
+                        fetch(`${baseUrl}/profile/${user.id}/goals-completed-on-time`, { cache: 'no-store' }),
+                    ]);
+
+                    const [streakData, tasksData, tasksOnTimeData, goalsData, goalsOnTimeData] = await Promise.all([
+                        streakRes.ok ? streakRes.json() : Promise.resolve({}),
+                        tasksRes.ok ? tasksRes.json() : Promise.resolve({}),
+                        tasksOnTimeRes.ok ? tasksOnTimeRes.json() : Promise.resolve({}),
+                        goalsRes.ok ? goalsRes.json() : Promise.resolve({}),
+                        goalsOnTimeRes.ok ? goalsOnTimeRes.json() : Promise.resolve({}),
+                    ]);
+
+                    setStreakDays(streakData.current_streak ?? 0);
+                    setTasksCompleted(tasksData.tasks_completed ?? 0);
+                    setOnTimeTasks(tasksOnTimeData.tasks_completed_on_time ?? 0);
+                    setGoalsCompleted(goalsData.goals_completed ?? 0);
+                    setOnTimeGoals(goalsOnTimeData.goals_completed_on_time ?? 0);
                 }
             } catch (e) {
                 console.error('Error loading profile', e);
@@ -63,16 +91,16 @@ const Profile = () => {
             <AccountCard
                 username={username}
                 email={email}
-                streakDays={217}
+                streakDays={streakDays}
                 onEdit={() => {}}
                 onSignOut={handleSignOut}
             />
 
             <AnalyticsSection
-                tasksCompleted={28}
-                goalsCompleted={28}
-                onTimeTasks={13}
-                onTimeGoals={13}
+                tasksCompleted={tasksCompleted}
+                goalsCompleted={goalsCompleted}
+                onTimeTasks={onTimeTasks}
+                onTimeGoals={onTimeGoals}
             />
 
             <BottomNav />
