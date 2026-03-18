@@ -4,6 +4,8 @@ from pydantic import BaseModel, Field
 from typing import Optional
 import json
 from app.services.ai_service import AIService
+from app.services.ai_service import log_ai_usage
+from app.aicalls import estimate_carbon_usage
 # Database functions (Tables.py)
 from ..Tables import (
     create_goal, get_all_goals, get_goal, delete_goal,
@@ -126,6 +128,20 @@ def create_goal_endpoint(goal: CreateGoalRequest):
     #----------------------Real AI integration(the following block of code calls the AI to generate the goal!)--------------
     try:
         ai_plan = ai_service.generate_plan(goal.title)
+
+        tokens_used = ai_plan.get("tokens_used", 0)
+        carbon_footprint = ai_plan.get("carbon_footprint")
+        if carbon_footprint is None:
+            carbon_footprint = estimate_carbon_usage(tokens_used)
+
+        #LOG AI usage for green metrics
+        log_ai_usage(
+            user_id = goal.user_id,
+            goal_id = goal_id,
+            endpoint_type = "generate_plan",
+            tokens_used = tokens_used,
+            carbon_footprint = carbon_footprint
+        )
     except Exception as e:
         raise HTTPException(status_code = 500, detail = f"AI generation failed: {str(e)}")
 
@@ -201,6 +217,19 @@ def feedback_on_plan(goal_id: str, request: FeedbackRequest):
             user_input = request.feedback,
             current_goals = current_tasks
         )
+        tokens_used = updated_plan.get("tokens_used", 0)
+        carbon_footprint = updated_plan.get("carbon_footprint")
+        if carbon_footprint is None:
+            carbon_footprint = estimate_carbon_usage(tokens_used)
+
+        #LOG AI usage for green metrics
+        log_ai_usage(
+            user_id = goal.user_id,
+            goal_id = goal_id,
+            endpoint_type = "revise_plan",
+            tokens_used = tokens_used,
+            carbon_footprint = carbon_footprint
+        )
     except Exception as e:
         raise HTTPException(status_code = 500, detail = f"AI feedback failed: {str(e)}")
 
@@ -239,6 +268,7 @@ def accept_plan(goal_id: str, request: AcceptPlanRequest):
         raise HTTPException(status_code=404, detail="Goal not found")
 
     # Check if goal already has saved tasks (i.e., this is a re-accept after feedback)
+    import json
     current_data = goal.get("goal_data", {})
     if isinstance(current_data, str):
         current_data = json.loads(current_data)
@@ -275,19 +305,16 @@ def accept_plan(goal_id: str, request: AcceptPlanRequest):
     }
 
 
-# ---- Get all goals for a user (with optional category filter) ----
+# ---- Get all goals for a user ----
 
 @goal_router.get("/goals/{user_id}")
-def get_goals(user_id: str, category: Optional[str] = None):
+def get_goals(user_id: str):
     """
-    Get all goals for a user, optionally filtered by category.
+    Get all goals for a user.
     
     Each goal includes its goal_data JSONB which contains
     the full nested task list (tasks + subtasks with both IDs).
     Only returns goals that have tasks saved (i.e., user has accepted the plan)!
-    
-    Query params:
-        category (optional): Filter by category name, e.g. ?category=Health
     
     Called when: User opens their dashboard/goals screen.
     """
@@ -305,12 +332,8 @@ def get_goals(user_id: str, category: Optional[str] = None):
         if goal_data.get("tasks"):
             accepted_goals.append(goal)
 
-    # Filter by category if provided
-    if category:
-        accepted_goals = [g for g in accepted_goals if g.get("category") == category]
-
     if not accepted_goals:
-        return {"goals": [], "message": "No goals found"}
+        return {"goals": [], "message": "No goals associated with the user"}
 
     return {"goals": accepted_goals}
 
@@ -382,73 +405,6 @@ def get_goal_details(goal_id: str):
     }
 
 
-# ---- Update a goal's category ----
-
-@goal_router.patch("/goals/{goal_id}/category")
-def update_goal_category(goal_id: str, request: UpdateCategoryRequest):
-    """
-    Update the category of an existing goal.
-    
-    Accepts any string — supports both predefined categories
-    (Health, Personal, Work, Education, Finance) and custom ones.
-    
-    Example: PATCH /goals/uuid-123/category
-    Body: {"category": "Fitness"}
-    """
-    # Verify the goal exists
-    try:
-        get_goal(goal_id)
-    except Exception:
-        raise HTTPException(status_code=404, detail="Goal not found")
-
-    supabase.table("goals").update(
-        {"category": request.category}
-    ).eq("id", goal_id).execute()
-
-    return {
-        "message": "Category updated",
-        "goal_id": goal_id,
-        "category": request.category
-    }
-
-
-# ---- Category endpoints ----
-
-@goal_router.get("/categories/{user_id}")
-def get_categories_endpoint(user_id: str):
-    """
-    Get all available categories for a user.
-    
-    Returns both system defaults (Health, Personal, Work, Education, Finance)
-    and any custom categories the user has created.
-    
-    Called when: Frontend populates the category dropdown.
-    """
-    categories = get_categories(user_id)
-    return {"categories": categories}
-
-
-@goal_router.post("/categories")
-def create_category_endpoint(request: CreateCategoryRequest):
-    """
-    Create a new custom category.
-    
-    Called when: User clicks "+New category" in the dropdown.
-    
-    Example: POST /categories
-    Body: {"user_id": "uuid-123", "name": "Fitness"}
-    """
-    try:
-        result = create_category(request.user_id, request.name)
-        if hasattr(result, "data") and result.data:
-            return {"message": "Category created", "category": result.data[0]}
-        raise HTTPException(status_code=500, detail="Failed to create category")
-    except Exception as e:
-        if "duplicate" in str(e).lower() or "unique" in str(e).lower():
-            raise HTTPException(status_code=400, detail="Category already exists")
-        raise HTTPException(status_code=500, detail=str(e))
-
-
 # ---- Delete a goal ----
 
 @goal_router.delete("/goals/{goal_id}")
@@ -462,4 +418,45 @@ def delete_goal_endpoint(goal_id: str):
         return {"message": "Goal deleted successfully", "goal_id": goal_id}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error deleting goal: {str(e)}")
+
+
+
+
     
+"""@goal_router.delete("/goals/{user_id}/{goal_id}")
+def delete_goal(user_id: str, goal_id: str):
+    
+    Delete a goal by its goal_id.
+    
+    try:
+        # Find the goal
+        all_goals = get_all_goals(user_id)
+        db_id = None
+        
+        for goal_record in all_goals:
+            if goal_record.get("goal_data", {}).get("goal_id") == goal_id:
+                db_id = goal_record.get("id")
+                break
+        
+        if not db_id:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Goal {goal_id} not found for user {user_id}"
+            )
+        
+        # Delete from database
+        supabase.table("goals").delete().eq("id", db_id).execute()
+        
+        return {
+            "status": "success",
+            "message": f"Goal {goal_id} deleted successfully"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error deleting goal: {str(e)}"
+        )
+        """ 
