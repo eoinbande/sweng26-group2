@@ -6,6 +6,7 @@ import AnalyticsSection from '../components/AnalyticsSection';
 import BottomNav from '../components/BottomNav';
 import Loading from '../components/Loading';
 import { supabase } from '../supabase_client';
+import { Check } from 'lucide-react';
 import '../styles/Profile.css';
 
 const Profile = () => {
@@ -18,6 +19,7 @@ const Profile = () => {
     const [goalsCompleted, setGoalsCompleted] = useState(0);
     const [onTimeGoals, setOnTimeGoals] = useState(0);
     const [profileLoaded, setProfileLoaded] = useState(false);
+    const [showSuccess, setShowSuccess] = useState(false);
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -84,18 +86,17 @@ const Profile = () => {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
 
-        const trimmedName = newName ? newName.trim() : newName;
-
         try {
-            if (trimmedName && trimmedName !== username) {
+            if (newName && newName !== username) {
                 const { error } = await supabase
                     .from('profiles')
-                    .update({ name: trimmedName })
+                    .update({ name: newName })
                     .eq('id', user.id);
                 
                 if (error) throw error;
-                setUsername(trimmedName);
-                alert('Username updated successfully!');
+                setUsername(newName);
+                setShowSuccess(true);
+                setTimeout(() => setShowSuccess(false), 2000);
             }
         } catch (error) {
             console.error('Error updating profile:', error);
@@ -109,6 +110,17 @@ const Profile = () => {
 
     return (
         <div className="profile-page">
+            {showSuccess && (
+                <>
+                    <div className="success-overlay"></div>
+                    <div className="success-popup">
+                        <div className="success-icon-circle">
+                            <Check size={32} strokeWidth={3} />
+                        </div>
+                        <span className="success-message">Username updated!</span>
+                    </div>
+                </>
+            )}
             <ProfileHeader />
 
             <AccountCard
