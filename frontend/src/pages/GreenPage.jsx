@@ -4,30 +4,6 @@ import BottomNav from '../components/BottomNav';
 import useCountUp from '../hooks/useCountUp';
 import '../styles/GreenPage.css';
 
-// semicircular gauge for co2 visualization
-const Co2Gauge = ({ loaded, fillOffset }) => (
-    <div className="co2-gauge-container">
-        <svg className="co2-gauge-svg" viewBox="0 0 200 115">
-            {/* track — both ends rounded */}
-            <path
-                className="co2-gauge-track"
-                d="M 20,100 A 80,80 0 0,1 180,100"
-                strokeWidth="22"
-                strokeLinecap="round"
-            />
-            {/* filled arc — both ends rounded */}
-            <path
-                className={`co2-gauge-fill ${loaded ? 'co2-gauge-fill--active' : ''}`}
-                d="M 20,100 A 80,80 0 0,1 180,100"
-                strokeWidth="22"
-                strokeLinecap="round"
-                strokeDasharray="251"
-                strokeDashoffset={loaded ? fillOffset : 251}
-            />
-        </svg>
-    </div>
-);
-
 // sparkline chart for carbon trend
 const CarbonSparkline = ({ data, labels, loaded }) => {
     if (!loaded || !data) return (
@@ -137,17 +113,9 @@ function GreenPage() {
         return () => clearTimeout(timer);
     }, []);
 
-    // temporary: 1000g max until we have a real usage-based cap
-    const CO2_GAUGE_MAX = 1000;
-    const ARC_LENGTH = 251;
-
     const co2Count = useCountUp(data?.co2 ?? 0, 1000, loaded);
     const aiCallsCount = useCountUp(data?.aiCalls ?? 0, 800, loaded);
     const tokensCount = useCountUp(data?.tokens ?? 0, 1000, loaded);
-
-    // temporary: scale gauge fill relative to 1000g max
-    const co2Raw = data?.co2 ?? 0;
-    const gaugeOffset = ARC_LENGTH - (ARC_LENGTH * Math.min(co2Raw, CO2_GAUGE_MAX) / CO2_GAUGE_MAX);
 
     return (
         <div className="green-page">
@@ -165,17 +133,19 @@ function GreenPage() {
 
                 {/* co2 card */}
                 <div className="green-page-co2-card">
-                    <Co2Gauge loaded={loaded} fillOffset={gaugeOffset} />
-                    <div className="co2-info">
-                        <span className="co2-value" style={co2Count.blur > 0 ? {
-                            filter: `blur(${co2Count.blur}px)`,
-                            transform: `scaleY(${1 + co2Count.blur * 0.04})`
-                        } : undefined}>
-                            {loaded ? `${co2Count.value}g` : '—'}
-                        </span>
-                        <span className="co2-label">CO<sub>2</sub></span>
-                        <span className="co2-description">from all your activity</span>
+                    <span className="co2-label">CO<sub>2</sub></span>
+                    <span className="co2-value" style={co2Count.blur > 0 ? {
+                        filter: `blur(${co2Count.blur}px)`,
+                        transform: `scaleY(${1 + co2Count.blur * 0.04})`
+                    } : undefined}>
+                        {loaded ? `${co2Count.value}g` : '—'}
+                    </span>
+                    <span className="co2-description">so far this month</span>
+                    <div className="co2-divider" />
+                    <div className="co2-change-badge">
+                        <span className="co2-change-arrow">↑</span> 5%
                     </div>
+                    <span className="co2-change-label">CO<sub>2</sub> vs. last month</span>
                 </div>
 
                 {/* stats section */}

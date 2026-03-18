@@ -185,6 +185,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    text-align: center;
     position: relative;
     margin-bottom: clamp(16px, 3dvh, 28px);
     animation: greenCardSlide 0.5s ease-out 0.4s both;
@@ -193,42 +194,6 @@
 @keyframes greenCardSlide {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
-}
-
-
-/* co2 gauge */
-
-.co2-gauge-container {
-    position: relative;
-    width: clamp(200px, 50vw, 280px);
-    height: clamp(115px, 28vw, 160px);
-    margin-bottom: clamp(4px, 0.8dvh, 10px);
-    overflow: hidden;
-}
-
-.co2-gauge-svg {
-    width: 100%;
-    height: 100%;
-}
-
-.co2-gauge-track {
-    fill: none;
-    stroke: rgba(255, 255, 255, 0.2);
-}
-
-.co2-gauge-fill {
-    fill: none;
-    stroke: #A2E070;
-    transition: stroke-dashoffset 1.2s ease-out;
-}
-
-/* active state handled via inline strokeDashoffset prop */
-
-.co2-info {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: clamp(2px, 0.4dvh, 4px);
 }
 
 .co2-value {
@@ -256,6 +221,45 @@
     font-weight: 400;
     color: #FFFFFF;
     opacity: 0.85;
+}
+
+.co2-divider {
+    align-self: stretch;
+    border: none;
+    min-height: 2px;
+    background-color: rgba(255, 255, 255, 0.5);
+    margin: clamp(12px, 2dvh, 20px) 0;
+}
+
+.co2-change-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(0, 0, 0, 0.1);
+    border: 1.5px solid rgba(255, 255, 255, 0.25);
+    color: #AAD786;
+    font-family: var(--font-sans);
+    font-size: clamp(16px, 2.5dvh, 22px);
+    font-weight: 600;
+    padding: clamp(6px, 1dvh, 10px) clamp(20px, 4vw, 32px);
+    border-radius: var(--radius-pill);
+    margin-bottom: clamp(6px, 1dvh, 10px);
+}
+
+.co2-change-arrow {
+    font-size: 1em;
+}
+
+.co2-change-label {
+    font-family: var(--font-sans);
+    font-size: clamp(11px, 1.4dvh, 14px);
+    font-weight: 400;
+    color: #FFFFFF;
+    opacity: 0.85;
+}
+
+.co2-change-label sub {
+    font-size: 0.7em;
 }
 
 
