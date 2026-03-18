@@ -103,6 +103,7 @@ function GreenPage() {
         const timer = setTimeout(() => {
             setData({
                 co2: 120,
+                co2ChangePct: 5,
                 aiCalls: 28,
                 tokens: 234,
                 // monthly carbon trend — replace with real data
@@ -114,6 +115,7 @@ function GreenPage() {
     }, []);
 
     const co2Count = useCountUp(data?.co2 ?? 0, 1000, loaded);
+    const co2Change = useCountUp(data?.co2ChangePct ?? 0, 800, loaded);
     const aiCallsCount = useCountUp(data?.aiCalls ?? 0, 800, loaded);
     const tokensCount = useCountUp(data?.tokens ?? 0, 1000, loaded);
 
@@ -143,7 +145,13 @@ function GreenPage() {
                     <span className="co2-description">so far this month</span>
                     <div className="co2-divider" />
                     <div className="co2-change-badge">
-                        <span className="co2-change-arrow">↑</span> 5%
+                        <span className="co2-change-arrow">↑</span>
+                        <span style={co2Change.blur > 0 ? {
+                            filter: `blur(${co2Change.blur}px)`,
+                            transform: `scaleY(${1 + co2Change.blur * 0.04})`
+                        } : undefined}>
+                            {loaded ? `${co2Change.value}%` : '—'}
+                        </span>
                     </div>
                     <span className="co2-change-label">CO<sub>2</sub> vs. last month</span>
                 </div>
