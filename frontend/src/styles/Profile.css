@@ -166,12 +166,101 @@
 
 .account-card-input {
     font-family: var(--font-sans);
-    font-size: clamp(13px, 3.59vw, 15px);
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    padding: 2px 6px;
-    margin-top: 2px;
+    font-size: clamp(14px, 4vw, 16px);
+    border: 2px solid #eee;
+    border-radius: 12px;
+    padding: 8px 12px;
+    margin-top: 4px;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+    outline: none;
 }
+
+.account-card-input:focus {
+    border-color: var(--blue);
+}
+
+.username-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.username-edit-container {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    width: 100%;
+}
+
+.inline-edit-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #888;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    transition: color 0.2s;
+}
+
+.inline-edit-btn:hover {
+    color: #000;
+}
+
+/* Success Popup */
+.success-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.2);
+    z-index: 999;
+    backdrop-filter: blur(2px);
+    animation: fadeIn 0.2s ease-out;
+}
+
+.success-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 32px 48px;
+    border-radius: 24px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    z-index: 1000;
+    animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.success-icon-circle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: var(--yellow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: black;
+    box-shadow: 0 4px 12px rgba(255, 197, 80, 0.4);
+}
+
+.success-message {
+    font-family: var(--font-sans);
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+@keyframes popIn {
+    from { transform: translate(-50%, -40%) scale(0.9); opacity: 0; }
+    to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
 
 .account-card-actions {
     position: absolute;
@@ -191,11 +280,12 @@
     justify-content: center;
     box-shadow: 0 2px 2px rgba(0, 0, 0, 0.25);
     cursor: pointer;
+    flex-shrink: 0;
 }
 
 .account-card-action-btn.save {
-    background-color: var(--green);
-    color: white;
+    background-color: var(--yellow);
+    color: black;
 }
 
 .account-card-action-btn.cancel {

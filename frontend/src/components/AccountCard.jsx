@@ -36,13 +36,27 @@ const AccountCard = ({ username, email, streakDays, onUpdateProfile, onSignOut }
                 <div className="account-card-field">
                     <span className="account-card-label">Username</span>
                     {isEditing ? (
-                        <input 
-                            className="account-card-input"
-                            value={editName}
-                            onChange={(e) => setEditName(e.target.value)}
-                        />
+                        <div className="username-edit-container">
+                            <input 
+                                className="account-card-input"
+                                value={editName}
+                                onChange={(e) => setEditName(e.target.value)}
+                                autoFocus
+                            />
+                            <button className="account-card-action-btn save" onClick={handleSave}>
+                                <Check size={18} />
+                            </button>
+                            <button className="account-card-action-btn cancel" onClick={handleCancel}>
+                                <X size={18} />
+                            </button>
+                        </div>
                     ) : (
-                        <span className="account-card-value">{username}</span>
+                        <div className="username-row">
+                            <span className="account-card-value">{username}</span>
+                            <button className="inline-edit-btn" onClick={handleEditClick} aria-label="Edit username">
+                                <Pencil size={18} fill="currentColor" />
+                            </button>
+                        </div>
                     )}
                 </div>
 
@@ -50,21 +64,6 @@ const AccountCard = ({ username, email, streakDays, onUpdateProfile, onSignOut }
                     <span className="account-card-label">Email</span>
                     <span className="account-card-value">{email}</span>
                 </div>
-
-                {isEditing ? (
-                    <div className="account-card-actions">
-                        <button className="account-card-action-btn save" onClick={handleSave}>
-                            <Check size={18} />
-                        </button>
-                        <button className="account-card-action-btn cancel" onClick={handleCancel}>
-                            <X size={18} />
-                        </button>
-                    </div>
-                ) : (
-                    <button className="account-card-edit" onClick={handleEditClick} aria-label="Edit profile">
-                        <Pencil strokeWidth={2.5} size={20} />
-                    </button>
-                )}
             </div>
 
             <button className="sign-out-button" onClick={onSignOut}>
