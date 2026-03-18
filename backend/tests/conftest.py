@@ -27,5 +27,11 @@ sys.modules["supabase"] = MagicMock(
     Client=MagicMock,
 )
 
-# ── 4. Now it is safe to import pytest fixtures etc. ────────────────────────
+# ── 4. Mock `openai` BEFORE aicalls.py is ever imported ─────────────────────
+#    pytest runs on Anaconda Python 3.11, but pip installed openai into
+#    Python 3.14 — so the package isn't available to the test runner.
+#    All tests that touch AI mock at the service layer anyway, so this is safe.
+sys.modules["openai"] = MagicMock()
+
+# ── 5. Now it is safe to import pytest fixtures etc. ────────────────────────
 import pytest

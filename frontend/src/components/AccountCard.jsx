@@ -1,7 +1,27 @@
-import { Pencil } from 'lucide-react';
+import { useState } from 'react';
+import { Pencil, Check, X } from 'lucide-react';
 import '../styles/Profile.css';
 
-const AccountCard = ({ username, email, streakDays, onEdit, onSignOut }) => {
+const AccountCard = ({ username, email, streakDays, onUpdateProfile, onSignOut }) => {
+    const [isEditing, setIsEditing] = useState(false);
+    const [editName, setEditName] = useState(username);
+
+    const handleEditClick = () => {
+        setEditName(username);
+        setIsEditing(true);
+    };
+
+    const handleSave = async () => {
+        if (onUpdateProfile) {
+            await onUpdateProfile(editName);
+        }
+        setIsEditing(false);
+    };
+
+    const handleCancel = () => {
+        setIsEditing(false);
+    };
+
     return (
         <div className="account-card-wrapper fade-in">
             <div className="account-card">
@@ -15,17 +35,35 @@ const AccountCard = ({ username, email, streakDays, onEdit, onSignOut }) => {
 
                 <div className="account-card-field">
                     <span className="account-card-label">Username</span>
-                    <span className="account-card-value">{username}</span>
+                    {isEditing ? (
+                        <div className="username-edit-container">
+                            <input 
+                                className="account-card-input"
+                                value={editName}
+                                onChange={(e) => setEditName(e.target.value)}
+                                autoFocus
+                            />
+                            <button className="account-card-action-btn save" onClick={handleSave}>
+                                <Check size={18} />
+                            </button>
+                            <button className="account-card-action-btn cancel" onClick={handleCancel}>
+                                <X size={18} />
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="username-row">
+                            <span className="account-card-value">{username}</span>
+                            <button className="inline-edit-btn" onClick={handleEditClick} aria-label="Edit username">
+                                <Pencil size={18} fill="currentColor" />
+                            </button>
+                        </div>
+                    )}
                 </div>
 
                 <div className="account-card-field">
                     <span className="account-card-label">Email</span>
                     <span className="account-card-value">{email}</span>
                 </div>
-
-                <button className="account-card-edit" onClick={onEdit} aria-label="Edit profile">
-                    <Pencil strokeWidth={4} />
-                </button>
             </div>
 
             <button className="sign-out-button" onClick={onSignOut}>

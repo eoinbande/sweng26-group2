@@ -50,7 +50,13 @@ const BottomNav = ({ transparent = false }) => {
                 alignItems: 'center',
                 gap: '3px',
                 cursor: 'pointer',
-            }} onClick={() => navigate('/home')}>
+            }} onClick={() => {
+                if (currentPath === '/home') {
+                    window.location.reload();
+                } else {
+                    navigate('/home');
+                }
+            }}>
                 <div className="bottom-nav-home-btn" style={{
                     backgroundColor: 'var(--primary)',
                     borderRadius: '50%',

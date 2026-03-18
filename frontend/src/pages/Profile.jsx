@@ -6,13 +6,20 @@ import AnalyticsSection from '../components/AnalyticsSection';
 import BottomNav from '../components/BottomNav';
 import Loading from '../components/Loading';
 import { supabase } from '../supabase_client';
+import { Check } from 'lucide-react';
 import '../styles/Profile.css';
 
 const Profile = () => {
     const navigate = useNavigate();
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
+    const [streakDays, setStreakDays] = useState(0);
+    const [tasksCompleted, setTasksCompleted] = useState(0);
+    const [onTimeTasks, setOnTimeTasks] = useState(0);
+    const [goalsCompleted, setGoalsCompleted] = useState(0);
+    const [onTimeGoals, setOnTimeGoals] = useState(0);
     const [profileLoaded, setProfileLoaded] = useState(false);
+    const [showSuccess, setShowSuccess] = useState(false);
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -30,6 +37,29 @@ const Profile = () => {
                         .single();
 
                     setUsername(profile?.name || user.email.split('@')[0]);
+
+                    const baseUrl = import.meta.env.VITE_API_URL;
+                    const [streakRes, tasksRes, tasksOnTimeRes, goalsRes, goalsOnTimeRes] = await Promise.all([
+                        fetch(`${baseUrl}/profile/${user.id}/streak`, { cache: 'no-store' }),
+                        fetch(`${baseUrl}/profile/${user.id}/tasks-completed`, { cache: 'no-store' }),
+                        fetch(`${baseUrl}/profile/${user.id}/tasks-completed-on-time`, { cache: 'no-store' }),
+                        fetch(`${baseUrl}/profile/${user.id}/goals-completed`, { cache: 'no-store' }),
+                        fetch(`${baseUrl}/profile/${user.id}/goals-completed-on-time`, { cache: 'no-store' }),
+                    ]);
+
+                    const [streakData, tasksData, tasksOnTimeData, goalsData, goalsOnTimeData] = await Promise.all([
+                        streakRes.ok ? streakRes.json() : Promise.resolve({}),
+                        tasksRes.ok ? tasksRes.json() : Promise.resolve({}),
+                        tasksOnTimeRes.ok ? tasksOnTimeRes.json() : Promise.resolve({}),
+                        goalsRes.ok ? goalsRes.json() : Promise.resolve({}),
+                        goalsOnTimeRes.ok ? goalsOnTimeRes.json() : Promise.resolve({}),
+                    ]);
+
+                    setStreakDays(streakData.current_streak ?? 0);
+                    setTasksCompleted(tasksData.tasks_completed ?? 0);
+                    setOnTimeTasks(tasksOnTimeData.tasks_completed_on_time ?? 0);
+                    setGoalsCompleted(goalsData.goals_completed ?? 0);
+                    setOnTimeGoals(goalsOnTimeData.goals_completed_on_time ?? 0);
                 }
             } catch (e) {
                 console.error('Error loading profile', e);
@@ -52,27 +82,60 @@ const Profile = () => {
         }
     };
 
+    const handleUpdateProfile = async (newName) => {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        try {
+            if (newName && newName !== username) {
+                const { error } = await supabase
+                    .from('profiles')
+                    .update({ name: newName })
+                    .eq('id', user.id);
+                
+                if (error) throw error;
+                setUsername(newName);
+                setShowSuccess(true);
+                setTimeout(() => setShowSuccess(false), 2000);
+            }
+        } catch (error) {
+            console.error('Error updating profile:', error);
+            alert('Failed to update profile. ' + error.message);
+        }
+    };
+
     if (!profileLoaded) {
         return <Loading />;
     }
 
     return (
         <div className="profile-page">
+            {showSuccess && (
+                <>
+                    <div className="success-overlay"></div>
+                    <div className="success-popup">
+                        <div className="success-icon-circle">
+                            <Check size={32} strokeWidth={3} />
+                        </div>
+                        <span className="success-message">Username updated!</span>
+                    </div>
+                </>
+            )}
             <ProfileHeader />
 
             <AccountCard
                 username={username}
                 email={email}
-                streakDays={217}
-                onEdit={() => {}}
+                streakDays={streakDays}
+                onUpdateProfile={handleUpdateProfile}
                 onSignOut={handleSignOut}
             />
 
             <AnalyticsSection
-                tasksCompleted={28}
-                goalsCompleted={28}
-                onTimeTasks={13}
-                onTimeGoals={13}
+                tasksCompleted={tasksCompleted}
+                goalsCompleted={goalsCompleted}
+                onTimeTasks={onTimeTasks}
+                onTimeGoals={onTimeGoals}
             />
 
             <BottomNav />

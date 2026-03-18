@@ -3,14 +3,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
 from app.database import supabase
 
-# Import the routers
-# Only 3 routers now — goals.py handles plan generation + feedback + accept,
-# tasks.py handles status updates + expand + progress,
-# auth.py handles user creation
+# Import all routers
 from app.routers.goals import goal_router
 from app.routers.tasks import task_router
 from app.routers.auth import account_router
 from app.routers.schedule import schedule_router
+from app.routers.profile import profile_router  
 
 app = FastAPI(
     title="Procrastination Solver API",
@@ -38,30 +36,4 @@ app.include_router(goal_router, prefix="/api", tags=["Goals"])
 app.include_router(task_router, prefix="/api", tags=["Tasks"])
 app.include_router(account_router, prefix="/api", tags=["Profiles"])
 app.include_router(schedule_router, prefix="/api", tags=["Schedule"])
-
-@app.get("/")
-async def root():
-    return {
-        "message": "Procrastination Solver API 🚀",
-        "version": "1.0.0",
-        "environment": settings.ENVIRONMENT,
-        "docs": "/docs"
-    }
-
-@app.get("/api/test/supabase")
-async def test_supabase():
-    """Test Supabase connection"""
-    try:
-        # Try to query (table might not exist yet, that's ok)
-        result = supabase.table('goals').select("*", count='exact').execute()
-        return {
-            "status": "success",
-            "message": "Supabase connection working!",
-            "goals_count": result.count if result.count else 0
-        }
-    except Exception as e:
-        return {
-            "status": "connected",
-            "message": "Supabase connected (tables may not exist yet)",
-            "note": str(e)
-        }
+app.include_router(profile_router, prefix="/api", tags=["Profile"])  
