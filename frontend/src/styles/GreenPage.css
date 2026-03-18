@@ -20,7 +20,7 @@
     z-index: 0;
 }
 
-/* wave 1 — largest, slowest, the main body of white */
+/* wave 1 — largest, slowest */
 
 .green-wave-1 {
     height: 72%;
@@ -29,8 +29,6 @@
     border-radius: 48% 52% 0 0 / 26% 20% 0 0;
     animation: wave1Rise 22s ease-in-out infinite, wave1Morph 16s ease-in-out infinite;
 }
-
-/* wave 1 — big slow swell */
 
 @keyframes wave1Rise {
     0%, 100% { transform: translateY(0) rotate(0deg); }
@@ -48,7 +46,7 @@
     83%      { border-radius: 50% 50% 0 0 / 28% 16% 0 0; }
 }
 
-/* wave 2 — slightly smaller, a bit faster, semi-transparent */
+/* wave 2 — slightly smaller, a bit faster */
 
 .green-wave-2 {
     height: 68%;
@@ -60,7 +58,7 @@
     animation: wave2Rise 18s ease-in-out infinite, wave2Morph 13s ease-in-out infinite;
 }
 
-/* wave 3 — smaller crest, faster, more transparent */
+/* wave 3 — smaller crest, faster */
 
 .green-wave-3 {
     height: 64%;
@@ -72,7 +70,7 @@
     animation: wave3Rise 15s ease-in-out infinite, wave3Morph 11s ease-in-out infinite;
 }
 
-/* wave 4 — smallest ripple, fastest, subtle */
+/* wave 4 — smallest ripple, fastest */
 
 .green-wave-4 {
     height: 60%;
@@ -83,8 +81,6 @@
     border-radius: 55% 45% 0 0 / 18% 32% 0 0;
     animation: wave4Rise 12s ease-in-out infinite, wave4Morph 9s ease-in-out infinite;
 }
-
-/* wave 2 — medium swell, offset rhythm */
 
 @keyframes wave2Rise {
     0%, 100% { transform: translateY(0) rotate(0deg); }
@@ -103,8 +99,6 @@
     85%      { border-radius: 50% 50% 0 0 / 16% 30% 0 0; }
 }
 
-/* wave 3 — quicker, taller peaks */
-
 @keyframes wave3Rise {
     0%, 100% { transform: translateY(0) rotate(0deg); }
     18%      { transform: translateY(-28px) rotate(1deg); }
@@ -121,8 +115,6 @@
     67%      { border-radius: 48% 52% 0 0 / 36% 14% 0 0; }
     84%      { border-radius: 52% 48% 0 0 / 20% 30% 0 0; }
 }
-
-/* wave 4 — small fast ripple, highest relative peaks */
 
 @keyframes wave4Rise {
     0%, 100% { transform: translateY(0) rotate(0deg); }
