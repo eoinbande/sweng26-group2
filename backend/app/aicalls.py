@@ -49,20 +49,14 @@ def aiGenerate(userInput):
     input = userInput,
     text_format = schemas.AIGeneratePlanResponse
     )
-<<<<<<< HEAD
-    return (json.loads(response.output_text))
-    # return (json.loads(response.output_text), response.usage.total_tokens) / Updated format
-=======
     data = json.loads(response.output_text)
-    tokens = response.usage.total_tokens if response.usage else 0 #get the tokens per call
-    carbon = estimate_carbon_usage(tokens) #Call the function to estimate carbon usage
+    tokens = response.usage.total_tokens if response.usage else 0
+    carbon = estimate_carbon_usage(tokens)
 
-    data["tokens_used"] = tokens #show data of tokens used per cal
-    data["carbon_footprint"] = carbon #show data of carbon footprint per call
+    data["tokens_used"] = tokens
+    data["carbon_footprint"] = carbon
 
     return data
-
->>>>>>> origin/ai_carbon_footprints
 
 def aiFeedback(userInput, currentGoals):
     response = get_client().responses.parse(
@@ -90,10 +84,6 @@ def aiFeedback(userInput, currentGoals):
     input = userInput,
     text_format = schemas.AIFeedbackResponse
     )
-<<<<<<< HEAD
-    return json.loads(response.output_text)
-    # return (json.loads(response.output_text), response.usage.total_tokens) / Updated format
-=======
     data = json.loads(response.output_text)
 
     tokens = response.usage.total_tokens if response.usage else 0
@@ -103,7 +93,6 @@ def aiFeedback(userInput, currentGoals):
     data["carbon_footprint"] = carbon
 
     return data
->>>>>>> origin/ai_carbon_footprints
 
 def aiExpand(userInput, currentGoals):
     response = get_client().responses.parse(
@@ -122,10 +111,6 @@ def aiExpand(userInput, currentGoals):
     input = userInput,
     text_format = schemas.AIExpandTaskResponse
     )
-<<<<<<< HEAD
-    return json.loads(response.output_text)
-    # return (json.loads(response.output_text), response.usage.total_tokens) / Updated format
-=======
     data = json.loads(response.output_text)
 
     tokens = response.usage.total_tokens if response.usage else 0
@@ -137,20 +122,10 @@ def aiExpand(userInput, currentGoals):
     return data
 
 
-# Little bit of test code just for prompt engineering, feel free to ignore
-"""
-response1 = aiGenerate("I want to learn piano")
-print(json.dumps(response1) + "\n")
-response2 = aiFeedback("My fingers hurt", response1)
-print(json.dumps(response2) + "\n")
-response3 = aiExpand("Help me break down task 3", response2)
-print(json.dumps(response3) + "\n")
-"""
-
 #this function calculates the average carbon usage per call
 def estimate_carbon_usage(tokens):
-    #**Estimates based on average AI compute energy usage**
-    #Source -> ML CO2 Impact
+    #**estimates based on average AI compute energy usage**
+    #source -> ML CO2 Impact
     energy_per_token = 0.000002
     carbon_average = 0.4
 
@@ -158,4 +133,3 @@ def estimate_carbon_usage(tokens):
     total_carbon_per_call = energy * carbon_average #formula required to calculate total carbon
 
     return round(total_carbon_per_call, 6) #round until 6 decimals
->>>>>>> origin/ai_carbon_footprints
