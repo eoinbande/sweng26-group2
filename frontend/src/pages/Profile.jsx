@@ -80,6 +80,29 @@ const Profile = () => {
         }
     };
 
+    const handleUpdateProfile = async (newName) => {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        const trimmedName = newName ? newName.trim() : newName;
+
+        try {
+            if (trimmedName && trimmedName !== username) {
+                const { error } = await supabase
+                    .from('profiles')
+                    .update({ name: trimmedName })
+                    .eq('id', user.id);
+                
+                if (error) throw error;
+                setUsername(trimmedName);
+                alert('Username updated successfully!');
+            }
+        } catch (error) {
+            console.error('Error updating profile:', error);
+            alert('Failed to update profile. ' + error.message);
+        }
+    };
+
     if (!profileLoaded) {
         return <Loading />;
     }
@@ -92,7 +115,7 @@ const Profile = () => {
                 username={username}
                 email={email}
                 streakDays={streakDays}
-                onEdit={() => {}}
+                onUpdateProfile={handleUpdateProfile}
                 onSignOut={handleSignOut}
             />
 
