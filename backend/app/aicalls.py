@@ -49,8 +49,14 @@ def aiGenerate(userInput):
     input = userInput,
     text_format = schemas.AIGeneratePlanResponse
     )
-    return (json.loads(response.output_text))
-    # return (json.loads(response.output_text), response.usage.total_tokens) / Updated format
+    data = json.loads(response.output_text)
+    tokens = response.usage.total_tokens if response.usage else 0
+    carbon = estimate_carbon_usage(tokens)
+
+    data["tokens_used"] = tokens
+    data["carbon_footprint"] = carbon
+
+    return data
 
 def aiFeedback(userInput, currentGoals):
     response = get_client().responses.parse(
@@ -78,8 +84,15 @@ def aiFeedback(userInput, currentGoals):
     input = userInput,
     text_format = schemas.AIFeedbackResponse
     )
-    return json.loads(response.output_text)
-    # return (json.loads(response.output_text), response.usage.total_tokens) / Updated format
+    data = json.loads(response.output_text)
+
+    tokens = response.usage.total_tokens if response.usage else 0
+    carbon = estimate_carbon_usage(tokens)
+
+    data["tokens_used"] = tokens
+    data["carbon_footprint"] = carbon
+
+    return data
 
 def aiExpand(userInput, currentGoals):
     response = get_client().responses.parse(
@@ -98,5 +111,25 @@ def aiExpand(userInput, currentGoals):
     input = userInput,
     text_format = schemas.AIExpandTaskResponse
     )
-    return json.loads(response.output_text)
-    # return (json.loads(response.output_text), response.usage.total_tokens) / Updated format
+    data = json.loads(response.output_text)
+
+    tokens = response.usage.total_tokens if response.usage else 0
+    carbon = estimate_carbon_usage(tokens)
+
+    data["tokens_used"] = tokens
+    data["carbon_footprint"] = carbon
+
+    return data
+
+
+#this function calculates the average carbon usage per call
+def estimate_carbon_usage(tokens):
+    #**estimates based on average AI compute energy usage**
+    #source -> ML CO2 Impact
+    energy_per_token = 0.000002
+    carbon_average = 0.4
+
+    energy = tokens * energy_per_token #energy used per call
+    total_carbon_per_call = energy * carbon_average #formula required to calculate total carbon
+
+    return round(total_carbon_per_call, 6) #round until 6 decimals

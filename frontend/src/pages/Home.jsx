@@ -48,7 +48,12 @@ function Home() {
     };
 
     if (!isAppReady) {
-        return <Loading onLoadingComplete={handleLoadingComplete} />;
+        return (
+        <div className="home-page">
+            <Loading onLoadingComplete={handleLoadingComplete} />
+            <BottomNav />
+        </div>
+        );
     }
 
     return (
