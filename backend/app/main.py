@@ -3,14 +3,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
 from app.database import supabase
 
-# Import the routers
-# Only 3 routers now — goals.py handles plan generation + feedback + accept,
-# tasks.py handles status updates + expand + progress,
-# auth.py handles user creation
+# Import all routers
 from app.routers.goals import goal_router
 from app.routers.tasks import task_router
 from app.routers.auth import account_router
 from app.routers.schedule import schedule_router
+from app.routers.profile import profile_router  
 from app.routers.green import green_router
 
 app = FastAPI(
@@ -39,6 +37,7 @@ app.include_router(goal_router, prefix="/api", tags=["Goals"])
 app.include_router(task_router, prefix="/api", tags=["Tasks"])
 app.include_router(account_router, prefix="/api", tags=["Profiles"])
 app.include_router(schedule_router, prefix="/api", tags=["Schedule"])
+app.include_router(profile_router, prefix="/api", tags=["Profile"])  
 app.include_router(green_router, prefix= "/api", tags = ["Green Computing"])
 
 @app.get("/")

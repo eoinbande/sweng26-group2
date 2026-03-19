@@ -2,6 +2,7 @@ stages:
   - lint
   - test
   - build
+  - deploy
 
 # ──────────────────────────────────────────────
 # Frontend jobs
@@ -91,3 +92,27 @@ backend-build:
   only:
     - branches
     - merge_requests
+
+
+# ──────────────────────────────────────────────
+# Deploy
+# ──────────────────────────────────────────────
+
+# Mirror to GitHub → triggers Vercel + Render auto-deploy
+mirror-to-github:
+  stage: deploy
+  image: alpine:latest
+  tags:
+    - docker
+  before_script:
+    - apk add --no-cache git openssh-client
+    - mkdir -p ~/.ssh
+    - echo "$GITHUB_SSH_KEY" > ~/.ssh/id_ed25519
+    - chmod 600 ~/.ssh/id_ed25519
+    - ssh-keyscan github.com >> ~/.ssh/known_hosts
+  script:
+    - git remote add github git@github.com:eoinbande/sweng26-group2.git || true
+    - git push github HEAD:main --force
+  only:
+    - main
+  when: on_success
