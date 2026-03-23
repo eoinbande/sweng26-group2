@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from app.database import supabase
-from datetime import datetime
+from datetime import datetime, timezone
 
 green_router = APIRouter()
 
@@ -88,6 +88,7 @@ def get_monthly_green_stats(user_id: str):
 @green_router.post("/green/offset/pay")
 def pay_offset(user_id: str, month: str):
 
+    current_time = datetime.now(timezone.utc)
     response = supabase.table("ai_usage_logs")\
     .select("*")\
     .eq("user_id", user_id)\
@@ -108,7 +109,8 @@ def pay_offset(user_id: str, month: str):
         "user_id": user_id,
         "carbon_offset": round(total_carbon, 6),
         "amount_paid": round(offset_cost, 6),
-        "timestamp": str(datetime.utcnow())
+        "timestamp": current_time.isoformat(),
+        "month": current_time.strftime("%Y-%m") #not sure is this is right, check this!
     }).execute()
 
     return {
