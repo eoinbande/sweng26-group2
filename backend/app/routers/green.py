@@ -116,3 +116,62 @@ def pay_offset(user_id: str, month: str):
         "carbon_offset": round(total_carbon, 6),
         "amount_paid": round(offset_cost, 6)
     }
+
+
+@green_router.get("/green/offset/{user_id}")
+def get_carbon_offset(user_id: str):
+
+    logs_res = supabase.table("ai_usage_logs")\
+    .select("*")\
+    .eq("user_id", user_id)\
+    .execute()
+
+    logs = logs_res.data or []
+
+    offsets_res = supabase.table("carbon_offsets")\
+    .select("*")\
+    .eq("user_id", user_id)\
+    .execute()
+
+    offsets = offsets_res.data or []
+
+    monthly_data = {}
+
+    for log in logs:
+        month = str(log["timestamp"])[:7]
+
+        if month not in monthly_data:
+            monthly_data[month] = {
+                "generated": 0,
+                "paid": 0
+            }
+        monthly_data[month]["generated"] += log["carbon_footprint"]
+
+    for offset in offsets:
+        month = offset["month"]
+
+        if month not in monthly_data:
+            monthly_data[month] = {
+                "generated": 0,
+                "paid": 0
+            }
+        
+        monthly_data[month]["paid"] += offset["carbon_offset"]
+    
+    result = {}
+
+    for month in monthly_data:
+        generated = monthly_data[month]["generated"]
+        paid = monthly_data[month]["paid"]
+
+        remaining = max(generated - paid, 0)
+        cost = remaining * 0.01
+
+        result[month] = {
+            "generated_carbon": round(generated, 6),
+            "offset_paid": round(paid, 6),
+            "remaining_carbon": round(remaining, 6),
+            "offset_cost_eur": round(cost, 6)
+        }
+    
+    return result
