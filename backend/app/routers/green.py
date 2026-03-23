@@ -110,7 +110,7 @@ def pay_offset(user_id: str, month: str):
         "carbon_offset": round(total_carbon, 6),
         "amount_paid": round(offset_cost, 6),
         "timestamp": current_time.isoformat(),
-        "month": current_time.strftime("%Y-%m") #not sure is this is right, check this!
+        "month": month #not sure is this is right, check this!
     }).execute()
 
     return {
