@@ -105,7 +105,7 @@ def pay_offset(user_id: str, month: str):
     offset_cost = total_carbon * 0.01  #an average of carbon offset pricing (1000 kg of CO2 is 10 euro)
 
     supabase.table("carbon_offsets").insert({
-        "user_id: user_id",
+        "user_id": user_id,
         "carbon_offset": round(total_carbon, 6),
         "amount_paid": round(offset_cost, 6),
         "timestamp": str(datetime.utcnow())
