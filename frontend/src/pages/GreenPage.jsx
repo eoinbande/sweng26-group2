@@ -22,10 +22,11 @@ const CarbonSparkline = ({ data, labels, loaded }) => {
     const padding = 8;
     const usableH = height - padding * 2;
     const usableW = width - padding * 2;
+    const pointCount = data.length > 1 ? data.length - 1 : 1;
 
-    // build polyline points
+    // build polyline points — missing months sit at the baseline (y=0 value)
     const points = data.map((val, i) => {
-        const x = padding + (i / (data.length - 1)) * usableW;
+        const x = padding + (i / pointCount) * usableW;
         const y = padding + usableH - ((val - min) / range) * usableH;
         return `${x},${y}`;
     }).join(' ');
@@ -33,7 +34,7 @@ const CarbonSparkline = ({ data, labels, loaded }) => {
     // build area fill path (closed shape under the line)
     const areaPath = `M ${padding},${padding + usableH} ` +
         data.map((val, i) => {
-            const x = padding + (i / (data.length - 1)) * usableW;
+            const x = padding + (i / pointCount) * usableW;
             const y = padding + usableH - ((val - min) / range) * usableH;
             return `L ${x},${y}`;
         }).join(' ') +
@@ -67,7 +68,7 @@ const CarbonSparkline = ({ data, labels, loaded }) => {
                 />
                 {/* dots */}
                 {data.map((val, i) => {
-                    const x = padding + (i / (data.length - 1)) * usableW;
+                    const x = padding + (i / pointCount) * usableW;
                     const y = padding + usableH - ((val - min) / range) * usableH;
                     return (
                         <circle
@@ -116,13 +117,22 @@ function GreenPage() {
                 const stats = await statsRes.json();
                 const monthly = await monthlyRes.json();
 
-                // sort months chronologically and extract carbon values + labels
-                const sortedMonths = Object.keys(monthly).sort();
-                const carbonTrend = sortedMonths.map(m => monthly[m].carbon_footprint);
-                const trendLabels = sortedMonths.map(m => {
-                    const [, month] = m.split('-');
-                    return new Date(2000, parseInt(month) - 1).toLocaleString('default', { month: 'short' });
+                // build all 12 months of the current year, fill missing with 0
+                const now = new Date();
+                const year = now.getFullYear();
+                const allMonths = Array.from({ length: 12 }, (_, i) => {
+                    const key = `${year}-${String(i + 1).padStart(2, '0')}`;
+                    return {
+                        key,
+                        label: new Date(year, i).toLocaleString('default', { month: 'short' }),
+                        carbon: monthly[key]?.carbon_footprint ?? 0,
+                    };
                 });
+                const carbonTrend = allMonths.map(m => m.carbon);
+                const trendLabels = allMonths.map(m => m.label);
+
+                // sort months that have data for % change calculation
+                const sortedMonths = Object.keys(monthly).sort();
 
                 // calculate month-over-month co2 % change
                 let co2ChangePct = 0;

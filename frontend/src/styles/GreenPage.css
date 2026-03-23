@@ -23,7 +23,7 @@
 /* wave 1 — largest, slowest */
 
 .green-wave-1 {
-    height: 72%;
+    height: 78%;
     bottom: -4%;
     background: var(--bg-color);
     border-radius: 48% 52% 0 0 / 26% 20% 0 0;
@@ -32,9 +32,9 @@
 
 @keyframes wave1Rise {
     0%, 100% { transform: translateY(0) rotate(0deg); }
-    25%      { transform: translateY(-20px) rotate(0.7deg); }
-    50%      { transform: translateY(10px) rotate(-0.4deg); }
-    75%      { transform: translateY(-14px) rotate(0.5deg); }
+    25%      { transform: translateY(-6px) rotate(0.7deg); }
+    50%      { transform: translateY(4px) rotate(-0.4deg); }
+    75%      { transform: translateY(-5px) rotate(0.5deg); }
 }
 
 @keyframes wave1Morph {
@@ -49,7 +49,7 @@
 /* wave 2 — slightly smaller, a bit faster */
 
 .green-wave-2 {
-    height: 68%;
+    height: 76%;
     bottom: -3%;
     left: -15%;
     width: 135%;
@@ -61,7 +61,7 @@
 /* wave 3 — smaller crest, faster */
 
 .green-wave-3 {
-    height: 64%;
+    height: 74%;
     bottom: -2%;
     left: -25%;
     width: 145%;
@@ -73,7 +73,7 @@
 /* wave 4 — smallest ripple, fastest */
 
 .green-wave-4 {
-    height: 60%;
+    height: 72%;
     bottom: -1%;
     left: -10%;
     width: 130%;
@@ -84,9 +84,9 @@
 
 @keyframes wave2Rise {
     0%, 100% { transform: translateY(0) rotate(0deg); }
-    20%      { transform: translateY(16px) rotate(-0.8deg); }
-    45%      { transform: translateY(-24px) rotate(0.6deg); }
-    70%      { transform: translateY(12px) rotate(-0.5deg); }
+    20%      { transform: translateY(5px) rotate(-0.8deg); }
+    45%      { transform: translateY(-6px) rotate(0.6deg); }
+    70%      { transform: translateY(4px) rotate(-0.5deg); }
 }
 
 @keyframes wave2Morph {
@@ -101,10 +101,10 @@
 
 @keyframes wave3Rise {
     0%, 100% { transform: translateY(0) rotate(0deg); }
-    18%      { transform: translateY(-28px) rotate(1deg); }
-    40%      { transform: translateY(14px) rotate(-0.7deg); }
-    60%      { transform: translateY(-18px) rotate(0.5deg); }
-    82%      { transform: translateY(10px) rotate(-0.6deg); }
+    18%      { transform: translateY(-5px) rotate(1deg); }
+    40%      { transform: translateY(4px) rotate(-0.7deg); }
+    60%      { transform: translateY(-6px) rotate(0.5deg); }
+    82%      { transform: translateY(3px) rotate(-0.6deg); }
 }
 
 @keyframes wave3Morph {
@@ -118,10 +118,10 @@
 
 @keyframes wave4Rise {
     0%, 100% { transform: translateY(0) rotate(0deg); }
-    22%      { transform: translateY(20px) rotate(-1.2deg); }
-    44%      { transform: translateY(-16px) rotate(0.8deg); }
-    66%      { transform: translateY(24px) rotate(-0.6deg); }
-    88%      { transform: translateY(-10px) rotate(0.9deg); }
+    22%      { transform: translateY(5px) rotate(-1.2deg); }
+    44%      { transform: translateY(-4px) rotate(0.8deg); }
+    66%      { transform: translateY(6px) rotate(-0.6deg); }
+    88%      { transform: translateY(-3px) rotate(0.9deg); }
 }
 
 @keyframes wave4Morph {
