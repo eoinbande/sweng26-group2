@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 from app.database import supabase
+from datetime import datetime
 
 green_router = APIRouter()
 
@@ -82,3 +83,36 @@ def get_monthly_green_stats(user_id: str):
         )
 
     return monthly_stats
+
+
+@green_router.post("/green/offset/pay")
+def pay_offset(user_id: str, month: str):
+
+    response = supabase.table("ai_usage_logs")\
+    .select("*")\
+    .eq("user_id", user_id)\
+    .execute()
+
+    logs = response.data or []
+
+    monthly_logs = [
+        log for log in logs
+        if str(log["timestamp"])[:7] == month
+    ]
+
+    total_carbon = sum(log["carbon_footprint"] for log in monthly_logs)
+
+    offset_cost = total_carbon * 0.01  #an average of carbon offset pricing (1000 kg of CO2 is 10 euro)
+
+    supabase.table("carbon_offsets").insert({
+        "user_id: user_id",
+        "carbon_offset": round(total_carbon, 6),
+        "amount_paid": round(offset_cost, 6),
+        "timestamp": str(datetime.utcnow())
+    }).execute()
+
+    return {
+        "message": "Offset successfull",
+        "carbon_offset": round(total_carbon, 6),
+        "amount_paid": round(offset_cost, 6)
+    }
