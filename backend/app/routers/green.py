@@ -168,10 +168,10 @@ def get_carbon_offset(user_id: str):
         cost = remaining * 0.01
 
         result[month] = {
-            "generated_carbon": round(generated, 6),
-            "offset_paid": round(paid, 6),
-            "remaining_carbon": round(remaining, 6),
-            "offset_cost_eur": round(cost, 6)
+            "generated_carbon": round(generated, 6), #total AI impact
+            "offset_paid": round(paid, 6), #what user already paid
+            "remaining_carbon": round(remaining, 6), #what still need to offset
+            "offset_cost_eur": round(cost, 6) #how much to pay
         }
     
     return result
