@@ -11,7 +11,7 @@ const CARD_COLORS = [
     'var(--yellow-soft)'
 ];
 
-const GoalsGrid = () => {
+const GoalsGrid = ({ visible = true }) => {
     const navigate = useNavigate();
     const { user } = useUser();
     const [goals, setGoals] = useState([]);
@@ -51,7 +51,7 @@ const GoalsGrid = () => {
     }, [user]);
 
     return (
-        <div className="home-goals-grid">
+        <div className={`home-goals-grid${visible ? ' home-goals-grid--visible' : ''}`}>
             <h4>{currentMonth}'s goals</h4>
 
             <div className="goals-scroll">

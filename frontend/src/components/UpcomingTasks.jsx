@@ -8,7 +8,7 @@ import '../index.css';
 
 dayjs.extend(relativeTime);
 
-const UpcomingTasks = () => {
+const UpcomingTasks = ({ onReady }) => {
     const navigate = useNavigate();
     const { user } = useUser();
     const scrollRef = useRef(null);
@@ -94,13 +94,13 @@ const UpcomingTasks = () => {
 
     // step 1: expand the container after tasks load
     // step 2: fade in items after expansion finishes
+    // step 3: notify parent the full sequence is done
     useEffect(() => {
         if (!loading) {
-            // small delay so the browser paints the compact state first
             const expandTimer = requestAnimationFrame(() => setExpanded(true));
-            // show items after the expand transition (0.45s)
-            const itemsTimer = setTimeout(() => setShowItems(true), 500);
-            return () => { cancelAnimationFrame(expandTimer); clearTimeout(itemsTimer); };
+            const itemsTimer = setTimeout(() => setShowItems(true), 300);
+            const readyTimer = setTimeout(() => onReady && onReady(), 450);
+            return () => { cancelAnimationFrame(expandTimer); clearTimeout(itemsTimer); clearTimeout(readyTimer); };
         }
     }, [loading]);
 

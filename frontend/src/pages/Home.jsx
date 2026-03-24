@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import Header from '../components/Header';
 import CalendarStrip from '../components/CalendarStrip';
@@ -19,14 +19,15 @@ function Home() {
     }, []);
 
     const { userName } = useUser();
+    const [tasksReady, setTasksReady] = useState(false);
 
     return (
         <div className="home-page">
             <Header userName={userName || 'Guest'} />
             <CalendarStrip />
             <CreateGoalCard />
-            <UpcomingTasks />
-            <GoalsGrid />
+            <UpcomingTasks onReady={() => setTasksReady(true)} />
+            <GoalsGrid visible={tasksReady} />
             <BottomNav />
         </div>
     );
