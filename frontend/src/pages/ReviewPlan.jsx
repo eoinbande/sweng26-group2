@@ -6,12 +6,14 @@ import { TaskCard } from '../components/TaskCard';
 import { InputBar } from '../components/InputBar';
 import LoadingOverlay from '../components/LoadingOverlay';
 import { isDemoMode } from '../supabase_client';
+import { useGoals } from '../contexts/GoalsContext';
 import '../styles/CreateGoal.css';
 import '../index.css';
 
 function ReviewPlan() {
     const navigate = useNavigate();
     const location = useLocation();
+    const { addGoal } = useGoals();
 
     // set body background so color bleeds behind status bar
     useEffect(() => {
@@ -168,19 +170,25 @@ function ReviewPlan() {
             });
 
             const data = await res.json();
-            console.log('Goal saved:', data);
 
             if (!res.ok) {
-                console.error('Save error:', data);
+                console.error('save error:', data);
                 alert('Failed to save goal.');
                 setSaving(false);
                 return;
             }
-            
-                // Came from GoalDetail or Review (aka iterative feedback) → go back to GoalDetail;
-                navigate(`/goal/${goalId}`, {
-                    state: { goalId }
-                });
+
+            // add to goals cache so other pages have it instantly
+            addGoal({
+                id: goalId,
+                title: previewData.title || location.state?.goalTitle,
+                due_date: dateToSend !== 'AI_DECIDE' ? dateToSend : data.due_date,
+                description: previewData.description || '',
+            });
+
+            navigate(`/goal/${goalId}`, {
+                state: { goalId }
+            });
 
         } catch (err) {
             console.error('Network error saving goal:', err);

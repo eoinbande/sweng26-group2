@@ -10,11 +10,13 @@ import FeedbackPopUp from '../components/FeedbackPopUp';
 import Congratulations from '../components/Congratulations';
 import '../styles/GoalDetail.css';
 import { supabase } from '../supabase_client';
+import { useGoals } from '../contexts/GoalsContext';
 
 const GoalDetail = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { id: paramId } = useParams();
+    const { deleteGoal: removeGoalFromCache, updateGoalProgress } = useGoals();
 
     // set body background so color bleeds behind status bar
     useEffect(() => {
@@ -206,12 +208,15 @@ const [closingDelete, setClosingDelete] = useState(false);
                 return;
             }
 
-            // Fetch progress after successful update
+            // fetch progress after successful update
             if (goalId) {
                 try {
                     const progRes = await fetch(`${import.meta.env.VITE_API_URL}/tasks/${goalId}/progress`, { cache: 'no-store' });
                     const progData = await progRes.json();
-                    if (progData) setProgress(progData.percentage);
+                    if (progData) {
+                        setProgress(progData.percentage);
+                        updateGoalProgress(goalId, progData.percentage);
+                    }
                 } catch (e) { console.error("Failed to fetch progress:", e); }
             }
         } catch (e) {
@@ -373,6 +378,7 @@ const [closingDelete, setClosingDelete] = useState(false);
             });
 
             if (response.ok) {
+                removeGoalFromCache(goalId);
                 triggerToast("Goal deleted successfully");
                 setTimeout(() => navigate('/goals'), 1500);
             } else {

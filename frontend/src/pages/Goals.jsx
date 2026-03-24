@@ -5,22 +5,21 @@ import GoalListCard from '../components/GoalListCard';
 import BottomNav from '../components/BottomNav';
 import Loading from '../components/Loading';
 import { useUser } from '../contexts/UserContext';
-import { supabase, isDemoMode } from '../supabase_client';
+import { useGoals } from '../contexts/GoalsContext';
 import '../styles/Goals.css';
 import CategoryIcon from '../components/CategoryIcon';
-
-const COLOR_SCHEMES_LIST = ['blue', 'yellow', 'green', 'pink'];
-
-const MOCK_GOALS = [
-    { id: 1, title: 'Learn Piano', description: 'Master basic chords and scales', date: '15 Mar', progress: 40, colorScheme: 'blue' },
-    { id: 2, title: 'Get fit for summer', description: 'Exercise 4x a week', date: '1 Jun', progress: 20, colorScheme: 'yellow' },
-    { id: 3, title: 'Ace Probability I', description: 'Study all chapters and past papers', date: '20 Apr', progress: 65, colorScheme: 'orange' },
-    { id: 4, title: 'Build portfolio site', description: 'Design and deploy personal website', date: '10 Mar', progress: 10, colorScheme: 'pink' },
-];
 
 const Goals = () => {
     const location = useLocation();
     const { user } = useUser();
+    const {
+        goals,
+        categories,
+        loading,
+        updateGoalCategory,
+        updateGoalProgress,
+        addCategory,
+    } = useGoals();
 
     // set body background so color bleeds behind status bar
     useEffect(() => {
@@ -29,12 +28,8 @@ const Goals = () => {
     }, []);
 
     const [showBottomFade, setShowBottomFade] = useState(true);
-    const [goals, setGoals] = useState([]);
-    const [loading, setLoading] = useState(true);
     const scrollRef = useRef(null);
-    const [categories, setCategories] = useState([]);
     const [selectedCategories, setSelectedCategories] = useState([]);
-
 
     const handleScroll = useCallback(() => {
         const el = scrollRef.current;
@@ -43,96 +38,39 @@ const Goals = () => {
         setShowBottomFade(!isAtBottom);
     }, []);
 
-    // fetch goals from backend on mount
-    useEffect(() => {
-        const fetchGoals = async () => {
-            if (isDemoMode) {
-                setGoals(MOCK_GOALS);
-                setLoading(false);
-                return;
-            }
-
-            if (!user) {
-                setLoading(false);
-                return;
-            }
-
-            try {
-                const res = await fetch(`${import.meta.env.VITE_API_URL}/goals/${user.id}`, { cache: 'no-store' });
-                const data = await res.json();
-
-                const mapped = await Promise.all((data.goals || []).map(async (goal, index) => {
-                    let goalData = {};
-                    try {
-                        goalData = typeof goal.goal_data === 'string'
-                            ? JSON.parse(goal.goal_data)
-                            : goal.goal_data || {};
-                    } catch (e) { goalData = {}; }
-
-                    let progress = 0;
-                    try {
-                        const pRes = await fetch(`${import.meta.env.VITE_API_URL}/tasks/${goal.id}/progress`, { cache: 'no-store' });
-                        const pData = await pRes.json();
-                        if (pData) progress = pData.percentage;
-                    } catch (e) {
-                        console.error("Failed to fetch progress for goal " + goal.id);
-                    }
-
-                    return {
-                        id: goal.id,
-                        title: goal.title,
-                        category: goal.category|| null, 
-                        description: goal.description || goalData.description || '',
-                        date: (goal.due_date || goalData.goal_due_date)
-                            ? new Date(goal.due_date || goalData.goal_due_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
-                            : '',
-                        progress: progress,
-                        colorScheme: COLOR_SCHEMES_LIST[index % COLOR_SCHEMES_LIST.length],
-                    };
-                }));
-
-                setGoals(mapped);
-                // Fetch categories
-                const catRes = await fetch(`${import.meta.env.VITE_API_URL}/categories/${user.id}`);
-                const catData = await catRes.json();
-                setCategories(catData.categories.map(c => c.name)); // backend returns objects with a .name field
-
-            } catch (err) {
-                console.error('Failed to fetch goals, using mock data:', err);
-                setGoals(MOCK_GOALS);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchGoals();
-    }, [user]);
-
-    /* ---- update progress when returning from GoalDetail ---- */
+    // update progress when returning from GoalDetail
     useEffect(() => {
         const updatedId = location.state?.updatedGoalId;
         const updatedProgress = location.state?.updatedProgress;
         if (updatedId != null && updatedProgress != null) {
-            setGoals(prev => prev.map(g =>
-                g.id === updatedId ? { ...g, progress: updatedProgress } : g
-            ));
+            updateGoalProgress(updatedId, updatedProgress);
         }
-    }, [location.state]);
+    }, [location.state, updateGoalProgress]);
 
-     const handleSelectionChange = (updated) => {
-    setSelectedCategories(updated);
+    const handleSelectionChange = (updated) => {
+        setSelectedCategories(updated);
     };
+
+    const baseUrl = import.meta.env.VITE_API_URL;
 
     const handleNewCategory = async (name) => {
-    if (!name.trim() || !user) return;
-    await fetch(`${import.meta.env.VITE_API_URL}/categories`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: user.id, name: name.trim() })
-    });
-    setCategories(prev => [...prev, name.trim()]); // still update state so UI reacts instantly
+        if (!name.trim() || !user) return;
+        await fetch(`${baseUrl}/categories`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: user.id, name: name.trim() })
+        });
+        addCategory(name.trim());
     };
 
+    const handleAssignCategory = async (goalId, cat) => {
+        await fetch(`${baseUrl}/goals/${goalId}/category`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ category: cat })
+        });
+        updateGoalCategory(goalId, cat);
+    };
 
     if (loading) {
         return (
@@ -143,9 +81,15 @@ const Goals = () => {
         );
     }
 
+    // map context goals to the shape GoalListCard expects
+    const displayGoals = goals.map(g => ({
+        ...g,
+        date: g.dateFormatted,
+    }));
+
     const filteredGoals = selectedCategories.length === 0
-    ? goals
-    : goals.filter(g => selectedCategories.includes(g.category));
+        ? displayGoals
+        : displayGoals.filter(g => selectedCategories.includes(g.category));
 
     const activeGoals = filteredGoals.filter(g => g.progress < 100);
     const completedGoals = filteredGoals.filter(g => g.progress === 100);
@@ -178,14 +122,7 @@ const Goals = () => {
                             goal={goal}
                             categories={categories}
                             onNewCategory={handleNewCategory}
-                            onAssignCategory={async (goalId, cat) => {
-                                await fetch(`${import.meta.env.VITE_API_URL}/goals/${goalId}/category`, {
-                                    method: 'PATCH',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ category: cat })
-                                });
-                                setGoals(prev => prev.map(g => g.id === goalId ? {...g, category: cat} : g));
-                            }}
+                            onAssignCategory={handleAssignCategory}
                         />
                     ))}
                 </div>
@@ -205,14 +142,7 @@ const Goals = () => {
                             completed
                             categories={categories}
                             onNewCategory={handleNewCategory}
-                            onAssignCategory={async (goalId, cat) => {
-                                await fetch(`${import.meta.env.VITE_API_URL}/goals/${goalId}/category`, {
-                                    method: 'PATCH',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ category: cat })
-                                });
-                                setGoals(prev => prev.map(g => g.id === goalId ? {...g, category: cat} : g));
-                            }}
+                            onAssignCategory={handleAssignCategory}
                         />
                     ))}
                 </div>
