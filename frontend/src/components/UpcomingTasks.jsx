@@ -160,10 +160,10 @@ const UpcomingTasks = () => {
                             }}
                         >
                             {!loading && tasks.length === 0 ? (
-                                <div style={{ 
-                                    height: '100%', 
-                                    display: 'flex', 
-                                    alignItems: 'center', 
+                                <div style={{
+                                    height: '100%',
+                                    display: 'flex',
+                                    alignItems: 'center',
                                     justifyContent: 'center',
                                     color: 'var(--text-secondary)',
                                     fontFamily: 'var(--font-sans)',
@@ -175,7 +175,7 @@ const UpcomingTasks = () => {
                             ) : (
                                 <ul style={{ listStyle: 'none' }}>
                                     {tasks.map((task, index) => (
-                                        <li key={index} className="task-item"
+                                        <li key={index} className="task-item task-item-animate"
                                             onClick={() => task.goalId && navigate(`/goal/${task.goalId}`, {
                                                 state: {
                                                     goalId: task.goalId,
@@ -189,7 +189,8 @@ const UpcomingTasks = () => {
                                                 display: 'flex',
                                                 alignItems: 'center',
                                                 justifyContent: 'space-between',
-                                                cursor: 'pointer'
+                                                cursor: 'pointer',
+                                                animationDelay: `${0.3 + index * 0.07}s`,
                                             }}>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                                 {/* arrow icon with hover effect */}
