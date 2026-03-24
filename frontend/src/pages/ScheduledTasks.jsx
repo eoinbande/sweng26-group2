@@ -7,6 +7,7 @@ import UpcomingTimeline from '../components/UpcomingTimeline';
 import UpcomingTimelineTasks from '../components/UpcomingTimelineTasks';
 import BottomNav from '../components/BottomNav';
 import { useUser } from '../contexts/UserContext';
+import { useSchedule } from '../contexts/ScheduleContext';
 import '../styles/ScheduledTasks.css';
 import '../index.css';
 
@@ -40,25 +41,6 @@ function buildTaskRanges(tasks, year, month) {
     return ranges;
 }
 
-// maps backend goal data → shape expected by UpcomingTimeline
-const mapGoalToTimeline = (g) => ({
-    id: g.goal_id,
-    goalId: g.goal_id,
-    title: g.title,
-    description: g.description || `${g.task_count} task${g.task_count === 1 ? '' : 's'}`,
-    dueDate: g.goal_due_date,
-});
-
-// maps backend task data → shape expected by UpcomingTimeline
-const mapTaskToTimeline = (t) => ({
-    id: t.task_id || t.ai_id,
-    goalId: t.goal_id,
-    title: t.description,
-    description: t.goal_title,
-    dueDate: t.due_date,
-    locked: t.status === 'not_started' && t.order > 1,
-});
-
 // maps backend task data → shape expected by UpcomingTimelineTasks
 const mapTaskToDaily = (t) => ({
     id: t.task_id || t.ai_id,
@@ -80,6 +62,7 @@ function ScheduledTasks() {
     const navigate = useNavigate();
     const location = useLocation();
     const { user } = useUser();
+    const { upcomingTasks, upcomingGoals, loaded: scheduleLoaded } = useSchedule();
 
     // set body background so color bleeds behind status bar
     useEffect(() => {
@@ -93,11 +76,8 @@ function ScheduledTasks() {
     const [selectedDate, setSelectedDate] = useState(
         restored?.selectedDate ? dayjs(restored.selectedDate) : null,
     );
-    const [upcomingTasks, setUpcomingTasks] = useState([]);
-    const [upcomingGoals, setUpcomingGoals] = useState([]);
     const [dailyTasks, setDailyTasks] = useState([]);
     const [dailyLoaded, setDailyLoaded] = useState(false);
-    const [scheduleLoaded, setScheduleLoaded] = useState(false);
     const calYear = now.getFullYear();
     const taskRanges = useMemo(
         () => buildTaskRanges(upcomingTasks, calYear, calMonth),
@@ -106,33 +86,6 @@ function ScheduledTasks() {
     const touchStartX = useRef(0);
     const calTouchStartX = useRef(0);
     const calendarRef = useRef(null);
-
-    // fetch upcoming tasks and goals from backend
-    useEffect(() => {
-        if (!user) return;
-        let cancelled = false;
-        (async () => {
-            try {
-                const [tasksRes, goalsRes] = await Promise.all([
-                    fetch(`${import.meta.env.VITE_API_URL}/schedule/${user.id}/upcoming-tasks`),
-                    fetch(`${import.meta.env.VITE_API_URL}/schedule/${user.id}/upcoming-goals`),
-                ]);
-                if (!cancelled && tasksRes.ok) {
-                    const json = await tasksRes.json();
-                    setUpcomingTasks(json.tasks.map(mapTaskToTimeline));
-                }
-                if (!cancelled && goalsRes.ok) {
-                    const json = await goalsRes.json();
-                    setUpcomingGoals(json.goals.map(mapGoalToTimeline));
-                }
-            } catch (err) {
-                console.error('failed to fetch schedule data:', err);
-            } finally {
-                if (!cancelled) setScheduleLoaded(true);
-            }
-        })();
-        return () => { cancelled = true; };
-    }, [user]);
 
     // fetch tasks for selected date
     useEffect(() => {

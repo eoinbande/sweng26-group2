@@ -22,6 +22,7 @@ function App() {
     <Router>
       <UserProvider>
       <GoalsProvider>
+      <ScheduleProvider>
       <Routes>
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/home" element={<Home />} />
@@ -37,6 +38,7 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/greenpage" element={<GreenPage />} />
       </Routes>
+      </ScheduleProvider>
       </GoalsProvider>
       </UserProvider>
     </Router>
