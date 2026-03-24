@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProfileHeader from '../components/ProfileHeader';
 import AccountCard from '../components/AccountCard';
 import AnalyticsSection from '../components/AnalyticsSection';
 import BottomNav from '../components/BottomNav';
-import Loading from '../components/Loading';
 import { supabase } from '../supabase_client';
 import { Check } from 'lucide-react';
 import '../styles/Profile.css';
@@ -27,6 +26,25 @@ const Profile = () => {
     const [onTimeGoals, setOnTimeGoals] = useState(0);
     const [profileLoaded, setProfileLoaded] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
+    const [pinkHeight, setPinkHeight] = useState(0);
+    const topSectionRef = useRef(null);
+    const cardRef = useRef(null);
+
+    // measure pink bg height: from top of section to vertical center of account card
+    const measurePink = useCallback(() => {
+        if (topSectionRef.current && cardRef.current) {
+            const sectionTop = topSectionRef.current.getBoundingClientRect().top;
+            const cardRect = cardRef.current.getBoundingClientRect();
+            const cardMid = cardRect.top + cardRect.height / 2;
+            setPinkHeight(cardMid - sectionTop);
+        }
+    }, []);
+
+    useEffect(() => {
+        measurePink();
+        window.addEventListener('resize', measurePink);
+        return () => window.removeEventListener('resize', measurePink);
+    }, [measurePink, username, profileLoaded]);
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -99,7 +117,7 @@ const Profile = () => {
                     .from('profiles')
                     .update({ name: newName })
                     .eq('id', user.id);
-                
+
                 if (error) throw error;
                 setUsername(newName);
                 setShowSuccess(true);
@@ -110,10 +128,6 @@ const Profile = () => {
             alert('Failed to update profile. ' + error.message);
         }
     };
-
-    if (!profileLoaded) {
-        return <Loading />;
-    }
 
     return (
         <div className="profile-page">
@@ -128,22 +142,35 @@ const Profile = () => {
                     </div>
                 </>
             )}
-            <ProfileHeader />
 
-            <AccountCard
-                username={username}
-                email={email}
-                streakDays={streakDays}
-                onUpdateProfile={handleUpdateProfile}
-                onSignOut={handleSignOut}
-            />
+            <div className="profile-page-content">
+              <div className="profile-content-bg">
+                <div className="profile-top-section" ref={topSectionRef}>
+                    <div
+                        className="profile-pink-bg"
+                        style={{ height: pinkHeight || 'auto' }}
+                    />
+                    <ProfileHeader />
 
-            <AnalyticsSection
-                tasksCompleted={tasksCompleted}
-                goalsCompleted={goalsCompleted}
-                onTimeTasks={onTimeTasks}
-                onTimeGoals={onTimeGoals}
-            />
+                    <div ref={cardRef}>
+                        <AccountCard
+                            username={username}
+                            email={email}
+                            streakDays={streakDays}
+                            onUpdateProfile={handleUpdateProfile}
+                            onSignOut={handleSignOut}
+                        />
+                    </div>
+                </div>
+
+                <AnalyticsSection
+                    tasksCompleted={tasksCompleted}
+                    goalsCompleted={goalsCompleted}
+                    onTimeTasks={onTimeTasks}
+                    onTimeGoals={onTimeGoals}
+                />
+              </div>
+            </div>
 
             <BottomNav />
         </div>
