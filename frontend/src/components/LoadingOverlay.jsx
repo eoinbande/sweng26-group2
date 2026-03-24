@@ -100,7 +100,7 @@ function LoadingOverlay({ onComplete, isLoading = false, minDisplayTime = 2000 }
                 paddingTop: 'var(--space-xl)',
                 paddingBottom: 'var(--space-xl)',
                 borderRadius: isShrinking ? '0 0 var(--radius-xxl) var(--radius-xxl)' : '0',
-                boxShadow: isShrinking ? 'var(--shadow-float)' : 'none',
+                boxShadow: 'none',
                 overflow: 'hidden',
                 zIndex: 9999,
                 transition: 'all 1.2s cubic-bezier(0.25, 0.1, 0.25, 1)',

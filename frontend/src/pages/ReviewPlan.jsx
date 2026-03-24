@@ -25,6 +25,13 @@ function ReviewPlan() {
     const [contentVisible, setContentVisible] = useState(false);
     const [showLoading, setShowLoading] = useState(location.state?.showLoading || false);
 
+    // feedback expansion states (mimics goaldadddate expand/contract)
+    const [isExpandedForFeedback, setIsExpandedForFeedback] = useState(false);
+    const [isContracting, setIsContracting] = useState(false);
+
+    // discard animation state
+    const [isDiscarding, setIsDiscarding] = useState(false);
+
     const [saving, setSaving] = useState(false);
     const [submittingFeedback, setSubmittingFeedback] = useState(false);
     const [feedbackText, setFeedbackText] = useState('');
@@ -122,10 +129,10 @@ function ReviewPlan() {
         }));
     }, [previewData]);
 
-    // Re-check fades when content becomes visible or tasks change
+    // reset scroll and re-check fades when content becomes visible or tasks change
     useEffect(() => {
         if (contentVisible) {
-            // Small delay so cards have rendered
+            if (scrollRef.current) scrollRef.current.scrollTop = 0;
             const t = setTimeout(updateFades, 600);
             return () => clearTimeout(t);
         }
@@ -197,85 +204,106 @@ function ReviewPlan() {
         }
     };
 
-    // Discard: delete the temporary goal and go back to CreateGoal
+    // discard: fade out content, shrink card, then navigate
     const handleDiscard = async () => {
+        const from = location.state?.originalFrom || location.state?.from;
 
-        const from = location.state?.originalFrom || location.state?.from;  // Get where we came from
-    
         if (from === 'detail') {
-            // Came from GoalDetail or Review (aka iterative feedback) → go back to GoalDetail;
-            navigate(`/goal/${goalId}`, {
-                state: { goalId }
-            });
-        } else {
-            // Came from CreateGoal or default → go to CreateGoal
-            navigate('/create-goal', { 
-                state: { originalPrompt } 
-            });
-        }
-    };
-    
-
-    // Feedback submisison
-    const handleSubmitFeedback = async (text) => {
-    const val = text || feedbackText; // handle value from InputBar or state
-    if (!val.trim()) return;
-
-    if (isDemoMode) {
-        console.log('Demo mode - feedback:', feedbackText);
-        return;
-    }
-
-    setSubmittingFeedback(true);
-    setShowLoading(true); // Show loading overlay while processing feedback
-
-    try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/goals/${goalId}/feedback`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ feedback: val, current_tasks: previewData?.tasks })
-        });
-
-        const data = await res.json();
-        console.log('Feedback response:', data);
-
-        if (!res.ok) {
-            console.error('Failed to process feedback:', data);
-            alert('Failed to process feedback. Check console.');
-            setSubmittingFeedback(false);
-            setShowLoading(false);
+            navigate(`/goal/${goalId}`, { state: { goalId } });
             return;
         }
 
-        setFeedbackText('');
+        // animate: fade out content, then shrink card to creategoal size
+        setContentVisible(false);
+        setIsDiscarding(true);
 
-        // Update the preview data with new tasks from feedback
-        // Navigate to ReviewPlan again with updated data and loading overlay
-        navigate('/review-plan', {
-            replace: true,
-            state: {
-                goal: goalTitle,
-                showLoading: true,
-                previewData: {
-                    ...previewData,
-                    tasks: data.tasks,  // Updated tasks from AI
-                },
-                userId,
-                originalPrompt,
-                dueDate: location.state?.dueDate,
-                originalFrom: location.state?.originalFrom || location.state?.from, // Preserve original source (detail vs create) for discard logic
-            },
-        });
-
-        setSubmittingFeedback(false);
-
-    } catch (err) {
-        console.error('Network error:', err);
-        alert('Network error. Is the backend running?');
-        setSubmittingFeedback(false);
-        setShowLoading(false);
-    }
+        // wait for fade + shrink, then navigate
+        setTimeout(() => {
+            navigate('/create-goal', { state: { originalPrompt } });
+        }, 900);
     };
+    
+
+    // stores feedback response while loading overlay plays
+    const feedbackResultRef = useRef(null);
+
+    // feedback submission: expand → loading overlay → contract → fade in
+    const handleSubmitFeedback = async (text) => {
+        const val = text || feedbackText;
+        if (!val.trim()) return;
+
+        if (isDemoMode) {
+            console.log('Demo mode - feedback:', feedbackText);
+            return;
+        }
+
+        setSubmittingFeedback(true);
+        feedbackResultRef.current = null;
+
+        // step 1: fade out content
+        setContentVisible(false);
+
+        // step 2: expand blue card to full screen after fade
+        await new Promise(r => setTimeout(r, 400));
+        setIsExpandedForFeedback(true);
+
+        // step 3: once expanded, show loading overlay
+        await new Promise(r => setTimeout(r, 1200));
+        setShowLoading(true);
+
+        try {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/goals/${goalId}/feedback`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ feedback: val, current_tasks: previewData?.tasks })
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                console.error('Failed to process feedback:', data);
+                alert('Failed to process feedback. Check console.');
+                setSubmittingFeedback(false);
+                setIsExpandedForFeedback(false);
+                setShowLoading(false);
+                setContentVisible(true);
+                return;
+            }
+
+            setFeedbackText('');
+            // store result — loading overlay onComplete will pick it up
+            feedbackResultRef.current = data;
+
+        } catch (err) {
+            console.error('Network error:', err);
+            alert('Network error. Is the backend running?');
+            setSubmittingFeedback(false);
+            setIsExpandedForFeedback(false);
+            setShowLoading(false);
+            setContentVisible(true);
+        }
+    };
+
+    // called when loading overlay finishes its shrink animation
+    const handleLoadingComplete = useCallback(() => {
+        setShowLoading(false);
+
+        // if this was a feedback submission, contract the card and show new data
+        if (feedbackResultRef.current) {
+            const data = feedbackResultRef.current;
+            feedbackResultRef.current = null;
+
+            setPreviewData(prev => ({ ...prev, tasks: data.tasks }));
+            setIsExpandedForFeedback(false);
+
+            // after contraction finishes, fade in new content
+            setTimeout(() => {
+                setIsContracting(false);
+                setContentVisible(true);
+                setSubmittingFeedback(false);
+            }, 1000);
+        }
+    }, []);
         
 
     // fade in content after mount (or after loading overlay completes)
@@ -290,14 +318,11 @@ function ReviewPlan() {
 
     useEffect(() => {
         if (location.state?.previewData) {
-            // Update previewData from location state (for feedback loop)
             setPreviewData(location.state.previewData);
-
-            // If the tasks in state change, ensure we show the loading if requested
-            if (location.state.showLoading) {
-                setShowLoading(true);
-                setContentVisible(false); // Hide content while loading overlay shows
-            }
+        }
+        if (location.state?.showLoading) {
+            setShowLoading(true);
+            setContentVisible(false);
         }
     }, [location.state]);
 
@@ -309,14 +334,16 @@ function ReviewPlan() {
                 padding: 'var(--space-xxl)',
                 paddingTop: 'var(--space-xl)',
                 paddingBottom: 'var(--space-xl)',
-                borderRadius: '0 0 var(--radius-xxl) var(--radius-xxl)',
-                boxShadow: showLoading ? 'none' : 'var(--shadow-float)',
+                borderRadius: isExpandedForFeedback ? '0' : '0 0 var(--radius-xxl) var(--radius-xxl)',
+                boxShadow: 'var(--shadow-float)',
                 overflow: 'hidden',
                 position: 'relative',
-                zIndex: 1,
+                zIndex: isExpandedForFeedback ? 100 : 1,
                 flexShrink: 0,
                 display: 'flex',
                 flexDirection: 'column',
+                height: isExpandedForFeedback ? '100dvh' : isDiscarding ? '66dvh' : undefined,
+                transition: 'height 1.2s cubic-bezier(0.25, 0.1, 0.25, 1), border-radius 0.3s ease-out, box-shadow 0.3s ease-out',
             }}>
                 {/* back button */}
                 <button
@@ -377,6 +404,7 @@ function ReviewPlan() {
                             paddingRight: 'var(--space-md)',
                             width: '100%',
                             boxSizing: 'border-box',
+                            backgroundColor: 'var(--accent-blue)',
                         }}
                     >
                         {/* task cards - populated from backend response */}
@@ -408,10 +436,10 @@ function ReviewPlan() {
                     {/* top fade overlay - hidden when scrolled to top */}
                     <div style={{
                         position: 'absolute',
-                        top: 0,
+                        top: -1,
                         left: 0,
                         right: 0,
-                        height: '30px',
+                        height: '32px',
                         background: 'linear-gradient(to bottom, var(--accent-blue) 0%, transparent 100%)',
                         pointerEvents: 'none',
                         zIndex: 10,
@@ -422,10 +450,10 @@ function ReviewPlan() {
                     {/* bottom fade overlay - hidden when scrolled to bottom */}
                     <div style={{
                         position: 'absolute',
-                        bottom: 0,
+                        bottom: -1,
                         left: 0,
                         right: 0,
-                        height: '30px',
+                        height: '32px',
                         background: 'linear-gradient(to top, var(--accent-blue) 0%, transparent 100%)',
                         pointerEvents: 'none',
                         zIndex: 10,
@@ -499,6 +527,9 @@ function ReviewPlan() {
             {/* bottom section - feedback input */}
             <div className="cg-bottom" style={{
                 justifyContent: 'center',
+                opacity: isDiscarding ? 0 : 1,
+                top: isDiscarding ? '66dvh' : undefined,
+                transition: 'opacity 0.4s ease-out, top 1.2s cubic-bezier(0.25, 0.1, 0.25, 1)',
             }}>
                 <div className="cg-manual-input">
                     <InputBar
@@ -513,14 +544,20 @@ function ReviewPlan() {
                 </div>
             </div>
 
-            <BottomNav />
+            <div style={{
+                opacity: (showLoading || isExpandedForFeedback) ? 0 : 1,
+                pointerEvents: (showLoading || isExpandedForFeedback) ? 'none' : 'auto',
+                transition: 'opacity 0.3s ease',
+            }}>
+                <BottomNav />
+            </div>
 
-            {/* loading overlay - shown when navigating from CreateGoal */}
+            {/* loading overlay - shown on initial load and during feedback */}
             {showLoading && (
-                <LoadingOverlay 
-                    onComplete={() => setShowLoading(false)} 
-                    isLoading={!previewData || submittingFeedback}
-                    minDisplayTime={previewData ? 100 : 2000}
+                <LoadingOverlay
+                    onComplete={handleLoadingComplete}
+                    isLoading={submittingFeedback ? !feedbackResultRef.current : !previewData}
+                    minDisplayTime={2000}
                 />
             )}
         </div>
