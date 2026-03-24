@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { UserProvider } from './contexts/UserContext';
 import { GoalsProvider } from './contexts/GoalsContext';
+import { ScheduleProvider } from './contexts/ScheduleContext';
 import Home from './pages/Home';
 import Goals from './pages/Goals';
 import CreateGoal from './pages/CreateGoal';
