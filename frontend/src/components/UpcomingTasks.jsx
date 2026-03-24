@@ -77,17 +77,24 @@ const UpcomingTasks = ({ onReady }) => {
         updateFades();
     }, [updateFades, tasks]);
 
-    // step 1: expand the container after tasks load
-    // step 2: fade in items after expansion finishes
-    // step 3: notify parent the full sequence is done
+    // step 1: wait for a paint so the compact state is visible
+    // step 2: expand the container
+    // step 3: fade in items after expansion finishes
+    // step 4: notify parent the full sequence is done
+    const [mounted, setMounted] = useState(false);
     useEffect(() => {
-        if (!loading) {
-            const expandTimer = requestAnimationFrame(() => setExpanded(true));
-            const itemsTimer = setTimeout(() => setShowItems(true), 300);
-            const readyTimer = setTimeout(() => onReady && onReady(), 450);
-            return () => { cancelAnimationFrame(expandTimer); clearTimeout(itemsTimer); clearTimeout(readyTimer); };
+        const frame = requestAnimationFrame(() => setMounted(true));
+        return () => cancelAnimationFrame(frame);
+    }, []);
+
+    useEffect(() => {
+        if (!loading && mounted) {
+            const expandTimer = setTimeout(() => setExpanded(true), 50);
+            const itemsTimer = setTimeout(() => setShowItems(true), 350);
+            const readyTimer = setTimeout(() => onReady && onReady(), 500);
+            return () => { clearTimeout(expandTimer); clearTimeout(itemsTimer); clearTimeout(readyTimer); };
         }
-    }, [loading]);
+    }, [loading, mounted]);
 
     const getBadgeColor = (level) => {
         switch(level) {

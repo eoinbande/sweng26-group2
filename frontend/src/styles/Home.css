@@ -208,22 +208,23 @@
     flex-direction: column;
     justify-content: flex-end;
     margin-top: clamp(8px, 1.5dvh, 16px);
-    opacity: 0;
     visibility: hidden;
 }
 
 .home-page .home-goals-grid--visible {
-    opacity: 1;
     visibility: visible;
-    animation: home-section-in 0.4s ease both;
 }
 
-.home-page .home-goals-grid>h4 {
+.home-page .home-goals-grid > h4 {
     font-family: var(--font-serif);
     font-size: clamp(16px, 2.7dvh, 20px);
-    /* Revert to match upcoming tasks */
     font-weight: 600;
     margin-bottom: clamp(6px, 1dvh, 12px);
+    opacity: 0;
+}
+
+.home-page .home-goals-grid--visible > h4 {
+    animation: home-section-in 0.35s ease both;
 }
 
 .home-page .home-goals-grid .goals-scroll {
@@ -243,15 +244,19 @@
     padding: clamp(8px, 1.5dvh, 14px);
     border-radius: clamp(20px, 2.5dvh, 32px);
     opacity: 0;
+}
+
+/* only animate when the section becomes visible */
+.home-page .home-goals-grid--visible .goal-card {
     animation: goal-card-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
-.home-page .home-goals-grid .goal-card:nth-child(1) { animation-delay: 0s; }
-.home-page .home-goals-grid .goal-card:nth-child(2) { animation-delay: 0.08s; }
-.home-page .home-goals-grid .goal-card:nth-child(3) { animation-delay: 0.16s; }
-.home-page .home-goals-grid .goal-card:nth-child(4) { animation-delay: 0.24s; }
-.home-page .home-goals-grid .goal-card:nth-child(5) { animation-delay: 0.32s; }
-.home-page .home-goals-grid .goal-card:nth-child(6) { animation-delay: 0.40s; }
+.home-page .home-goals-grid--visible .goal-card:nth-child(1) { animation-delay: 0s; }
+.home-page .home-goals-grid--visible .goal-card:nth-child(2) { animation-delay: 0.08s; }
+.home-page .home-goals-grid--visible .goal-card:nth-child(3) { animation-delay: 0.16s; }
+.home-page .home-goals-grid--visible .goal-card:nth-child(4) { animation-delay: 0.24s; }
+.home-page .home-goals-grid--visible .goal-card:nth-child(5) { animation-delay: 0.32s; }
+.home-page .home-goals-grid--visible .goal-card:nth-child(6) { animation-delay: 0.40s; }
 
 .home-page .home-goals-grid .goal-card h5 {
     font-size: clamp(12px, 1.4dvh, 15px);
