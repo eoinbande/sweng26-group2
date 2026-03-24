@@ -154,6 +154,7 @@ const Profile = () => {
                     goalsCompleted={goalsCompleted}
                     onTimeTasks={onTimeTasks}
                     onTimeGoals={onTimeGoals}
+                    loaded={profileLoaded}
                 />
               </div>
             </div>
