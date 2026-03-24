@@ -16,6 +16,12 @@ const GoalDetail = () => {
     const location = useLocation();
     const { id: paramId } = useParams();
 
+    // set body background so color bleeds behind status bar
+    useEffect(() => {
+        document.body.style.backgroundColor = '#F8F8F4';
+        return () => { document.body.style.backgroundColor = ''; };
+    }, []);
+
     // Safely access location state
     // Use "Loading..." as default if we are loading, unless we want to show stale title
     const [goalTitle, setGoalTitle] = useState(location.state?.goal?.title || location.state?.goalTitle || "Loading...");

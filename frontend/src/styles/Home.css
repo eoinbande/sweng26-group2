@@ -1,6 +1,8 @@
 /* responsive styles for the home page */
 
+
 /* staggered mount animation for home page sections */
+
 @keyframes home-section-in {
     from {
         opacity: 0;
@@ -11,6 +13,7 @@
         transform: translateY(0);
     }
 }
+
 
 /* uses dvh (dynamic viewport height) so content fits any phone screen */
 
@@ -125,7 +128,8 @@
     margin-top: clamp(8px, 2.2dvh, 24px);
     display: flex;
     flex-direction: column;
-    flex: 1; /* Grow to fill space */
+    flex: 1;
+    /* Grow to fill space */
     min-height: 20dvh;
     animation: home-section-in 0.5s ease 0.24s both;
 }
@@ -175,7 +179,8 @@
 /* goals grid */
 
 .home-page .home-goals-grid {
-    flex-shrink: 1; /* Allow to shrink if needed */
+    flex-shrink: 1;
+    /* Allow to shrink if needed */
     min-height: 0;
     display: flex;
     flex-direction: column;
@@ -186,7 +191,8 @@
 
 .home-page .home-goals-grid>h4 {
     font-family: var(--font-serif);
-    font-size: clamp(16px, 2.7dvh, 20px); /* Revert to match upcoming tasks */
+    font-size: clamp(16px, 2.7dvh, 20px);
+    /* Revert to match upcoming tasks */
     font-weight: 600;
     margin-bottom: clamp(6px, 1dvh, 12px);
 }
@@ -195,15 +201,19 @@
     display: flex;
     gap: var(--space-md);
     overflow-x: auto;
-    padding: clamp(6px, 1dvh, 12px) 24px; /* Reduced padding */
+    padding: clamp(6px, 1dvh, 12px) 24px;
+    /* Reduced padding */
     margin: 0 -24px;
-    min-height: 80px; /* Force height to prevent layout shift */
+    min-height: 80px;
+    /* Force height to prevent layout shift */
 }
 
 .home-page .home-goals-grid .goal-card {
-    min-width: clamp(130px, 35vw, 170px); /* Wider */
+    min-width: clamp(130px, 35vw, 170px);
+    /* Wider */
     max-width: clamp(130px, 35vw, 170px);
-    padding: clamp(8px, 1.5dvh, 14px);   /* Reduced padding */
+    padding: clamp(8px, 1.5dvh, 14px);
+    /* Reduced padding */
     border-radius: clamp(20px, 2.5dvh, 32px);
 }
 

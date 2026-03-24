@@ -13,6 +13,12 @@ function ReviewPlan() {
     const navigate = useNavigate();
     const location = useLocation();
 
+    // set body background so color bleeds behind status bar
+    useEffect(() => {
+        document.body.style.backgroundColor = '#BFD1E5';
+        return () => { document.body.style.backgroundColor = ''; };
+    }, []);
+
     // content visibility states
     const [contentVisible, setContentVisible] = useState(false);
     const [showLoading, setShowLoading] = useState(location.state?.showLoading || false);

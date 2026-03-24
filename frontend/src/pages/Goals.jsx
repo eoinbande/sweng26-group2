@@ -19,6 +19,13 @@ const MOCK_GOALS = [
 
 const Goals = () => {
     const location = useLocation();
+
+    // set body background so color bleeds behind status bar
+    useEffect(() => {
+        document.body.style.backgroundColor = '#F8F8F4';
+        return () => { document.body.style.backgroundColor = ''; };
+    }, []);
+
     const [showBottomFade, setShowBottomFade] = useState(true);
     const [goals, setGoals] = useState([]);
     const [loading, setLoading] = useState(true);

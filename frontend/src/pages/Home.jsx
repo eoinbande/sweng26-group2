@@ -14,7 +14,12 @@ import '../styles/Home.css';
 import '../index.css';
 
 function Home() {
-    
+    // set body background so color bleeds behind status bar
+    useEffect(() => {
+        document.body.style.backgroundColor = '#F8F8F4';
+        return () => { document.body.style.backgroundColor = ''; };
+    }, []);
+
     const [userName, setUserName] = useState('Guest');
     const [isAppReady, setIsAppReady] = useState(false);
 

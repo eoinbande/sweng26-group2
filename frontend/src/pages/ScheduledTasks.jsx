@@ -79,6 +79,12 @@ const MONTH_NAMES = [
 function ScheduledTasks() {
     const navigate = useNavigate();
     const location = useLocation();
+
+    // set body background so color bleeds behind status bar
+    useEffect(() => {
+        document.body.style.backgroundColor = '#F8F8F4';
+        return () => { document.body.style.backgroundColor = ''; };
+    }, []);
     const restored = location.state;
     const now = new Date();
     const [calMonth, setCalMonth] = useState(restored?.calMonth ?? now.getMonth());

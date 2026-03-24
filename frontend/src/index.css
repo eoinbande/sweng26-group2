@@ -56,6 +56,11 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+    overscroll-behavior: none;
 }
 
 body {
@@ -155,6 +160,11 @@ h6 {
 .goal-grid-card:hover {
     transform: scale(1.05) rotate(-2deg);
     box-shadow: var(--shadow-lg);
+}
+
+button, nav, label, [role="button"], [role="navigation"] {
+    -webkit-user-select: none;
+    user-select: none;
 }
 
 button {

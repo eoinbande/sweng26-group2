@@ -96,6 +96,12 @@ const CarbonSparkline = ({ data, labels, loaded }) => {
 };
 
 function GreenPage() {
+    // set body background so color bleeds behind status bar
+    useEffect(() => {
+        document.body.style.backgroundColor = '#AAD786';
+        return () => { document.body.style.backgroundColor = ''; };
+    }, []);
+
     // simulated loading state — replace with real fetch later
     const [data, setData] = useState(null);
     const loaded = data !== null;

@@ -11,6 +11,13 @@ import '../styles/Profile.css';
 
 const Profile = () => {
     const navigate = useNavigate();
+
+    // set body background so color bleeds behind status bar
+    useEffect(() => {
+        document.body.style.backgroundColor = '#ffdbda';
+        return () => { document.body.style.backgroundColor = ''; };
+    }, []);
+
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [streakDays, setStreakDays] = useState(0);
