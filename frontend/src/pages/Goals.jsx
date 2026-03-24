@@ -4,6 +4,7 @@ import PageHeader from '../components/PageHeader';
 import GoalListCard from '../components/GoalListCard';
 import BottomNav from '../components/BottomNav';
 import Loading from '../components/Loading';
+import { useUser } from '../contexts/UserContext';
 import { supabase, isDemoMode } from '../supabase_client';
 import '../styles/Goals.css';
 import CategoryIcon from '../components/CategoryIcon';
@@ -19,6 +20,7 @@ const MOCK_GOALS = [
 
 const Goals = () => {
     const location = useLocation();
+    const { user } = useUser();
 
     // set body background so color bleeds behind status bar
     useEffect(() => {
@@ -41,23 +43,21 @@ const Goals = () => {
         setShowBottomFade(!isAtBottom);
     }, []);
 
-    // Fetch goals from backend on mount
+    // fetch goals from backend on mount
     useEffect(() => {
         const fetchGoals = async () => {
-            // In demo mode, use mock data directly
             if (isDemoMode) {
                 setGoals(MOCK_GOALS);
                 setLoading(false);
                 return;
             }
 
-            try {
-                const { data: { user } } = await supabase.auth.getUser();
-                if (!user) {
-                    setLoading(false);
-                    return;
-                }
+            if (!user) {
+                setLoading(false);
+                return;
+            }
 
+            try {
                 const res = await fetch(`${import.meta.env.VITE_API_URL}/goals/${user.id}`, { cache: 'no-store' });
                 const data = await res.json();
 
@@ -106,9 +106,9 @@ const Goals = () => {
         };
 
         fetchGoals();
-    }, []);
+    }, [user]);
 
-    /* ---- Update progress when returning from GoalDetail ---- */
+    /* ---- update progress when returning from GoalDetail ---- */
     useEffect(() => {
         const updatedId = location.state?.updatedGoalId;
         const updatedProgress = location.state?.updatedProgress;
@@ -124,8 +124,7 @@ const Goals = () => {
     };
 
     const handleNewCategory = async (name) => {
-    if (!name.trim()) return;
-    const { data: { user } } = await supabase.auth.getUser();
+    if (!name.trim() || !user) return;
     await fetch(`${import.meta.env.VITE_API_URL}/categories`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

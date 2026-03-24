@@ -6,7 +6,7 @@ import MonthCalendar from '../components/MonthCalendar';
 import UpcomingTimeline from '../components/UpcomingTimeline';
 import UpcomingTimelineTasks from '../components/UpcomingTimelineTasks';
 import BottomNav from '../components/BottomNav';
-import { supabase } from '../supabase_client';
+import { useUser } from '../contexts/UserContext';
 import '../styles/ScheduledTasks.css';
 import '../index.css';
 
@@ -79,6 +79,7 @@ const MONTH_NAMES = [
 function ScheduledTasks() {
     const navigate = useNavigate();
     const location = useLocation();
+    const { user } = useUser();
 
     // set body background so color bleeds behind status bar
     useEffect(() => {
@@ -108,12 +109,10 @@ function ScheduledTasks() {
 
     // fetch upcoming tasks and goals from backend
     useEffect(() => {
+        if (!user) return;
         let cancelled = false;
         (async () => {
             try {
-                const { data } = await supabase.auth.getUser();
-                const user = data?.user;
-                if (!user) return;
                 const [tasksRes, goalsRes] = await Promise.all([
                     fetch(`${import.meta.env.VITE_API_URL}/schedule/${user.id}/upcoming-tasks`),
                     fetch(`${import.meta.env.VITE_API_URL}/schedule/${user.id}/upcoming-goals`),
@@ -133,19 +132,17 @@ function ScheduledTasks() {
             }
         })();
         return () => { cancelled = true; };
-    }, []);
+    }, [user]);
 
     // fetch tasks for selected date
     useEffect(() => {
         if (!selectedDate) { setDailyTasks([]); setDailyLoaded(false); return; }
+        if (!user) return;
         setDailyTasks([]);
         setDailyLoaded(false);
         let cancelled = false;
         (async () => {
             try {
-                const { data } = await supabase.auth.getUser();
-                const user = data?.user;
-                if (!user) return;
                 const dateStr = selectedDate.format('YYYY-MM-DD');
                 const res = await fetch(
                     `${import.meta.env.VITE_API_URL}/schedule/${user.id}/date?date=${dateStr}`
@@ -160,7 +157,7 @@ function ScheduledTasks() {
             }
         })();
         return () => { cancelled = true; };
-    }, [selectedDate]);
+    }, [selectedDate, user]);
 
     // sync header when MUI changes month (swipe, outside-month click, etc.)
     const onMonthChange = useCallback((date) => {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 
 import Header from '../components/Header';
 import CalendarStrip from '../components/CalendarStrip';
@@ -6,8 +6,7 @@ import CreateGoalCard from '../components/CreateGoalCard';
 import UpcomingTasks from '../components/UpcomingTasks';
 import GoalsGrid from '../components/GoalsGrid';
 import BottomNav from '../components/BottomNav';
-
-import { supabase } from '../supabase_client';
+import { useUser } from '../contexts/UserContext';
 
 import '../styles/Home.css';
 import '../index.css';
@@ -19,36 +18,11 @@ function Home() {
         return () => { document.body.style.backgroundColor = ''; };
     }, []);
 
-    const [userName, setUserName] = useState('Guest');
-
-    // once the UI is rendered get the profile data
-    useEffect(() => {
-        const fetchProfile = async () => {
-            try {
-                const { data } = await supabase.auth.getUser();
-                const user = data?.user;
-
-                if (user) {
-                    const { data: profile } = await supabase
-                        .from('profiles')
-                        .select('name')
-                        .eq('id', user.id)
-                        .single();
-
-                    setUserName(profile?.name || user.email.split('@')[0]);
-                }
-            } catch (e) {
-                console.error("Error loading profile", e);
-            }
-        };
-
-        fetchProfile();
-    }, []);
+    const { userName } = useUser();
 
     return (
         <div className="home-page">
-            {/* pass the name to the Header as a prop */}
-            <Header userName={userName} />
+            <Header userName={userName || 'Guest'} />
             <CalendarStrip />
             <CreateGoalCard />
             <UpcomingTasks />

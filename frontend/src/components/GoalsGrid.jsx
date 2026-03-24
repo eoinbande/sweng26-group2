@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../supabase_client';
+import { useUser } from '../contexts/UserContext';
 import dayjs from 'dayjs';
 import '../index.css';
 
@@ -13,21 +13,15 @@ const CARD_COLORS = [
 
 const GoalsGrid = () => {
     const navigate = useNavigate();
+    const { user } = useUser();
     const [goals, setGoals] = useState([]);
     const [loading, setLoading] = useState(true);
     const currentMonth = new Date().toLocaleString('en-US', { month: 'long' });
 
     useEffect(() => {
+        if (!user) return;
         const fetchGoals = async () => {
             try {
-                const { data } = await supabase.auth.getUser();
-                const user = data?.user;
-                if (!user) {
-                    setLoading(false);
-                    return;
-                }
-
-                // Get goals for this month ( next 30 days is what the endpoint does
                 const res = await fetch(`${import.meta.env.VITE_API_URL}/schedule/${user.id}/upcoming-goals?days=30`);
                 if (res.ok) {
                     const json = await res.json();
@@ -54,7 +48,7 @@ const GoalsGrid = () => {
         };
 
         fetchGoals();
-    }, []);
+    }, [user]);
 
     return (
         <div className="home-goals-grid">

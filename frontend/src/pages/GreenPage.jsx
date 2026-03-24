@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PageHeader from '../components/PageHeader';
 import BottomNav from '../components/BottomNav';
 import useCountUp from '../hooks/useCountUp';
-import { supabase } from '../supabase_client';
+import { useUser } from '../contexts/UserContext';
 import '../styles/GreenPage.css';
 
 // sparkline chart for carbon trend
@@ -96,21 +96,21 @@ const CarbonSparkline = ({ data, labels, loaded }) => {
 };
 
 function GreenPage() {
+    const { user } = useUser();
+
     // set body background so color bleeds behind status bar
     useEffect(() => {
         document.body.style.backgroundColor = '#AAD786';
         return () => { document.body.style.backgroundColor = ''; };
     }, []);
 
-    // simulated loading state — replace with real fetch later
     const [data, setData] = useState(null);
     const loaded = data !== null;
 
     useEffect(() => {
+        if (!user) return;
         const fetchGreenData = async () => {
             try {
-                const { data: { user } } = await supabase.auth.getUser();
-                if (!user) return;
 
                 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -165,7 +165,7 @@ function GreenPage() {
         };
 
         fetchGreenData();
-    }, []);
+    }, [user]);
 
     const co2Count = useCountUp(data?.co2 ?? 0, 1000, loaded);
     const co2Change = useCountUp(data?.co2ChangePct ?? 0, 800, loaded);

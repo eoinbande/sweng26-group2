@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { UserProvider } from './contexts/UserContext';
 import Home from './pages/Home';
 import Goals from './pages/Goals';
 import CreateGoal from './pages/CreateGoal';
@@ -15,10 +16,9 @@ import GreenPage from './pages/GreenPage'
 import './index.css';
 
 function App() {
-  const [isLoading, setIsLoading] = useState(true);
-
   return (
     <Router>
+      <UserProvider>
       <Routes>
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/home" element={<Home />} />
@@ -34,6 +34,7 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/greenpage" element={<GreenPage />} />
       </Routes>
+      </UserProvider>
     </Router>
   );
 }

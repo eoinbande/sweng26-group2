@@ -1,7 +1,7 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
 import { ArrowUpRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../supabase_client';
+import { useUser } from '../contexts/UserContext';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import '../index.css';
@@ -10,6 +10,7 @@ dayjs.extend(relativeTime);
 
 const UpcomingTasks = () => {
     const navigate = useNavigate();
+    const { user } = useUser();
     const scrollRef = useRef(null);
     const [showTopFade, setShowTopFade] = useState(false);
     const [showBottomFade, setShowBottomFade] = useState(false);
@@ -32,15 +33,9 @@ const UpcomingTasks = () => {
     }, [updateFades, tasks]);
 
     useEffect(() => {
+        if (!user) return;
         const fetchTasks = async () => {
             try {
-                const { data } = await supabase.auth.getUser();
-                const user = data?.user;
-                if (!user) {
-                    setLoading(false);
-                    return;
-                }
-
                 const res = await fetch(`${import.meta.env.VITE_API_URL}/schedule/${user.id}/upcoming-tasks?days=15`);
                 if (res.ok) {
                     const json = await res.json();
@@ -95,7 +90,7 @@ const UpcomingTasks = () => {
         };
 
         fetchTasks();
-    }, []);
+    }, [user]);
 
     // step 1: expand the container after tasks load
     // step 2: fade in items after expansion finishes

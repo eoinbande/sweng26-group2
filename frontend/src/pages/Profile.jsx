@@ -4,12 +4,14 @@ import ProfileHeader from '../components/ProfileHeader';
 import AccountCard from '../components/AccountCard';
 import AnalyticsSection from '../components/AnalyticsSection';
 import BottomNav from '../components/BottomNav';
+import { useUser } from '../contexts/UserContext';
 import { supabase } from '../supabase_client';
 import { Check } from 'lucide-react';
 import '../styles/Profile.css';
 
 const Profile = () => {
     const navigate = useNavigate();
+    const { user, userName, userEmail, updateUserName } = useUser();
 
     // set body background so color bleeds behind status bar
     useEffect(() => {
@@ -17,8 +19,6 @@ const Profile = () => {
         return () => { document.body.style.backgroundColor = ''; };
     }, []);
 
-    const [username, setUsername] = useState('');
-    const [email, setEmail] = useState('');
     const [streakDays, setStreakDays] = useState(0);
     const [tasksCompleted, setTasksCompleted] = useState(0);
     const [onTimeTasks, setOnTimeTasks] = useState(0);
@@ -44,57 +44,44 @@ const Profile = () => {
         measurePink();
         window.addEventListener('resize', measurePink);
         return () => window.removeEventListener('resize', measurePink);
-    }, [measurePink, username, profileLoaded]);
+    }, [measurePink, userName, profileLoaded]);
 
+    // fetch analytics data only (user profile comes from context)
     useEffect(() => {
-        const fetchProfile = async () => {
+        if (!user) return;
+        const fetchAnalytics = async () => {
             try {
-                const { data } = await supabase.auth.getUser();
-                const user = data?.user;
+                const baseUrl = import.meta.env.VITE_API_URL;
+                const [streakRes, tasksRes, tasksOnTimeRes, goalsRes, goalsOnTimeRes] = await Promise.all([
+                    fetch(`${baseUrl}/profile/${user.id}/streak`, { cache: 'no-store' }),
+                    fetch(`${baseUrl}/profile/${user.id}/tasks-completed`, { cache: 'no-store' }),
+                    fetch(`${baseUrl}/profile/${user.id}/tasks-completed-on-time`, { cache: 'no-store' }),
+                    fetch(`${baseUrl}/profile/${user.id}/goals-completed`, { cache: 'no-store' }),
+                    fetch(`${baseUrl}/profile/${user.id}/goals-completed-on-time`, { cache: 'no-store' }),
+                ]);
 
-                if (user) {
-                    setEmail(user.email);
+                const [streakData, tasksData, tasksOnTimeData, goalsData, goalsOnTimeData] = await Promise.all([
+                    streakRes.ok ? streakRes.json() : Promise.resolve({}),
+                    tasksRes.ok ? tasksRes.json() : Promise.resolve({}),
+                    tasksOnTimeRes.ok ? tasksOnTimeRes.json() : Promise.resolve({}),
+                    goalsRes.ok ? goalsRes.json() : Promise.resolve({}),
+                    goalsOnTimeRes.ok ? goalsOnTimeRes.json() : Promise.resolve({}),
+                ]);
 
-                    const { data: profile } = await supabase
-                        .from('profiles')
-                        .select('name')
-                        .eq('id', user.id)
-                        .single();
-
-                    setUsername(profile?.name || user.email.split('@')[0]);
-
-                    const baseUrl = import.meta.env.VITE_API_URL;
-                    const [streakRes, tasksRes, tasksOnTimeRes, goalsRes, goalsOnTimeRes] = await Promise.all([
-                        fetch(`${baseUrl}/profile/${user.id}/streak`, { cache: 'no-store' }),
-                        fetch(`${baseUrl}/profile/${user.id}/tasks-completed`, { cache: 'no-store' }),
-                        fetch(`${baseUrl}/profile/${user.id}/tasks-completed-on-time`, { cache: 'no-store' }),
-                        fetch(`${baseUrl}/profile/${user.id}/goals-completed`, { cache: 'no-store' }),
-                        fetch(`${baseUrl}/profile/${user.id}/goals-completed-on-time`, { cache: 'no-store' }),
-                    ]);
-
-                    const [streakData, tasksData, tasksOnTimeData, goalsData, goalsOnTimeData] = await Promise.all([
-                        streakRes.ok ? streakRes.json() : Promise.resolve({}),
-                        tasksRes.ok ? tasksRes.json() : Promise.resolve({}),
-                        tasksOnTimeRes.ok ? tasksOnTimeRes.json() : Promise.resolve({}),
-                        goalsRes.ok ? goalsRes.json() : Promise.resolve({}),
-                        goalsOnTimeRes.ok ? goalsOnTimeRes.json() : Promise.resolve({}),
-                    ]);
-
-                    setStreakDays(streakData.current_streak ?? 0);
-                    setTasksCompleted(tasksData.tasks_completed ?? 0);
-                    setOnTimeTasks(tasksOnTimeData.tasks_completed_on_time ?? 0);
-                    setGoalsCompleted(goalsData.goals_completed ?? 0);
-                    setOnTimeGoals(goalsOnTimeData.goals_completed_on_time ?? 0);
-                }
+                setStreakDays(streakData.current_streak ?? 0);
+                setTasksCompleted(tasksData.tasks_completed ?? 0);
+                setOnTimeTasks(tasksOnTimeData.tasks_completed_on_time ?? 0);
+                setGoalsCompleted(goalsData.goals_completed ?? 0);
+                setOnTimeGoals(goalsOnTimeData.goals_completed_on_time ?? 0);
             } catch (e) {
-                console.error('Error loading profile', e);
+                console.error('Error loading analytics', e);
             } finally {
                 setProfileLoaded(true);
             }
         };
 
-        fetchProfile();
-    }, []);
+        fetchAnalytics();
+    }, [user]);
 
     const handleSignOut = async () => {
         try {
@@ -108,18 +95,17 @@ const Profile = () => {
     };
 
     const handleUpdateProfile = async (newName) => {
-        const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
 
         try {
-            if (newName && newName !== username) {
+            if (newName && newName !== userName) {
                 const { error } = await supabase
                     .from('profiles')
                     .update({ name: newName })
                     .eq('id', user.id);
 
                 if (error) throw error;
-                setUsername(newName);
+                updateUserName(newName);
                 setShowSuccess(true);
                 setTimeout(() => setShowSuccess(false), 2000);
             }
@@ -154,8 +140,8 @@ const Profile = () => {
 
                     <div ref={cardRef}>
                         <AccountCard
-                            username={username}
-                            email={email}
+                            username={userName}
+                            email={userEmail}
                             streakDays={streakDays}
                             onUpdateProfile={handleUpdateProfile}
                             onSignOut={handleSignOut}
