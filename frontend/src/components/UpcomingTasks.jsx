@@ -15,6 +15,8 @@ const UpcomingTasks = () => {
     const [showBottomFade, setShowBottomFade] = useState(false);
     const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [expanded, setExpanded] = useState(false);
+    const [showItems, setShowItems] = useState(false);
     const [hoveredIndex, setHoveredIndex] = useState(null);
 
     const updateFades = useCallback(() => {
@@ -95,6 +97,18 @@ const UpcomingTasks = () => {
         fetchTasks();
     }, []);
 
+    // step 1: expand the container after tasks load
+    // step 2: fade in items after expansion finishes
+    useEffect(() => {
+        if (!loading) {
+            // small delay so the browser paints the compact state first
+            const expandTimer = requestAnimationFrame(() => setExpanded(true));
+            // show items after the expand transition (0.45s)
+            const itemsTimer = setTimeout(() => setShowItems(true), 500);
+            return () => { cancelAnimationFrame(expandTimer); clearTimeout(itemsTimer); };
+        }
+    }, [loading]);
+
     const getBadgeColor = (level) => {
         switch(level) {
             case 'urgent': return 'var(--accent-red-soft)';
@@ -104,7 +118,7 @@ const UpcomingTasks = () => {
     };
 
     return (
-        <div className="home-upcoming-tasks">
+        <div className={`home-upcoming-tasks${expanded ? ' home-upcoming-tasks--expanded' : ''}`}>
             <h4>Upcoming Tasks</h4>
 
             <div style={{
@@ -172,7 +186,7 @@ const UpcomingTasks = () => {
                                 }}>
                                     No upcoming tasks!
                                 </div>
-                            ) : (
+                            ) : showItems ? (
                                 <ul style={{ listStyle: 'none' }}>
                                     {tasks.map((task, index) => (
                                         <li key={index} className="task-item task-item-animate"
@@ -190,7 +204,7 @@ const UpcomingTasks = () => {
                                                 alignItems: 'center',
                                                 justifyContent: 'space-between',
                                                 cursor: 'pointer',
-                                                animationDelay: `${0.3 + index * 0.07}s`,
+                                                animationDelay: `${index * 0.07}s`,
                                             }}>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                                 {/* arrow icon with hover effect */}
@@ -229,7 +243,7 @@ const UpcomingTasks = () => {
                                         </li>
                                     ))}
                                 </ul>
-                            )}
+                            ) : null}
                         </div>
 
                         {/* top fade overlay */}

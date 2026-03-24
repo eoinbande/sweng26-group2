@@ -7,7 +7,6 @@ import UpcomingTasks from '../components/UpcomingTasks';
 import GoalsGrid from '../components/GoalsGrid';
 import BottomNav from '../components/BottomNav';
 
-import Loading from '../components/Loading';
 import { supabase } from '../supabase_client';
 
 import '../styles/Home.css';
@@ -21,9 +20,8 @@ function Home() {
     }, []);
 
     const [userName, setUserName] = useState('Guest');
-    const [isAppReady, setIsAppReady] = useState(false);
 
-    // once the UI is rendered get the progile data
+    // once the UI is rendered get the profile data
     useEffect(() => {
         const fetchProfile = async () => {
             try {
@@ -46,20 +44,6 @@ function Home() {
 
         fetchProfile();
     }, []);
-
-    // called by Loading.jsx after 2 sec. which will update our state
-    const handleLoadingComplete = () => {
-        setIsAppReady(true);
-    };
-
-    if (!isAppReady) {
-        return (
-        <div className="home-page">
-            <Loading onLoadingComplete={handleLoadingComplete} />
-            <BottomNav />
-        </div>
-        );
-    }
 
     return (
         <div className="home-page">

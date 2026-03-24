@@ -52,7 +52,7 @@ const BottomNav = ({ transparent = false }) => {
             justifyContent: 'space-around',
             borderTop: 'none',
             zIndex: 100,
-            paddingBottom: 'calc(14px + env(safe-area-inset-bottom, 0px))',
+            paddingBottom: 'calc(1px + env(safe-area-inset-bottom, 0px))',
             WebkitUserSelect: 'none',
             userSelect: 'none',
         }}>
