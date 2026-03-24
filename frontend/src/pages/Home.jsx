@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import Header from '../components/Header';
 import CalendarStrip from '../components/CalendarStrip';
@@ -14,7 +15,7 @@ import '../styles/Home.css';
 import '../index.css';
 
 function Home() {
-    
+    const navigate = useNavigate();
     const [userName, setUserName] = useState('Guest');
     const [isAppReady, setIsAppReady] = useState(false);
 
@@ -62,6 +63,12 @@ function Home() {
             <Header userName={userName} />
             <CalendarStrip />
             <CreateGoalCard />
+            <button
+                className="btn-view-garden"
+                onClick={() => navigate('/garden')}
+            >
+                🌿 View Garden
+            </button>
             <UpcomingTasks />
             <GoalsGrid />
             <BottomNav />

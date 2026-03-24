@@ -1,0 +1,266 @@
+/* FocusPanel — inline expandable focus timer at the bottom of Goal detail pages */
+
+/* ── Outer wrapper ── */
+
+.focus-panel {
+    margin-top: var(--space-xl);
+    margin-bottom: var(--space-lg);
+}
+
+
+/* ── Collapsed: Focus button ── */
+
+.btn-focus {
+    width: 100%;
+    background-color: var(--green);
+    color: #fff;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 16px;
+    border: none;
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(105, 153, 93, 0.3);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-focus:active {
+    transform: scale(0.97);
+}
+
+
+/* ── Expand/collapse animation ── */
+
+.focus-panel-body {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.45s ease-out, opacity 0.3s ease-out;
+}
+
+.focus-panel-body.open {
+    max-height: 680px;
+    opacity: 1;
+}
+
+
+/* ── Setup view ── */
+
+.focus-setup {
+    padding: var(--space-lg) 0 var(--space-md);
+}
+
+.focus-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-lg);
+}
+
+.focus-panel-title {
+    font-family: var(--font-serif);
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--text-main);
+    margin: 0;
+}
+
+.focus-close-btn {
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    transition: background 0.15s;
+    line-height: 1;
+}
+
+.focus-close-btn:hover {
+    background: rgba(0, 0, 0, 0.06);
+}
+
+.focus-duration-label {
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin: var(--space-sm) 0 var(--space-md);
+}
+
+
+/* ── Mode toggle ── */
+
+.focus-mode-toggle {
+    display: flex;
+    gap: 6px;
+    background: var(--blue-soft, #dce3e9);
+    border-radius: var(--radius-lg);
+    padding: 4px;
+    margin: var(--space-sm) 0;
+}
+
+.focus-mode-btn {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: calc(var(--radius-lg) - 4px);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    background: transparent;
+    color: var(--text-secondary);
+    transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.focus-mode-btn.active {
+    background: var(--card-bg);
+    color: var(--text-main);
+    font-weight: 600;
+    box-shadow: var(--shadow-sm);
+}
+
+.focus-mode-hint {
+    font-size: 12px;
+    color: var(--text-secondary);
+    text-align: center;
+    margin: var(--space-xs) 0 var(--space-sm);
+}
+
+.btn-start-session {
+    width: 100%;
+    background-color: var(--green);
+    color: #fff;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 16px;
+    border: none;
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    cursor: pointer;
+    margin-top: var(--space-md);
+    box-shadow: 0 4px 12px rgba(105, 153, 93, 0.3);
+    transition: transform 0.15s ease;
+}
+
+.btn-start-session:active {
+    transform: scale(0.97);
+}
+
+
+/* ── Active session view ── */
+
+.focus-active {
+    padding: var(--space-lg) 0 var(--space-md);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.focus-active .focus-panel-title {
+    text-align: center;
+}
+
+.focus-countdown {
+    font-family: var(--font-serif);
+    font-size: 52px;
+    font-weight: 600;
+    color: var(--text-main);
+    letter-spacing: 3px;
+    line-height: 1;
+}
+
+.focus-mode-label {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.btn-stop-session {
+    background-color: var(--red, #dd645f);
+    color: #fff;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 15px;
+    border: none;
+    border-radius: var(--radius-lg);
+    padding: 14px 36px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(221, 100, 95, 0.28);
+    transition: transform 0.15s ease;
+}
+
+.btn-stop-session:active {
+    transform: scale(0.97);
+}
+
+.focus-warning {
+    font-size: 12px;
+    color: var(--accent-red-soft, #dd645f);
+    text-align: center;
+    margin: 0;
+}
+
+
+/* ── Timer Dial ── */
+
+.timer-dial-wrapper {
+    position: relative;
+    height: 150px;
+    overflow: hidden;
+}
+
+.timer-dial-highlight {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 50px;
+    transform: translateY(-50%);
+    background: rgba(105, 153, 93, 0.09);
+    border-top: 1.5px solid rgba(105, 153, 93, 0.28);
+    border-bottom: 1.5px solid rgba(105, 153, 93, 0.28);
+    border-radius: var(--radius-sm);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.timer-dial-scroll {
+    height: 150px;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+
+.timer-dial-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+.timer-dial-spacer {
+    height: 50px;
+    flex-shrink: 0;
+}
+
+.timer-dial-item {
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    scroll-snap-align: center;
+    font-family: var(--font-serif);
+    font-size: 17px;
+    color: var(--text-secondary);
+    opacity: 0.4;
+    transition: opacity 0.15s, font-size 0.15s;
+    user-select: none;
+}
+
+.timer-dial-item.selected {
+    opacity: 1;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--text-main);
+}
