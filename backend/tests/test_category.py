@@ -71,3 +71,41 @@ class TestDeleteCategory:
         assert "message" in data
         assert "user_id" in data
         assert "category" in data
+
+    #── 404 — category not found ──────────────────────────────────────────────
+ 
+    @patch("app.routers.goals.supabase")
+    def test_delete_category_not_found(self, mock_sb, mock_user_id):
+        """Should return 404 when the category does not exist for this user."""
+        mock_sb.table.return_value = _mock_supabase_chain([])  # empty → not found
+ 
+        response = client.delete(f"/api/categories/{mock_user_id}/NonExistentCategory")
+ 
+        assert response.status_code == 404
+        assert "not found" in response.json()["detail"].lower()
+ 
+    @patch("app.routers.goals.supabase")
+    def test_delete_default_category_returns_404(self, mock_sb, mock_user_id):
+        """
+        System default categories (Health, Work, etc.) are not stored per-user
+        in the categories table, so the SELECT returns nothing → 404.
+        """
+        mock_sb.table.return_value = _mock_supabase_chain([])
+ 
+        response = client.delete(f"/api/categories/{mock_user_id}/Health")
+ 
+        assert response.status_code == 404
+ 
+    @patch("app.routers.goals.supabase") 
+    def test_delete_category_wrong_user_returns_404(self, mock_sb, mock_category_name):
+        """
+        A category belonging to a different user should not be found
+        (the SELECT filters by both user_id and name).
+        """
+        mock_sb.table.return_value = _mock_supabase_chain([])
+ 
+        response = client.delete(f"/api/categories/wrong-user-id/{mock_category_name}")
+ 
+        assert response.status_code == 404
+ 
+    
