@@ -79,6 +79,7 @@
     min-width: 0;
 }
 
+/* draw animation: red underline draws in from left */
 .goal-detail-header__title-input {
     flex: 1;
     font-family: var(--font-serif);
@@ -87,10 +88,20 @@
     color: var(--text-main);
     background: transparent;
     border: none;
-    border-bottom: 2px solid var(--red);
+    border-bottom: 2px solid transparent;
     outline: none;
     padding: 4px 0;
     min-width: 0;
+    background-image: linear-gradient(var(--red), var(--red));
+    background-size: 0% 2px;
+    background-position: left bottom;
+    background-repeat: no-repeat;
+    animation: drawUnderline 0.4s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+}
+
+@keyframes drawUnderline {
+    0%   { background-size: 0% 2px; }
+    100% { background-size: 100% 2px; }
 }
 
 .goal-detail-header__action-btn {
@@ -104,14 +115,42 @@
     border-radius: 50%;
     flex-shrink: 0;
     transition: background-color 0.15s;
+    animation: actionBtnIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
 .goal-detail-header__action-btn.save {
     color: var(--green);
+    animation-delay: 0.15s;
 }
 
 .goal-detail-header__action-btn.cancel {
     color: #888;
+    animation-delay: 0.22s;
+}
+
+@keyframes actionBtnIn {
+    0%   { opacity: 0; transform: scale(0.5); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+/* closing animations */
+
+.goal-detail-header__title-input.closing {
+    animation: eraseUnderline 0.2s ease-in forwards;
+}
+
+@keyframes eraseUnderline {
+    0%   { background-size: 100% 2px; }
+    100% { background-size: 0% 2px; }
+}
+
+.goal-detail-header__action-btn.closing {
+    animation: actionBtnOut 0.15s ease-in forwards;
+}
+
+@keyframes actionBtnOut {
+    0%   { opacity: 1; transform: scale(1); }
+    100% { opacity: 0; transform: scale(0.5); }
 }
 
 .goal-detail-header__action-btn:active {

@@ -25,27 +25,37 @@ const GoalDetailHeader = ({ title, progress = 0, category, endDate, onBack, onTi
     const progressColor = getProgressColor(progress);
     const formattedEndDate = formatEndDate(endDate);
     const [isEditing, setIsEditing] = useState(false);
+    const [editClosing, setEditClosing] = useState(false);
     const [editValue, setEditValue] = useState(title);
     const inputRef = useRef(null);
 
     useEffect(() => {
-        if (isEditing && inputRef.current) {
+        if (isEditing && !editClosing && inputRef.current) {
             inputRef.current.focus();
             inputRef.current.select();
         }
-    }, [isEditing]);
+    }, [isEditing, editClosing]);
+
+    const closeEdit = (callback) => {
+        setEditClosing(true);
+        setTimeout(() => {
+            setIsEditing(false);
+            setEditClosing(false);
+            if (callback) callback();
+        }, 200);
+    };
 
     const handleSave = () => {
         const trimmed = editValue.trim();
-        if (trimmed && trimmed !== title && onTitleChange) {
-            onTitleChange(trimmed);
-        }
-        setIsEditing(false);
+        closeEdit(() => {
+            if (trimmed && trimmed !== title && onTitleChange) {
+                onTitleChange(trimmed);
+            }
+        });
     };
 
     const handleCancel = () => {
-        setEditValue(title);
-        setIsEditing(false);
+        closeEdit(() => setEditValue(title));
     };
 
     const handleKeyDown = (e) => {
@@ -65,18 +75,18 @@ const GoalDetailHeader = ({ title, progress = 0, category, endDate, onBack, onTi
                     <ArrowUpLeft size={40} strokeWidth={2.5} />
                 </button>
                 {isEditing ? (
-                    <div className="goal-detail-header__edit-row">
+                    <div className={`goal-detail-header__edit-row${editClosing ? ' closing' : ''}`}>
                         <input
                             ref={inputRef}
-                            className="goal-detail-header__title-input"
+                            className={`goal-detail-header__title-input${editClosing ? ' closing' : ''}`}
                             value={editValue}
                             onChange={(e) => setEditValue(e.target.value)}
                             onKeyDown={handleKeyDown}
                         />
-                        <button className="goal-detail-header__action-btn save" onClick={handleSave} aria-label="Save">
+                        <button className={`goal-detail-header__action-btn save${editClosing ? ' closing' : ''}`} onClick={handleSave} aria-label="Save">
                             <Check size={22} strokeWidth={2.5} />
                         </button>
-                        <button className="goal-detail-header__action-btn cancel" onClick={handleCancel} aria-label="Cancel">
+                        <button className={`goal-detail-header__action-btn cancel${editClosing ? ' closing' : ''}`} onClick={handleCancel} aria-label="Cancel">
                             <X size={22} strokeWidth={2.5} />
                         </button>
                     </div>
