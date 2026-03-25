@@ -69,6 +69,55 @@
     line-height: 1.2;
 }
 
+/* inline title editing */
+
+.goal-detail-header__edit-row {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+}
+
+.goal-detail-header__title-input {
+    flex: 1;
+    font-family: var(--font-serif);
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text-main);
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid var(--red);
+    outline: none;
+    padding: 4px 0;
+    min-width: 0;
+}
+
+.goal-detail-header__action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    flex-shrink: 0;
+    transition: background-color 0.15s;
+}
+
+.goal-detail-header__action-btn.save {
+    color: var(--green);
+}
+
+.goal-detail-header__action-btn.cancel {
+    color: #888;
+}
+
+.goal-detail-header__action-btn:active {
+    background-color: rgba(0, 0, 0, 0.06);
+}
+
 /* progress section */
 
 .goal-detail-header__progress-section {

@@ -416,6 +416,7 @@ const [closingDelete, setClosingDelete] = useState(false);
                     progress={progress}
                     category={goalCategory}
                     endDate={endDate}
+                    onTitleChange={(newTitle) => setGoalTitle(newTitle)}
                     onBack={() => {
                         if (location.state?.from === 'schedule') {
                             navigate('/schedule', {
