@@ -126,3 +126,25 @@ def test_get_tasks_for_date_invalid_format():
  
     assert response.status_code == 400
     assert "Invalid date format" in response.json()["detail"]
+
+
+def test_get_tasks_for_date_completely_invalid_string():
+    """Should return 400 for a completely nonsensical date string."""
+    response = client.get("/api/schedule/user-1/date?date=not-a-date")
+ 
+    assert response.status_code == 400
+    assert "Invalid date format" in response.json()["detail"]
+ 
+ 
+def test_get_tasks_for_date_excludes_completed():
+    """Completed tasks should never appear in the date results."""
+    with patch("app.routers.schedule.get_all_goals") as mock_goals:
+        mock_goals.return_value = SAMPLE_GOALS
+ 
+        response = client.get(f"/api/schedule/user-1/date?date={IN_14_DAYS}")
+ 
+    assert response.status_code == 200
+    data = response.json()
+    # task-3 is due IN_14_DAYS but is completed — should not appear
+    for task in data["tasks"]:
+        assert task["status"] != "completed"
