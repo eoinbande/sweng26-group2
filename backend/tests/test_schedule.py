@@ -173,3 +173,19 @@ def test_get_tasks_for_date_response_shape():
     assert "date" in data
     assert "tasks" in data
     assert "count" in data
+
+# GET /schedule/{user_id}/upcoming-tasks — tasks in next N days
+
+def test_get_upcoming_tasks_default_window():
+    """Should return tasks within the default 15-day window."""
+    with patch("app.routers.schedule.get_all_goals") as mock_goals:
+        mock_goals.return_value = SAMPLE_GOALS
+ 
+        response = client.get("/api/schedule/user-1/upcoming-tasks")
+ 
+    assert response.status_code == 200
+    data = response.json()
+    # task-1 (today) and task-2 (in 7 days) are within 15 days
+    # task-3 is completed so excluded; task-4 is in 20 days so outside default window
+    assert data["count"] == 2
+    assert data["days"] == 15
