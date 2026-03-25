@@ -264,3 +264,34 @@ def test_get_upcoming_tasks_goal_metadata_attached():
     for task in data["tasks"]:
         assert "goal_id" in task
         assert "goal_title" in task
+
+def test_get_upcoming_tasks_excludes_past_tasks():
+    """Tasks with due dates before today should not appear."""
+    goals_with_past_task = [
+        {
+            "id": "goal-x",
+            "title": "Old goal",
+            "category": "personal",
+            "goal_data": {
+                "goal_due_date": IN_7_DAYS,
+                "tasks": [
+                    {
+                        "id": "task-old",
+                        "ai_id": "task_old",
+                        "description": "Overdue task",
+                        "due_date": YESTERDAY,
+                        "status": "not_started",
+                        "order": 1
+                    }
+                ]
+            }
+        }
+    ]
+    with patch("app.routers.schedule.get_all_goals") as mock_goals:
+        mock_goals.return_value = goals_with_past_task
+ 
+        response = client.get("/api/schedule/user-1/upcoming-tasks")
+ 
+    data = response.json()
+    assert data["count"] == 0
+ 
