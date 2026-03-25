@@ -202,3 +202,14 @@ def test_get_upcoming_tasks_custom_window():
     # task-1, task-2, and task-4 (in 20 days) all fall within 25 days; task-3 is completed
     assert data["count"] == 3
     assert data["days"] == 25
+
+def test_get_upcoming_tasks_excludes_completed():
+    """Completed tasks should never appear in upcoming tasks."""
+    with patch("app.routers.schedule.get_all_goals") as mock_goals:
+        mock_goals.return_value = SAMPLE_GOALS
+    
+        response = client.get("/api/schedule/user-1/upcoming-tasks?days=60")
+ 
+    data = response.json()
+    for task in data["tasks"]:
+        assert task["status"] != "completed"
