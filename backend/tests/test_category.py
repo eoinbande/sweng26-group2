@@ -21,3 +21,19 @@ def mock_user_id():
 def mock_category_name():
     """Standard custom category name."""
     return "Fitness"
+
+def _mock_supabase_chain(data):
+    """
+    Helper that builds a mock Supabase fluent chain ending in .execute().
+    Covers .select().eq().eq().execute() and similar patterns.
+    """
+    mock_response = MagicMock()
+    mock_response.data = data
+ 
+    chain = MagicMock()
+    chain.execute.return_value = mock_response
+    chain.select.return_value = chain
+    chain.eq.return_value = chain
+    chain.update.return_value = chain
+    chain.delete.return_value = chain
+    return chain
