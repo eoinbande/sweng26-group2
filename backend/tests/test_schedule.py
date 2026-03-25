@@ -88,3 +88,21 @@ GOAL_NO_TASKS = [
         }
     }
 ]
+
+
+# ==============================================================================
+# GET /schedule/{user_id}/date — tasks for a specific date
+# ==============================================================================
+ 
+def test_get_tasks_for_date_success():
+    """Should return tasks that are due on the given date."""
+    with patch("app.routers.schedule.get_all_goals") as mock_goals:
+        mock_goals.return_value = SAMPLE_GOALS
+ 
+        response = client.get(f"/api/schedule/user-1/date?date={TODAY}")
+ 
+    assert response.status_code == 200
+    data = response.json()
+    assert data["date"] == TODAY
+    assert data["count"] == 1
+    assert data["tasks"][0]["description"] == "Buy a new tyre"
