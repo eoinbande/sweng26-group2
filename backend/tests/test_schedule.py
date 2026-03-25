@@ -106,3 +106,23 @@ def test_get_tasks_for_date_success():
     assert data["date"] == TODAY
     assert data["count"] == 1
     assert data["tasks"][0]["description"] == "Buy a new tyre"
+
+def test_get_tasks_for_date_no_tasks_on_day():
+    """Should return empty list when no tasks are due on the given date."""
+    with patch("app.routers.schedule.get_all_goals") as mock_goals:
+        mock_goals.return_value = SAMPLE_GOALS
+ 
+        response = client.get(f"/api/schedule/user-1/date?date={YESTERDAY}")
+ 
+    assert response.status_code == 200
+    data = response.json()
+    assert data["count"] == 0
+    assert data["tasks"] == []
+ 
+ 
+def test_get_tasks_for_date_invalid_format():
+    """Should return 400 when date is not in YYYY-MM-DD format."""
+    response = client.get("/api/schedule/user-1/date?date=25-03-2026")
+ 
+    assert response.status_code == 400
+    assert "Invalid date format" in response.json()["detail"]
