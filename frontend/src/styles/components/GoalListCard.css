@@ -146,6 +146,12 @@
     background-color: rgba(255,255,255,0.5);
     color: var(--text-main);
     white-space: nowrap;
+    animation: badgePopIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes badgePopIn {
+    0% { opacity: 0; transform: scale(0.7); }
+    100% { opacity: 1; transform: scale(1); }
 }
 
 .assign-category-btn {
@@ -180,6 +186,22 @@
     z-index: 100;
     min-width: 140px;
     padding: 8px 0;
+    animation: assignDropdownIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform-origin: top right;
+}
+
+@keyframes assignDropdownIn {
+    0% { opacity: 0; transform: scale(0.9) translateY(-6px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes assignDropdownOut {
+    0% { opacity: 1; transform: scale(1) translateY(0); }
+    100% { opacity: 0; transform: scale(0.9) translateY(-6px); }
+}
+
+.assign-dropdown.closing {
+    animation: assignDropdownOut 0.2s ease-in forwards;
 }
 
 .assign-dropdown p {
