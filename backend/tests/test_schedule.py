@@ -334,4 +334,103 @@ def test_get_upcoming_goals_excludes_draft_goals():
     data = response.json()
     assert data["count"] == 0
 
+def test_get_upcoming_goals_no_goals():
+    """Should return empty list when user has no goals at all."""
+    with patch("app.routers.schedule.get_all_goals") as mock_goals:
+        mock_goals.return_value = []
  
+        response = client.get("/api/schedule/user-1/upcoming-goals")
+ 
+    assert response.status_code == 200
+    data = response.json()
+    assert data["count"] == 0
+    assert data["goals"] == []
+ 
+ 
+def test_get_upcoming_goals_sorted_by_due_date():
+    """Goals should be returned sorted by goal_due_date ascending."""
+    with patch("app.routers.schedule.get_all_goals") as mock_goals:
+        mock_goals.return_value = SAMPLE_GOALS
+ 
+        response = client.get("/api/schedule/user-1/upcoming-goals?days=60")
+ 
+    data = response.json()
+    dates = [g["goal_due_date"] for g in data["goals"]]
+    assert dates == sorted(dates)
+
+def test_get_upcoming_goals_response_shape():
+    """Response should include from, to, days, goals, and count."""
+    with patch("app.routers.schedule.get_all_goals") as mock_goals:
+        mock_goals.return_value = SAMPLE_GOALS
+ 
+        response = client.get("/api/schedule/user-1/upcoming-goals")
+ 
+    data = response.json()
+    assert "from" in data
+    assert "to" in data
+    assert "days" in data
+    assert "goals" in data
+    assert "count" in data
+ 
+ 
+def test_get_upcoming_goals_goal_fields():
+    """Each goal entry should carry the expected fields."""
+    with patch("app.routers.schedule.get_all_goals") as mock_goals:
+        mock_goals.return_value = SAMPLE_GOALS
+ 
+        response = client.get("/api/schedule/user-1/upcoming-goals?days=60")
+ 
+    data = response.json()
+    for goal in data["goals"]:
+        assert "goal_id" in goal
+        assert "title" in goal
+        assert "category" in goal
+        assert "goal_due_date" in goal
+        assert "task_count" in goal
+ 
+ 
+def test_get_upcoming_goals_task_count_correct():
+    """task_count should reflect the number of tasks in the goal."""
+    with patch("app.routers.schedule.get_all_goals") as mock_goals:
+        mock_goals.return_value = SAMPLE_GOALS
+ 
+        response = client.get("/api/schedule/user-1/upcoming-goals?days=60")
+ 
+    data = response.json()
+    goal_1 = next(g for g in data["goals"] if g["goal_id"] == "goal-1")
+    assert goal_1["task_count"] == 3  # all 3 tasks in goal-1 (including completed)
+ 
+ 
+def test_get_upcoming_goals_goal_data_as_string():
+    """Should handle goal_data stored as a JSON string (Supabase JSONB edge case)."""
+    import json
+    goals_with_string_data = [
+        {
+            "id": "goal-str",
+            "title": "Stringified goal",
+            "category": "health",
+            "goal_data": json.dumps({
+                "description": "Stored as string",
+                "goal_due_date": IN_14_DAYS,
+                "tasks": [
+                    {
+                        "id": "t-1",
+                        "ai_id": "task_1",
+                        "description": "Some task",
+                        "due_date": IN_7_DAYS,
+                        "status": "not_started",
+                        "order": 1
+                    }
+                ]
+            })
+        }
+    ]
+    with patch("app.routers.schedule.get_all_goals") as mock_goals:
+        mock_goals.return_value = goals_with_string_data
+ 
+        response = client.get("/api/schedule/user-1/upcoming-goals?days=30")
+ 
+    assert response.status_code == 200
+    data = response.json()
+    assert data["count"] == 1
+    assert data["goals"][0]["goal_id"] == "goal-str" 
