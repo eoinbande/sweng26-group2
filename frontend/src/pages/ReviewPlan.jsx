@@ -7,6 +7,7 @@ import { InputBar } from '../components/InputBar';
 import LoadingOverlay from '../components/LoadingOverlay';
 import { isDemoMode } from '../supabase_client';
 import { useGoals } from '../contexts/GoalsContext';
+import { useSchedule } from '../contexts/ScheduleContext';
 import '../styles/CreateGoal.css';
 import '../index.css';
 
@@ -14,6 +15,7 @@ function ReviewPlan() {
     const navigate = useNavigate();
     const location = useLocation();
     const { addGoal } = useGoals();
+    const { refreshSchedule } = useSchedule();
 
     // set body background so color bleeds behind status bar
     useEffect(() => {
@@ -192,6 +194,7 @@ function ReviewPlan() {
                 due_date: dateToSend !== 'AI_DECIDE' ? dateToSend : data.due_date,
                 description: previewData.description || '',
             });
+            refreshSchedule();
 
             navigate(`/goal/${goalId}`, {
                 state: { goalId }

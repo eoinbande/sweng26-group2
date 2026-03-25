@@ -11,12 +11,14 @@ import Congratulations from '../components/Congratulations';
 import '../styles/GoalDetail.css';
 import { supabase } from '../supabase_client';
 import { useGoals } from '../contexts/GoalsContext';
+import { useSchedule } from '../contexts/ScheduleContext';
 
 const GoalDetail = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { id: paramId } = useParams();
     const { deleteGoal: removeGoalFromCache, updateGoalProgress } = useGoals();
+    const { refreshSchedule } = useSchedule();
 
     // set body background so color bleeds behind status bar
     useEffect(() => {
@@ -374,6 +376,7 @@ const [closingDelete, setClosingDelete] = useState(false);
 
             if (response.ok) {
                 removeGoalFromCache(goalId);
+                refreshSchedule();
                 triggerToast("Goal deleted successfully");
                 setTimeout(() => navigate('/goals'), 1500);
             } else {
