@@ -218,6 +218,9 @@ const [closingDelete, setClosingDelete] = useState(false);
                     }
                 } catch (e) { console.error("Failed to fetch progress:", e); }
             }
+
+            // refresh schedule so completed tasks/goals disappear from calendar
+            refreshSchedule();
         } catch (e) {
             console.error("Failed to update task status:", e);
         }
