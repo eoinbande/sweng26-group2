@@ -294,4 +294,20 @@ def test_get_upcoming_tasks_excludes_past_tasks():
  
     data = response.json()
     assert data["count"] == 0
+
+# GET /schedule/{user_id}/upcoming-goals — goals due in next N days
+
+def test_get_upcoming_goals_default_window():
+    """Should return goals due within the default 30-day window."""
+    with patch("app.routers.schedule.get_all_goals") as mock_goals:
+        mock_goals.return_value = SAMPLE_GOALS
+ 
+        response = client.get("/api/schedule/user-1/upcoming-goals")
+ 
+    assert response.status_code == 200
+    data = response.json()
+    # goal-1 is due in 14 days (within 30), goal-2 is due in 35 days (outside)
+    assert data["count"] == 1
+    assert data["goals"][0]["goal_id"] == "goal-1"
+
  
