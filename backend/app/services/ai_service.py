@@ -16,11 +16,15 @@ class AIService:
 
 
 def log_ai_usage(user_id, endpoint_type, tokens_used, carbon_footprint):
+    try:
+        supabase.table("ai_usage_logs").insert({
+            "user_id": user_id,
+            "endpoint_type": endpoint_type,
+            "tokens_used": tokens_used,
+            "carbon_footprint": carbon_footprint
+        }).execute()
+        print(f"[GREEN LOG] Logged: user={user_id}, type={endpoint_type}, tokens={tokens_used}, carbon={carbon_footprint}")
+    except Exception as e:
+        print(f"[GREEN LOG ERROR] Failed to log: {e}")
 
-    supabase.table("ai_usage_logs").insert({
-        "user_id": user_id,
-        "endpoint_type": endpoint_type,
-        "tokens_used": tokens_used,
-        "carbon_footprint": carbon_footprint
-    })
 """Central place for error handling and logging"""
