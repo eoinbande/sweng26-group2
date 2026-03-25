@@ -71,6 +71,16 @@ body {
 
 #root {
     height: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+    position: relative;
+}
+
+/* on desktop, contain page backgrounds within the app container */
+@media (min-width: 481px) {
+    body {
+        background-color: Canvas !important;
+    }
 }
 
 h1,
