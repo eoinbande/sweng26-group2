@@ -72,21 +72,26 @@ export const GoalsProvider = ({ children }) => {
         fetchGoals();
     }, [fetchGoals]);
 
-    // add a newly accepted goal to the cache
+    // add or update a goal in the cache (prevents duplicates on feedback re-accept)
     const addGoal = useCallback((goal) => {
         setGoals(prev => {
+            const goalId = goal.id || goal.goal_id;
+            const existing = prev.find(g => g.id === goalId);
             const newGoal = {
-                id: goal.id || goal.goal_id,
+                id: goalId,
                 title: goal.title,
-                category: goal.category || null,
+                category: goal.category || existing?.category || null,
                 description: goal.description || '',
                 dueDate: goal.due_date || goal.goal_due_date || null,
                 dateFormatted: (goal.due_date || goal.goal_due_date)
                     ? new Date(goal.due_date || goal.goal_due_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
                     : '',
-                progress: 0,
-                colorScheme: COLOR_SCHEMES[prev.length % COLOR_SCHEMES.length],
+                progress: existing?.progress ?? 0,
+                colorScheme: existing?.colorScheme || COLOR_SCHEMES[prev.length % COLOR_SCHEMES.length],
             };
+            if (existing) {
+                return prev.map(g => g.id === goalId ? newGoal : g);
+            }
             return [...prev, newGoal];
         });
     }, []);
