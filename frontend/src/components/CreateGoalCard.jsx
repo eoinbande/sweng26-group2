@@ -26,10 +26,7 @@ const CreateGoalCard = () => {
                 </p>
             </div>
 
-            <button className="interactive create-goal-btn" onClick={() => navigate('/create-goal')}
-                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
-                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1.0)'}
-            >
+            <button className="create-goal-btn" onClick={() => navigate('/create-goal')}>
                 <Plus style={{ width: '45%', height: '45%' }} color="#1A1A1A" />
             </button>
         </div>

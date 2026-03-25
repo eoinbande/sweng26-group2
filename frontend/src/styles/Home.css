@@ -117,8 +117,19 @@
     justify-content: center;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     flex-shrink: 0;
-    transition: transform 0.2s;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
     cursor: pointer;
+}
+
+@media (hover: hover) {
+    .home-page .home-create-goal .create-goal-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    }
+}
+
+.home-page .home-create-goal .create-goal-btn:active {
+    transform: scale(1.15);
 }
 
 
