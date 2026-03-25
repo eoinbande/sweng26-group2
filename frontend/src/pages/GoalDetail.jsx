@@ -36,6 +36,7 @@ const GoalDetail = () => {
     /* rstore tasks from location.state if returning from feedback page */
     const [tasks, setTasks] = useState(location.state?.tasks || []);
     const [endDate, setEndDate] = useState("");
+    const [rawDueDate, setRawDueDate] = useState("");
     const [progress, setProgress] = useState(0);
 
     // Feedback popup state
@@ -132,7 +133,8 @@ const [closingDelete, setClosingDelete] = useState(false);
                 // Set End Date if available
                 if (data.goal && data.goal.goal_data && data.goal.goal_data.goal_due_date) {
                     const rawDate = data.goal.goal_data.goal_due_date;
-                    // Format date nicely (e.g. 14 Feb 2026)
+                    setRawDueDate(rawDate);
+                    // format date nicely (e.g. 14 Feb 2026)
                     const dateObj = new Date(rawDate);
                     if (!isNaN(dateObj)) {
                         setEndDate(dateObj.toLocaleDateString('en-GB', {
@@ -354,7 +356,8 @@ const [closingDelete, setClosingDelete] = useState(false);
                 },
                 userId: userId,
                 originalPrompt: goalTitle,
-                dueDate: endDate,
+                dueDate: rawDueDate || 'AI_DECIDE',
+                from: 'feedback',
             },
         });
 

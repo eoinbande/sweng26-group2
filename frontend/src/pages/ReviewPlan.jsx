@@ -14,7 +14,7 @@ import '../index.css';
 function ReviewPlan() {
     const navigate = useNavigate();
     const location = useLocation();
-    const { addGoal } = useGoals();
+    const { addGoal, refreshGoals } = useGoals();
     const { refreshSchedule } = useSchedule();
 
     // set body background so color bleeds behind status bar
@@ -187,13 +187,8 @@ function ReviewPlan() {
                 return;
             }
 
-            // add to goals cache so other pages have it instantly
-            addGoal({
-                id: goalId,
-                title: previewData.title || location.state?.goalTitle,
-                due_date: dateToSend !== 'AI_DECIDE' ? dateToSend : data.due_date,
-                description: previewData.description || '',
-            });
+            // refetch full data from backend so all pages have correct info
+            refreshGoals();
             refreshSchedule();
 
             navigate(`/goal/${goalId}`, {
