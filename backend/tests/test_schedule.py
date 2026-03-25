@@ -189,3 +189,16 @@ def test_get_upcoming_tasks_default_window():
     # task-3 is completed so excluded; task-4 is in 20 days so outside default window
     assert data["count"] == 2
     assert data["days"] == 15
+
+def test_get_upcoming_tasks_custom_window():
+    """Should respect a custom days query param."""
+    with patch("app.routers.schedule.get_all_goals") as mock_goals:
+        mock_goals.return_value = SAMPLE_GOALS
+ 
+        response = client.get("/api/schedule/user-1/upcoming-tasks?days=25")
+ 
+    assert response.status_code == 200
+    data = response.json()
+    # task-1, task-2, and task-4 (in 20 days) all fall within 25 days; task-3 is completed
+    assert data["count"] == 3
+    assert data["days"] == 25
