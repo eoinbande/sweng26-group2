@@ -21,7 +21,10 @@ export const GoalsProvider = ({ children }) => {
             const res = await fetch(`${baseUrl}/goals/${user.id}`, { cache: 'no-store' });
             const data = await res.json();
 
-            const mapped = await Promise.all((data.goals || []).map(async (goal, index) => {
+            // fetch progress sequentially to avoid flooding supabase connections
+            const mapped = [];
+            for (let index = 0; index < (data.goals || []).length; index++) {
+                const goal = data.goals[index];
                 let goalData = {};
                 try {
                     goalData = typeof goal.goal_data === 'string'
@@ -38,7 +41,7 @@ export const GoalsProvider = ({ children }) => {
                     console.error('failed to fetch progress for goal ' + goal.id);
                 }
 
-                return {
+                mapped.push({
                     id: goal.id,
                     title: goal.title,
                     category: goal.category || null,
@@ -49,8 +52,8 @@ export const GoalsProvider = ({ children }) => {
                         : '',
                     progress,
                     colorScheme: COLOR_SCHEMES[index % COLOR_SCHEMES.length],
-                };
-            }));
+                });
+            }
 
             setGoals(mapped);
 

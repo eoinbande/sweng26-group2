@@ -106,20 +106,15 @@ const [closingDelete, setClosingDelete] = useState(false);
         const fetchGoalDetails = async () => {
             setIsLoading(true);
             try {
-                // fetch goal details and progress in parallel
-                const [response, progRes] = await Promise.all([
-                    fetch(`${import.meta.env.VITE_API_URL}/goal-details/${goalId}`, { cache: 'no-store' }),
-                    fetch(`${import.meta.env.VITE_API_URL}/tasks/${goalId}/progress`, { cache: 'no-store' }),
-                ]);
-
+                // fetch sequentially to avoid flooding supabase connections
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/goal-details/${goalId}`, { cache: 'no-store' });
                 if (!response.ok) {
                     throw new Error('Failed to fetch details');
                 }
+                const data = await response.json();
 
-                const [data, progData] = await Promise.all([
-                    response.json(),
-                    progRes.json(),
-                ]);
+                const progRes = await fetch(`${import.meta.env.VITE_API_URL}/tasks/${goalId}/progress`, { cache: 'no-store' });
+                const progData = await progRes.json();
 
                 // Debug log to check data structure
                 console.log("Goal details fetched:", data);

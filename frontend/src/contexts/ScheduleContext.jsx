@@ -33,14 +33,14 @@ export const ScheduleProvider = ({ children }) => {
     const fetchSchedule = useCallback(async () => {
         if (!user) return;
         try {
-            const [tasksRes, goalsRes] = await Promise.all([
-                fetch(`${baseUrl}/schedule/${user.id}/upcoming-tasks`),
-                fetch(`${baseUrl}/schedule/${user.id}/upcoming-goals`),
-            ]);
+            // fetch sequentially to avoid flooding supabase connections
+            const tasksRes = await fetch(`${baseUrl}/schedule/${user.id}/upcoming-tasks`);
             if (tasksRes.ok) {
                 const json = await tasksRes.json();
                 setUpcomingTasks(json.tasks.map(mapTaskToTimeline));
             }
+
+            const goalsRes = await fetch(`${baseUrl}/schedule/${user.id}/upcoming-goals`);
             if (goalsRes.ok) {
                 const json = await goalsRes.json();
                 setUpcomingGoals(json.goals.map(mapGoalToTimeline));
