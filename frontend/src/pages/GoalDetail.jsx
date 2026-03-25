@@ -192,7 +192,7 @@ const [closingDelete, setClosingDelete] = useState(false);
         prevProgressRef.current = progress;
     }, [progress]);
 
-    /* API Helper to update status */
+    /* API Helper to update status - only patches, no progress fetch to avoid race conditions */
     const updateTaskStatus = async (taskId, newStatus) => {
         try {
             const res = await fetch(`${import.meta.env.VITE_API_URL}/tasks/${taskId}/status`, {
@@ -203,20 +203,7 @@ const [closingDelete, setClosingDelete] = useState(false);
 
             if (!res.ok) {
                 console.error("Failed to update task status:", res.status);
-                // Optionally revert local state here
                 return;
-            }
-
-            // fetch progress after successful update
-            if (goalId) {
-                try {
-                    const progRes = await fetch(`${import.meta.env.VITE_API_URL}/tasks/${goalId}/progress`, { cache: 'no-store' });
-                    const progData = await progRes.json();
-                    if (progData) {
-                        setProgress(progData.percentage);
-                        updateGoalProgress(goalId, progData.percentage);
-                    }
-                } catch (e) { console.error("Failed to fetch progress:", e); }
             }
 
             // refresh schedule so completed tasks/goals disappear from calendar
@@ -225,6 +212,14 @@ const [closingDelete, setClosingDelete] = useState(false);
             console.error("Failed to update task status:", e);
         }
     };
+
+    // sync local progress whenever it changes (after initial load).
+    // So no per-request progress fetch
+    useEffect(() => {
+        if (prevProgressRef.current !== null && goalId) {
+            updateGoalProgress(goalId, progress);
+        }
+    }, [progress, goalId, updateGoalProgress]);
 
     /* derived helpers */
     const isTaskComplete = (task) => {
