@@ -237,3 +237,30 @@ def test_get_upcoming_tasks_no_goals():
     data = response.json()
     assert data["count"] == 0
     assert data["tasks"] == []
+
+def test_get_upcoming_tasks_response_shape():
+    """Response should include from, to, days, tasks, and count."""
+    with patch("app.routers.schedule.get_all_goals") as mock_goals:
+        mock_goals.return_value = SAMPLE_GOALS
+ 
+        response = client.get("/api/schedule/user-1/upcoming-tasks")
+ 
+    data = response.json()
+    assert "from" in data
+    assert "to" in data
+    assert "days" in data
+    assert "tasks" in data
+    assert "count" in data
+ 
+ 
+def test_get_upcoming_tasks_goal_metadata_attached():
+    """Each task should carry goal_id and goal_title from its parent goal."""
+    with patch("app.routers.schedule.get_all_goals") as mock_goals:
+        mock_goals.return_value = SAMPLE_GOALS
+ 
+        response = client.get("/api/schedule/user-1/upcoming-tasks?days=60")
+ 
+    data = response.json()
+    for task in data["tasks"]:
+        assert "goal_id" in task
+        assert "goal_title" in task
