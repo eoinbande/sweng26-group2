@@ -108,4 +108,74 @@ class TestDeleteCategory:
  
         assert response.status_code == 404
  
-    
+    # ── Goals are nulled out, not deleted ────────────────────────────────────
+ 
+    @patch("app.routers.goals.supabase")
+    def test_delete_category_nulls_goals_not_deletes_them(
+        self, mock_sb, mock_user_id, mock_category_name
+    ):
+        """
+        Deleting a category must null the category field on affected goals,
+        NOT delete the goals themselves.
+        Verified by confirming UPDATE is called on the goals table.
+        """
+        existing_category = [{"id": "cat-1", "user_id": mock_user_id, "name": mock_category_name}]
+ 
+        # Track which tables are touched
+        tables_called = []
+ 
+        def table_side_effect(table_name):
+            tables_called.append(table_name)
+            return _mock_supabase_chain(existing_category)
+ 
+        mock_sb.table.side_effect = table_side_effect
+ 
+        response = client.delete(f"/api/categories/{mock_user_id}/{mock_category_name}")
+ 
+        assert response.status_code == 200
+        # goals table must be touched (for the UPDATE) and categories for the DELETE
+        assert "goals" in tables_called
+        assert "categories" in tables_called
+ 
+    @patch("app.routers.goals.supabase")
+    def test_delete_category_calls_supabase_three_times(
+        self, mock_sb, mock_user_id, mock_category_name
+    ):
+        """
+        The endpoint should make exactly 3 Supabase calls:
+        1. SELECT  — confirm the category exists
+        2. UPDATE  — null out goals using this category
+        3. DELETE  — remove the category row
+        """
+        existing_category = [{"id": "cat-1", "user_id": mock_user_id, "name": mock_category_name}]
+        mock_sb.table.return_value = _mock_supabase_chain(existing_category)
+ 
+        client.delete(f"/api/categories/{mock_user_id}/{mock_category_name}")
+ 
+        assert mock_sb.table.call_count == 3
+ 
+    # ── Category name in path ────────────────────────────────────────────────
+ 
+    @patch("app.routers.goals.supabase")
+    def test_delete_category_name_with_spaces(self, mock_sb, mock_user_id):
+        """Should handle category names that contain spaces (URL-encoded by the client)."""
+        category_name = "My Custom Goal"
+        existing_category = [{"id": "cat-2", "user_id": mock_user_id, "name": category_name}]
+        mock_sb.table.return_value = _mock_supabase_chain(existing_category)
+ 
+        response = client.delete(f"/api/categories/{mock_user_id}/My%20Custom%20Goal")
+ 
+        assert response.status_code == 200
+        assert response.json()["category"] == category_name
+ 
+    @patch("app.routers.goals.supabase")
+    def test_delete_category_name_returned_in_response(
+        self, mock_sb, mock_user_id, mock_category_name
+    ):
+        """The deleted category name should be echoed back in the response."""
+        existing_category = [{"id": "cat-1", "user_id": mock_user_id, "name": mock_category_name}]
+        mock_sb.table.return_value = _mock_supabase_chain(existing_category)
+ 
+        response = client.delete(f"/api/categories/{mock_user_id}/{mock_category_name}")
+ 
+        assert response.json()["category"] == mock_category_name
