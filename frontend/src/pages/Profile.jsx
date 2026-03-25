@@ -52,18 +52,15 @@ const Profile = () => {
         const fetchAnalytics = async () => {
             try {
                 const baseUrl = import.meta.env.VITE_API_URL;
-                const [streakRes, tasksRes, tasksOnTimeRes, goalsRes, goalsOnTimeRes] = await Promise.all([
-                    fetch(`${baseUrl}/profile/${user.id}/streak`),
-                    fetch(`${baseUrl}/profile/${user.id}/tasks-completed`),
-                    fetch(`${baseUrl}/profile/${user.id}/tasks-completed-on-time`),
-                    fetch(`${baseUrl}/profile/${user.id}/goals-completed`),
-                    fetch(`${baseUrl}/profile/${user.id}/goals-completed-on-time`),
-                ]);
-                if (streakRes.ok) setStreakDays((await streakRes.json()).current_streak ?? 0);
-                if (tasksRes.ok) setTasksCompleted((await tasksRes.json()).tasks_completed ?? 0);
-                if (tasksOnTimeRes.ok) setOnTimeTasks((await tasksOnTimeRes.json()).tasks_completed_on_time ?? 0);
-                if (goalsRes.ok) setGoalsCompleted((await goalsRes.json()).goals_completed ?? 0);
-                if (goalsOnTimeRes.ok) setOnTimeGoals((await goalsOnTimeRes.json()).goals_completed_on_time ?? 0);
+                const res = await fetch(`${baseUrl}/profile/${user.id}/summary`);
+                if (res.ok) {
+                    const data = await res.json();
+                    setStreakDays(data.current_streak ?? 0);
+                    setTasksCompleted(data.tasks_completed ?? 0);
+                    setOnTimeTasks(data.tasks_completed_on_time ?? 0);
+                    setGoalsCompleted(data.goals_completed ?? 0);
+                    setOnTimeGoals(data.goals_completed_on_time ?? 0);
+                }
             } catch (e) {
                 console.error('Error loading analytics', e);
             } finally {
