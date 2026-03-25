@@ -148,3 +148,28 @@ def test_get_tasks_for_date_excludes_completed():
     # task-3 is due IN_14_DAYS but is completed — should not appear
     for task in data["tasks"]:
         assert task["status"] != "completed"
+
+def test_get_tasks_for_date_no_goals():
+    """Should return empty list when user has no goals."""
+    with patch("app.routers.schedule.get_all_goals") as mock_goals:
+        mock_goals.return_value = []
+ 
+        response = client.get(f"/api/schedule/user-1/date?date={TODAY}")
+ 
+    assert response.status_code == 200
+    data = response.json()
+    assert data["count"] == 0
+    assert data["tasks"] == []
+ 
+ 
+def test_get_tasks_for_date_response_shape():
+    """Response should always include date, tasks, and count keys."""
+    with patch("app.routers.schedule.get_all_goals") as mock_goals:
+        mock_goals.return_value = SAMPLE_GOALS
+ 
+        response = client.get(f"/api/schedule/user-1/date?date={TODAY}")
+ 
+    data = response.json()
+    assert "date" in data
+    assert "tasks" in data
+    assert "count" in data
