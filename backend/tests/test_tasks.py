@@ -72,14 +72,16 @@ def test_modify_task_notfound():
 
 #this test checks if we can successfully expand a task(for now only task_5/MOCK)
 def test_expand_task():
-    fake_task = {"goal_id": "goal-1", "ai_id": "task_5"}
+    fake_task = {"goal_id": "goal-1", "ai_id": "task_5", "user_id": "user-1"}
     fake_subtasks = [{"ai_id": "task_5a", "title": "Step 1", "description": "Step 1", "order": 1},
                      {"ai_id": "task_5b", "title": "Step 2", "description": "Step 2", "order": 2}]
 
     with patch("app.routers.tasks.get_task") as mock_get_task, \
          patch("app.routers.tasks.get_tasks_for_goal") as mock_get_tasks, \
          patch("app.routers.tasks.add_subtasks_to_task") as mock_add_subtasks, \
-         patch("app.routers.tasks.ai_service.expand_task") as mock_ai:
+         patch("app.routers.tasks.ai_service.expand_task") as mock_ai, \
+         patch("app.routers.tasks.log_ai_usage"), \
+         patch("app.routers.tasks.estimate_carbon_usage", return_value=0.001):
 
         mock_get_task.return_value = fake_task
         mock_get_tasks.return_value = []
@@ -101,12 +103,13 @@ def test_task_already_expanded():
     fake_subtasks = [{"ai_id": "task_5a", "title": "Step 1", "description": "Step 1", "order": 1},
                      {"ai_id": "task_5b", "title": "Step 2", "description": "Step 2", "order": 2}]
 
-    with patch("app.routers.tasks.get_task") as mock_get_task, \
-         patch("app.routers.tasks.get_tasks_for_goal") as mock_get_tasks, \
+    with patch("app.routers.tasks.get_tasks_for_goal") as mock_get_tasks, \
          patch("app.routers.tasks.add_subtasks_to_task") as mock_add_subtasks, \
-         patch("app.routers.tasks.ai_service.expand_task") as mock_ai:
+         patch("app.routers.tasks.ai_service.expand_task") as mock_ai, \
+         patch("app.routers.tasks.log_ai_usage"), \
+         patch("app.routers.tasks.estimate_carbon_usage", return_value=0.001):
 
-        mock_get_task.return_value = {"id": "task_5", "goal_id": "goal-1", "ai_id": "task_5"}
+        mock_get_task.return_value = {"id": "task_5", "goal_id": "goal-1", "ai_id": "task_5", "user_id": "user-1"}
 
         mock_get_tasks.side_effect = [
             [],   # first expand: check existing subtasks
