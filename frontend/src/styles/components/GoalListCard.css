@@ -70,7 +70,7 @@
 .goal-list-card .progress-fill {
     height: 100%;
     border-radius: 99px;
-    transition: width 0.3s ease;
+    transition: width 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
 /* date Tab – vertical strip on the right side of the card  */

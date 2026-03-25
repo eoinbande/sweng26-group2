@@ -1,7 +1,14 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 export default function ProgressBar({ progress = 0 }) {
   const p = Math.max(0, Math.min(100, Math.round(progress)));
+  const [mounted, setMounted] = useState(false);
+
+  // start at 0 width, then animate to target after mount
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => setMounted(true));
+    return () => cancelAnimationFrame(raf);
+  }, []);
 
   // Choose color by percentage bucket
   let color = "#e53935"; // red for 0-33
@@ -15,7 +22,7 @@ export default function ProgressBar({ progress = 0 }) {
         <div
           className="progress-fill"
           style={{
-            width: `${p}%`,
+            width: mounted ? `${p}%` : '0%',
             background: color,
           }}
         />
