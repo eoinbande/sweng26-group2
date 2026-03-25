@@ -1,6 +1,5 @@
 import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Pencil } from 'lucide-react';
 import ProgressBar from './ProgressBar';
 import '../styles/components/GoalListCard.css';
 
@@ -70,25 +69,18 @@ const GoalListCard = ({ goal, onClick, categories, onAssignCategory, onNewCatego
         >
             <div className={`goal-card-inner${completed ? ' goal-card-inner--completed' : ''}`}>
             <div className={`goal-card-header${completed ? ' goal-card-header--completed' : ''}`} style={{ backgroundColor: scheme.header }}>        <h2 className="goal-card-title">{goal.title}</h2>
-        <div className="goal-card-header-actions">
-            {goal.category
-                ? <span
-                    className="category-badge"
-                    onClick={!completed ? (e) => { e.stopPropagation(); isAssignOpen ? closeAssign() : setIsAssignOpen(true); } : undefined}
-                    style={!completed ? { cursor: 'pointer' } : {}}
-                  >
-                    {goal.category}
-                  </span>
-                : !completed && (
-                    <button className="assign-category-btn" onClick={(e) => { e.stopPropagation(); isAssignOpen ? closeAssign() : setIsAssignOpen(true); }}>+</button>
-                )
-            }
-            {!completed && (
-                <button className="goal-edit-btn" onClick={(e) => { e.stopPropagation(); }} aria-label="Edit goal">
-                    <Pencil size={20} />
-                </button>
-            )}
-        </div>
+        {goal.category
+            ? <span
+                className="category-badge"
+                onClick={!completed ? (e) => { e.stopPropagation(); isAssignOpen ? closeAssign() : setIsAssignOpen(true); } : undefined}
+                style={!completed ? { cursor: 'pointer' } : {}}
+              >
+                {goal.category}
+              </span>
+            : !completed && (
+                <button className="assign-category-btn" onClick={(e) => { e.stopPropagation(); isAssignOpen ? closeAssign() : setIsAssignOpen(true); }}>+</button>
+            )
+        }
 
         {!completed && isAssignOpen && (
             <div className={`assign-dropdown${assignClosing ? ' closing' : ''}`} onClick={e => e.stopPropagation()}>

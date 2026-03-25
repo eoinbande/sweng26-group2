@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowUpLeft, Calendar } from 'lucide-react';
+import { ArrowUpLeft, Calendar, Pencil } from 'lucide-react';
 import '../styles/components/GoalDetailHeader.css';
 
 // progress bar fills
@@ -27,7 +27,7 @@ const GoalDetailHeader = ({ title, progress = 0, category, endDate, onBack }) =>
 
     return (
         <div className="goal-detail-header">
-            {/* back arrow and title */}
+            {/* back arrow, title, and edit button */}
             <div className="goal-detail-header__title-row">
                 <button
                     className="goal-detail-header__back-btn"
@@ -37,6 +37,9 @@ const GoalDetailHeader = ({ title, progress = 0, category, endDate, onBack }) =>
                     <ArrowUpLeft size={40} strokeWidth={2.5} />
                 </button>
                 <h1 className="goal-detail-header__title">{title}</h1>
+                <button className="goal-detail-header__edit-btn" aria-label="Edit goal">
+                    <Pencil size={26} />
+                </button>
             </div>
 
             {/* progress bar */}
