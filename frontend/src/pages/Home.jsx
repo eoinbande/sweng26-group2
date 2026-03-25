@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import Header from '../components/Header';
 import CalendarStrip from '../components/CalendarStrip';
@@ -6,64 +6,28 @@ import CreateGoalCard from '../components/CreateGoalCard';
 import UpcomingTasks from '../components/UpcomingTasks';
 import GoalsGrid from '../components/GoalsGrid';
 import BottomNav from '../components/BottomNav';
-
-import Loading from '../components/Loading';
-import { supabase } from '../supabase_client';
+import { useUser } from '../contexts/UserContext';
 
 import '../styles/Home.css';
 import '../index.css';
 
 function Home() {
-    
-    const [userName, setUserName] = useState('Guest');
-    const [isAppReady, setIsAppReady] = useState(false);
-
-    // once the UI is rendered get the progile data
+    // set body background so color bleeds behind status bar
     useEffect(() => {
-        const fetchProfile = async () => {
-            try {
-                const { data } = await supabase.auth.getUser();
-                const user = data?.user;
-
-                if (user) {
-                    const { data: profile } = await supabase
-                        .from('profiles')
-                        .select('name')
-                        .eq('id', user.id)
-                        .single();
-
-                    setUserName(profile?.name || user.email.split('@')[0]);
-                }
-            } catch (e) {
-                console.error("Error loading profile", e);
-            }
-        };
-
-        fetchProfile();
+        document.body.style.backgroundColor = '#F8F8F4';
+        return () => { document.body.style.backgroundColor = ''; };
     }, []);
 
-    // called by Loading.jsx after 2 sec. which will update our state
-    const handleLoadingComplete = () => {
-        setIsAppReady(true);
-    };
-
-    if (!isAppReady) {
-        return (
-        <div className="home-page">
-            <Loading onLoadingComplete={handleLoadingComplete} />
-            <BottomNav />
-        </div>
-        );
-    }
+    const { userName } = useUser();
+    const [tasksReady, setTasksReady] = useState(false);
 
     return (
         <div className="home-page">
-            {/* pass the name to the Header as a prop */}
-            <Header userName={userName} />
+            <Header userName={userName || 'Guest'} />
             <CalendarStrip />
             <CreateGoalCard />
-            <UpcomingTasks />
-            <GoalsGrid />
+            <UpcomingTasks onReady={() => setTasksReady(true)} />
+            <GoalsGrid visible={tasksReady} />
             <BottomNav />
         </div>
     );

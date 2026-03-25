@@ -25,6 +25,12 @@ const MOCK_PREVIEW = {
 function GoalAddDate() {
     const navigate = useNavigate();
     const location = useLocation();
+
+    // set body background so color bleeds behind status bar
+    useEffect(() => {
+        document.body.style.backgroundColor = '#BFD1E5';
+        return () => { document.body.style.backgroundColor = ''; };
+    }, []);
     const [manualGoal, setManualGoal] = useState('');
     const [dateValue, setDateValue] = useState('');
     const [showPicker, setShowPicker] = useState(false);

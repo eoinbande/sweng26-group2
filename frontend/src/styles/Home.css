@@ -1,6 +1,20 @@
 /* responsive styles for the home page */
 
 
+/* staggered mount animation for home page sections */
+
+@keyframes home-section-in {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
 /* uses dvh (dynamic viewport height) so content fits any phone screen */
 
 .home-page {
@@ -11,7 +25,7 @@
     flex-direction: column;
     gap: clamp(4px, 1.2dvh, 12px);
     padding: clamp(8px, 1.2dvh, 12px) 24px;
-    padding-bottom: clamp(64px, 9dvh, 80px);
+    padding-bottom: clamp(80px, 12dvh, 100px);
     background-color: var(--bg-color);
     position: relative;
     overflow: hidden;
@@ -24,6 +38,7 @@
     padding-top: clamp(8px, 2dvh, 24px);
     padding-bottom: clamp(2px, 3dvh, 15px);
     flex-shrink: 0;
+    animation: home-section-in 0.4s ease both;
 }
 
 .home-page .home-header h1 {
@@ -50,6 +65,7 @@
 .home-page .home-calendar {
     margin-bottom: clamp(4px, 2dvh, 4dvh);
     flex-shrink: 1;
+    animation: home-section-in 0.4s ease 0.08s both;
 }
 
 .home-page .home-calendar .calendar-day-label {
@@ -77,6 +93,7 @@
     padding: clamp(20px, 3.5dvh, 4dvh) clamp(16px, 5dvh, 30px);
     padding-right: clamp(24px, 6dvh, 8%);
     flex-shrink: 1;
+    animation: home-section-in 0.4s ease 0.16s both;
 }
 
 .home-page .home-create-goal h3 {
@@ -100,8 +117,19 @@
     justify-content: center;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     flex-shrink: 0;
-    transition: transform 0.2s;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
     cursor: pointer;
+}
+
+@media (hover: hover) {
+    .home-page .home-create-goal .create-goal-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    }
+}
+
+.home-page .home-create-goal .create-goal-btn:active {
+    transform: scale(1.15);
 }
 
 
@@ -111,8 +139,15 @@
     margin-top: clamp(8px, 2.2dvh, 24px);
     display: flex;
     flex-direction: column;
-    flex: 1; /* Grow to fill space */
-    min-height: 20dvh; 
+    flex: 0;
+    min-height: 0;
+    animation: home-section-in 0.5s ease 0.24s both;
+    transition: flex 0.45s cubic-bezier(0.4, 0, 0.2, 1), min-height 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.home-page .home-upcoming-tasks--expanded {
+    flex: 1;
+    min-height: 20dvh;
 }
 
 .home-page .home-upcoming-tasks>h4 {
@@ -123,10 +158,25 @@
     flex-shrink: 0;
 }
 
+@keyframes task-slide-in {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 .home-page .home-upcoming-tasks .task-item {
     margin-bottom: clamp(4px, 0.6dvh, 8px);
     padding: 0.5px 0;
     border-radius: 8px;
+}
+
+.home-page .home-upcoming-tasks .task-item-animate {
+    animation: task-slide-in 0.25s cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 
 .home-page .home-upcoming-tasks .task-title {
@@ -144,37 +194,80 @@
 
 /* goals grid */
 
+@keyframes goal-card-pop {
+    0% {
+        opacity: 0;
+        transform: scale(0.3) rotate(-12deg);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.08) rotate(2deg);
+    }
+    70% {
+        transform: scale(0.95) rotate(-1deg);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+    }
+}
+
 .home-page .home-goals-grid {
-    flex-shrink: 1; /* Allow to shrink if needed */
+    flex-shrink: 1;
     min-height: 0;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
     margin-top: clamp(8px, 1.5dvh, 16px);
+    visibility: hidden;
 }
 
-.home-page .home-goals-grid>h4 {
+.home-page .home-goals-grid--visible {
+    visibility: visible;
+}
+
+.home-page .home-goals-grid > h4 {
     font-family: var(--font-serif);
-    font-size: clamp(16px, 2.7dvh, 20px); /* Revert to match upcoming tasks */
+    font-size: clamp(16px, 2.7dvh, 20px);
     font-weight: 600;
     margin-bottom: clamp(6px, 1dvh, 12px);
+    opacity: 0;
+}
+
+.home-page .home-goals-grid--visible > h4 {
+    animation: home-section-in 0.35s ease both;
 }
 
 .home-page .home-goals-grid .goals-scroll {
     display: flex;
     gap: var(--space-md);
     overflow-x: auto;
-    padding: clamp(6px, 1dvh, 12px) 24px; /* Reduced padding */
+    padding: clamp(6px, 1dvh, 12px) 24px;
+    /* Reduced padding */
     margin: 0 -24px;
-    min-height: 80px; /* Force height to prevent layout shift */
+    min-height: 80px;
+    /* Force height to prevent layout shift */
 }
 
 .home-page .home-goals-grid .goal-card {
-    min-width: clamp(130px, 35vw, 170px); /* Wider */
+    min-width: clamp(130px, 35vw, 170px);
     max-width: clamp(130px, 35vw, 170px);
-    padding: clamp(8px, 1.5dvh, 14px);   /* Reduced padding */
+    padding: clamp(8px, 1.5dvh, 14px);
     border-radius: clamp(20px, 2.5dvh, 32px);
+    opacity: 0;
 }
+
+/* only animate when the section becomes visible */
+.home-page .home-goals-grid--visible .goal-card {
+    animation: goal-card-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.home-page .home-goals-grid--visible .goal-card:nth-child(1) { animation-delay: 0s; }
+.home-page .home-goals-grid--visible .goal-card:nth-child(2) { animation-delay: 0.08s; }
+.home-page .home-goals-grid--visible .goal-card:nth-child(3) { animation-delay: 0.16s; }
+.home-page .home-goals-grid--visible .goal-card:nth-child(4) { animation-delay: 0.24s; }
+.home-page .home-goals-grid--visible .goal-card:nth-child(5) { animation-delay: 0.32s; }
+.home-page .home-goals-grid--visible .goal-card:nth-child(6) { animation-delay: 0.40s; }
 
 .home-page .home-goals-grid .goal-card h5 {
     font-size: clamp(12px, 1.4dvh, 15px);

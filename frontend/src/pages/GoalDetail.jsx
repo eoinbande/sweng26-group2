@@ -10,11 +10,21 @@ import FeedbackPopUp from '../components/FeedbackPopUp';
 import Congratulations from '../components/Congratulations';
 import '../styles/GoalDetail.css';
 import { supabase } from '../supabase_client';
+import { useGoals } from '../contexts/GoalsContext';
+import { useSchedule } from '../contexts/ScheduleContext';
 
 const GoalDetail = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { id: paramId } = useParams();
+    const { deleteGoal: removeGoalFromCache, updateGoalProgress } = useGoals();
+    const { refreshSchedule } = useSchedule();
+
+    // set body background so color bleeds behind status bar
+    useEffect(() => {
+        document.body.style.backgroundColor = '#F8F8F4';
+        return () => { document.body.style.backgroundColor = ''; };
+    }, []);
 
     // Safely access location state
     // Use "Loading..." as default if we are loading, unless we want to show stale title
@@ -26,6 +36,7 @@ const GoalDetail = () => {
     /* rstore tasks from location.state if returning from feedback page */
     const [tasks, setTasks] = useState(location.state?.tasks || []);
     const [endDate, setEndDate] = useState("");
+    const [rawDueDate, setRawDueDate] = useState("");
     const [progress, setProgress] = useState(0);
 
     // Feedback popup state
@@ -98,20 +109,15 @@ const [closingDelete, setClosingDelete] = useState(false);
         const fetchGoalDetails = async () => {
             setIsLoading(true);
             try {
-                // fetch goal details and progress in parallel
-                const [response, progRes] = await Promise.all([
-                    fetch(`${import.meta.env.VITE_API_URL}/goal-details/${goalId}`, { cache: 'no-store' }),
-                    fetch(`${import.meta.env.VITE_API_URL}/tasks/${goalId}/progress`, { cache: 'no-store' }),
-                ]);
-
+                // fetch sequentially to avoid flooding supabase connections
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/goal-details/${goalId}`, { cache: 'no-store' });
                 if (!response.ok) {
                     throw new Error('Failed to fetch details');
                 }
+                const data = await response.json();
 
-                const [data, progData] = await Promise.all([
-                    response.json(),
-                    progRes.json(),
-                ]);
+                const progRes = await fetch(`${import.meta.env.VITE_API_URL}/tasks/${goalId}/progress`, { cache: 'no-store' });
+                const progData = await progRes.json();
 
                 // Debug log to check data structure
                 console.log("Goal details fetched:", data);
@@ -127,7 +133,8 @@ const [closingDelete, setClosingDelete] = useState(false);
                 // Set End Date if available
                 if (data.goal && data.goal.goal_data && data.goal.goal_data.goal_due_date) {
                     const rawDate = data.goal.goal_data.goal_due_date;
-                    // Format date nicely (e.g. 14 Feb 2026)
+                    setRawDueDate(rawDate);
+                    // format date nicely (e.g. 14 Feb 2026)
                     const dateObj = new Date(rawDate);
                     if (!isNaN(dateObj)) {
                         setEndDate(dateObj.toLocaleDateString('en-GB', {
@@ -200,14 +207,20 @@ const [closingDelete, setClosingDelete] = useState(false);
                 return;
             }
 
-            // Fetch progress after successful update
+            // fetch progress after successful update
             if (goalId) {
                 try {
                     const progRes = await fetch(`${import.meta.env.VITE_API_URL}/tasks/${goalId}/progress`, { cache: 'no-store' });
                     const progData = await progRes.json();
-                    if (progData) setProgress(progData.percentage);
+                    if (progData) {
+                        setProgress(progData.percentage);
+                        updateGoalProgress(goalId, progData.percentage);
+                    }
                 } catch (e) { console.error("Failed to fetch progress:", e); }
             }
+
+            // refresh schedule so completed tasks/goals disappear from calendar
+            refreshSchedule();
         } catch (e) {
             console.error("Failed to update task status:", e);
         }
@@ -346,7 +359,8 @@ const [closingDelete, setClosingDelete] = useState(false);
                 },
                 userId: userId,
                 originalPrompt: goalTitle,
-                dueDate: endDate,
+                dueDate: rawDueDate || 'AI_DECIDE',
+                from: 'feedback',
             },
         });
 
@@ -367,6 +381,8 @@ const [closingDelete, setClosingDelete] = useState(false);
             });
 
             if (response.ok) {
+                removeGoalFromCache(goalId);
+                refreshSchedule();
                 triggerToast("Goal deleted successfully");
                 setTimeout(() => navigate('/goals'), 1500);
             } else {

@@ -1,5 +1,4 @@
-import React from 'react';
-import { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProgressBar from './ProgressBar';
 import '../styles/components/GoalListCard.css';
@@ -35,6 +34,12 @@ const GoalListCard = ({ goal, onClick, categories, onAssignCategory, onNewCatego
     const navigate = useNavigate();
     const scheme = COLOR_SCHEMES[goal.colorScheme] || COLOR_SCHEMES.blue;
     const [isAssignOpen, setIsAssignOpen] = useState(false);
+    const [assignClosing, setAssignClosing] = useState(false);
+
+    const closeAssign = useCallback(() => {
+        setAssignClosing(true);
+        setTimeout(() => { setIsAssignOpen(false); setAssignClosing(false); }, 200);
+    }, []);
 
 
     const handleClick = () => {
@@ -65,27 +70,27 @@ const GoalListCard = ({ goal, onClick, categories, onAssignCategory, onNewCatego
             <div className={`goal-card-inner${completed ? ' goal-card-inner--completed' : ''}`}>
             <div className={`goal-card-header${completed ? ' goal-card-header--completed' : ''}`} style={{ backgroundColor: scheme.header }}>        <h2 className="goal-card-title">{goal.title}</h2>
         {goal.category
-            ? <span 
-                className="category-badge" 
-                onClick={!completed ? (e) => { e.stopPropagation(); setIsAssignOpen(!isAssignOpen); } : undefined}
+            ? <span
+                className="category-badge"
+                onClick={!completed ? (e) => { e.stopPropagation(); isAssignOpen ? closeAssign() : setIsAssignOpen(true); } : undefined}
                 style={!completed ? { cursor: 'pointer' } : {}}
               >
                 {goal.category}
               </span>
             : !completed && (
-                <button className="assign-category-btn" onClick={(e) => { e.stopPropagation(); setIsAssignOpen(!isAssignOpen); }}>+</button>
+                <button className="assign-category-btn" onClick={(e) => { e.stopPropagation(); isAssignOpen ? closeAssign() : setIsAssignOpen(true); }}>+</button>
             )
         }
 
         {!completed && isAssignOpen && (
-            <div className="assign-dropdown" onClick={e => e.stopPropagation()}>
+            <div className={`assign-dropdown${assignClosing ? ' closing' : ''}`} onClick={e => e.stopPropagation()}>
                 {categories.map((cat, i) => (
                     <React.Fragment key={cat}>
                         {i > 0 && <div className="assign-dropdown-divider" />}
                         <p onClick={(e) => {
                             e.stopPropagation();
                             onAssignCategory(goal.id, cat);
-                            setIsAssignOpen(false);
+                            closeAssign();
                         }}>
                              {cat}
                         </p>

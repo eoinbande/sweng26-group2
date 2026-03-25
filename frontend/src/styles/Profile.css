@@ -34,21 +34,55 @@
     max-width: 480px;
     margin: 0 auto;
     height: 100dvh;
-    background-color: var(--bg-color);
+    background-color: #ffdbda;
     display: flex;
     flex-direction: column;
     position: relative;
+    overflow: hidden;
+}
+
+/* scrollable content wrapper — transparent so pink bleeds on overscroll */
+.profile-page-content {
+    position: relative;
+    z-index: 1;
+    flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
 }
 
-.profile-page::-webkit-scrollbar {
+.profile-page-content::-webkit-scrollbar {
     display: none;
 }
 
+/* inner wrapper — beige bg scrolls with content, reveals pink on overscroll */
+.profile-content-bg {
+    min-height: 100%;
+    background-color: var(--bg-color);
+    display: flex;
+    flex-direction: column;
+}
 
-/* profile header — pink bg extends behind account card */
+/* wraps header + card so the pink shape can span both */
+.profile-top-section {
+    position: relative;
+}
+
+/* pink shape — absolutely positioned within .profile-top-section,
+   height set dynamically via JS to reach 50% of the account card */
+.profile-pink-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: #ffdbda;
+    border-radius: 0 0 clamp(22px, 7.18vw, 32px) clamp(22px, 7.18vw, 32px);
+    z-index: 0;
+    pointer-events: none;
+}
+
+
+/* profile header */
 
 .profile-header-wrapper {
     position: relative;
@@ -56,14 +90,7 @@
 }
 
 .profile-header-bg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: calc(100% + 70px);
-    background-color: #ffdbda;
-    border-radius: 0 0 clamp(22px, 7.18vw, 32px) clamp(22px, 7.18vw, 32px);
-    z-index: 0;
+    display: none;
 }
 
 .profile-header-content {
@@ -343,7 +370,7 @@
     flex-direction: column;
     gap: 2px;
     margin-top: 20px;
-    padding-bottom: 100px;
+    padding-bottom: clamp(100px, 28vw, 140px);
 }
 
 .analytics-section-title {

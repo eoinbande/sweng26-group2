@@ -1,21 +1,69 @@
-import { useRef, useState, useCallback, useEffect } from 'react';
+import { useRef, useState, useCallback, useEffect, useMemo } from 'react';
 import { ArrowUpRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../supabase_client';
+import { useSchedule } from '../contexts/ScheduleContext';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import '../index.css';
 
 dayjs.extend(relativeTime);
 
-const UpcomingTasks = () => {
+// derive urgency labels from cached schedule tasks
+const mapToDisplayTasks = (scheduleTasks) => {
+    const cutoff = dayjs().add(15, 'day');
+    return scheduleTasks
+        .filter(t => dayjs(t.dueDate).isBefore(cutoff))
+        .map(t => {
+            const dueDate = t.dueDate ? dayjs(t.dueDate) : null;
+            let dueText = null;
+            let urgencyLevel = 'normal';
+
+            if (dueDate) {
+                const now = dayjs().startOf('day');
+                const target = dueDate.startOf('day');
+                const diffDays = target.diff(now, 'day');
+
+                if (diffDays < 0) {
+                    dueText = target.format('D MMM');
+                    urgencyLevel = 'urgent';
+                } else if (diffDays === 0) {
+                    dueText = 'Today';
+                    urgencyLevel = 'urgent';
+                } else if (diffDays === 1) {
+                    dueText = 'Tomorrow';
+                    urgencyLevel = 'urgent';
+                } else if (diffDays < 7) {
+                    dueText = target.format('dddd');
+                    urgencyLevel = 'warning';
+                } else {
+                    dueText = target.format('D MMM');
+                    urgencyLevel = 'normal';
+                }
+            }
+
+            return {
+                title: t.title,
+                due: dueText,
+                urgencyLevel,
+                id: t.id,
+                goalId: t.goalId,
+                goalTitle: t.description,
+            };
+        });
+};
+
+const UpcomingTasks = ({ onReady }) => {
     const navigate = useNavigate();
+    const { upcomingTasks: scheduleTasks, loaded } = useSchedule();
     const scrollRef = useRef(null);
     const [showTopFade, setShowTopFade] = useState(false);
     const [showBottomFade, setShowBottomFade] = useState(false);
-    const [tasks, setTasks] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [expanded, setExpanded] = useState(false);
+    const [showItems, setShowItems] = useState(false);
     const [hoveredIndex, setHoveredIndex] = useState(null);
+
+    const tasks = useMemo(() => mapToDisplayTasks(scheduleTasks), [scheduleTasks]);
+    const loading = !loaded;
 
     const updateFades = useCallback(() => {
         const el = scrollRef.current;
@@ -29,71 +77,24 @@ const UpcomingTasks = () => {
         updateFades();
     }, [updateFades, tasks]);
 
+    // step 1: wait for a paint so the compact state is visible
+    // step 2: expand the container
+    // step 3: fade in items after expansion finishes
+    // step 4: notify parent the full sequence is done
+    const [mounted, setMounted] = useState(false);
     useEffect(() => {
-        const fetchTasks = async () => {
-            try {
-                const { data } = await supabase.auth.getUser();
-                const user = data?.user;
-                if (!user) {
-                    setLoading(false);
-                    return;
-                }
-
-                const res = await fetch(`${import.meta.env.VITE_API_URL}/schedule/${user.id}/upcoming-tasks?days=15`);
-                if (res.ok) {
-                    const json = await res.json();
-                    
-                    // Map backend tasks to frontend structure
-                    const mappedTasks = json.tasks.map(t => {
-                        const dueDate = t.due_date ? dayjs(t.due_date) : null;
-                        let dueText = null;
-                        let urgencyLevel = 'normal'; // normal, urgent (red), warning (orange)
-
-                        if (dueDate) {
-                            const now = dayjs().startOf('day');
-                            const target = dueDate.startOf('day');
-                            const diffDays = target.diff(now, 'day');
-
-                            if (diffDays < 0) {
-                                // Overdue
-                                dueText = target.format('D MMM');
-                                urgencyLevel = 'urgent';
-                            } else if (diffDays === 0) {
-                                dueText = 'Today';
-                                urgencyLevel = 'urgent';
-                            } else if (diffDays === 1) {
-                                dueText = 'Tomorrow';
-                                urgencyLevel = 'urgent';
-                            } else if (diffDays < 7) {
-                                dueText = target.format('dddd'); // Day name
-                                urgencyLevel = 'warning';
-                            } else {
-                                dueText = target.format('D MMM');
-                                urgencyLevel = 'normal';
-                            }
-                        }
-
-                        return {
-                            title: t.description,
-                            due: dueText,
-                            urgencyLevel,
-                            id: t.task_id || t.ai_id,
-                            goalId: t.goal_id,
-                            goalTitle: t.goal_title
-                        };
-                    });
-                    
-                    setTasks(mappedTasks);
-                }
-            } catch (err) {
-                console.error("Error fetching upcoming tasks:", err);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchTasks();
+        const frame = requestAnimationFrame(() => setMounted(true));
+        return () => cancelAnimationFrame(frame);
     }, []);
+
+    useEffect(() => {
+        if (!loading && mounted) {
+            const expandTimer = setTimeout(() => setExpanded(true), 50);
+            const itemsTimer = setTimeout(() => setShowItems(true), 350);
+            const readyTimer = setTimeout(() => onReady && onReady(), 500);
+            return () => { clearTimeout(expandTimer); clearTimeout(itemsTimer); clearTimeout(readyTimer); };
+        }
+    }, [loading, mounted]);
 
     const getBadgeColor = (level) => {
         switch(level) {
@@ -104,7 +105,7 @@ const UpcomingTasks = () => {
     };
 
     return (
-        <div className="home-upcoming-tasks">
+        <div className={`home-upcoming-tasks${expanded ? ' home-upcoming-tasks--expanded' : ''}`}>
             <h4>Upcoming Tasks</h4>
 
             <div style={{
@@ -160,10 +161,10 @@ const UpcomingTasks = () => {
                             }}
                         >
                             {!loading && tasks.length === 0 ? (
-                                <div style={{ 
-                                    height: '100%', 
-                                    display: 'flex', 
-                                    alignItems: 'center', 
+                                <div style={{
+                                    height: '100%',
+                                    display: 'flex',
+                                    alignItems: 'center',
                                     justifyContent: 'center',
                                     color: 'var(--text-secondary)',
                                     fontFamily: 'var(--font-sans)',
@@ -172,10 +173,10 @@ const UpcomingTasks = () => {
                                 }}>
                                     No upcoming tasks!
                                 </div>
-                            ) : (
+                            ) : showItems ? (
                                 <ul style={{ listStyle: 'none' }}>
                                     {tasks.map((task, index) => (
-                                        <li key={index} className="task-item"
+                                        <li key={index} className="task-item task-item-animate"
                                             onClick={() => task.goalId && navigate(`/goal/${task.goalId}`, {
                                                 state: {
                                                     goalId: task.goalId,
@@ -189,7 +190,8 @@ const UpcomingTasks = () => {
                                                 display: 'flex',
                                                 alignItems: 'center',
                                                 justifyContent: 'space-between',
-                                                cursor: 'pointer'
+                                                cursor: 'pointer',
+                                                animationDelay: `${index * 0.07}s`,
                                             }}>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                                 {/* arrow icon with hover effect */}
@@ -228,7 +230,7 @@ const UpcomingTasks = () => {
                                         </li>
                                     ))}
                                 </ul>
-                            )}
+                            ) : null}
                         </div>
 
                         {/* top fade overlay */}

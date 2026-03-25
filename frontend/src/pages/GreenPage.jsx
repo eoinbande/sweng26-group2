@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PageHeader from '../components/PageHeader';
 import BottomNav from '../components/BottomNav';
 import useCountUp from '../hooks/useCountUp';
-import { supabase } from '../supabase_client';
+import { useUser } from '../contexts/UserContext';
 import '../styles/GreenPage.css';
 
 // sparkline chart for carbon trend
@@ -22,10 +22,11 @@ const CarbonSparkline = ({ data, labels, loaded }) => {
     const padding = 8;
     const usableH = height - padding * 2;
     const usableW = width - padding * 2;
+    const pointCount = data.length > 1 ? data.length - 1 : 1;
 
-    // build polyline points
+    // build polyline points — missing months sit at the baseline (y=0 value)
     const points = data.map((val, i) => {
-        const x = padding + (i / (data.length - 1)) * usableW;
+        const x = padding + (i / pointCount) * usableW;
         const y = padding + usableH - ((val - min) / range) * usableH;
         return `${x},${y}`;
     }).join(' ');
@@ -33,7 +34,7 @@ const CarbonSparkline = ({ data, labels, loaded }) => {
     // build area fill path (closed shape under the line)
     const areaPath = `M ${padding},${padding + usableH} ` +
         data.map((val, i) => {
-            const x = padding + (i / (data.length - 1)) * usableW;
+            const x = padding + (i / pointCount) * usableW;
             const y = padding + usableH - ((val - min) / range) * usableH;
             return `L ${x},${y}`;
         }).join(' ') +
@@ -67,7 +68,7 @@ const CarbonSparkline = ({ data, labels, loaded }) => {
                 />
                 {/* dots */}
                 {data.map((val, i) => {
-                    const x = padding + (i / (data.length - 1)) * usableW;
+                    const x = padding + (i / pointCount) * usableW;
                     const y = padding + usableH - ((val - min) / range) * usableH;
                     return (
                         <circle
@@ -95,15 +96,21 @@ const CarbonSparkline = ({ data, labels, loaded }) => {
 };
 
 function GreenPage() {
-    // simulated loading state — replace with real fetch later
+    const { user } = useUser();
+
+    // set body background so color bleeds behind status bar
+    useEffect(() => {
+        document.body.style.backgroundColor = '#AAD786';
+        return () => { document.body.style.backgroundColor = ''; };
+    }, []);
+
     const [data, setData] = useState(null);
     const loaded = data !== null;
 
     useEffect(() => {
+        if (!user) return;
         const fetchGreenData = async () => {
             try {
-                const { data: { user } } = await supabase.auth.getUser();
-                if (!user) return;
 
                 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -116,13 +123,22 @@ function GreenPage() {
                 const stats = await statsRes.json();
                 const monthly = await monthlyRes.json();
 
-                // sort months chronologically and extract carbon values + labels
-                const sortedMonths = Object.keys(monthly).sort();
-                const carbonTrend = sortedMonths.map(m => monthly[m].carbon_footprint);
-                const trendLabels = sortedMonths.map(m => {
-                    const [, month] = m.split('-');
-                    return new Date(2000, parseInt(month) - 1).toLocaleString('default', { month: 'short' });
+                // build all 12 months of the current year, fill missing with 0
+                const now = new Date();
+                const year = now.getFullYear();
+                const allMonths = Array.from({ length: 12 }, (_, i) => {
+                    const key = `${year}-${String(i + 1).padStart(2, '0')}`;
+                    return {
+                        key,
+                        label: new Date(year, i).toLocaleString('default', { month: 'short' }),
+                        carbon: monthly[key]?.carbon_footprint ?? 0,
+                    };
                 });
+                const carbonTrend = allMonths.map(m => m.carbon);
+                const trendLabels = allMonths.map(m => m.label);
+
+                // sort months that have data for % change calculation
+                const sortedMonths = Object.keys(monthly).sort();
 
                 // calculate month-over-month co2 % change
                 let co2ChangePct = 0;
@@ -149,7 +165,7 @@ function GreenPage() {
         };
 
         fetchGreenData();
-    }, []);
+    }, [user]);
 
     const co2Count = useCountUp(data?.co2 ?? 0, 1000, loaded);
     const co2Change = useCountUp(data?.co2ChangePct ?? 0, 800, loaded);

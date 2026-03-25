@@ -1,5 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { UserProvider } from './contexts/UserContext';
+import { GoalsProvider } from './contexts/GoalsContext';
+import { ScheduleProvider } from './contexts/ScheduleContext';
 import Home from './pages/Home';
 import Goals from './pages/Goals';
 import CreateGoal from './pages/CreateGoal';
@@ -15,10 +18,11 @@ import GreenPage from './pages/GreenPage'
 import './index.css';
 
 function App() {
-  const [isLoading, setIsLoading] = useState(true);
-
   return (
     <Router>
+      <UserProvider>
+      <GoalsProvider>
+      <ScheduleProvider>
       <Routes>
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/home" element={<Home />} />
@@ -34,6 +38,9 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/greenpage" element={<GreenPage />} />
       </Routes>
+      </ScheduleProvider>
+      </GoalsProvider>
+      </UserProvider>
     </Router>
   );
 }

@@ -112,13 +112,17 @@ function Day(props) {
 
     const highlight = isCurrentMonth ? getDayHighlight(dayOfMonth, goalRanges) : null;
 
+    const handleClick = () => {
+        if (!outsideCurrentMonth && onDayClick) onDayClick(day);
+    };
+
     return (
         <StyledDay
             {...other}
             day={day}
             outsideCurrentMonth={outsideCurrentMonth}
-            // intercept MUI's selection — call our handler instead
-            onDaySelect={(d) => { if (!outsideCurrentMonth && onDayClick) onDayClick(d); }}
+            onDaySelect={handleClick}
+            onClick={handleClick}
             disableMargin
             selected={false}
             className={highlight ? 'day-highlighted' : undefined}
