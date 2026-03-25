@@ -44,7 +44,8 @@ def aiGenerate(userInput):
                       Limit the number of main tasks to a maximum of five. If KEY information is missing from the prompt, do not generate
                       every task now. Instead, generate a smaller list of tasks (some with requires_input set to true) and gather further
                       information to later make a more accurate set of tasks. Do not assume any concrete info you have not been given.
-                      Keep task titles to a single sentence unless absolutely necessary, do not provide examples in task titles.""",
+                      Keep task.description to single, brief sentences (ideally >10 words), do not provide examples in task titles. Similarly
+                      limit the overarching goal description.""",
     model = "gpt-5.2",
     input = userInput,
     text_format = schemas.AIGeneratePlanResponse

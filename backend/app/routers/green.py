@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 from app.database import supabase
+from datetime import datetime, timezone
 
 green_router = APIRouter()
 
@@ -82,3 +83,97 @@ def get_monthly_green_stats(user_id: str):
         )
 
     return monthly_stats
+
+
+@green_router.post("/green/offset/pay")
+def pay_offset(user_id: str, month: str):
+
+    current_time = datetime.now(timezone.utc)
+    response = supabase.table("ai_usage_logs")\
+    .select("*")\
+    .eq("user_id", user_id)\
+    .execute()
+
+    logs = response.data or []
+
+    monthly_logs = [
+        log for log in logs
+        if str(log["timestamp"])[:7] == month
+    ]
+
+    total_carbon = sum(log["carbon_footprint"] for log in monthly_logs)
+
+    offset_cost = total_carbon * 0.01  #an average of carbon offset pricing (1000 kg of CO2 is 10 euro)
+
+    supabase.table("carbon_offsets").insert({
+        "user_id": user_id,
+        "carbon_offset": round(total_carbon, 6),
+        "amount_paid": round(offset_cost, 6),
+        "timestamp": current_time.isoformat(),
+        "month": month #not sure is this is right, check this!
+    }).execute()
+
+    return {
+        "message": "Offset successfull",
+        "carbon_offset": round(total_carbon, 6),
+        "amount_paid": round(offset_cost, 6)
+    }
+
+
+@green_router.get("/green/offset/{user_id}")
+def get_carbon_offset(user_id: str):
+
+    logs_res = supabase.table("ai_usage_logs")\
+    .select("*")\
+    .eq("user_id", user_id)\
+    .execute()
+
+    logs = logs_res.data or []
+
+    offsets_res = supabase.table("carbon_offsets")\
+    .select("*")\
+    .eq("user_id", user_id)\
+    .execute()
+
+    offsets = offsets_res.data or []
+
+    monthly_data = {}
+
+    for log in logs:
+        month = str(log["timestamp"])[:7]
+
+        if month not in monthly_data:
+            monthly_data[month] = {
+                "generated": 0,
+                "paid": 0
+            }
+        monthly_data[month]["generated"] += log["carbon_footprint"]
+
+    for offset in offsets:
+        month = offset["month"]
+
+        if month not in monthly_data:
+            monthly_data[month] = {
+                "generated": 0,
+                "paid": 0
+            }
+        
+        monthly_data[month]["paid"] += offset["carbon_offset"]
+    
+    result = {}
+
+    for month in monthly_data:
+        generated = monthly_data[month]["generated"]
+        paid = monthly_data[month]["paid"]
+
+        remaining = max(generated - paid, 0)
+        cost = remaining * 0.01
+
+        result[month] = {
+            "generated_carbon": round(generated, 6), #total AI impact
+            "offset_paid": round(paid, 6), #what user already paid
+            "remaining_carbon": round(remaining, 6), #what still need to offset
+            "offset_cost_eur": round(cost, 6) #how much to pay
+        }
+    
+    return result
