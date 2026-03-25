@@ -213,3 +213,27 @@ def test_get_upcoming_tasks_excludes_completed():
     data = response.json()
     for task in data["tasks"]:
         assert task["status"] != "completed"
+
+def test_get_upcoming_tasks_sorted_by_due_date():
+    """Tasks should be returned sorted by due_date ascending."""
+    with patch("app.routers.schedule.get_all_goals") as mock_goals:
+        mock_goals.return_value = SAMPLE_GOALS
+ 
+        response = client.get("/api/schedule/user-1/upcoming-tasks?days=60")
+ 
+    data = response.json()
+    dates = [t["due_date"] for t in data["tasks"]]
+    assert dates == sorted(dates)
+ 
+ 
+def test_get_upcoming_tasks_no_goals():
+    """Should return empty list when user has no goals."""
+    with patch("app.routers.schedule.get_all_goals") as mock_goals:
+        mock_goals.return_value = []
+ 
+        response = client.get("/api/schedule/user-1/upcoming-tasks")
+ 
+    assert response.status_code == 200
+    data = response.json()
+    assert data["count"] == 0
+    assert data["tasks"] == []
