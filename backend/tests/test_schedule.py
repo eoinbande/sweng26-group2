@@ -310,4 +310,28 @@ def test_get_upcoming_goals_default_window():
     assert data["count"] == 1
     assert data["goals"][0]["goal_id"] == "goal-1"
 
+def test_get_upcoming_goals_custom_window():
+    """Should respect a custom days query param."""
+    with patch("app.routers.schedule.get_all_goals") as mock_goals:
+        mock_goals.return_value = SAMPLE_GOALS
+ 
+        response = client.get("/api/schedule/user-1/upcoming-goals?days=60")
+ 
+    assert response.status_code == 200
+    data = response.json()
+    # Both goal-1 (14 days) and goal-2 (35 days) are within 60 days
+    assert data["count"] == 2
+ 
+ 
+def test_get_upcoming_goals_excludes_draft_goals():
+    """Goals with no tasks (unaccepted drafts) should be excluded."""
+    with patch("app.routers.schedule.get_all_goals") as mock_goals:
+        mock_goals.return_value = GOAL_NO_TASKS
+ 
+        response = client.get("/api/schedule/user-1/upcoming-goals?days=30")
+ 
+    assert response.status_code == 200
+    data = response.json()
+    assert data["count"] == 0
+
  
