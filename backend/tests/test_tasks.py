@@ -103,7 +103,8 @@ def test_task_already_expanded():
     fake_subtasks = [{"ai_id": "task_5a", "title": "Step 1", "description": "Step 1", "order": 1},
                      {"ai_id": "task_5b", "title": "Step 2", "description": "Step 2", "order": 2}]
 
-    with patch("app.routers.tasks.get_tasks_for_goal") as mock_get_tasks, \
+    with patch("app.routers.tasks.get_task") as mock_get_task, \
+         patch("app.routers.tasks.get_tasks_for_goal") as mock_get_tasks, \
          patch("app.routers.tasks.add_subtasks_to_task") as mock_add_subtasks, \
          patch("app.routers.tasks.ai_service.expand_task") as mock_ai, \
          patch("app.routers.tasks.log_ai_usage"), \
