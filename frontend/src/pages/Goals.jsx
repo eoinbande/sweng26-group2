@@ -66,10 +66,8 @@ const Goals = () => {
 
     const handleDeleteCategory = async (name) => {
     if (!user) return;
-    await fetch(`${baseUrl}/categories`, {
+    await fetch(`${baseUrl}/categories/${user.id}/${encodeURIComponent(name)}`, {
         method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: user.id, name })
     });
     deleteCategory(name);
 };
