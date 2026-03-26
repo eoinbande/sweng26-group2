@@ -85,38 +85,73 @@ def get_monthly_green_stats(user_id: str):
     return monthly_stats
 
 
+"""function pay_offset change to connect credits system!"""
+
+
 @green_router.post("/green/offset/pay")
 def pay_offset(user_id: str, month: str):
 
-    current_time = datetime.now(timezone.utc)
-    response = supabase.table("ai_usage_logs")\
+    #current_time = datetime.now(timezone.utc)
+    logs_res = supabase.table("ai_usage_logs")\
     .select("*")\
     .eq("user_id", user_id)\
     .execute()
 
-    logs = response.data or []
+    logs = logs_res.data or []
 
+    #filter logs for ONLY that month
     monthly_logs = [
         log for log in logs
         if str(log["timestamp"])[:7] == month
     ]
 
+    #calculate total carbon of user
     total_carbon = sum(log["carbon_footprint"] for log in monthly_logs)
 
-    offset_cost = total_carbon * 0.01  #an average of carbon offset pricing (1000 kg of CO2 is 10 euro)
+  #  offset_cost = total_carbon * 0.01  #an average of carbon offset pricing (1000 kg of CO2 is 10 euro)
 
+    #Get user credits
+    credits_res = supabase.table("user_credits")\
+        .select("*")\
+        .eq("user_id", user_id)\
+        .execute()
+
+    credits_data = credits_res.data #this variable holds the current amount of credits
+
+    if not credits_data:
+        return {"error": "User has no credits"}
+    
+    current_credits = credits_data[0]["credits"]
+
+    #Check if user has enough credits
+    if current_credits < total_carbon:
+        return {
+            "error": "Not enough credits",
+            "needed": round(total_carbon, 6),
+            "available": round(current_credits, 6)
+        }
+
+    #Deduct credits from user wallet
+    new_credits = current_credits - total_carbon
+
+    #update database with new current credits
+    supabase.table("user_credits").update({
+        "credits": new_credits
+    }).eq("user_id", user_id).execute()
+
+    #Store carbon offset
     supabase.table("carbon_offsets").insert({
         "user_id": user_id,
         "carbon_offset": round(total_carbon, 6),
-        "amount_paid": round(offset_cost, 6),
-        "timestamp": current_time.isoformat(),
+        "amount_paid": round(total_carbon * 0.01, 6),
         "month": month #not sure is this is right, check this!
     }).execute()
 
     return {
-        "message": "Offset successfull",
+        "message": "Offset successful",
         "carbon_offset": round(total_carbon, 6),
-        "amount_paid": round(offset_cost, 6)
+        "amount_paid": round(total_carbon, 6),
+        "credits_remaining": round(new_credits, 6)
     }
 
 
