@@ -108,6 +108,13 @@ export const GoalsProvider = ({ children }) => {
         ));
     }, []);
 
+    // update a goal's title in the cache
+    const updateGoalTitle = useCallback((goalId, title) => {
+        setGoals(prev => prev.map(g =>
+            g.id === goalId ? { ...g, title } : g
+        ));
+    }, []);
+
     // update a goal's progress in the cache
     const updateGoalProgress = useCallback((goalId, progress) => {
         setGoals(prev => prev.map(g =>
@@ -128,6 +135,7 @@ export const GoalsProvider = ({ children }) => {
             addGoal,
             deleteGoal,
             updateGoalCategory,
+            updateGoalTitle,
             updateGoalProgress,
             addCategory,
             refreshGoals: fetchGoals,
