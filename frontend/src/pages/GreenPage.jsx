@@ -18,6 +18,15 @@ const formatCompact = (n, { decimal = false } = {}) => {
     return m >= 10 ? `${Math.round(m)}M` : `${+m.toFixed(1)}M`;
 };
 
+// format carbon from grams: g if < 1000, kg otherwise
+const formatCarbonGrams = (g) => {
+    if (g < 1000) return `${Math.round(g)}g`;
+    return `${+(g / 1000).toFixed(1)}kg`;
+};
+
+// format carbon from kg (sparkline data is in kg)
+const formatCarbon = (kg) => formatCarbonGrams(kg * 1000);
+
 // sparkline chart for carbon trend
 const CarbonSparkline = ({ data, labels, loaded }) => {
     const svgRef = useRef(null);
@@ -82,10 +91,10 @@ const CarbonSparkline = ({ data, labels, loaded }) => {
         <div className="sparkline-card">
             <span className="sparkline-title">Monthly carbon trend</span>
 
-            {/* tooltip */}
+            {/* tooltip — fixed top-right position */}
             {activeIndex !== null && (
-                <div className="sparkline-tooltip" style={{ left: `${(activeX / width) * 100}%` }}>
-                    <span className="sparkline-tooltip-value">{Math.round(data[activeIndex] * 1000)}g</span>
+                <div className="sparkline-tooltip">
+                    <span className="sparkline-tooltip-value">{formatCarbon(data[activeIndex])}</span>
                     <span className="sparkline-tooltip-label">{labels[activeIndex]}</span>
                 </div>
             )}
@@ -260,7 +269,7 @@ function GreenPage() {
                         filter: `blur(${co2Count.blur}px)`,
                         transform: `scaleY(${1 + co2Count.blur * 0.04})`
                     } : undefined}>
-                        {loaded ? `${formatCompact(co2Count.value)}g` : '—'}
+                        {loaded ? formatCarbonGrams(co2Count.value) : '—'}
                     </span>
                     <span className="co2-description">so far this month</span>
                     <div className="co2-divider" />

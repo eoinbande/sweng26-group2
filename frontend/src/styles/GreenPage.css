@@ -413,22 +413,26 @@
 
 .sparkline-tooltip {
     position: absolute;
-    top: clamp(6px, 1dvh, 10px);
-    transform: translateX(-50%);
+    top: clamp(14px, 2dvh, 22px);
+    right: clamp(20px, 4vw, 28px);
     background: rgba(0, 0, 0, 0.6);
     border-radius: 10px;
     padding: 4px 10px;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     pointer-events: none;
     z-index: 5;
     animation: tooltipFadeIn 0.15s ease-out;
+    white-space: nowrap;
+    width: 60px;
+    height: 38px;
 }
 
 @keyframes tooltipFadeIn {
-    from { opacity: 0; transform: translateX(-50%) translateY(4px); }
-    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
 }
 
 .sparkline-tooltip-value {
