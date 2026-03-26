@@ -424,6 +424,7 @@ const [closingDelete, setClosingDelete] = useState(false);
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({ title: newTitle }),
                             });
+                            refreshSchedule();
                         } catch (err) {
                             console.error('failed to update goal title:', err);
                         }
