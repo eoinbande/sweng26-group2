@@ -116,6 +116,7 @@ const Goals = () => {
                     selectedCategories={selectedCategories}
                     onSelectionChange={handleSelectionChange}
                     onNewCategory={handleNewCategory}
+                    onDeleteCategory={handleDeleteCategory} 
                 />
                 {/* Goals List */}
                 {activeGoals.length === 0 && completedGoals.length === 0 ? (
