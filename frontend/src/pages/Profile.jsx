@@ -139,6 +139,7 @@ const Profile = () => {
                             streakDays={streakDays}
                             onUpdateProfile={handleUpdateProfile}
                             onSignOut={handleSignOut}
+                            loaded={profileLoaded}
                         />
                     </div>
                 </div>

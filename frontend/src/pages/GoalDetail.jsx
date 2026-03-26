@@ -17,7 +17,7 @@ const GoalDetail = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { id: paramId } = useParams();
-    const { deleteGoal: removeGoalFromCache, updateGoalProgress } = useGoals();
+    const { deleteGoal: removeGoalFromCache, updateGoalProgress, updateGoalTitle } = useGoals();
     const { refreshSchedule } = useSchedule();
 
     // set body background so color bleeds behind status bar
@@ -416,6 +416,20 @@ const [closingDelete, setClosingDelete] = useState(false);
                     progress={progress}
                     category={goalCategory}
                     endDate={endDate}
+                    onTitleChange={async (newTitle) => {
+                        setGoalTitle(newTitle);
+                        updateGoalTitle(goalId, newTitle);
+                        try {
+                            await fetch(`${import.meta.env.VITE_API_URL}/goals/${goalId}/title`, {
+                                method: 'PATCH',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ title: newTitle }),
+                            });
+                            refreshSchedule();
+                        } catch (err) {
+                            console.error('failed to update goal title:', err);
+                        }
+                    }}
                     onBack={() => {
                         if (location.state?.from === 'schedule') {
                             navigate('/schedule', {
