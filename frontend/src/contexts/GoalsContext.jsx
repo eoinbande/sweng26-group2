@@ -120,6 +120,12 @@ export const GoalsProvider = ({ children }) => {
         setCategories(prev => prev.includes(name) ? prev : [...prev, name]);
     }, []);
 
+    //delete category
+    const deleteCategory = useCallback((name) => {
+        setCategories(prev => prev.filter(c => c !== name));
+    }, []);
+
+
     return (
         <GoalsContext.Provider value={{
             goals,
