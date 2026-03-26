@@ -8,7 +8,6 @@ import Loading from '../components/Loading'; // Import Loading component if it e
 import LoadingOverlay from '../components/LoadingOverlay'; // Import LoadingOverlay for feedback
 import FeedbackPopUp from '../components/FeedbackPopUp';
 import Congratulations from '../components/Congratulations';
-import FocusPanel from '../components/FocusPanel';
 import '../styles/GoalDetail.css';
 import { supabase } from '../supabase_client';
 import { useGoals } from '../contexts/GoalsContext';
@@ -457,8 +456,6 @@ const [closingDelete, setClosingDelete] = useState(false);
                     toggleTask={toggleTask}
                     toggleSubtask={toggleSubtask}
                 />
-
-                <FocusPanel goalId={goalId} goalTitle={goalTitle} />
             </div>
 
             {/* congratulations popup */}
