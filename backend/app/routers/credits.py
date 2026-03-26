@@ -41,4 +41,14 @@ def add_creddits(user_id: str, amount: float):
 
 def get_credits(user_id: str):
 
-    res = supabase.table
+    res = supabase.table("user_credits")\
+        .select("*")\
+        .eq("user_id", user_id)\
+        .execute()
+    
+    data = res.data
+
+    if not data:
+        return {"credits": 0}
+    
+    return {"credits": data[0]["credits"]}
