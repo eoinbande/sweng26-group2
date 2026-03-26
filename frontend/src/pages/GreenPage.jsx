@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import PageHeader from '../components/PageHeader';
 import BottomNav from '../components/BottomNav';
 import useCountUp from '../hooks/useCountUp';
@@ -20,6 +20,27 @@ const formatCompact = (n, { decimal = false } = {}) => {
 
 // sparkline chart for carbon trend
 const CarbonSparkline = ({ data, labels, loaded }) => {
+    const svgRef = useRef(null);
+    const [activeIndex, setActiveIndex] = useState(null);
+
+    // resolve touch/mouse x → nearest data index
+    const getIndexFromX = useCallback((clientX) => {
+        if (!svgRef.current || !data) return null;
+        const rect = svgRef.current.getBoundingClientRect();
+        const relX = (clientX - rect.left) / rect.width;
+        const idx = Math.round(relX * (data.length - 1));
+        return Math.max(0, Math.min(data.length - 1, idx));
+    }, [data]);
+
+    const handlePointerMove = useCallback((e) => {
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        setActiveIndex(getIndexFromX(clientX));
+    }, [getIndexFromX]);
+
+    const handlePointerLeave = useCallback(() => {
+        setActiveIndex(null);
+    }, []);
+
     if (!loaded || !data) return (
         <div className="sparkline-card">
             <span className="sparkline-title">Monthly carbon trend</span>
@@ -53,10 +74,32 @@ const CarbonSparkline = ({ data, labels, loaded }) => {
         }).join(' ') +
         ` L ${padding + usableW},${padding + usableH} Z`;
 
+    // active point coordinates
+    const activeX = activeIndex !== null ? padding + (activeIndex / pointCount) * usableW : null;
+    const activeY = activeIndex !== null ? padding + usableH - ((data[activeIndex] - min) / range) * usableH : null;
+
     return (
         <div className="sparkline-card">
             <span className="sparkline-title">Monthly carbon trend</span>
-            <svg className="sparkline-svg" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
+
+            {/* tooltip */}
+            {activeIndex !== null && (
+                <div className="sparkline-tooltip" style={{ left: `${(activeX / width) * 100}%` }}>
+                    <span className="sparkline-tooltip-value">{Math.round(data[activeIndex] * 1000)}g</span>
+                    <span className="sparkline-tooltip-label">{labels[activeIndex]}</span>
+                </div>
+            )}
+
+            <svg
+                ref={svgRef}
+                className="sparkline-svg sparkline-svg--interactive"
+                viewBox={`0 0 ${width} ${height}`}
+                preserveAspectRatio="none"
+                onMouseMove={handlePointerMove}
+                onMouseLeave={handlePointerLeave}
+                onTouchMove={handlePointerMove}
+                onTouchEnd={handlePointerLeave}
+            >
                 <defs>
                     <linearGradient id="sparkFill" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="0%" stopColor="#A2E070" stopOpacity="0.4" />
@@ -79,29 +122,40 @@ const CarbonSparkline = ({ data, labels, loaded }) => {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                 />
+                {/* vertical indicator line */}
+                {activeIndex !== null && (
+                    <line
+                        x1={activeX} y1={padding}
+                        x2={activeX} y2={padding + usableH}
+                        stroke="rgba(255,255,255,0.4)"
+                        strokeWidth="1.5"
+                        strokeDasharray="3 3"
+                    />
+                )}
                 {/* dots */}
                 {data.map((val, i) => {
                     const x = padding + (i / pointCount) * usableW;
                     const y = padding + usableH - ((val - min) / range) * usableH;
+                    const isActive = i === activeIndex;
                     return (
                         <circle
                             key={i}
-                            className="sparkline-dot"
+                            className={`sparkline-dot${isActive ? ' sparkline-dot--active' : ''}`}
                             cx={x}
                             cy={y}
-                            r="3"
-                            fill="#FFFFFF"
+                            r={isActive ? 5 : 3}
+                            fill={isActive ? '#FFFFFF' : '#FFFFFF'}
                             stroke="#A2E070"
-                            strokeWidth="1.5"
+                            strokeWidth={isActive ? 2.5 : 1.5}
                             style={{ animationDelay: `${i * 0.08}s` }}
                         />
                     );
                 })}
             </svg>
-            {/* day labels */}
+            {/* month labels */}
             <div className="sparkline-labels">
                 {labels.map((label, i) => (
-                    <span key={i} className="sparkline-label">{label}</span>
+                    <span key={i} className={`sparkline-label${i === activeIndex ? ' sparkline-label--active' : ''}`}>{label}</span>
                 ))}
             </div>
         </div>

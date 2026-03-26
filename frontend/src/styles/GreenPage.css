@@ -371,6 +371,7 @@
 /* carbon trend sparkline */
 
 .sparkline-card {
+    position: relative;
     background: #67B082;
     border-radius: clamp(24px, 5dvh, 36px);
     padding: clamp(16px, 2.5dvh, 24px) clamp(20px, 4vw, 28px);
@@ -401,6 +402,61 @@
     width: 100%;
     height: clamp(60px, 10dvh, 90px);
     display: block;
+}
+
+.sparkline-svg--interactive {
+    cursor: crosshair;
+    touch-action: none;
+}
+
+/* tooltip */
+
+.sparkline-tooltip {
+    position: absolute;
+    top: clamp(6px, 1dvh, 10px);
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 10px;
+    padding: 4px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: none;
+    z-index: 5;
+    animation: tooltipFadeIn 0.15s ease-out;
+}
+
+@keyframes tooltipFadeIn {
+    from { opacity: 0; transform: translateX(-50%) translateY(4px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.sparkline-tooltip-value {
+    font-family: var(--font-serif);
+    font-size: 14px;
+    font-weight: 600;
+    color: #FFFFFF;
+    white-space: nowrap;
+}
+
+.sparkline-tooltip-label {
+    font-family: var(--font-sans);
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* active dot pulse */
+
+.sparkline-dot--active {
+    filter: drop-shadow(0 0 4px rgba(162, 224, 112, 0.6));
+    transition: r 0.15s ease, stroke-width 0.15s ease;
+}
+
+/* active month label highlight */
+
+.sparkline-label--active {
+    opacity: 1 !important;
+    font-weight: 700;
 }
 
 .sparkline-line {
