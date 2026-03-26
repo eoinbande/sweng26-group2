@@ -5,7 +5,8 @@ const CategoryIcon = ({
     categories,
     selectedCategories,
     onSelectionChange,
-    onNewCategory
+    onNewCategory,
+    onDeleteCategory
 }) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [dropdownClosing, setDropdownClosing] = useState(false);
