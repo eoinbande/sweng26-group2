@@ -89,10 +89,13 @@ const UpcomingTasks = ({ onReady }) => {
 
     useEffect(() => {
         if (!loading && mounted) {
-            const expandTimer = setTimeout(() => setExpanded(true), 50);
-            const itemsTimer = setTimeout(() => setShowItems(true), 350);
-            const readyTimer = setTimeout(() => onReady && onReady(), 500);
-            return () => { clearTimeout(expandTimer); clearTimeout(itemsTimer); clearTimeout(readyTimer); };
+            // batch expand + items in one frame to minimize re-renders that swallow clicks
+            const expandTimer = requestAnimationFrame(() => {
+                setExpanded(true);
+                setShowItems(true);
+            });
+            const readyTimer = setTimeout(() => onReady && onReady(), 300);
+            return () => { cancelAnimationFrame(expandTimer); clearTimeout(readyTimer); };
         }
     }, [loading, mounted]);
 
