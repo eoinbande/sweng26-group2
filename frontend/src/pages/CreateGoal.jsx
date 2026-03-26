@@ -11,6 +11,12 @@ function CreateGoal() {
     const navigate = useNavigate();
     const location = useLocation();
 
+    // set body background so color bleeds behind status bar
+    useEffect(() => {
+        document.body.style.backgroundColor = '#BFD1E5';
+        return () => { document.body.style.backgroundColor = ''; };
+    }, []);
+
     // restore the prompt if coming back from ReviewPlan via Discard
     const restoredPrompt = location.state?.originalPrompt || '';
 

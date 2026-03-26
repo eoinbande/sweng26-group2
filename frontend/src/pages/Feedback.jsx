@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ArrowUpLeft } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
@@ -7,6 +7,12 @@ import '../index.css';
 function Feedback() {
     const navigate = useNavigate();
     const location = useLocation();
+
+    // set body background so color bleeds behind status bar
+    useEffect(() => {
+        document.body.style.backgroundColor = '#F8F8F4';
+        return () => { document.body.style.backgroundColor = ''; };
+    }, []);
 
     const subtask = location.state?.subtask;
     const taskTitle = location.state?.taskTitle;

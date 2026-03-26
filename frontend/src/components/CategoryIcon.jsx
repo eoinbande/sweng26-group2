@@ -5,10 +5,13 @@ const CategoryIcon = ({
     categories,
     selectedCategories,
     onSelectionChange,
-    onNewCategory
+    onNewCategory,
+    onDeleteCategory
 }) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [dropdownClosing, setDropdownClosing] = useState(false);
     const [isAddingNew, setIsAddingNew] = useState(false);
+    const [inputClosing, setInputClosing] = useState(false);
     const [newCatInput, setNewCatInput] = useState('');
     const inputRef = useRef(null);
     const containerRef = useRef(null);
@@ -17,21 +20,31 @@ const CategoryIcon = ({
         if (isAddingNew && inputRef.current) inputRef.current.focus();
     }, [isAddingNew]);
 
-    // Close dropdown when clicking outside
+    const closeDropdown = () => {
+        setDropdownClosing(true);
+        setTimeout(() => { setIsDropdownOpen(false); setDropdownClosing(false); }, 200);
+    };
+
+    const closeInput = () => {
+        setInputClosing(true);
+        setTimeout(() => { setIsAddingNew(false); setInputClosing(false); setNewCatInput(''); }, 200);
+    };
+
+    // close dropdown when clicking outside
     useEffect(() => {
         const handleClickOutside = (e) => {
-            if (containerRef.current && !containerRef.current.contains(e.target))
-                setIsDropdownOpen(false);
+            if (containerRef.current && !containerRef.current.contains(e.target)) {
+                if (isDropdownOpen && !dropdownClosing) closeDropdown();
+            }
         };
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
+    }, [isDropdownOpen, dropdownClosing]);
 
     const handleAddCategory = () => {
         const trimmed = newCatInput.trim();
         if (trimmed && !categories.includes(trimmed)) onNewCategory(trimmed);
-        setNewCatInput('');
-        setIsAddingNew(false);
+        closeInput();
     };
 
     return (
@@ -39,21 +52,24 @@ const CategoryIcon = ({
             <div className="category-bar-row">
                 <button
                     className="category-btn"
-                    onClick={() => { setIsDropdownOpen(!isDropdownOpen); setIsAddingNew(false); }}
+                    onClick={() => {
+                        if (isDropdownOpen) { closeDropdown(); }
+                        else { setIsDropdownOpen(true); if (isAddingNew) closeInput(); }
+                    }}
                 >
                     Category {isDropdownOpen ? '▲' : '▼'}
                 </button>
                 <button
                     className="new-category-btn"
-                    onClick={() => { setIsAddingNew(true); setIsDropdownOpen(false); }}
+                    onClick={() => { setIsAddingNew(true); if (isDropdownOpen) closeDropdown(); }}
                 >
                     + New category
                 </button>
 
                 {isDropdownOpen && (
-                    <div className="category-dropdown">
+                    <div className={`category-dropdown${dropdownClosing ? ' closing' : ''}`}>
                         <p className="dropdown-item"
-                            onClick={() => { onSelectionChange([]); setIsDropdownOpen(false); }}>
+                            onClick={() => { onSelectionChange([]); closeDropdown(); }}>
                             {selectedCategories.length === 0
                                 ? <span className="checkmark">✓</span>
                                 : <span className="checkmark-placeholder" />}
@@ -62,18 +78,34 @@ const CategoryIcon = ({
                         {categories.map(cat => (
                             <React.Fragment key={cat}>
                                 <div className="dropdown-divider" />
-                                <p className="dropdown-item"
-                                    onClick={() => {
-                                        const updated = selectedCategories.includes(cat)
-                                            ? selectedCategories.filter(c => c !== cat)
-                                            : [...selectedCategories, cat];
-                                        onSelectionChange(updated);
-                                    }}>
-                                    {selectedCategories.includes(cat)
-                                        ? <span className="checkmark">✓</span>
-                                        : <span className="checkmark-placeholder" />}
-                                    {cat}
-                                </p>
+                                <div className="dropdown-item">
+                                    <span
+                                        onClick={() => {
+                                            const updated = selectedCategories.includes(cat)
+                                                ? selectedCategories.filter(c => c !== cat)
+                                                : [...selectedCategories, cat];
+                                            onSelectionChange(updated);
+                                        }}
+                                        style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, cursor: 'pointer' }}
+                                    >
+                                        {selectedCategories.includes(cat)
+                                            ? <span className="checkmark">✓</span>
+                                            : <span className="checkmark-placeholder" />}
+                                        {cat}
+                                    </span>
+                                    <button
+                                        className="category-delete-btn"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            onDeleteCategory(cat);
+                                            if (selectedCategories.includes(cat)) {
+                                                onSelectionChange(selectedCategories.filter(c => c !== cat));
+                                            }
+                                        }}
+                                    >
+                                        ×
+                                    </button>
+                                </div>
                             </React.Fragment>
                         ))}
                     </div>
@@ -81,7 +113,7 @@ const CategoryIcon = ({
             </div>
 
             {isAddingNew && (
-                <div className="new-category-input-row">
+                <div className={`new-category-input-row${inputClosing ? ' closing' : ''}`}>
                     <input
                         ref={inputRef}
                         className="new-category-field"
@@ -91,12 +123,12 @@ const CategoryIcon = ({
                         onChange={e => setNewCatInput(e.target.value)}
                         onKeyDown={e => {
                             if (e.key === 'Enter') handleAddCategory();
-                            if (e.key === 'Escape') { setIsAddingNew(false); setNewCatInput(''); }
+                            if (e.key === 'Escape') closeInput();
                         }}
                     />
                     <button className="new-category-add-btn" onClick={handleAddCategory}>Add</button>
                     <button className="new-category-cancel-btn"
-                        onClick={() => { setIsAddingNew(false); setNewCatInput(''); }}>×</button>
+                        onClick={closeInput}>×</button>
                 </div>
             )}
         </div>

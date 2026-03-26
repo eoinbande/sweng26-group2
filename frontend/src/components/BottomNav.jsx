@@ -52,6 +52,7 @@ const BottomNav = ({ transparent = false }) => {
             justifyContent: 'space-around',
             borderTop: 'none',
             zIndex: 100,
+            WebkitUserSelect: 'none',
         }}>
             <NavIcon icon={<Target />} label="Goals" active={currentPath === '/goals'} onClick={() => navigate('/goals')} />
             <NavIcon icon={<Schedule />} label="Schedule" active={currentPath === '/schedule'} onClick={() => navigate('/schedule')} />

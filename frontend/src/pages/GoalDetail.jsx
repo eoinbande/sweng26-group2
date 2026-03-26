@@ -11,11 +11,21 @@ import Congratulations from '../components/Congratulations';
 import FocusPanel from '../components/FocusPanel';
 import '../styles/GoalDetail.css';
 import { supabase } from '../supabase_client';
+import { useGoals } from '../contexts/GoalsContext';
+import { useSchedule } from '../contexts/ScheduleContext';
 
 const GoalDetail = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { id: paramId } = useParams();
+    const { deleteGoal: removeGoalFromCache, updateGoalProgress, updateGoalTitle } = useGoals();
+    const { refreshSchedule } = useSchedule();
+
+    // set body background so color bleeds behind status bar
+    useEffect(() => {
+        document.body.style.backgroundColor = '#F8F8F4';
+        return () => { document.body.style.backgroundColor = ''; };
+    }, []);
 
     // Safely access location state
     // Use "Loading..." as default if we are loading, unless we want to show stale title
@@ -27,6 +37,7 @@ const GoalDetail = () => {
     /* rstore tasks from location.state if returning from feedback page */
     const [tasks, setTasks] = useState(location.state?.tasks || []);
     const [endDate, setEndDate] = useState("");
+    const [rawDueDate, setRawDueDate] = useState("");
     const [progress, setProgress] = useState(0);
 
     // Feedback popup state
@@ -99,20 +110,15 @@ const [closingDelete, setClosingDelete] = useState(false);
         const fetchGoalDetails = async () => {
             setIsLoading(true);
             try {
-                // fetch goal details and progress in parallel
-                const [response, progRes] = await Promise.all([
-                    fetch(`${import.meta.env.VITE_API_URL}/goal-details/${goalId}`, { cache: 'no-store' }),
-                    fetch(`${import.meta.env.VITE_API_URL}/tasks/${goalId}/progress`, { cache: 'no-store' }),
-                ]);
-
+                // fetch sequentially to avoid flooding supabase connections
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/goal-details/${goalId}`, { cache: 'no-store' });
                 if (!response.ok) {
                     throw new Error('Failed to fetch details');
                 }
+                const data = await response.json();
 
-                const [data, progData] = await Promise.all([
-                    response.json(),
-                    progRes.json(),
-                ]);
+                const progRes = await fetch(`${import.meta.env.VITE_API_URL}/tasks/${goalId}/progress`, { cache: 'no-store' });
+                const progData = await progRes.json();
 
                 // Debug log to check data structure
                 console.log("Goal details fetched:", data);
@@ -128,7 +134,8 @@ const [closingDelete, setClosingDelete] = useState(false);
                 // Set End Date if available
                 if (data.goal && data.goal.goal_data && data.goal.goal_data.goal_due_date) {
                     const rawDate = data.goal.goal_data.goal_due_date;
-                    // Format date nicely (e.g. 14 Feb 2026)
+                    setRawDueDate(rawDate);
+                    // format date nicely (e.g. 14 Feb 2026)
                     const dateObj = new Date(rawDate);
                     if (!isNaN(dateObj)) {
                         setEndDate(dateObj.toLocaleDateString('en-GB', {
@@ -186,7 +193,7 @@ const [closingDelete, setClosingDelete] = useState(false);
         prevProgressRef.current = progress;
     }, [progress]);
 
-    /* API Helper to update status */
+    /* API Helper to update status - only patches, no progress fetch to avoid race conditions */
     const updateTaskStatus = async (taskId, newStatus) => {
         try {
             const res = await fetch(`${import.meta.env.VITE_API_URL}/tasks/${taskId}/status`, {
@@ -197,22 +204,23 @@ const [closingDelete, setClosingDelete] = useState(false);
 
             if (!res.ok) {
                 console.error("Failed to update task status:", res.status);
-                // Optionally revert local state here
                 return;
             }
 
-            // Fetch progress after successful update
-            if (goalId) {
-                try {
-                    const progRes = await fetch(`${import.meta.env.VITE_API_URL}/tasks/${goalId}/progress`, { cache: 'no-store' });
-                    const progData = await progRes.json();
-                    if (progData) setProgress(progData.percentage);
-                } catch (e) { console.error("Failed to fetch progress:", e); }
-            }
+            // refresh schedule so completed tasks/goals disappear from calendar
+            refreshSchedule();
         } catch (e) {
             console.error("Failed to update task status:", e);
         }
     };
+
+    // sync local progress whenever it changes (after initial load).
+    // So no per-request progress fetch
+    useEffect(() => {
+        if (prevProgressRef.current !== null && goalId) {
+            updateGoalProgress(goalId, progress);
+        }
+    }, [progress, goalId, updateGoalProgress]);
 
     /* derived helpers */
     const isTaskComplete = (task) => {
@@ -232,37 +240,36 @@ const [closingDelete, setClosingDelete] = useState(false);
 
     /* toggle a subtask */
     const toggleSubtask = (taskId, subtaskId) => {
-    let newStatus = 'not_started';
+    // Read current state directly instead of it being a side effect
+    const task = tasks.find(t => t.id === taskId);
+    if (!task) return;
+    const subtask = task.subtasks.find(s => s.id === subtaskId);
+    if (!subtask) return;
+
+    const newCompleted = !subtask.completed;
+    const newStatus = newCompleted ? 'completed' : 'not_started';
+    const updatedSubtasks = task.subtasks.map(s =>
+        s.id === subtaskId ? { ...s, completed: newCompleted } : s
+    );
+    const allDoneAfter = updatedSubtasks.every(s => s.completed);
+    const parentWasCompleted = task.completed;
 
     setTasks(prev => {
-        const newTasks = prev.map(task => {
-            if (task.id !== taskId) return task;
-
-            // 1. Update the specific subtask
-            const updatedSubtasks = task.subtasks.map(s => {
-                if (s.id === subtaskId) {
-                    const nextCompleted = !s.completed;
-                    newStatus = nextCompleted ? 'completed' : 'not_started';
-                    return { ...s, completed: nextCompleted };
-                }
-                return s;
-            });
-
-            // 2. Check if ALL subtasks are now complete to auto-update parent
-            const allDone = updatedSubtasks.every(s => s.completed);
-            
-            return {
-                ...task,
-                subtasks: updatedSubtasks,
-                completed: allDone // Auto-complete parent if all subs are done
-            };
+        const newTasks = prev.map(t => {
+            if (t.id !== taskId) return t;
+            return { ...t, subtasks: updatedSubtasks, completed: allDoneAfter };
         });
-        
         setProgress(calculateLocalProgress(newTasks));
         return newTasks;
     });
 
     updateTaskStatus(subtaskId, newStatus);
+
+    // If the parent was completed but is no longer (subtask was unchecked)
+    // sync the parent's status to the backend too
+    if (parentWasCompleted && !allDoneAfter) {
+        updateTaskStatus(taskId, 'not_started');
+    }
     };
 
     /* toggle a whole task (complete all subtasks or un-complete) */
@@ -347,7 +354,8 @@ const [closingDelete, setClosingDelete] = useState(false);
                 },
                 userId: userId,
                 originalPrompt: goalTitle,
-                dueDate: endDate,
+                dueDate: rawDueDate || 'AI_DECIDE',
+                from: 'feedback',
             },
         });
 
@@ -368,6 +376,8 @@ const [closingDelete, setClosingDelete] = useState(false);
             });
 
             if (response.ok) {
+                removeGoalFromCache(goalId);
+                refreshSchedule();
                 triggerToast("Goal deleted successfully");
                 setTimeout(() => navigate('/goals'), 1500);
             } else {
@@ -406,6 +416,20 @@ const [closingDelete, setClosingDelete] = useState(false);
                     progress={progress}
                     category={goalCategory}
                     endDate={endDate}
+                    onTitleChange={async (newTitle) => {
+                        setGoalTitle(newTitle);
+                        updateGoalTitle(goalId, newTitle);
+                        try {
+                            await fetch(`${import.meta.env.VITE_API_URL}/goals/${goalId}/title`, {
+                                method: 'PATCH',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ title: newTitle }),
+                            });
+                            refreshSchedule();
+                        } catch (err) {
+                            console.error('failed to update goal title:', err);
+                        }
+                    }}
                     onBack={() => {
                         if (location.state?.from === 'schedule') {
                             navigate('/schedule', {

@@ -1,7 +1,7 @@
 import AnalyticsCard from './AnalyticsCard';
 import '../styles/Profile.css';
 
-const AnalyticsSection = ({ tasksCompleted, goalsCompleted, onTimeTasks, onTimeGoals }) => {
+const AnalyticsSection = ({ tasksCompleted, goalsCompleted, onTimeTasks, onTimeGoals, loaded }) => {
     return (
         <section className="analytics-section fade-in fade-in-delay-1">
             <h2 className="analytics-section-title">Your Analytics</h2>
@@ -15,6 +15,7 @@ const AnalyticsSection = ({ tasksCompleted, goalsCompleted, onTimeTasks, onTimeG
                     bottomLabel="Out of which..."
                     smallNumber={onTimeTasks}
                     smallLabel="Were completed on-time."
+                    loaded={loaded}
                 />
                 <AnalyticsCard
                     topLabel="You have completed..."
@@ -23,6 +24,7 @@ const AnalyticsSection = ({ tasksCompleted, goalsCompleted, onTimeTasks, onTimeG
                     bottomLabel="Out of which..."
                     smallNumber={onTimeGoals}
                     smallLabel="Were completed on-time."
+                    loaded={loaded}
                 />
             </div>
         </section>

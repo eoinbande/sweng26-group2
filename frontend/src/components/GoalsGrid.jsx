@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../supabase_client';
+import { useGoals } from '../contexts/GoalsContext';
 import dayjs from 'dayjs';
 import '../index.css';
 
@@ -11,57 +11,36 @@ const CARD_COLORS = [
     'var(--yellow-soft)'
 ];
 
-const GoalsGrid = () => {
+const GoalsGrid = ({ visible = true }) => {
     const navigate = useNavigate();
-    const [goals, setGoals] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const { goals, loading } = useGoals();
     const currentMonth = new Date().toLocaleString('en-US', { month: 'long' });
 
-    useEffect(() => {
-        const fetchGoals = async () => {
-            try {
-                const { data } = await supabase.auth.getUser();
-                const user = data?.user;
-                if (!user) {
-                    setLoading(false);
-                    return;
-                }
-
-                // Get goals for this month ( next 30 days is what the endpoint does
-                const res = await fetch(`${import.meta.env.VITE_API_URL}/schedule/${user.id}/upcoming-goals?days=30`);
-                if (res.ok) {
-                    const json = await res.json();
-                    
-                    const mappedGoals = json.goals.map((g, index) => {
-                        const bgColor = CARD_COLORS[index % CARD_COLORS.length];
-
-                        return {
-                            id: g.goal_id,
-                            title: g.title,
-                            date: dayjs(g.goal_due_date).format('D MMM'),
-                            category: g.category,
-                            color: bgColor
-                        };
-                    });
-                    
-                    setGoals(mappedGoals);
-                }
-            } catch (err) {
-                console.error("Error fetching goals:", err);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchGoals();
-    }, []);
+    // derive upcoming goals (due within 30 days) from cached goals
+    const upcomingGoals = useMemo(() => {
+        const now = dayjs().startOf('day');
+        const cutoff = now.add(30, 'day');
+        return goals
+            .filter(g => {
+                if (!g.dueDate) return false;
+                const due = dayjs(g.dueDate);
+                return due.isAfter(now.subtract(1, 'day')) && due.isBefore(cutoff);
+            })
+            .map((g, index) => ({
+                id: g.id,
+                title: g.title,
+                date: g.dateFormatted,
+                category: g.category,
+                color: CARD_COLORS[index % CARD_COLORS.length],
+            }));
+    }, [goals]);
 
     return (
-        <div className="home-goals-grid">
+        <div className={`home-goals-grid${visible ? ' home-goals-grid--visible' : ''}`}>
             <h4>{currentMonth}'s goals</h4>
 
             <div className="goals-scroll">
-                {!loading && goals.length === 0 ? (
+                {!loading && upcomingGoals.length === 0 ? (
                     <div style={{
                         display: 'flex',
                         alignItems: 'center',
@@ -74,8 +53,8 @@ const GoalsGrid = () => {
                         No upcoming goals!
                     </div>
                 ) : (
-                    goals.map((goal, index) => (
-                        <div key={index} className="goal-grid-card goal-card" onClick={() => navigate(`/goal/${goal.id}`, { state: { goalTitle: goal.title } })} style={{
+                    upcomingGoals.map((goal, index) => (
+                        <div key={goal.id} className="goal-grid-card goal-card" onClick={() => navigate(`/goal/${goal.id}`, { state: { goalTitle: goal.title } })} style={{
                             backgroundColor: goal.color,
                             display: 'flex',
                             flexDirection: 'column',

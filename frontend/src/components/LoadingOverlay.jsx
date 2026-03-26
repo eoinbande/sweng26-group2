@@ -100,7 +100,7 @@ function LoadingOverlay({ onComplete, isLoading = false, minDisplayTime = 2000 }
                 paddingTop: 'var(--space-xl)',
                 paddingBottom: 'var(--space-xl)',
                 borderRadius: isShrinking ? '0 0 var(--radius-xxl) var(--radius-xxl)' : '0',
-                boxShadow: isShrinking ? 'var(--shadow-float)' : 'none',
+                boxShadow: 'none',
                 overflow: 'hidden',
                 zIndex: 9999,
                 transition: 'all 1.2s cubic-bezier(0.25, 0.1, 0.25, 1)',
@@ -126,9 +126,9 @@ function LoadingOverlay({ onComplete, isLoading = false, minDisplayTime = 2000 }
                     <ArrowLeft size={32} color="var(--text-main)" strokeWidth={2.5} />
                 </button>
 
-                {/* spinner - fixed at center of viewport */}
+                {/* spinner - centered within overlay */}
                 <div style={{
-                    position: 'fixed',
+                    position: 'absolute',
                     top: '45%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
@@ -156,9 +156,9 @@ function LoadingOverlay({ onComplete, isLoading = false, minDisplayTime = 2000 }
                     }} /> */}
                 </div>
 
-                {/* cycling phrase - positioned below spinner, expands downward */}
+                {/* cycling phrase - positioned below spinner */}
                 <div style={{
-                    position: 'fixed',
+                    position: 'absolute',
                     top: 'calc(50% + 50px)',
                     left: '50%',
                     transform: 'translateX(-50%)',
