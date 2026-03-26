@@ -460,6 +460,58 @@ def create_category_endpoint(request: CreateCategoryRequest):
         if "duplicate" in str(e).lower() or "unique" in str(e).lower():
             raise HTTPException(status_code=400, detail="Category already exists")
         raise HTTPException(status_code=500, detail=str(e))
+    
+# ---- Delete a category ----
+
+@goal_router.delete("/categories/{user_id}/{category_name}")
+def delete_category_endpoint(user_id: str, category_name: str):
+    """
+    Delete a custom category for a user.
+
+    BEHAVIOUR:
+    - Deletes the category row from the categories table.
+    - Any goals that were using this category have their category set to None
+      (rather than blocking the delete or deleting the goals themselves).
+
+    NOTE: System default categories (Health, Personal, Work, Education, Finance)
+    cannot be deleted — those are not stored per-user in the categories table,
+    so a delete attempt simply returns 404.
+
+    Example: DELETE /categories/uuid-123/Fitness
+    """
+    # Check the category exists for this user before attempting delete
+    result = supabase.table("categories") \
+        .select("*") \
+        .eq("user_id", user_id) \
+        .eq("name", category_name) \
+        .execute()
+
+    if not result.data:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Category '{category_name}' not found for this user."
+        )
+
+    # Null out the category on any goals that were using it
+    # This keeps goals intact — they just become uncategorised
+    supabase.table("goals") \
+        .update({"category": None}) \
+        .eq("user_id", user_id) \
+        .eq("category", category_name) \
+        .execute()
+
+    # Delete the category itself
+    supabase.table("categories") \
+        .delete() \
+        .eq("user_id", user_id) \
+        .eq("name", category_name) \
+        .execute()
+
+    return {
+        "message": f"Category '{category_name}' deleted successfully",
+        "user_id": user_id,
+        "category": category_name
+    }
 
 
 # ---- Delete a goal ----
