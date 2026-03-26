@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 from app.services.stripe_service import create_checkout_session
+from app.database import supabase
 
 credits_router = APIRouter() #main router for credits
 
@@ -36,3 +37,8 @@ def add_creddits(user_id: str, amount: float):
         }).execute()
     
     return {"message": "Credits added"}
+
+
+def get_credits(user_id: str):
+
+    res = supabase.table
