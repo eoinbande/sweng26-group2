@@ -64,6 +64,17 @@ const Goals = () => {
         addCategory(name.trim());
     };
 
+    const handleDeleteCategory = async (name) => {
+    if (!user) return;
+    await fetch(`${baseUrl}/categories`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: user.id, name })
+    });
+    deleteCategory(name);
+};
+
+
     const handleAssignCategory = async (goalId, cat) => {
         await fetch(`${baseUrl}/goals/${goalId}/category`, {
             method: 'PATCH',
