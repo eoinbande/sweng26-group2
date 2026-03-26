@@ -78,18 +78,34 @@ const CategoryIcon = ({
                         {categories.map(cat => (
                             <React.Fragment key={cat}>
                                 <div className="dropdown-divider" />
-                                <p className="dropdown-item"
-                                    onClick={() => {
-                                        const updated = selectedCategories.includes(cat)
-                                            ? selectedCategories.filter(c => c !== cat)
-                                            : [...selectedCategories, cat];
-                                        onSelectionChange(updated);
-                                    }}>
-                                    {selectedCategories.includes(cat)
-                                        ? <span className="checkmark">✓</span>
-                                        : <span className="checkmark-placeholder" />}
-                                    {cat}
-                                </p>
+                                <div className="dropdown-item">
+                                    <span
+                                        onClick={() => {
+                                            const updated = selectedCategories.includes(cat)
+                                                ? selectedCategories.filter(c => c !== cat)
+                                                : [...selectedCategories, cat];
+                                            onSelectionChange(updated);
+                                        }}
+                                        style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, cursor: 'pointer' }}
+                                    >
+                                        {selectedCategories.includes(cat)
+                                            ? <span className="checkmark">✓</span>
+                                            : <span className="checkmark-placeholder" />}
+                                        {cat}
+                                    </span>
+                                    <button
+                                        className="category-delete-btn"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            onDeleteCategory(cat);
+                                            if (selectedCategories.includes(cat)) {
+                                                onSelectionChange(selectedCategories.filter(c => c !== cat));
+                                            }
+                                        }}
+                                    >
+                                        ×
+                                    </button>
+                                </div>
                             </React.Fragment>
                         ))}
                     </div>
