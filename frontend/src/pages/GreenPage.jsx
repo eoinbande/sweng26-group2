@@ -5,6 +5,19 @@ import useCountUp from '../hooks/useCountUp';
 import { useUser } from '../contexts/UserContext';
 import '../styles/GreenPage.css';
 
+// format a number to at most 4 characters (e.g. 1500 → "1.5K", 13000 → "13K")
+const formatCompact = (n, { decimal = false } = {}) => {
+    if (n < 10000) return String(n);
+    if (n < 1000000) {
+        const k = n / 1000;
+        if (decimal) return `${+k.toFixed(1)}K`;
+        return k >= 10 ? `${Math.round(k)}K` : `${+k.toFixed(1)}K`;
+    }
+    const m = n / 1000000;
+    if (decimal) return `${+m.toFixed(1)}M`;
+    return m >= 10 ? `${Math.round(m)}M` : `${+m.toFixed(1)}M`;
+};
+
 // sparkline chart for carbon trend
 const CarbonSparkline = ({ data, labels, loaded }) => {
     if (!loaded || !data) return (
@@ -193,7 +206,7 @@ function GreenPage() {
                         filter: `blur(${co2Count.blur}px)`,
                         transform: `scaleY(${1 + co2Count.blur * 0.04})`
                     } : undefined}>
-                        {loaded ? `${co2Count.value}g` : '—'}
+                        {loaded ? `${formatCompact(co2Count.value)}g` : '—'}
                     </span>
                     <span className="co2-description">so far this month</span>
                     <div className="co2-divider" />
@@ -222,7 +235,7 @@ function GreenPage() {
                             filter: `blur(${aiCallsCount.blur}px)`,
                             transform: `scaleY(${1 + aiCallsCount.blur * 0.04})`
                         } : undefined}>
-                            {loaded ? aiCallsCount.value : '—'}
+                            {loaded ? formatCompact(aiCallsCount.value) : '—'}
                         </span>
                         <span className="stat-label">AI Calls</span>
                     </div>
@@ -232,7 +245,7 @@ function GreenPage() {
                             filter: `blur(${tokensCount.blur}px)`,
                             transform: `scaleY(${1 + tokensCount.blur * 0.04})`
                         } : undefined}>
-                            {loaded ? tokensCount.value : '—'}
+                            {loaded ? formatCompact(tokensCount.value, { decimal: true }) : '—'}
                         </span>
                         <span className="stat-label">tokens</span>
                     </div>
