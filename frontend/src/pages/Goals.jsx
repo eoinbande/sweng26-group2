@@ -19,7 +19,6 @@ const Goals = () => {
         updateGoalCategory,
         updateGoalProgress,
         addCategory,
-        deleteCategory,
     } = useGoals();
 
     // set body background so color bleeds behind status bar
@@ -64,11 +63,6 @@ const Goals = () => {
         addCategory(name.trim());
     };
 
-    const handleDeleteCategory = async (name) => {
-    deleteCategory(name);
-};
-
-
     const handleAssignCategory = async (goalId, cat) => {
         await fetch(`${baseUrl}/goals/${goalId}/category`, {
             method: 'PATCH',
@@ -110,7 +104,6 @@ const Goals = () => {
                     selectedCategories={selectedCategories}
                     onSelectionChange={handleSelectionChange}
                     onNewCategory={handleNewCategory}
-                    onDeleteCategory={handleDeleteCategory} 
                 />
                 {/* Goals List */}
                 {activeGoals.length === 0 && completedGoals.length === 0 ? (

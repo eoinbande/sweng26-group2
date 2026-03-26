@@ -186,8 +186,7 @@ def save_tasks_to_db(goal_id: str, tasks: list[dict]):
             "order": task["order"],
             "status": task.get("status", "not_started"),
             "requires_input": task.get("requires_input", False),
-            "parent_id": None,  # Top-level task, no parent
-            "due_date": task.get("due_date")
+            "parent_id": None  # Top-level task, no parent
         }).execute()
 
         # Insert each subtask (parent_id points to the parent task's UUID)
@@ -200,8 +199,7 @@ def save_tasks_to_db(goal_id: str, tasks: list[dict]):
                 "order": subtask["order"],
                 "status": subtask.get("status", "not_started"),
                 "requires_input": False,
-                "parent_id": task["id"],  # Points to parent task's UUID
-                "due_date": subtask.get("due_date")
+                "parent_id": task["id"]  # Points to parent task's UUID
             }).execute()
 
     return tasks

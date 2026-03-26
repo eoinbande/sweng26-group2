@@ -153,8 +153,10 @@ class TestGetAllTasksForUser:
         tasks_g1 = [{"id": "t1", "goal_id": "goal-1"}]
         tasks_g2 = [{"id": "t2", "goal_id": "goal-2"}, {"id": "t3", "goal_id": "goal-2"}]
 
-        all_tasks = tasks_g1 + tasks_g2
-        mock_supabase.table.return_value.select.return_value.in_.return_value.execute.return_value = type("R", (), {"data": all_tasks})()
+        mock_supabase.table.return_value.select.return_value.eq.return_value.execute.side_effect = [
+            type("R", (), {"data": tasks_g1})(),
+            type("R", (), {"data": tasks_g2})(),
+        ]
 
         result = _get_all_tasks_for_user("user-1")
         assert len(result) == 3

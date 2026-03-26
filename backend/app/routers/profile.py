@@ -13,9 +13,11 @@ def _get_all_tasks_for_user(user_id: str) -> list[dict]:
     goals = get_all_goals(user_id)
     if not goals:
         return []
-    goal_ids = [g["id"] for g in goals]
-    rows = supabase.table("tasks").select("*").in_("goal_id", goal_ids).execute().data
-    return rows or []
+    all_tasks = []
+    for goal in goals:
+        rows = supabase.table("tasks").select("*").eq("goal_id", goal["id"]).execute().data
+        all_tasks.extend(rows or [])
+    return all_tasks
 
 def _is_goal_completed(goal_id: str) -> bool:
     rows = supabase.table("tasks").select("status").eq("goal_id", goal_id).execute().data
@@ -140,75 +142,3 @@ def get_tasks_completed_on_time(user_id: str):
             count += 1
  
     return {"user_id": user_id, "tasks_completed_on_time": count}
-
-@profile_router.get("/profile/{user_id}/summary")
-def get_profile_summary(user_id: str):
-    """All profile analytics in one call."""
-    goals = get_all_goals(user_id) or []
-    all_tasks = _get_all_tasks_for_user(user_id)
-    
-    # streak
-    completed = [t for t in all_tasks if t.get("status") == "completed" and t.get("updated_at")]
-    active_days = set()
-    for t in completed:
-        dt = _parse_date(t["updated_at"])
-        if dt:
-            active_days.add(dt.strftime("%Y-%m-%d"))
-    
-    current_streak = 0
-    if active_days:
-        now = datetime.now(timezone.utc)
-        today = now.strftime("%Y-%m-%d")
-        yesterday = (now - timedelta(days=1)).strftime("%Y-%m-%d")
-        if today in active_days or yesterday in active_days:
-            check = datetime.strptime(today if today in active_days else yesterday, "%Y-%m-%d").replace(tzinfo=timezone.utc)
-            while check.strftime("%Y-%m-%d") in active_days:
-                current_streak += 1
-                check -= timedelta(days=1)
-    
-    # tasks completed
-    tasks_completed = sum(1 for t in all_tasks if t.get("status") == "completed")
-    
-    # goals completed
-    goals_completed = 0
-    for g in goals:
-        rows = [t for t in all_tasks if t.get("goal_id") == g["id"]]
-        if rows and all(r.get("status") == "completed" for r in rows):
-            goals_completed += 1
-    
-    # tasks completed on time
-    tasks_on_time = 0
-    for t in all_tasks:
-        if t.get("status") != "completed":
-            continue
-        due_dt = _parse_date(t.get("due_date"))
-        completed_dt = _parse_date(t.get("updated_at"))
-        if due_dt and completed_dt and completed_dt.date() <= due_dt.date():
-            tasks_on_time += 1
-    
-    # goals completed on time
-    goals_on_time = 0
-    for g in goals:
-        goal_tasks = [t for t in all_tasks if t.get("goal_id") == g["id"]]
-        if not goal_tasks or not all(r.get("status") == "completed" for r in goal_tasks):
-            continue
-        goal_data = g.get("goal_data", {})
-        if isinstance(goal_data, str):
-            try:
-                goal_data = json.loads(goal_data)
-            except (json.JSONDecodeError, TypeError):
-                goal_data = {}
-        due_dt = _parse_date(goal_data.get("goal_due_date"))
-        if not due_dt:
-            continue
-        completion_dates = [d for d in (_parse_date(t["updated_at"]) for t in goal_tasks if t.get("updated_at")) if d]
-        if completion_dates and max(completion_dates).date() <= due_dt.date():
-            goals_on_time += 1
-    
-    return {
-        "current_streak": current_streak,
-        "tasks_completed": tasks_completed,
-        "goals_completed": goals_completed,
-        "tasks_completed_on_time": tasks_on_time,
-        "goals_completed_on_time": goals_on_time
-    }
