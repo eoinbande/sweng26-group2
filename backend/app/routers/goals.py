@@ -72,6 +72,9 @@ class UpdateCategoryRequest(BaseModel):
     """
     category: str
 
+class UpdateTitleRequest(BaseModel):
+    title: str
+
 
 class CreateCategoryRequest(BaseModel):
     """
@@ -423,6 +426,26 @@ def update_goal_category(goal_id: str, request: UpdateCategoryRequest):
         "goal_id": goal_id,
         "category": request.category
     }
+
+
+# ---- Update a goal's title ----
+
+@goal_router.patch("/goals/{goal_id}/title")
+def update_goal_title(goal_id: str, request: UpdateTitleRequest):
+    """
+    Update the title of an existing goal.
+    
+    Example: PATCH /goals/uuid-123/title
+    Body: {"title": "New goal title"}
+    """
+    try:
+        get_goal(goal_id)
+    except Exception:
+        raise HTTPException(status_code=404, detail="Goal not found")
+    supabase.table("goals").update(
+        {"title": request.title}
+    ).eq("id", goal_id).execute()
+    return {"message": "Goal title updated", "goal_id": goal_id, "title": request.title}
 
 
 # ---- Category endpoints ----
