@@ -31,6 +31,8 @@ const formatCarbon = (kg) => formatCarbonGrams(kg * 1000);
 const CarbonSparkline = ({ data, labels, loaded }) => {
     const svgRef = useRef(null);
     const [activeIndex, setActiveIndex] = useState(null);
+    const [tooltipClosing, setTooltipClosing] = useState(false);
+    const lastIndexRef = useRef(null);
 
     // resolve touch/mouse x → nearest data index
     const getIndexFromX = useCallback((clientX) => {
@@ -43,11 +45,18 @@ const CarbonSparkline = ({ data, labels, loaded }) => {
 
     const handlePointerMove = useCallback((e) => {
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        setActiveIndex(getIndexFromX(clientX));
+        const idx = getIndexFromX(clientX);
+        setTooltipClosing(false);
+        setActiveIndex(idx);
+        lastIndexRef.current = idx;
     }, [getIndexFromX]);
 
     const handlePointerLeave = useCallback(() => {
-        setActiveIndex(null);
+        setTooltipClosing(true);
+        setTimeout(() => {
+            setActiveIndex(null);
+            setTooltipClosing(false);
+        }, 200);
     }, []);
 
     if (!loaded || !data) return (
@@ -93,7 +102,7 @@ const CarbonSparkline = ({ data, labels, loaded }) => {
 
             {/* tooltip — fixed top-right position */}
             {activeIndex !== null && (
-                <div className="sparkline-tooltip">
+                <div className={`sparkline-tooltip${tooltipClosing ? ' closing' : ''}`}>
                     <span className="sparkline-tooltip-value">{formatCarbon(data[activeIndex])}</span>
                     <span className="sparkline-tooltip-label">{labels[activeIndex]}</span>
                 </div>

@@ -415,8 +415,9 @@
     position: absolute;
     top: clamp(14px, 2dvh, 22px);
     right: clamp(20px, 4vw, 28px);
-    background: rgba(0, 0, 0, 0.6);
-    border-radius: 10px;
+    background: linear-gradient(135deg, rgba(20, 50, 20, 0.9), rgba(40, 80, 40, 0.85));
+    border: 1.5px solid #7CCD5A;
+    border-radius: 12px;
     padding: 4px 10px;
     display: flex;
     flex-direction: column;
@@ -424,29 +425,45 @@
     justify-content: center;
     pointer-events: none;
     z-index: 5;
-    animation: tooltipFadeIn 0.15s ease-out;
+    animation: tooltipFadeIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     white-space: nowrap;
     width: 60px;
     height: 38px;
+    backdrop-filter: blur(6px);
+    box-shadow: 0 2px 14px rgba(122, 205, 90, 0.35), inset 0 0 10px rgba(162, 224, 112, 0.1);
+}
+
+.sparkline-tooltip.closing {
+    animation: tooltipFadeOut 0.2s ease-in forwards;
 }
 
 @keyframes tooltipFadeIn {
-    from { opacity: 0; transform: scale(0.9); }
-    to { opacity: 1; transform: scale(1); }
+    0%   { opacity: 0; transform: scale(0.6); filter: blur(4px); }
+    60%  { opacity: 1; transform: scale(1.05); filter: blur(0px); }
+    100% { opacity: 1; transform: scale(1); filter: blur(0px); }
+}
+
+@keyframes tooltipFadeOut {
+    0%   { opacity: 1; transform: scale(1); filter: blur(0px); }
+    100% { opacity: 0; transform: scale(0.7); filter: blur(4px); }
 }
 
 .sparkline-tooltip-value {
     font-family: var(--font-serif);
     font-size: 14px;
     font-weight: 600;
-    color: #FFFFFF;
+    background: linear-gradient(135deg, #7CCD5A, #B8F080, #D4F7B8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
     white-space: nowrap;
+    filter: drop-shadow(0 0 6px rgba(162, 224, 112, 0.5));
 }
 
 .sparkline-tooltip-label {
     font-family: var(--font-sans);
     font-size: 10px;
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(255, 255, 255, 0.75);
 }
 
 /* active dot pulse */
