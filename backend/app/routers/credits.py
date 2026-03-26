@@ -11,3 +11,28 @@ def buy_credits(user_id: str, amount_eur: float):
     return {
         "checkout_url": checkout_url
     }
+
+@credits_router.post("/credits/add-after-payment")
+def add_creddits(user_id: str, amount: float):
+
+    res = supabase.table("user_credits")\
+        .select("*")\
+        .eq("user_id", user_id)\
+        .execute()
+    
+    data = res.data
+
+    if data:
+        current = data[0]["credits"]
+
+        supabase.table("user_credits").update({
+            "credits": current + amount
+        }).eq("user_id", user_id).execute()
+    
+    else:
+        supabase.table("user_credits").insert({
+            "user_id": user_id,
+            "credits": amount
+        }).execute()
+    
+    return {"message": "Credits added"}
