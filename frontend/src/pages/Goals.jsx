@@ -19,6 +19,7 @@ const Goals = () => {
         updateGoalCategory,
         updateGoalProgress,
         addCategory,
+        deleteCategory,
     } = useGoals();
 
     // set body background so color bleeds behind status bar
