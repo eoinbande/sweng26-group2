@@ -33,7 +33,7 @@ const AccountCard = ({ username, email, streakDays, onUpdateProfile, onSignOut, 
     return (
         <div className="account-card-wrapper fade-in">
             <div className="account-card">
-                <div className="account-card-streak">
+                <div className={`account-card-streak${loaded ? ' loaded' : ''}`}>
                     <div className="streak-fire-wrap">
                         <svg className={`account-card-streak-icon${fireReady ? ' loaded' : ''}`} viewBox="0 0 24 24" fill="#ee9300" xmlns="http://www.w3.org/2000/svg">
                             <path d="M12 2C10.5 6 7 8.5 7 12.5C7 16.09 9.69 19 12 19C14.31 19 17 16.09 17 12.5C17 8.5 13.5 6 12 2Z" />
