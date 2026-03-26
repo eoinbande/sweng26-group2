@@ -136,6 +136,7 @@ export const GoalsProvider = ({ children }) => {
             updateGoalCategory,
             updateGoalProgress,
             addCategory,
+            deleteCategory,
             refreshGoals: fetchGoals,
         }}>
             {children}
