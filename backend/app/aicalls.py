@@ -79,7 +79,10 @@ def aiFeedback(userInput, currentGoals):
                       redundant by new tasks. Importantly, NEVER geneerate a new task with an ai_id equal to or lower than the highest ai_id you were 
                       passeed. For example, if you were passed a task with ai_id "task_7", the LOWEST ai_id you may generate is "task_8". Consider
                       carefully where to restructure the "order" of the tasks for this change of plans to fit in properly. Keep task titles to a single
-                      sentence unless absolutely necessary"""
+                      sentence unless absolutely necessary. If the user feedback is vague and could be interpreted in multiple ways, make the minimal number of changes to the
+                      plan that would satisfy the feedback, rather than restructuring the entire plan. Finally, when updating the due dates on new tasks, ensure that the
+                      date lies in the correct chronological order with the existing tasks, in relation to the order field within the JSON (i.e. the due date for order 1 should
+                      always be earlier than the due date for order 2, etc.)."""
                       + json.dumps(currentGoals),
     model = "gpt-5.2",
     input = userInput,
@@ -106,7 +109,7 @@ def aiExpand(userInput, currentGoals):
                      bearing in mind the complexity of the task and the time taken to complete prior tasks.Keep this list to five
                      entries or less, and generate ai_ids according to the parent task's ai_id (for parent task_3, make the subtasks task_3a,
                      task_3b, etc.). Do NOT populate the id field, and initialise all status to "not_started". Keep task titles to a single sentence
-                     unless absolutely necessary"""
+                     unless absolutely necessary, and only ever update a single task unless the user explicitly states multiple tasks to expand."""
                      + json.dumps(currentGoals),
     model = "gpt-5.2",
     input = userInput,

@@ -127,6 +127,25 @@ export const GoalsProvider = ({ children }) => {
         setCategories(prev => prev.includes(name) ? prev : [...prev, name]);
     }, []);
 
+    //delete category
+    const deleteCategory = useCallback(async (name) => {
+        if (!user) return;
+        try {
+            const res = await fetch(`${baseUrl}/categories/${user.id}/${encodeURIComponent(name)}`, {
+                method: 'DELETE',
+            });
+            if (res.ok) {
+                setCategories(prev => prev.filter(c => c !== name));
+                setGoals(prev => prev.map(g => g.category === name ? { ...g, category: null } : g));
+            } else {
+                console.error('Failed to delete category:', res.status);
+            }
+        } catch (e) {
+            console.error('Error deleting category:', e);
+        }
+    }, [user, baseUrl]);
+
+
     return (
         <GoalsContext.Provider value={{
             goals,
@@ -138,6 +157,7 @@ export const GoalsProvider = ({ children }) => {
             updateGoalTitle,
             updateGoalProgress,
             addCategory,
+            deleteCategory,
             refreshGoals: fetchGoals,
         }}>
             {children}
