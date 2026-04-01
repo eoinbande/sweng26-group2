@@ -44,6 +44,7 @@ const CarbonSparkline = ({ data, labels, loaded }) => {
     }, [data]);
 
     const handlePointerMove = useCallback((e) => {
+        if (e.touches) e.preventDefault();
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const idx = getIndexFromX(clientX);
         setTooltipClosing(false);
@@ -115,6 +116,7 @@ const CarbonSparkline = ({ data, labels, loaded }) => {
                 preserveAspectRatio="none"
                 onMouseMove={handlePointerMove}
                 onMouseLeave={handlePointerLeave}
+                onTouchStart={handlePointerMove}
                 onTouchMove={handlePointerMove}
                 onTouchEnd={handlePointerLeave}
             >
