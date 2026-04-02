@@ -15,6 +15,7 @@ import Feedback from './pages/Feedback';
 import ScheduledTasks from './pages/ScheduledTasks';
 import Profile from './pages/Profile';
 import GreenPage from './pages/GreenPage'
+import Garden from './pages/Garden'
 import './index.css';
 
 function App() {
@@ -37,6 +38,7 @@ function App() {
         <Route path="/schedule" element={<ScheduledTasks />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/greenpage" element={<GreenPage />} />
+        <Route path="/garden" element={<Garden />} />
       </Routes>
       </ScheduleProvider>
       </GoalsProvider>
