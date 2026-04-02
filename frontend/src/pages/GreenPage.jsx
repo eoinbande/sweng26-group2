@@ -44,6 +44,7 @@ const CarbonSparkline = ({ data, labels, loaded }) => {
     }, [data]);
 
     const handlePointerMove = useCallback((e) => {
+        if (e.touches) e.preventDefault();
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const idx = getIndexFromX(clientX);
         setTooltipClosing(false);
@@ -115,6 +116,7 @@ const CarbonSparkline = ({ data, labels, loaded }) => {
                 preserveAspectRatio="none"
                 onMouseMove={handlePointerMove}
                 onMouseLeave={handlePointerLeave}
+                onTouchStart={handlePointerMove}
                 onTouchMove={handlePointerMove}
                 onTouchEnd={handlePointerLeave}
             >
@@ -235,9 +237,11 @@ function GreenPage() {
                     }
                 }
 
-                // total_carbon is in kg, convert to grams for display
+                // current month carbon from monthly data (in kg), convert to grams
+                const currentMonthKey = `${year}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+                const currentMonthCarbon = monthly[currentMonthKey]?.carbon_footprint ?? 0;
                 setData({
-                    co2: Math.round(stats.total_carbon * 1000),
+                    co2: Math.round(currentMonthCarbon * 1000),
                     co2ChangePct,
                     aiCalls: stats.total_ai_calls,
                     tokens: stats.total_tokens,

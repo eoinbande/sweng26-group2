@@ -24,7 +24,7 @@
     padding: 0 24px; /* Increased from --space-md (12px) to 24px for breathability */
     padding-top: 8px;
     padding-bottom: 180px;
-    /* room for FAB + BottomNav */
+    /* room for FAB + BottomNav + Focus panel button */
 }
 
 /*toast styling*/
