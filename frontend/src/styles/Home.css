@@ -133,6 +133,29 @@
 }
 
 
+/* view garden button */
+
+.home-page .btn-view-garden {
+    width: 100%;
+    background-color: var(--green);
+    color: #fff;
+    font-family: var(--font-sans);
+    font-size: clamp(13px, 2dvh, 15px);
+    font-weight: 600;
+    border: none;
+    border-radius: var(--radius-lg);
+    padding: clamp(10px, 1.8dvh, 14px) 16px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(105, 153, 93, 0.28);
+    transition: transform 0.15s ease;
+    flex-shrink: 0;
+}
+
+.home-page .btn-view-garden:active {
+    transform: scale(0.97);
+}
+
+
 /* upcoming tasks */
 
 .home-page .home-upcoming-tasks {
