@@ -87,7 +87,6 @@ def get_monthly_green_stats(user_id: str):
 
 """function pay_offset change to connect credits system!"""
 
-
 @green_router.post("/green/offset/pay")
 def pay_offset(user_id: str, month: str):
 
