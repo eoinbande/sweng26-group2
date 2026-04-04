@@ -11,6 +11,7 @@ from app.routers.schedule import schedule_router
 from app.routers.profile import profile_router  
 from app.routers.green import green_router
 from app.routers.credits import credits_router
+from app.routers.focus import focus_router
 
 app = FastAPI(
     title="Procrastination Solver API",
@@ -41,6 +42,7 @@ app.include_router(schedule_router, prefix="/api", tags=["Schedule"])
 app.include_router(profile_router, prefix="/api", tags=["Profile"])  
 app.include_router(green_router, prefix= "/api", tags = ["Green Computing"])
 app.include_router(credits_router,prefix= "/api", tags = ["Credits"])
+app.include_router(focus_router, prefix="/api", tags=["Focus"])
 
 @app.get("/")
 async def root():

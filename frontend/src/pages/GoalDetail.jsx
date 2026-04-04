@@ -8,6 +8,7 @@ import Loading from '../components/Loading'; // Import Loading component if it e
 import LoadingOverlay from '../components/LoadingOverlay'; // Import LoadingOverlay for feedback
 import FeedbackPopUp from '../components/FeedbackPopUp';
 import Congratulations from '../components/Congratulations';
+import FocusPanel from '../components/FocusPanel';
 import '../styles/GoalDetail.css';
 import { supabase } from '../supabase_client';
 import { useGoals } from '../contexts/GoalsContext';
@@ -17,7 +18,7 @@ const GoalDetail = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { id: paramId } = useParams();
-    const { deleteGoal: removeGoalFromCache, updateGoalProgress } = useGoals();
+    const { deleteGoal: removeGoalFromCache, updateGoalProgress, updateGoalTitle } = useGoals();
     const { refreshSchedule } = useSchedule();
 
     // set body background so color bleeds behind status bar
@@ -239,37 +240,36 @@ const [closingDelete, setClosingDelete] = useState(false);
 
     /* toggle a subtask */
     const toggleSubtask = (taskId, subtaskId) => {
-    let newStatus = 'not_started';
+    // Read current state directly instead of it being a side effect
+    const task = tasks.find(t => t.id === taskId);
+    if (!task) return;
+    const subtask = task.subtasks.find(s => s.id === subtaskId);
+    if (!subtask) return;
+
+    const newCompleted = !subtask.completed;
+    const newStatus = newCompleted ? 'completed' : 'not_started';
+    const updatedSubtasks = task.subtasks.map(s =>
+        s.id === subtaskId ? { ...s, completed: newCompleted } : s
+    );
+    const allDoneAfter = updatedSubtasks.every(s => s.completed);
+    const parentWasCompleted = task.completed;
 
     setTasks(prev => {
-        const newTasks = prev.map(task => {
-            if (task.id !== taskId) return task;
-
-            // 1. Update the specific subtask
-            const updatedSubtasks = task.subtasks.map(s => {
-                if (s.id === subtaskId) {
-                    const nextCompleted = !s.completed;
-                    newStatus = nextCompleted ? 'completed' : 'not_started';
-                    return { ...s, completed: nextCompleted };
-                }
-                return s;
-            });
-
-            // 2. Check if ALL subtasks are now complete to auto-update parent
-            const allDone = updatedSubtasks.every(s => s.completed);
-            
-            return {
-                ...task,
-                subtasks: updatedSubtasks,
-                completed: allDone // Auto-complete parent if all subs are done
-            };
+        const newTasks = prev.map(t => {
+            if (t.id !== taskId) return t;
+            return { ...t, subtasks: updatedSubtasks, completed: allDoneAfter };
         });
-        
         setProgress(calculateLocalProgress(newTasks));
         return newTasks;
     });
 
     updateTaskStatus(subtaskId, newStatus);
+
+    // If the parent was completed but is no longer (subtask was unchecked)
+    // sync the parent's status to the backend too
+    if (parentWasCompleted && !allDoneAfter) {
+        updateTaskStatus(taskId, 'not_started');
+    }
     };
 
     /* toggle a whole task (complete all subtasks or un-complete) */
@@ -416,6 +416,20 @@ const [closingDelete, setClosingDelete] = useState(false);
                     progress={progress}
                     category={goalCategory}
                     endDate={endDate}
+                    onTitleChange={async (newTitle) => {
+                        setGoalTitle(newTitle);
+                        updateGoalTitle(goalId, newTitle);
+                        try {
+                            await fetch(`${import.meta.env.VITE_API_URL}/goals/${goalId}/title`, {
+                                method: 'PATCH',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ title: newTitle }),
+                            });
+                            refreshSchedule();
+                        } catch (err) {
+                            console.error('failed to update goal title:', err);
+                        }
+                    }}
                     onBack={() => {
                         if (location.state?.from === 'schedule') {
                             navigate('/schedule', {
@@ -443,6 +457,8 @@ const [closingDelete, setClosingDelete] = useState(false);
                     toggleTask={toggleTask}
                     toggleSubtask={toggleSubtask}
                 />
+
+                <FocusPanel goalId={goalId} goalTitle={goalTitle} />
             </div>
 
             {/* congratulations popup */}

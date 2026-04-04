@@ -19,6 +19,7 @@ const Goals = () => {
         updateGoalCategory,
         updateGoalProgress,
         addCategory,
+        deleteCategory,
     } = useGoals();
 
     // set body background so color bleeds behind status bar
@@ -63,6 +64,11 @@ const Goals = () => {
         addCategory(name.trim());
     };
 
+    const handleDeleteCategory = async (name) => {
+    deleteCategory(name);
+};
+
+
     const handleAssignCategory = async (goalId, cat) => {
         await fetch(`${baseUrl}/goals/${goalId}/category`, {
             method: 'PATCH',
@@ -104,54 +110,49 @@ const Goals = () => {
                     selectedCategories={selectedCategories}
                     onSelectionChange={handleSelectionChange}
                     onNewCategory={handleNewCategory}
+                    onDeleteCategory={handleDeleteCategory} 
                 />
                 {/* Goals List */}
-                {activeGoals.length === 0 && completedGoals.length === 0 ? (
-    <p style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>No goals yet. Create one!</p>
-) : (
-    <>
-        {activeGoals.length > 0 && (
-            <>
                 <div className="goals-section-header">
                     <h2 className="goals-section-title">Active Goals</h2>
                     <p className="goals-section-subtitle">See your current goals here</p>
                 </div>
-                <div className="goals-list">
-                    {activeGoals.map((goal) => (
-                        <GoalListCard key={goal.id}
-                            goal={goal}
-                            categories={categories}
-                            onNewCategory={handleNewCategory}
-                            onAssignCategory={handleAssignCategory}
-                        />
-                    ))}
-                </div>
-            </>
-        )}
+                {activeGoals.length > 0 ? (
+                    <div className="goals-list">
+                        {activeGoals.map((goal) => (
+                            <GoalListCard key={goal.id}
+                                goal={goal}
+                                categories={categories}
+                                onNewCategory={handleNewCategory}
+                                onAssignCategory={handleAssignCategory}
+                            />
+                        ))}
+                    </div>
+                ) : (
+                    <p style={{ textAlign: 'center', padding: '1rem', color: '#888' }}>No active goals. Create one to get started!</p>
+                )}
 
-        <div style={{ marginTop: '30px' }}>
-            <div className="goals-section-header">
-                <h2 className="goals-section-title">Completed Goals</h2>
-                <p className="goals-section-subtitle">See your goal history here</p>
-            </div>
-            {completedGoals.length > 0 ? (
-                <div className="goals-list">
-                    {completedGoals.map((goal) => (
-                        <GoalListCard key={goal.id}
-                            goal={goal}
-                            completed
-                            categories={categories}
-                            onNewCategory={handleNewCategory}
-                            onAssignCategory={handleAssignCategory}
-                        />
-                    ))}
+                <div style={{ marginTop: '30px' }}>
+                    <div className="goals-section-header">
+                        <h2 className="goals-section-title">Completed Goals</h2>
+                        <p className="goals-section-subtitle">See your goal history here</p>
+                    </div>
+                    {completedGoals.length > 0 ? (
+                        <div className="goals-list">
+                            {completedGoals.map((goal) => (
+                                <GoalListCard key={goal.id}
+                                    goal={goal}
+                                    completed
+                                    categories={categories}
+                                    onNewCategory={handleNewCategory}
+                                    onAssignCategory={handleAssignCategory}
+                                />
+                            ))}
+                        </div>
+                    ) : (
+                        <p style={{ textAlign: 'center', padding: '1rem', color: '#888' }}>No completed goals yet — start your journey!</p>
+                    )}
                 </div>
-            ) : (
-                <p style={{ textAlign: 'center', padding: '1rem', color: '#888' }}>No completed goals yet!</p>
-            )}
-        </div>
-    </>
-)}
 
 
             <div

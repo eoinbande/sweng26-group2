@@ -38,7 +38,7 @@
     padding-top: clamp(8px, 2dvh, 24px);
     padding-bottom: clamp(2px, 3dvh, 15px);
     flex-shrink: 0;
-    animation: home-section-in 0.4s ease both;
+    animation: home-section-in 0.3s ease both;
 }
 
 .home-page .home-header h1 {
@@ -65,7 +65,7 @@
 .home-page .home-calendar {
     margin-bottom: clamp(4px, 2dvh, 4dvh);
     flex-shrink: 1;
-    animation: home-section-in 0.4s ease 0.08s both;
+    animation: home-section-in 0.3s ease 0.04s both;
 }
 
 .home-page .home-calendar .calendar-day-label {
@@ -93,7 +93,7 @@
     padding: clamp(20px, 3.5dvh, 4dvh) clamp(16px, 5dvh, 30px);
     padding-right: clamp(24px, 6dvh, 8%);
     flex-shrink: 1;
-    animation: home-section-in 0.4s ease 0.16s both;
+    animation: home-section-in 0.3s ease 0.08s both;
 }
 
 .home-page .home-create-goal h3 {
@@ -129,7 +129,30 @@
 }
 
 .home-page .home-create-goal .create-goal-btn:active {
-    transform: scale(1.15);
+    opacity: 0.8;
+}
+
+
+/* view garden button */
+
+.home-page .btn-view-garden {
+    width: 100%;
+    background-color: var(--green);
+    color: #fff;
+    font-family: var(--font-sans);
+    font-size: clamp(13px, 2dvh, 15px);
+    font-weight: 600;
+    border: none;
+    border-radius: var(--radius-lg);
+    padding: clamp(10px, 1.8dvh, 14px) 16px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(105, 153, 93, 0.28);
+    transition: transform 0.15s ease;
+    flex-shrink: 0;
+}
+
+.home-page .btn-view-garden:active {
+    transform: scale(0.97);
 }
 
 
@@ -141,7 +164,7 @@
     flex-direction: column;
     flex: 0;
     min-height: 0;
-    animation: home-section-in 0.5s ease 0.24s both;
+    animation: home-section-in 0.3s ease 0.12s both;
     transition: flex 0.45s cubic-bezier(0.4, 0, 0.2, 1), min-height 0.45s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -235,7 +258,7 @@
 }
 
 .home-page .home-goals-grid--visible > h4 {
-    animation: home-section-in 0.35s ease both;
+    animation: home-section-in 0.25s ease both;
 }
 
 .home-page .home-goals-grid .goals-scroll {
@@ -259,15 +282,15 @@
 
 /* only animate when the section becomes visible */
 .home-page .home-goals-grid--visible .goal-card {
-    animation: goal-card-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    animation: goal-card-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
 .home-page .home-goals-grid--visible .goal-card:nth-child(1) { animation-delay: 0s; }
-.home-page .home-goals-grid--visible .goal-card:nth-child(2) { animation-delay: 0.08s; }
-.home-page .home-goals-grid--visible .goal-card:nth-child(3) { animation-delay: 0.16s; }
-.home-page .home-goals-grid--visible .goal-card:nth-child(4) { animation-delay: 0.24s; }
-.home-page .home-goals-grid--visible .goal-card:nth-child(5) { animation-delay: 0.32s; }
-.home-page .home-goals-grid--visible .goal-card:nth-child(6) { animation-delay: 0.40s; }
+.home-page .home-goals-grid--visible .goal-card:nth-child(2) { animation-delay: 0.05s; }
+.home-page .home-goals-grid--visible .goal-card:nth-child(3) { animation-delay: 0.10s; }
+.home-page .home-goals-grid--visible .goal-card:nth-child(4) { animation-delay: 0.15s; }
+.home-page .home-goals-grid--visible .goal-card:nth-child(5) { animation-delay: 0.20s; }
+.home-page .home-goals-grid--visible .goal-card:nth-child(6) { animation-delay: 0.25s; }
 
 .home-page .home-goals-grid .goal-card h5 {
     font-size: clamp(12px, 1.4dvh, 15px);

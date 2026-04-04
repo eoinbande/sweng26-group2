@@ -52,21 +52,15 @@ const Profile = () => {
         const fetchAnalytics = async () => {
             try {
                 const baseUrl = import.meta.env.VITE_API_URL;
-                // fetch sequentially to avoid flooding supabase connections
-                const streakRes = await fetch(`${baseUrl}/profile/${user.id}/streak`);
-                if (streakRes.ok) setStreakDays((await streakRes.json()).current_streak ?? 0);
-
-                const tasksRes = await fetch(`${baseUrl}/profile/${user.id}/tasks-completed`);
-                if (tasksRes.ok) setTasksCompleted((await tasksRes.json()).tasks_completed ?? 0);
-
-                const tasksOnTimeRes = await fetch(`${baseUrl}/profile/${user.id}/tasks-completed-on-time`);
-                if (tasksOnTimeRes.ok) setOnTimeTasks((await tasksOnTimeRes.json()).tasks_completed_on_time ?? 0);
-
-                const goalsRes = await fetch(`${baseUrl}/profile/${user.id}/goals-completed`);
-                if (goalsRes.ok) setGoalsCompleted((await goalsRes.json()).goals_completed ?? 0);
-
-                const goalsOnTimeRes = await fetch(`${baseUrl}/profile/${user.id}/goals-completed-on-time`);
-                if (goalsOnTimeRes.ok) setOnTimeGoals((await goalsOnTimeRes.json()).goals_completed_on_time ?? 0);
+                const res = await fetch(`${baseUrl}/profile/${user.id}/summary`);
+                if (res.ok) {
+                    const data = await res.json();
+                    setStreakDays(data.current_streak ?? 0);
+                    setTasksCompleted(data.tasks_completed ?? 0);
+                    setOnTimeTasks(data.tasks_completed_on_time ?? 0);
+                    setGoalsCompleted(data.goals_completed ?? 0);
+                    setOnTimeGoals(data.goals_completed_on_time ?? 0);
+                }
             } catch (e) {
                 console.error('Error loading analytics', e);
             } finally {
@@ -139,6 +133,7 @@ const Profile = () => {
                             streakDays={streakDays}
                             onUpdateProfile={handleUpdateProfile}
                             onSignOut={handleSignOut}
+                            loaded={profileLoaded}
                         />
                     </div>
                 </div>
