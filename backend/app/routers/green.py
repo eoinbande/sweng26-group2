@@ -96,43 +96,36 @@ def pay_offset(user_id: str, month: str):
         .select("*")\
         .eq("user_id", user_id)\
         .execute()
-
     logs = logs_res.data or []
 
     # 2. Filter logs by month
-    monthly_logs = [
-        log for log in logs
-        if str(log["timestamp"])[:7] == month
-    ]
+    monthly_logs = [log for log in logs if str(log["timestamp"])[:7] == month]
 
     # 3. Calculate total carbon
-    total_carbon = sum(log["carbon_footprint"] for log in monthly_logs)
-    total_carbon = round(total_carbon, 6)
-
-    #handle no logs (TEST REQUIREMENT)
-    if total_carbon == 0:
-        return {
-            "message": "Offset successfull",
-            "carbon_offset": 0,
-            "amount_paid": 0,
-            "credits_remaining": current_credits
-        }
+    total_carbon = round(sum(log["carbon_footprint"] for log in monthly_logs), 6)
 
     # 4. Get user credits
     credits_res = supabase.table("user_credits")\
         .select("*")\
         .eq("user_id", user_id)\
         .execute()
-
     credits_data = credits_res.data
 
-    #Handle missing credits safely (fixes KeyError in tests)
-    if not credits_data or "credits" not in credits_data[0]:
-        current_credits = 0
-    else:
+   
+    current_credits = 0
+    if credits_data and "credits" in credits_data[0]:
         current_credits = credits_data[0]["credits"]
 
-    # 5. Check if enough credits
+    # 5. Handle no logs (total_carbon == 0)
+    if total_carbon == 0:
+        return {
+            "message": "Offset successfull",
+            "carbon_offset": 0,
+            "amount_paid": 0,
+            "credits_remaining": round(current_credits, 6)  # fix for missing key
+        }
+
+    # 6. Check if enough credits
     if current_credits < total_carbon:
         return {
             "error": "Not enough credits",
@@ -140,14 +133,12 @@ def pay_offset(user_id: str, month: str):
             "available": round(current_credits, 6)
         }
 
-    # 6. Deduct credits
+    # 7. Deduct credits
     new_credits = current_credits - total_carbon
+    supabase.table("user_credits").update({"credits": new_credits})\
+        .eq("user_id", user_id).execute()
 
-    supabase.table("user_credits").update({
-        "credits": new_credits
-    }).eq("user_id", user_id).execute()
-
-    # 7. Store carbon offset
+    # 8. Store carbon offset
     supabase.table("carbon_offsets").insert({
         "user_id": user_id,
         "carbon_offset": total_carbon,
@@ -155,7 +146,7 @@ def pay_offset(user_id: str, month: str):
         "month": month
     }).execute()
 
-    # 8. Return response (MATCH TEST EXACTLY)
+    # 9. Return response
     return {
         "message": "Offset successfull",
         "carbon_offset": total_carbon,
