@@ -114,7 +114,8 @@ def pay_offset(user_id: str, month: str):
         return {
             "message": "Offset successfull",
             "carbon_offset": 0,
-            "amount_paid": 0
+            "amount_paid": 0,
+            "credits_remaining": current_credits
         }
 
     # 4. Get user credits
@@ -156,7 +157,7 @@ def pay_offset(user_id: str, month: str):
 
     # 8. Return response (MATCH TEST EXACTLY)
     return {
-        "message": "Offset successfull",  # ⚠️ spelling must match test
+        "message": "Offset successfull",
         "carbon_offset": total_carbon,
         "amount_paid": round(total_carbon * 0.01, 6),
         "credits_remaining": round(new_credits, 6)
