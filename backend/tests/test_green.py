@@ -186,23 +186,56 @@ def test_monthly_stats_single_month():
 # POST /green/offset/pay — pay carbon offset
 # ──────────────────────────────────────────────
 
+#modified test to handle credits/stripe logic
 def test_pay_offset_with_data():
-    """Test that paying offset calculates correct carbon and cost."""
+    """Test that paying offset calculates correct carbon and cost with sufficient credits."""
+    # Logs for March
     march_logs = [log for log in SAMPLE_LOGS if "2026-03" in log["timestamp"]]
+    
+    # Mock Supabase responses
     with patch("app.routers.green.supabase") as mock_sb:
-        mock_table = mock_supabase_response(march_logs)
+        # 1. Mock ai_usage_logs table
+        mock_logs_table = mock_supabase_response(march_logs)
+        
+        # 2. Mock user_credits table with enough credits
+        # Let's assume user has 0.01 credits, enough for total carbon ~0.00344
+        mock_credits_table = mock_supabase_response([{"credits": 0.01}])
+        
+        # 3. Mock insert chain for carbon_offsets table
         mock_insert_chain = MagicMock()
         mock_insert_chain.execute.return_value = MagicMock()
-        mock_table.insert.return_value = mock_insert_chain
-        mock_sb.table.return_value = mock_table
+        mock_logs_table.insert.return_value = mock_insert_chain
+        mock_credits_table.insert.return_value = mock_insert_chain
+        
+        # 4. Return proper table based on name
+        def table_side_effect(name):
+            if name == "ai_usage_logs":
+                return mock_logs_table
+            elif name == "user_credits":
+                return mock_credits_table
+            elif name == "carbon_offsets":
+                return mock_insert_chain  # insert chain
+            else:
+                return mock_logs_table
+        
+        mock_sb.table.side_effect = table_side_effect
+        
+        # 5. Call the endpoint
         response = client.post("/api/green/offset/pay?user_id=user-1&month=2026-03")
-
+    
+    # 6. Assertions
     assert response.status_code == 200
     data = response.json()
     assert data["message"] == "Offset successfull"
-    expected_carbon = round(0.002 + 0.00144, 6)
+    
+    # Calculate expected total carbon
+    expected_carbon = round(sum(log["carbon_footprint"] for log in march_logs), 6)
     assert data["carbon_offset"] == expected_carbon
     assert data["amount_paid"] == round(expected_carbon * 0.01, 6)
+    
+    # Credits remaining should be reduced
+    expected_remaining = round(0.01 - expected_carbon, 6)
+    assert data["credits_remaining"] == expected_remaining
 
 
 def test_pay_offset_no_logs():
