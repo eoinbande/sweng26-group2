@@ -295,6 +295,63 @@ def test_expand_task_ai_subtask_missing_description():
         assert "AI returned invalid subtask structure" in response.json()["detail"]
 
 
+# Test for AI service returning invalid subtask structure (missing ai_id) - line 163-169
+def test_expand_task_ai_subtask_missing_ai_id():
+    fake_task = {"id": "task-struct-error2", "goal_id": "goal-1", "ai_id": "ai-task-4", "user_id": "user-1"}
+    
+    with patch("app.routers.tasks.get_task") as mock_get_task, \
+         patch("app.routers.tasks.get_tasks_for_goal") as mock_get_tasks, \
+         patch("app.routers.tasks.ai_service.expand_task") as mock_ai:
+        
+        mock_get_task.return_value = fake_task
+        mock_get_tasks.return_value = []
+        # AI returns subtask missing 'ai_id'
+        mock_ai.return_value = {
+            "subtasks": [
+                {"description": "Do something", "title": "Step 1"}  # missing ai_id
+            ]
+        }
+        
+        response = client.post(
+            f"/api/tasks/{fake_task['id']}/expand",
+            json={"stuck_reason": "I need help"}
+        )
+        
+        assert response.status_code == 500
+        assert "AI returned invalid subtask structure" in response.json()["detail"]
+
+
+# Test for AI service returning duplicate ai_id - line 181-192
+def test_expand_task_ai_duplicate_ai_id():
+    fake_task = {"id": "task-duplicate", "goal_id": "goal-1", "ai_id": "ai-task-5", "user_id": "user-1"}
+    existing_tasks = [
+        {"id": "existing-1", "ai_id": "subtask-1", "parent_id": None},
+        {"id": "existing-2", "ai_id": "subtask-2", "parent_id": None}
+    ]
+    fake_subtasks = [
+        {"ai_id": "subtask-1", "description": "Duplicate step 1", "title": "Step 1", "order": 1},  # duplicate ai_id
+        {"ai_id": "subtask-3", "description": "Step 2", "title": "Step 2", "order": 2}
+    ]
+    
+    with patch("app.routers.tasks.get_task") as mock_get_task, \
+         patch("app.routers.tasks.get_tasks_for_goal") as mock_get_tasks, \
+         patch("app.routers.tasks.ai_service.expand_task") as mock_ai:
+        
+        mock_get_task.return_value = fake_task
+        # First call for checking existing subtasks (returns empty)
+        # Second call for getting goal tasks for duplicate check
+        mock_get_tasks.side_effect = [[], existing_tasks]
+        mock_ai.return_value = {"subtasks": fake_subtasks}
+        
+        response = client.post(
+            f"/api/tasks/{fake_task['id']}/expand",
+            json={"stuck_reason": "I need help"}
+        )
+        
+        assert response.status_code == 500
+        assert "AI returned duplicate ai_id" in response.json()["detail"]
+
+
 
 
 #######THIS test FUNCTION TU TEST DELETE A GOAL NEEDS TO BE MOVED TO THE test_goals#########
