@@ -374,6 +374,46 @@ def test_expand_task_ai_empty_subtasks():
         assert "AI returned epty subtask list" in response.json()["detail"]
 
 
+# Test for successful expand with carbon_footprint already provided by AI - line 142 coverage
+def test_expand_task_with_carbon_footprint_from_ai():
+    fake_task = {"id": "task-carbon", "goal_id": "goal-1", "ai_id": "ai-task-7", "user_id": "user-1"}
+    fake_subtasks = [
+        {"ai_id": "subtask-7a", "description": "Step 1", "title": "Step 1", "order": 1},
+        {"ai_id": "subtask-7b", "description": "Step 2", "title": "Step 2", "order": 2}
+    ]
+    
+    with patch("app.routers.tasks.get_task") as mock_get_task, \
+         patch("app.routers.tasks.get_tasks_for_goal") as mock_get_tasks, \
+         patch("app.routers.tasks.ai_service.expand_task") as mock_ai, \
+         patch("app.routers.tasks.log_ai_usage") as mock_log, \
+         patch("app.routers.tasks.add_subtasks_to_task") as mock_add_subtasks:
+        
+        mock_get_task.return_value = fake_task
+        mock_get_tasks.return_value = []  # No existing subtasks
+        # AI returns with carbon_footprint already provided
+        mock_ai.return_value = {
+            "subtasks": fake_subtasks,
+            "tokens_used": 150,
+            "carbon_footprint": 0.005  # AI already provided carbon footprint
+        }
+        mock_add_subtasks.return_value = fake_subtasks
+        
+        response = client.post(
+            f"/api/tasks/{fake_task['id']}/expand",
+            json={"stuck_reason": "Break this down for me"}
+        )
+        
+        assert response.status_code == 200
+        data = response.json()
+        assert data["message"] == "Task expanded into subtasks"
+        # Verify log_ai_usage was called with the carbon_footprint from AI
+        mock_log.assert_called_once()
+        call_args = mock_log.call_args[1]
+        assert call_args["carbon_footprint"] == 0.005
+        assert call_args["tokens_used"] == 150
+
+
+
 
 #######THIS test FUNCTION TU TEST DELETE A GOAL NEEDS TO BE MOVED TO THE test_goals#########
 
