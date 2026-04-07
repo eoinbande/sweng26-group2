@@ -157,3 +157,70 @@ class TestGetGoalsCompletedExtra:
         assert response.json()["user_id"] == uid
 
 
+# =============================================================================
+# GET /api/profile/{user_id}/goals-completed-on-time – extra branches
+# =============================================================================
+
+class TestGetGoalsCompletedOnTimeExtra:
+
+    @patch("app.routers.profile.get_all_goals")
+    @patch("app.routers.profile._get_all_tasks_for_user")
+    @patch("app.routers.profile._is_goal_completed")
+    def test_goal_with_no_matching_tasks_after_filter_skipped(
+        self, mock_completed, mock_tasks, mock_get_goals, uid
+    ):
+        """
+        A completed goal whose tasks have no updated_at values should not be
+        counted – there is no completion date to compare against.
+        """
+        mock_get_goals.return_value = [{"id": "goal-1", "goal_data": {"goal_due_date": "2025-06-30"}}]
+        # tasks exist but all lack updated_at
+        mock_tasks.return_value = [{"goal_id": "goal-1", "status": "completed", "updated_at": None}]
+        mock_completed.return_value = True
+        response = client.get(f"/api/profile/{uid}/goals-completed-on-time")
+        assert response.json()["goals_completed_on_time"] == 0
+
+    @patch("app.routers.profile.get_all_goals")
+    @patch("app.routers.profile._get_all_tasks_for_user")
+    @patch("app.routers.profile._is_goal_completed")
+    def test_goal_data_invalid_json_string_skipped(
+        self, mock_completed, mock_tasks, mock_get_goals, uid
+    ):
+        """Malformed JSON in goal_data should not raise – the goal is simply skipped."""
+        mock_get_goals.return_value = [{"id": "goal-1", "goal_data": "{not valid json"}]
+        mock_tasks.return_value = [{"goal_id": "goal-1", "status": "completed", "updated_at": "2025-06-01T10:00:00"}]
+        mock_completed.return_value = True
+        response = client.get(f"/api/profile/{uid}/goals-completed-on-time")
+        assert response.status_code == 200
+        assert response.json()["goals_completed_on_time"] == 0
+
+    @patch("app.routers.profile.get_all_goals")
+    @patch("app.routers.profile._get_all_tasks_for_user")
+    @patch("app.routers.profile._is_goal_completed")
+    def test_returns_correct_user_id(self, mock_completed, mock_tasks, mock_get_goals, uid):
+        mock_get_goals.return_value = []
+        mock_tasks.return_value = []
+        mock_completed.return_value = False
+        response = client.get(f"/api/profile/{uid}/goals-completed-on-time")
+        assert response.json()["user_id"] == uid
+
+    @patch("app.routers.profile.get_all_goals")
+    @patch("app.routers.profile._get_all_tasks_for_user")
+    @patch("app.routers.profile._is_goal_completed")
+    def test_multiple_goals_mixed_timeliness(
+        self, mock_completed, mock_tasks, mock_get_goals, uid
+    ):
+        """Two completed goals: one on time, one late → count == 1."""
+        mock_get_goals.return_value = [
+            {"id": "goal-1", "goal_data": {"goal_due_date": "2025-06-30"}},
+            {"id": "goal-2", "goal_data": {"goal_due_date": "2025-06-01"}},
+        ]
+        mock_tasks.return_value = [
+            {"goal_id": "goal-1", "status": "completed", "updated_at": "2025-06-15T10:00:00"},
+            {"goal_id": "goal-2", "status": "completed", "updated_at": "2025-06-20T10:00:00"},
+        ]
+        mock_completed.return_value = True
+        response = client.get(f"/api/profile/{uid}/goals-completed-on-time")
+        assert response.json()["goals_completed_on_time"] == 1
+
+
