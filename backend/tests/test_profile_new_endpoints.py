@@ -65,3 +65,30 @@ class TestParseDateExtra:
         assert _parse_date("2025-06") is None
 
 
+# =============================================================================
+# _is_goal_completed – extra branches
+# =============================================================================
+
+class TestIsGoalCompletedExtra:
+
+    @patch("app.routers.profile.supabase")
+    def test_returns_false_when_data_is_none(self, mock_supabase):
+        """Supabase returning None instead of [] should be treated as no tasks."""
+        mock_supabase.table.return_value.select.return_value.eq.return_value.execute.return_value.data = None
+        assert _is_goal_completed("goal-x") is False
+
+    @patch("app.routers.profile.supabase")
+    def test_single_completed_task_returns_true(self, mock_supabase):
+        mock_supabase.table.return_value.select.return_value.eq.return_value.execute.return_value.data = [
+            {"status": "completed"}
+        ]
+        assert _is_goal_completed("goal-x") is True
+
+    @patch("app.routers.profile.supabase")
+    def test_single_pending_task_returns_false(self, mock_supabase):
+        mock_supabase.table.return_value.select.return_value.eq.return_value.execute.return_value.data = [
+            {"status": "pending"}
+        ]
+        assert _is_goal_completed("goal-x") is False
+
+
