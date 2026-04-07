@@ -247,6 +247,28 @@ def test_expand_task_ai_missing_subtasks_key():
         assert "AI response error" in response.json()["detail"]
 
 
+# Test for AI service returning invalid format (subtasks not a list) - line 163-169
+def test_expand_task_ai_subtasks_not_list():
+    fake_task = {"id": "task-format-error", "goal_id": "goal-1", "ai_id": "ai-task-2", "user_id": "user-1"}
+    
+    with patch("app.routers.tasks.get_task") as mock_get_task, \
+         patch("app.routers.tasks.get_tasks_for_goal") as mock_get_tasks, \
+         patch("app.routers.tasks.ai_service.expand_task") as mock_ai:
+        
+        mock_get_task.return_value = fake_task
+        mock_get_tasks.return_value = []
+        # AI returns subtasks as a string (invalid format)
+        mock_ai.return_value = {"subtasks": "not a list"}
+        
+        response = client.post(
+            f"/api/tasks/{fake_task['id']}/expand",
+            json={"stuck_reason": "I need help"}
+        )
+        
+        assert response.status_code == 500
+        assert "AI subtasks invalid format" in response.json()["detail"]
+
+
 
 
 #######THIS test FUNCTION TU TEST DELETE A GOAL NEEDS TO BE MOVED TO THE test_goals#########
