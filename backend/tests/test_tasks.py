@@ -321,7 +321,7 @@ def test_expand_task_ai_subtask_missing_ai_id():
         assert "AI returned invalid subtask structure" in response.json()["detail"]
 
 
-#not currently working might have time to fix later
+# not currently working might have time to fix later
 # # Test for AI service returning duplicate ai_id - line 181-192
 # def test_expand_task_ai_duplicate_ai_id():
 #     fake_task = {"id": "task-duplicate", "goal_id": "goal-1", "ai_id": "ai-task-5", "user_id": "user-1"}
