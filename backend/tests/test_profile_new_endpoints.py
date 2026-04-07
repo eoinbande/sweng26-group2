@@ -92,3 +92,68 @@ class TestIsGoalCompletedExtra:
         assert _is_goal_completed("goal-x") is False
 
 
+# =============================================================================
+# GET /api/profile/{user_id}/streak – extra branches
+# =============================================================================
+
+class TestGetStreakExtra:
+
+    @patch("app.routers.profile._get_all_tasks_for_user")
+    def test_tasks_with_null_updated_at_are_ignored(self, mock_tasks, uid):
+        """Tasks missing updated_at must not crash and must not inflate the streak."""
+        mock_tasks.return_value = [
+            {"status": "completed", "updated_at": None},
+            {"status": "completed", "updated_at": None},
+        ]
+        response = client.get(f"/api/profile/{uid}/streak")
+        assert response.status_code == 200
+        assert response.json()["current_streak"] == 0
+
+    @patch("app.routers.profile._get_all_tasks_for_user")
+    def test_streak_only_from_yesterday_is_one(self, mock_tasks, uid, yesterday_str):
+        """Activity only on yesterday still counts as a streak of 1."""
+        mock_tasks.return_value = [{"status": "completed", "updated_at": yesterday_str}]
+        response = client.get(f"/api/profile/{uid}/streak")
+        assert response.json()["current_streak"] == 1
+
+    @patch("app.routers.profile._get_all_tasks_for_user")
+    def test_long_consecutive_streak(self, mock_tasks, uid):
+        """Streak spanning 7 consecutive days ending today should be 7."""
+        now = datetime.now(timezone.utc)
+        tasks = [
+            {
+                "status": "completed",
+                "updated_at": (now - timedelta(days=i)).strftime("%Y-%m-%dT%H:%M:%S+00:00"),
+            }
+            for i in range(7)
+        ]
+        mock_tasks.return_value = tasks
+        response = client.get(f"/api/profile/{uid}/streak")
+        assert response.json()["current_streak"] == 7
+
+    @patch("app.routers.profile._get_all_tasks_for_user")
+    def test_non_completed_tasks_do_not_extend_streak(self, mock_tasks, uid, today_str, yesterday_str):
+        """in_progress tasks on yesterday must not extend a today-only streak."""
+        mock_tasks.return_value = [
+            {"status": "completed",   "updated_at": today_str},
+            {"status": "in_progress", "updated_at": yesterday_str},
+        ]
+        response = client.get(f"/api/profile/{uid}/streak")
+        assert response.json()["current_streak"] == 1
+
+
+# =============================================================================
+# GET /api/profile/{user_id}/goals-completed – extra branch
+# =============================================================================
+
+class TestGetGoalsCompletedExtra:
+
+    @patch("app.routers.profile.get_all_goals")
+    @patch("app.routers.profile._is_goal_completed")
+    def test_returns_correct_user_id(self, mock_completed, mock_get_goals, uid):
+        mock_get_goals.return_value = []
+        mock_completed.return_value = False
+        response = client.get(f"/api/profile/{uid}/goals-completed")
+        assert response.json()["user_id"] == uid
+
+
