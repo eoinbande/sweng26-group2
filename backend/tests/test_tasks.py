@@ -352,6 +352,27 @@ def test_expand_task_ai_duplicate_ai_id():
         assert "AI returned duplicate ai_id" in response.json()["detail"]
 
 
+# Test for AI service returning empty subtask list - line 194-199
+def test_expand_task_ai_empty_subtasks():
+    fake_task = {"id": "task-empty", "goal_id": "goal-1", "ai_id": "ai-task-6", "user_id": "user-1"}
+    
+    with patch("app.routers.tasks.get_task") as mock_get_task, \
+         patch("app.routers.tasks.get_tasks_for_goal") as mock_get_tasks, \
+         patch("app.routers.tasks.ai_service.expand_task") as mock_ai:
+        
+        mock_get_task.return_value = fake_task
+        mock_get_tasks.return_value = []  # No existing subtasks
+        # AI returns empty subtask list
+        mock_ai.return_value = {"subtasks": []}
+        
+        response = client.post(
+            f"/api/tasks/{fake_task['id']}/expand",
+            json={"stuck_reason": "I need help"}
+        )
+        
+        assert response.status_code == 500
+        assert "AI returned epty subtask list" in response.json()["detail"]
+
 
 
 #######THIS test FUNCTION TU TEST DELETE A GOAL NEEDS TO BE MOVED TO THE test_goals#########
