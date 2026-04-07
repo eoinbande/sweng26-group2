@@ -269,6 +269,32 @@ def test_expand_task_ai_subtasks_not_list():
         assert "AI subtasks invalid format" in response.json()["detail"]
 
 
+# Test for AI service returning invalid subtask structure (missing description) - line 163-169
+def test_expand_task_ai_subtask_missing_description():
+    fake_task = {"id": "task-struct-error", "goal_id": "goal-1", "ai_id": "ai-task-3", "user_id": "user-1"}
+    
+    with patch("app.routers.tasks.get_task") as mock_get_task, \
+         patch("app.routers.tasks.get_tasks_for_goal") as mock_get_tasks, \
+         patch("app.routers.tasks.ai_service.expand_task") as mock_ai:
+        
+        mock_get_task.return_value = fake_task
+        mock_get_tasks.return_value = []
+        # AI returns subtask missing 'description'
+        mock_ai.return_value = {
+            "subtasks": [
+                {"ai_id": "subtask-1", "title": "Step 1"}  # missing description
+            ]
+        }
+        
+        response = client.post(
+            f"/api/tasks/{fake_task['id']}/expand",
+            json={"stuck_reason": "I need help"}
+        )
+        
+        assert response.status_code == 500
+        assert "AI returned invalid subtask structure" in response.json()["detail"]
+
+
 
 
 #######THIS test FUNCTION TU TEST DELETE A GOAL NEEDS TO BE MOVED TO THE test_goals#########
