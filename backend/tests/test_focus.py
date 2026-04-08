@@ -15,6 +15,7 @@ client = TestClient(app)
 # ──────────────────────────────────────────────
 
 SAMPLE_PLANT_ALIVE = {
+    
     "id": "plant-uuid-1",
     "user_id": "user-1",
     "goal_id": "goal-1",
