@@ -130,16 +130,13 @@ export const GoalsProvider = ({ children }) => {
     //delete category
     const deleteCategory = useCallback(async (name) => {
         if (!user) return;
+        // Optimistic update — remove from UI immediately
+        setCategories(prev => prev.filter(c => c !== name));
+        setGoals(prev => prev.map(g => g.category === name ? { ...g, category: null } : g));
         try {
-            const res = await fetch(`${baseUrl}/categories/${user.id}/${encodeURIComponent(name)}`, {
+            await fetch(`${baseUrl}/categories/${user.id}/${encodeURIComponent(name)}`, {
                 method: 'DELETE',
             });
-            if (res.ok) {
-                setCategories(prev => prev.filter(c => c !== name));
-                setGoals(prev => prev.map(g => g.category === name ? { ...g, category: null } : g));
-            } else {
-                console.error('Failed to delete category:', res.status);
-            }
         } catch (e) {
             console.error('Error deleting category:', e);
         }
