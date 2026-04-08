@@ -159,3 +159,30 @@ def test_save_plant_invalid_status():
     assert response.json()["detail"] == "status must be 'alive' or 'dead'"
 
 
+def test_save_plant_empty_status():
+    """Test that an empty status string returns a 400 error."""
+    payload = {
+        "user_id": "user-1",
+        "goal_id": "goal-1",
+        "duration": 25,
+        "completed": True,
+        "deep_focus": False,
+        "status": ""
+    }
+    with patch("app.routers.focus.supabase"):
+        response = client.post("/api/focus/plants", json=payload)
+
+    assert response.status_code == 400
+    assert response.json()["detail"] == "status must be 'alive' or 'dead'"
+
+
+def test_save_plant_missing_required_fields():
+    """Test that omitting required fields returns a 422 validation error."""
+    payload = {
+        "user_id": "user-1",
+        # goal_id, duration, completed, deep_focus, status all missing
+    }
+    response = client.post("/api/focus/plants", json=payload)
+    assert response.status_code == 422
+
+
