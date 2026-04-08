@@ -73,3 +73,89 @@ def mock_supabase_select(return_data):
     return mock_chain
 
 
+# ──────────────────────────────────────────────
+# POST /focus/plants — save a plant
+# ──────────────────────────────────────────────
+
+def test_save_alive_plant():
+    """Test that a successfully completed session saves an alive plant."""
+    payload = {
+        "user_id": "user-1",
+        "goal_id": "goal-1",
+        "goal_title": "Learn Python",
+        "duration": 25,
+        "completed": True,
+        "deep_focus": False,
+        "status": "alive"
+    }
+    with patch("app.routers.focus.supabase") as mock_sb:
+        mock_sb.table.return_value = mock_supabase_insert(SAMPLE_PLANT_ALIVE)
+        response = client.post("/api/focus/plants", json=payload)
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "alive"
+    assert data["user_id"] == "user-1"
+    assert data["goal_id"] == "goal-1"
+    assert data["completed"] is True
+
+
+def test_save_dead_plant():
+    """Test that an abandoned deep focus session saves a dead plant."""
+    payload = {
+        "user_id": "user-1",
+        "goal_id": "goal-2",
+        "goal_title": "Read a book",
+        "duration": 10,
+        "completed": False,
+        "deep_focus": True,
+        "status": "dead"
+    }
+    with patch("app.routers.focus.supabase") as mock_sb:
+        mock_sb.table.return_value = mock_supabase_insert(SAMPLE_PLANT_DEAD)
+        response = client.post("/api/focus/plants", json=payload)
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "dead"
+    assert data["completed"] is False
+    assert data["deep_focus"] is True
+
+
+def test_save_plant_without_goal_title():
+    """Test that goal_title is optional and can be omitted."""
+    payload = {
+        "user_id": "user-1",
+        "goal_id": "goal-3",
+        "duration": 50,
+        "completed": True,
+        "deep_focus": True,
+        "status": "alive"
+    }
+    with patch("app.routers.focus.supabase") as mock_sb:
+        mock_sb.table.return_value = mock_supabase_insert(SAMPLE_PLANT_NO_TITLE)
+        response = client.post("/api/focus/plants", json=payload)
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["goal_title"] is None
+    assert data["status"] == "alive"
+
+
+def test_save_plant_invalid_status():
+    """Test that an invalid status value returns a 400 error."""
+    payload = {
+        "user_id": "user-1",
+        "goal_id": "goal-1",
+        "duration": 25,
+        "completed": True,
+        "deep_focus": False,
+        "status": "wilting"  # invalid
+    }
+    with patch("app.routers.focus.supabase"):
+        response = client.post("/api/focus/plants", json=payload)
+
+    assert response.status_code == 400
+    assert response.json()["detail"] == "status must be 'alive' or 'dead'"
+
+
