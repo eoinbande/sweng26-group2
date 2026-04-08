@@ -186,3 +186,45 @@ def test_save_plant_missing_required_fields():
     assert response.status_code == 422
 
 
+# ──────────────────────────────────────────────
+# GET /focus/plants/{user_id} — get garden
+# ──────────────────────────────────────────────
+
+def test_get_plants_with_data():
+    """Test that a user's garden returns all plants newest first."""
+    plants = [SAMPLE_PLANT_DEAD, SAMPLE_PLANT_ALIVE]  # newest first
+    with patch("app.routers.focus.supabase") as mock_sb:
+        mock_sb.table.return_value = mock_supabase_select(plants)
+        response = client.get("/api/focus/plants/user-1")
+
+    assert response.status_code == 200
+    data = response.json()
+    assert "plants" in data
+    assert len(data["plants"]) == 2
+    assert data["plants"][0]["id"] == "plant-uuid-2"  # newest first
+    assert data["plants"][1]["id"] == "plant-uuid-1"
+
+
+def test_get_plants_empty_garden():
+    """Test that a user with no plants returns an empty list."""
+    with patch("app.routers.focus.supabase") as mock_sb:
+        mock_sb.table.return_value = mock_supabase_select([])
+        response = client.get("/api/focus/plants/user-1")
+
+    assert response.status_code == 200
+    data = response.json()
+    assert "plants" in data
+    assert data["plants"] == []
+
+
+def test_get_plants_single_plant():
+    """Test that a garden with one plant returns a list of one."""
+    with patch("app.routers.focus.supabase") as mock_sb:
+        mock_sb.table.return_value = mock_supabase_select([SAMPLE_PLANT_ALIVE])
+        response = client.get("/api/focus/plants/user-1")
+
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data["plants"]) == 1
+    assert data["plants"][0]["status"] == "alive"
+
