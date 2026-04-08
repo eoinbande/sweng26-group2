@@ -228,3 +228,29 @@ def test_get_plants_single_plant():
     assert len(data["plants"]) == 1
     assert data["plants"][0]["status"] == "alive"
 
+
+def test_get_plants_different_user():
+    """Test that fetching plants for a different user returns their own garden."""
+    other_plant = {**SAMPLE_PLANT_ALIVE, "user_id": "user-2", "id": "plant-uuid-99"}
+    with patch("app.routers.focus.supabase") as mock_sb:
+        mock_sb.table.return_value = mock_supabase_select([other_plant])
+        response = client.get("/api/focus/plants/user-2")
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["plants"][0]["user_id"] == "user-2"
+
+
+def test_get_plants_contains_alive_and_dead():
+    """Test that a garden can contain both alive and dead plants."""
+    plants = [SAMPLE_PLANT_ALIVE, SAMPLE_PLANT_DEAD, SAMPLE_PLANT_NO_TITLE]
+    with patch("app.routers.focus.supabase") as mock_sb:
+        mock_sb.table.return_value = mock_supabase_select(plants)
+        response = client.get("/api/focus/plants/user-1")
+
+    assert response.status_code == 200
+    data = response.json()
+    statuses = {p["status"] for p in data["plants"]}
+    assert "alive" in statuses
+    assert "dead" in statuses
+    assert len(data["plants"]) == 3
