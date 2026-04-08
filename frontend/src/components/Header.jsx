@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Sprout } from 'lucide-react';
 import '../index.css';
 
 const Header = ({userName}) => {
@@ -17,7 +18,7 @@ const Header = ({userName}) => {
                         className="btn-view-garden"
                         onClick={() => navigate('/garden')}
                     >
-                        🌿
+                        <Sprout size={20} strokeWidth={2.2} />
                     </button>
                     <div className="header-avatar" onClick={() => navigate('/profile')} style={{ cursor: 'pointer' }}>
                         <div className="avatar-placeholder">
