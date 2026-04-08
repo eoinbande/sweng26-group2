@@ -51,3 +51,25 @@ SAMPLE_PLANT_NO_TITLE = {
 }
 
 
+def mock_supabase_insert(return_data):
+    """Helper to mock a Supabase insert chain returning a single row."""
+    mock_response = MagicMock()
+    mock_response.data = [return_data]
+    mock_chain = MagicMock()
+    mock_chain.execute.return_value = mock_response
+    mock_chain.insert.return_value = mock_chain
+    return mock_chain
+
+
+def mock_supabase_select(return_data):
+    """Helper to mock a Supabase select/filter chain returning a list."""
+    mock_response = MagicMock()
+    mock_response.data = return_data
+    mock_chain = MagicMock()
+    mock_chain.execute.return_value = mock_response
+    mock_chain.select.return_value = mock_chain
+    mock_chain.eq.return_value = mock_chain
+    mock_chain.order.return_value = mock_chain
+    return mock_chain
+
+
