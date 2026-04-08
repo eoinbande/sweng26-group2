@@ -1,6 +1,6 @@
-# Procrastination Solver
+# Project 2 Quantexa - Procrastination Solver
 
-An AI-powered goal planning app that helps users break down their goals into actionable steps, stay accountable, and beat procrastination. Built with React and FastAPI.
+The goal of our project is to help users overcome procrastination by breaking down their goals into manageable, actionable steps using AI. Many people struggle with getting started on tasks; whether it's a large project, a personal goal, or a daily habit, because the goal feels too overwhelming or abstract. Our app targets these users by providing AI-generated step-by-step plans tailored to their specific goals, along with built-in accountability features such as timers and progress tracking to keep them on track. Users can sign up or log in to save their goals, track their progress over time, and stay motivated. In the end, this project's goal is to make productivity accessible, personal, and sustainable.
 
 **Deployed version:** https://sweng26-group2.vercel.app
 
